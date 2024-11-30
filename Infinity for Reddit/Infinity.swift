@@ -7,9 +7,15 @@
 
 import SwiftUI
 import SwiftData
+import Swinject
 
 @main
-struct Infinity_for_RedditApp: App {
+struct Infinity: App {
+    let container: Container = {
+        let container = Container()
+        return container
+    }()
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
