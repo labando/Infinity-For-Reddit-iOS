@@ -1,22 +1,13 @@
 {
-  "originHash" : "13123a8dd4ebe7d2593a9c02a027576b4126db6c26941a90d69456f2cb6c4edb",
+  "originHash" : "527809c16cb48b08458fdc0f3567c86653a18c1e06429ac52da346e079bc5c80",
   "pins" : [
     {
-      "identity" : "grdb.swift",
+      "identity" : "alamofire",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/groue/GRDB.swift.git",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
       "state" : {
-        "branch" : "master",
-        "revision" : "3ecb5c54553559217592d21a6d9841becb891b38"
-      }
-    },
-    {
-      "identity" : "swiftyjson",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
-      "state" : {
-        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
-        "version" : "5.0.2"
+        "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
+        "version" : "5.10.2"
       }
     },
     {

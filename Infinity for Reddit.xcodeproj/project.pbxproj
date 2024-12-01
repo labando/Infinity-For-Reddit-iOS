@@ -7,9 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		555963082CFC1E5600806FA8 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 555963072CFC1E5600806FA8 /* GRDB */; };
 		55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 55949B872CFA7EAD002D1C46 /* Swinject */; };
-		55C741EA2CFCB5C000853D4E /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 55C741E92CFCB5C000853D4E /* SwiftyJSON */; };
+		824357B22CFCFF1A0091EFF1 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 824357B12CFCFF1A0091EFF1 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,9 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55C741EA2CFCB5C000853D4E /* SwiftyJSON in Frameworks */,
 				55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */,
-				555963082CFC1E5600806FA8 /* GRDB in Frameworks */,
+				824357B22CFCFF1A0091EFF1 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -122,8 +120,7 @@
 			name = "Infinity for Reddit";
 			packageProductDependencies = (
 				55949B872CFA7EAD002D1C46 /* Swinject */,
-				555963072CFC1E5600806FA8 /* GRDB */,
-				55C741E92CFCB5C000853D4E /* SwiftyJSON */,
+				824357B12CFCFF1A0091EFF1 /* Alamofire */,
 			);
 			productName = "Infinity for Reddit";
 			productReference = 559BD2332CF7D58500621685 /* Infinity for Reddit.app */;
@@ -209,8 +206,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				55949B862CFA7EAD002D1C46 /* XCRemoteSwiftPackageReference "Swinject" */,
-				555963062CFC1E5600806FA8 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
-				55C741E82CFCB5C000853D4E /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+				824357B02CFCFF1A0091EFF1 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 559BD2342CF7D58500621685 /* Products */;
@@ -571,14 +567,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		555963062CFC1E5600806FA8 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/groue/GRDB.swift.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		55949B862CFA7EAD002D1C46 /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
@@ -587,31 +575,26 @@
 				minimumVersion = 2.9.1;
 			};
 		};
-		55C741E82CFCB5C000853D4E /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+		824357B02CFCFF1A0091EFF1 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.2;
+				minimumVersion = 5.10.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		555963072CFC1E5600806FA8 /* GRDB */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 555963062CFC1E5600806FA8 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
-			productName = GRDB;
-		};
 		55949B872CFA7EAD002D1C46 /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 55949B862CFA7EAD002D1C46 /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
 		};
-		55C741E92CFCB5C000853D4E /* SwiftyJSON */ = {
+		824357B12CFCFF1A0091EFF1 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 55C741E82CFCB5C000853D4E /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
-			productName = SwiftyJSON;
+			package = 824357B02CFCFF1A0091EFF1 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

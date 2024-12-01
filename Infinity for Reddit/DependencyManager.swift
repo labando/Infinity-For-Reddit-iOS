@@ -5,6 +5,7 @@
 //  Created by Docile Alligator on 2024-11-29.
 //
 import Swinject
+import Alamofire
 
 class DependencyManager {
     static let shared = DependencyManager()
@@ -18,5 +19,6 @@ class DependencyManager {
     
     private func registerDependencies(_ c: Container) {
         // TODO register dependencies on container
+        c.register(Session.self) {_ in AF}
     }
 }
