@@ -32,7 +32,8 @@ struct Infinity: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.dependencyManager, DependencyManager.shared)
+                .environment(\.dependencyManager, DependencyManager.shared.container)
+                .environment(\.redditGRDBDatabasePool, RedditGRDBDatabase.shared.dbPool)
         }
         .modelContainer(sharedModelContainer)
     }

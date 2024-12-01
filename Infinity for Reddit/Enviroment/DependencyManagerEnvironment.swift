@@ -9,7 +9,7 @@ import SwiftUI
 import Swinject
 
 struct DependencyManagerKey: EnvironmentKey {
-    static let defaultValue: Container = DependencyManager.shared
+    static let defaultValue: Container = DependencyManager.shared.container
 }
 
 extension EnvironmentValues {
