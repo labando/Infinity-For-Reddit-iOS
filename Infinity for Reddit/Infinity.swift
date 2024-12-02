@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 import Swinject
 
 @main
@@ -15,25 +14,11 @@ struct Infinity: App {
         let container = Container()
         return container
     }()
-    
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(\.dependencyManager, DependencyManager.shared.container)
         }
-        .modelContainer(sharedModelContainer)
     }
 }

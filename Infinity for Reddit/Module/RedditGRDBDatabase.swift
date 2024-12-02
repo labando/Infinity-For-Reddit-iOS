@@ -16,11 +16,26 @@ struct RedditGRDBDatabase {
             .path
         
         let dbPool = try DatabasePool(path: path)
+        try setupDatabaseScheme(dbPool)
         try setupMigrations(dbPool)
         return dbPool
     }
     
     private static func setupMigrations(_ dbPool: DatabasePool) throws {
         // TODO for future database scheme migration
+    }
+    
+    private static func setupDatabaseScheme(_ dbPool: DatabasePool) throws {
+        try dbPool.write { db in
+            try db.create(table: Account.databaseTableName, ifNotExists: true) { t in
+                t.column("username", .text).primaryKey()
+                t.column("isCurrentUser", .boolean).notNull()
+                t.column("profileImageUrl", .text)
+                t.column("bannerImageUrl", .text)
+                t.column("karma", .integer)
+                t.column("accessToken", .text)
+                t.column("refreshToken", .text)
+            }
+        }
     }
 }
