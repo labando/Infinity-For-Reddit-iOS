@@ -9,7 +9,9 @@ import Foundation
 import SwiftUI
 
 struct LoginView: View {
-    func getLoginURL() -> String {
+    @Environment(\.dismiss) private var dismiss
+    
+    func getLoginURL() -> URL {
         // Define the OAuth URL components
         let baseURL = URL(string: APIUtils.OAUTH_URL)!
         
@@ -25,13 +27,15 @@ struct LoginView: View {
         ]
         
         // Get the final URL with the query parameters
-        return components.url!.absoluteString
+        return components.url!
     }
     
     var body: some View {
-        VStack {
-            WebView(url: URL(string: getLoginURL())!)
-                .edgesIgnoringSafeArea(.all)
+        NavigationStack {
+            VStack {
+                WebView(url: getLoginURL())
+            }
+            .navigationBarTitle("Login", displayMode: .inline)
         }
     }
 }
