@@ -16,7 +16,7 @@ struct AccountDao {
 
     func insert(_ account: Account) throws {
         try dbPool.write { db in
-            try account.insert(db) // Insert or replace
+            try account.insert(db, onConflict: .replace)
         }
     }
 

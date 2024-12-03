@@ -17,7 +17,7 @@ struct SubredditDataDao {
     
     func insert(subredditData: SubredditData) {
         try? dbPool.write { db in
-            try subredditData.insert(db)
+            try subredditData.insert(db, onConflict: .replace)
         }
     }
     

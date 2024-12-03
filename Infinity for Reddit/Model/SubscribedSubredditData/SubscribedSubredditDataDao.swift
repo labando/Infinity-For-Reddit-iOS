@@ -17,14 +17,14 @@ struct SubscribedSubredditDataDao {
     
     func insert(subscribedSubredditData: SubscribedSubredditData) {
         try? dbPool.write { db in
-            try subscribedSubredditData.insert(db)
+            try subscribedSubredditData.insert(db, onConflict: .replace)
         }
     }
     
     func insertAll(subscribedSubredditData: [SubscribedSubredditData]) {
         try? dbPool.write { db in
             for data in subscribedSubredditData{
-                try data.insert(db)
+                try data.insert(db, onConflict: .replace)
             }
         }
     }

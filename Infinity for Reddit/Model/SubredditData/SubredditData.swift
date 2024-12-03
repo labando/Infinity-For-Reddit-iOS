@@ -21,11 +21,11 @@ struct SubredditData: Codable, FetchableRecord, PersistableRecord {
     let createdUTC: Int
     let suggestedCommentSort: String?
     let isNSFW: Bool
-    var isSelected: Bool = false
+    var isSelected: Bool
     
     init(id: String, name: String? = nil, iconUrl: String? = nil, bannerUrl: String? = nil,
          description: String? = nil, sidebarDescription: String? = nil, nSubscribers: Int, createdUTC: Int,
-         suggestedCommentSort: String? = nil, isNSFW: Bool, isSelected: Bool = false) {
+         suggestedCommentSort: String? = nil, isNSFW: Bool) {
         self.id = id
         self.name = name
         self.iconUrl = iconUrl
@@ -36,6 +36,6 @@ struct SubredditData: Codable, FetchableRecord, PersistableRecord {
         self.createdUTC = createdUTC
         self.suggestedCommentSort = suggestedCommentSort
         self.isNSFW = isNSFW
-        self.isSelected = isSelected
+        self.isSelected = false
     }
 }
