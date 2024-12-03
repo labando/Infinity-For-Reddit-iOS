@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Swinject
 import Alamofire
+import SwiftyJSON
 
 struct LoginView: View {
     @Environment(\.dependencyManager) var container: Container
@@ -69,7 +70,7 @@ struct LoginView: View {
                                         let auth = "Basic \(base64Credentials)"
                                         headers[APIUtils.AUTHORIZATION_KEY] = auth
                                         
-                                        session.request(RedditAPI.getAccessToken(headers: headers, params: params))
+                                        session.request(RedditAPI.getAccessToken(queries: nil, headers: headers, params: params))
                                             .validate()
                                             .responseString { response in
                                                 switch response.result {
@@ -86,6 +87,49 @@ struct LoginView: View {
                                                                    let refreshToken = responseJSON["refresh_token"] as? String {
                                                                     print("Access Token: \(accessToken)")
                                                                     print("Refresh Token: \(refreshToken)")
+                                                                    
+                                                                    session.request(RedditOAuthAPI.getMyInfo(
+                                                                        headers: APIUtils.getOAuthHeader(accessToken: accessToken)))
+                                                                    .validate()
+                                                                    .responseString { response in
+                                                                        switch response.result {
+                                                                        case .success(let myInfoResponse):
+                                                                            guard !myInfoResponse.isEmpty else {
+                                                                                print("Error: Empty response from Reddit")
+                                                                                return
+                                                                            }
+                                                                            if let myInfo = myInfoResponse.data(using: .utf8) {
+                                                                                do {
+                                                                                    let jsonResponse = try JSON(data: myInfo)
+                                                                                    
+                                                                                    // Parse the response
+                                                                                    let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
+                                                                                    let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
+                                                                                    
+                                                                                    var bannerImageUrl: String? = nil
+                                                                                    if let subredditData = jsonResponse[JSONUtils.SUBREDDIT_KEY].dictionary {
+                                                                                        bannerImageUrl = subredditData[JSONUtils.BANNER_IMG_KEY]?.stringValue
+                                                                                    }
+                                                                                    
+                                                                                    let karma = jsonResponse[JSONUtils.TOTAL_KARMA_KEY].intValue
+                                                                                    
+                                                                                    let account = Account(
+                                                                                        username: name,
+                                                                                        isCurrentUser: true,
+                                                                                        profileImageUrl: profileImageUrl,
+                                                                                        bannerImageUrl: bannerImageUrl,
+                                                                                        karma: karma
+                                                                                    )
+                                                                                } catch {
+                                                                                    print("Error: Failed to parse account JSON - \(error.localizedDescription)")
+                                                                                }
+                                                                            }
+                                                                            break
+                                                                        case .failure(let error):
+                                                                            print("Error: \(error.localizedDescription)")
+                                                                            break
+                                                                        }
+                                                                    }
                                                                 } else {
                                                                     print("Error: Tokens not found in response")
                                                                 }
@@ -94,6 +138,7 @@ struct LoginView: View {
                                                             print("Error: Failed to parse JSON - \(error.localizedDescription)")
                                                         }
                                                     }
+                                                    break
                                                 case .failure(let error):
                                                     print("Error: \(error.localizedDescription)")
                                                     break

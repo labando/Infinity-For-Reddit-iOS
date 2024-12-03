@@ -5,6 +5,8 @@
 //  Created by Docile Alligator on 2024-12-01.
 //
 
+import Alamofire
+
 class APIUtils {
     // Base URIs
     static let OAUTH_URL = "https://www.reddit.com/api/v1/authorize.compact"
@@ -49,7 +51,7 @@ class APIUtils {
     static let REFRESH_TOKEN_KEY = "refresh_token"
     
     // Utility Methods
-    static func getHttpBasicAuthHeader() -> [String: String] {
+    static func getHttpBasicAuthHeader() -> HTTPHeaders {
         let credentials = "\(CLIENT_ID):"
         guard let encodedCredentials = credentials.data(using: .utf8)?.base64EncodedString() else {
             return [:]
@@ -57,7 +59,7 @@ class APIUtils {
         return [AUTHORIZATION_KEY: "Basic \(encodedCredentials)"]
     }
     
-    static func getOAuthHeader(accessToken: String) -> [String: String] {
+    static func getOAuthHeader(accessToken: String) -> HTTPHeaders {
         return [
             AUTHORIZATION_KEY: "\(AUTHORIZATION_BASE)\(accessToken)",
             USER_AGENT_KEY: USER_AGENT

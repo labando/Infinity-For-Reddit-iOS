@@ -1,58 +1,58 @@
 //
-//  RedditAPI.swift
+//  RedditOAuthAPI.swift
 //  Infinity for Reddit
 //
-//  Created by Docile Alligator on 2024-12-02.
+//  Created by Docile Alligator on 2024-12-03.
 //
 
 import Alamofire
 import Foundation
 
-enum RedditAPI: URLRequestConvertible {
-    case getAccessToken(queries: [String: String]?, headers: HTTPHeaders, params: [String: String]?)
+enum RedditOAuthAPI: URLRequestConvertible {
+    case getMyInfo(headers: HTTPHeaders)
     
     private var baseURL: String {
-        return "https://www.reddit.com"
+        return "https://oauth.reddit.com"
     }
     
     var method: HTTPMethod {
         switch self {
-        case .getAccessToken:
-            return .post
+        case .getMyInfo:
+            return .get
         }
     }
     
     var path: String {
         switch self {
-        case .getAccessToken:
-            return "/api/v1/access_token"
+        case .getMyInfo:
+            return "/api/v1/me"
         }
     }
     
     var parameters: [String: String]? {
         switch self {
-        case .getAccessToken(_, _, let params):
-            return params
+        case .getMyInfo(_):
+            return nil
         }
     }
     
     var queries: [String: String]? {
         switch self {
-        case .getAccessToken(queries: let queries, _, _):
-            return queries
+        case .getMyInfo(_):
+            return ["raw_json": "1"]
         }
     }
     
     var headers: HTTPHeaders? {
         switch self {
-        case .getAccessToken(_, let headers, _):
+        case .getMyInfo(let headers):
             return headers
         }
     }
     
     var encoding: ParameterEncoding {
         switch self {
-        case .getAccessToken:
+        case .getMyInfo:
             return URLEncoding.default
         }
     }
