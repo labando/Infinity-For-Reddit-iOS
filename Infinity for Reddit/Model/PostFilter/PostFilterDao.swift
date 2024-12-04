@@ -78,4 +78,19 @@ struct PostFilterDao {
             return try PostFilter.fetchAll(db, sql: sql, arguments: [usage, nameOfUsage, usage])
         }
     }
+    
+    func getAllPostFilterWithUsageLiveData() -> AnyPublisher<[PostFilterWithUsage], Error> {
+        ValueObservation
+            .tracking { db in
+                try dbPool.read { db in
+                    try PostFilter.fetchAll(db, sql: "SELECT * FROM post_filter ORDER BY name")
+                        .map { postFilter in
+                            let postFilterUsages = try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE name = ?", arguments: [postFilter.name])
+                            return PostFilterWithUsage(postFilter: postFilter, postFilterUsages: postFilterUsages)
+                        }
+                }
+            }
+            .publisher(in: dbPool)
+            .eraseToAnyPublisher()
+    }
 }
