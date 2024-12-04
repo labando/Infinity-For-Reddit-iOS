@@ -78,4 +78,20 @@ struct CommentFilterDao {
             return try CommentFilter.fetchAll(db, sql: sql, arguments: [usage, nameOfUsage])
         }
     }
+    
+    func getAllCommentFilterWithUsageLiveData() -> AnyPublisher<[CommentFilterWithUsage], Error> {
+        ValueObservation
+            .tracking { db in
+                try dbPool.read { db in // Use dbPool.read for the transaction
+                    try CommentFilter.fetchAll(db, sql: "SELECT * FROM comment_filter ORDER BY name")
+                        .map { commentFilter in
+                            let commentFilterUsages = try CommentFilterUsage
+                                .fetchAll(db, sql: "SELECT * FROM comment_filter_usage WHERE name = ?", arguments: [commentFilter.name])
+                            return CommentFilterWithUsage(commentFilter: commentFilter, commentFilterUsageList: commentFilterUsages)
+                        }
+                }
+            }
+            .publisher(in: dbPool)
+            .eraseToAnyPublisher()
+    }
 }
