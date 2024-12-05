@@ -11,7 +11,7 @@ struct AnonymousMultiredditSubreddit: Codable, FetchableRecord, PersistableRecor
     static let databaseTableName = "anonymous_multireddit_subreddits"
 
     var path: String
-    var username: String = Account.ANONYMOUS_ACCOUNT
+    var username: Account = Account.ANONYMOUS_ACCOUNT
     var subredditName: String
 
     init(path: String, subredditName: String) {
