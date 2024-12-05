@@ -13,6 +13,28 @@ struct MoreView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
     var body: some View {
-        Text("More")
+        NavigationView {
+            List {
+                Section(header: Text("Account")) {
+                    NavigationLink(destination: HistoryView()) {
+                    Text("History")
+                    }
+                }
+                Section(header: Text("Post")) {
+                    NavigationLink(destination: UpvotedView()) {
+                    Text("Upvoted")
+                }
+                    NavigationLink(destination: DownvotedView()) {
+                        Text("Downvoted")
+                    }
+                }
+                Section(header: Text("Preferences")) {
+                    NavigationLink(destination: UpvotedView()) {
+                        Text("Settings")
+                    }
+                }
+            }
+            .navigationTitle("More")
+        }
     }
 }
