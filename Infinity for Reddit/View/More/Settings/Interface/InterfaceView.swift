@@ -65,7 +65,7 @@ struct InterfaceView: View {
     
     var body: some View {
         List {
-            NavigationLink(destination: InterfaceView()) {
+            NavigationLink(destination: FontView()) {
                 Label("Font", systemImage: "textformat.size")
             }
             NavigationLink(destination: ImmersiveInterfaceView()) {
