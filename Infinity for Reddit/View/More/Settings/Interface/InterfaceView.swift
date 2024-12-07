@@ -80,7 +80,7 @@ struct InterfaceView: View {
             NavigationLink(destination: ImmersiveInterfaceView()) {
                 Text("Immersive Interface").padding(.leading, 44.5)
             }
-            NavigationLink(destination: InterfaceView()) {
+            NavigationLink(destination: NavigationDrawerView()) {
                 Text("Navigation Drawer").padding(.leading, 44.5)
             }
             NavigationLink(destination: InterfaceView()) {
