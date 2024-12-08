@@ -11,7 +11,8 @@ import Combine
 public class PostListingViewModel: ObservableObject {
     // MARK: - Properties
     @Published var posts: [Post] = []
-    @Published var isLoading: Bool = false
+    @Published var isInitialLoading: Bool = false
+    @Published var isLoadingMore: Bool = false
     @Published var hasMorePages: Bool = true
     private var isInitialLoad: Bool = true
     
@@ -31,31 +32,40 @@ public class PostListingViewModel: ObservableObject {
     
     /// Fetches the next page of posts
     public func loadPosts(account: Account) {
-        guard !isLoading, hasMorePages else { return }
+        guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
-        isLoading = true
+        if posts.isEmpty {
+            isInitialLoading = true
+        } else {
+            isLoadingMore = true
+        }
         
         if isInitialLoad {
             postListingRepository.setAccount(account)
             isInitialLoad = false
         }
         
-        postListingRepository.fetchPosts(postListingType: .frontPage, limit: 100)
+        postListingRepository.fetchPosts(postListingType: .frontPage, limit: 100, after: after ?? "")
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
-                self?.isLoading = false
+                self?.isInitialLoading = false
+                self?.isLoadingMore = false
+                
                 if case .failure(let error) = completion {
                     print("Error fetching posts: \(error)")
                 }
             }, receiveValue: { [weak self] listingData in
                 guard let self = self else { return }
-                //self.posts.append(contentsOf: newPosts)
                 if (listingData.posts.isEmpty) {
                     // No more posts
+                    hasMorePages = false
+                    after = nil
                 } else {
                     let realNewPosts = listingData.posts.filter {
                         !self.allPostIds.contains($0.id)
                     }
+                    
+                    after = listingData.after
                     
                     self.posts.append(contentsOf: realNewPosts)
                     
@@ -65,6 +75,8 @@ public class PostListingViewModel: ObservableObject {
                                 $0.id
                             }
                     )
+                    
+                    hasMorePages = !(realNewPosts.isEmpty || listingData.after == nil || listingData.after.isEmpty)
                 }
                 print("fuck")
             })
@@ -77,7 +89,8 @@ public class PostListingViewModel: ObservableObject {
         cancellables.forEach { $0.cancel() }
         
         isInitialLoad = true
-        isLoading = false
+        isInitialLoading = false
+        isLoadingMore = false
         
         after = nil
         hasMorePages = true

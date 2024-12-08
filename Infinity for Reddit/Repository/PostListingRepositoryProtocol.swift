@@ -8,6 +8,6 @@
 import Combine
 
 public protocol PostListingRepositoryProtocol {
-    func fetchPosts(postListingType: PostListingType, limit: Int) -> AnyPublisher<ListingData, Error>
+    func fetchPosts(postListingType: PostListingType, limit: Int, after: String) -> AnyPublisher<ListingData, Error>
     func setAccount(_ account: Account)
 }

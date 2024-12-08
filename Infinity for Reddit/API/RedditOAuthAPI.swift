@@ -10,7 +10,7 @@ import Foundation
 
 enum RedditOAuthAPI: URLRequestConvertible {
     case getMyInfo(headers: HTTPHeaders)
-    case getFrongPagePost(headers: HTTPHeaders)
+    case getFrongPagePost(headers: HTTPHeaders, queries: [String: String])
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -38,7 +38,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo(_):
             return nil
-        case .getFrongPagePost:
+        case .getFrongPagePost(_, _):
             return nil
         }
     }
@@ -47,8 +47,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo(_):
             return ["raw_json": "1"]
-        case .getFrongPagePost(_):
-            return ["raw_json": "1"]
+        case .getFrongPagePost(_, let queries):
+            return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         }
     }
     
@@ -56,7 +56,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo(let headers):
             return headers
-        case .getFrongPagePost(let headers):
+        case .getFrongPagePost(let headers, _):
             return headers
         }
     }

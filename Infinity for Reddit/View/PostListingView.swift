@@ -33,18 +33,28 @@ struct PostListingView: View {
     
     var body: some View {
         Group {
-            if postListingViewModel.isLoading {
+            if postListingViewModel.isInitialLoading {
                 Text("Is loading")
             } else if postListingViewModel.posts.isEmpty {
                 Text("No posts")
             } else {
-                List(postListingViewModel.posts, id: \.id) { post in
-                    Text(post.title)
+                List {
+                    ForEach(postListingViewModel.posts, id: \.id) { post in
+                        Text(post.title)
+                    }
+                    if postListingViewModel.hasMorePages {
+                        Text("Loading more pages")
+                            .onAppear {
+                                print("damn")
+                                postListingViewModel.loadPosts(account: accountViewModel.account)
+                            }
+                    }
                 }
             }
         }
         .onAppear {
             postListingViewModel.loadPosts(account: accountViewModel.account)
         }
+        .listStyle(.plain)
     }
 }

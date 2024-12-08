@@ -27,11 +27,10 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         self.account = account
     }
     
-    public func fetchPosts(postListingType: PostListingType, limit: Int) -> AnyPublisher<ListingData, any Error> {
+    public func fetchPosts(postListingType: PostListingType, limit: Int, after: String) -> AnyPublisher<ListingData, any Error> {
         return Future<ListingData, Error> { promise in
-            self.session.request(RedditOAuthAPI.getFrongPagePost(headers: APIUtils.getOAuthHeader(accessToken: self.account?.accessToken ?? "")))
+            self.session.request(RedditOAuthAPI.getFrongPagePost(headers: APIUtils.getOAuthHeader(accessToken: self.account?.accessToken ?? ""), queries: ["after": after]))
                 .validate()
-                //.publishData()
                 .responseData { response in
                     switch response.result {
                     case .success(let data):
