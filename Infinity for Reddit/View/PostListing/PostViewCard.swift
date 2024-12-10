@@ -11,6 +11,12 @@ import SDWebImageSwiftUI
 struct PostViewCard: View {
     @EnvironmentObject var post: Post
     
+    let formatter = DateFormatter()
+    
+    init() {
+        formatter.dateFormat = "y-MM-dd H:mm"
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .center) {
@@ -20,11 +26,17 @@ struct PostViewCard: View {
                     Text("u/\(post.author)")
                 }
                 
-                //Text(Date(timeIntervalSince1970: TimeInterval(post.createdUtc)))
+                Spacer()
+                
+                Text(
+                    formatter.string(from: Date(timeIntervalSince1970: TimeInterval(post.createdUtc)))
+                )
             }
             .padding(.vertical, 8)
             
             Text(post.title)
+                .font(.system(size: 24))
+                .padding(.bottom, 8)
             
             if let preview = post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
                 WebImage(url: URL(string: url)) { image in
