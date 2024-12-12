@@ -7,11 +7,11 @@
 
 struct UserDefaultsUtils {
     
-    // NotificationView
+    // NotificationInterfaceView
     static let ENABLE_NOTIFICATION_KEY = "enable_notification"
     static let NOTIFICATION_INTERVAL_KEY = "notificaiton_interval"
     
-    // SettingsView
+    // SettingsInterfaceView
     static let HIDE_FAB_IN_POST_FEED = "hide_fab_in_post_feed"
     static let BOTTOM_APP_BAR_KEY = "bottom_app_bar"
     static let HIDE_SUBREDDIT_DESCRIPTION = "hide_subreddit_description"
@@ -20,7 +20,7 @@ struct UserDefaultsUtils {
     static let SHOW_ABSOLUTE_NUMBER_OF_VOTES = "show_absolute_number_of_votes"
     static let DEFAULT_SEARCH_RESULT_TAB = "default_search_result_tab"
     
-    // FontView
+    // FontInterfaceView
     static let FONT_FAMILY_KEY = "font_family"
     static let FONT_SIZE_KEY = "font_size"
     static let TITLE_FONT_FAMILY_KEY = "title_font_family"
@@ -32,7 +32,7 @@ struct UserDefaultsUtils {
     static let IMMERSIVE_INTERFACE_KEY = "immersive_interface"
     static let IMMERSIVE_INTERFACE_IGNORE_NAV_BAR_KEY = "immersive_interface_ignore_nav_bar"
     
-    // NavigationDrawerView
+    // NavigationDrawerInterfaceView
     static let SHOW_AVATAR_ON_RIGHT = "show_avatar_on_the_right"
     static let COLLAPSE_ACCOUNT_SECTION = "collapse_account_section"
     static let COLLAPSE_REDDIT_SECTION = "collapse_reddit_section"
@@ -44,11 +44,11 @@ struct UserDefaultsUtils {
     static let HIDE_SUBSCRIBED_SUBREDDITS_SECTION = "hide_subscribed_subreddits_section"
     static let HIDE_ACCOUNT_KARMA_NAV_BAR = "hide_account_karma"
 
-    // TimeFormatView
+    // TimeFormatInterfaceView
     static let SHOW_ELAPSED_TIME_KEY = "show_elapsed_time"
     static let TIME_FORMAT_KEY = "time_format"
     
-    // PostView
+    // PostInterfaceView
     static let DEFAULT_POST_LAYOUT_KEY = "default_post_layout"
     static let DEFAULT_LINK_POST_LAYOUT_KEY = "default_link_post_layout"
     static let HIDE_POST_TYPE = "hide_post_type"
@@ -63,4 +63,9 @@ struct UserDefaultsUtils {
     static let LONG_PRESS_TO_HIDE_TOOLBAR_IN_COMPACT_LAYOUT = "long_press_to_hide_toolbar_in_compact_layout"
     static let POST_COMPACT_LAYOUT_TOOLBAR_HIDDEN_BY_DEFAULT = "post_compact_layout_toolbar_hidden_by_default"
     static let CLICK_TO_SHOW_MEDIA_IN_GALLERY_LAYOUT = "click_to_show_media_in_gallery_layout"
+    
+    //PostDetailsInterfaceView
+    static let SEPARATE_POST_AND_COMMENTS_IN_LANDSCAPE_MODE = "separate_post_and_comments_in_landscape_mode"
+    static let HIDE_UPVOTE_RATIO = "hide_upvote_ratio"
+    static let EMBEDDED_MEDIA_TYPE = "embedded_media_type"
 }

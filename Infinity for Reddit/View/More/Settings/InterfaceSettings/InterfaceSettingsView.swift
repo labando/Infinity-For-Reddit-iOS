@@ -110,7 +110,7 @@ struct InterfaceSettingsView: View {
             NavigationLink(destination: PostInterfaceView()) {
                 Text("Post").padding(.leading, 44.5)
             }
-            NavigationLink(destination: InterfaceSettingsView()) {
+            NavigationLink(destination: PostDetailInterfaceView()) {
                 Text("Post Details").padding(.leading, 44.5)
             }
             NavigationLink(destination: InterfaceSettingsView()) {

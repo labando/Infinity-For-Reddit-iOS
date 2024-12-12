@@ -77,7 +77,7 @@ struct PostInterfaceView: View {
         }
         
         if userDefaults.object(forKey: HIDE_THE_NUMBER_OF_COMMENTS) == nil {
-            userDefaults.set(true, forKey: HIDE_THE_NUMBER_OF_COMMENTS)
+            userDefaults.set(false, forKey: HIDE_THE_NUMBER_OF_COMMENTS)
         }
         
         if userDefaults.object(forKey: HIDE_TEXT_POST_CONTENT) == nil {
