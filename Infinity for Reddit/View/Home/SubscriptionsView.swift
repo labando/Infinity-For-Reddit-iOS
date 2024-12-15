@@ -49,7 +49,7 @@ struct SubscriptionsView: View {
             } else if selectedOption == 1 {
                 UsersView(subscriptionListingViewModel: subscriptionListingViewModel)
             } else {
-                CustomFeedView()
+                CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel)
             }
 
             Spacer() // Push content to the top
@@ -65,7 +65,7 @@ struct SubscriptionsView: View {
         
         var body: some View {
             Group {
-                if subscriptionListingViewModel.isLoading {
+                if subscriptionListingViewModel.isLoadingSubscriptions {
                     Text("Is loading")
                 } else if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
                     Text("No subscribed subreddits")
@@ -85,7 +85,7 @@ struct SubscriptionsView: View {
         
         var body: some View {
             Group {
-                if subscriptionListingViewModel.isLoading {
+                if subscriptionListingViewModel.isLoadingSubscriptions {
                     Text("Is loading")
                 } else if subscriptionListingViewModel.userSubscriptions.isEmpty {
                     Text("No subscribed users")
@@ -101,10 +101,25 @@ struct SubscriptionsView: View {
     }
 
     struct CustomFeedView: View {
+        @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
+        
         var body: some View {
-            Text("Custom Feed Content")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.blue.opacity(0.1))
+            Group {
+                if subscriptionListingViewModel.isLoadingMyCustomFeeds {
+                    Text("Is loading")
+                } else if subscriptionListingViewModel.myCustomFeeds.isEmpty {
+                    Text("No custom feeds")
+                } else {
+                    List {
+                        ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                            return Text(customFeed.displayName)
+                        }
+                    }.scrollBounceBehavior(.basedOnSize)
+                }
+            }
+            .onAppear {
+                subscriptionListingViewModel.loadMyCustomFeeds()
+            }
         }
     }
 }

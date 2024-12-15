@@ -13,7 +13,9 @@ public class SubscriptionListingViewModel: ObservableObject {
     @Published var subredditSubscriptions: [Subscription] = []
     @Published var userSubscriptions: [Subscription] = []
     private var subscriptionsPrivate: [Subscription] = []
-    @Published var isLoading: Bool = false
+    @Published var myCustomFeeds: [CustomFeed] = []
+    @Published var isLoadingSubscriptions: Bool = false
+    @Published var isLoadingMyCustomFeeds: Bool = false
     private var after: String? = nil
     private var cancellables = Set<AnyCancellable>()
     
@@ -26,11 +28,10 @@ public class SubscriptionListingViewModel: ObservableObject {
     
     // MARK: - Methods
     
-    /// Fetches the next page of posts
     public func loadSubscriptions() {
-        guard !isLoading || (isLoading && after != nil && after?.isEmpty != true) else { return }
+        guard !isLoadingSubscriptions || (isLoadingSubscriptions && after != nil && after?.isEmpty != true) else { return }
         
-        isLoading = true
+        isLoadingSubscriptions = true
         
         subscriptionListingRepository.fetchSubscriptions(
             queries: ["limit": "100", "after": after ?? ""]
@@ -40,7 +41,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         print("Error fetching subscriptions: \(error)")
                         self?.after = nil
-                        self?.isLoading = false
+                        self?.isLoadingSubscriptions = false
                     }
                 }
             }, receiveValue: { [weak self] subscriptionListing in
@@ -63,7 +64,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                     
                     DispatchQueue.main.async {
                         self.after = nil
-                        self.isLoading = false
+                        self.isLoadingSubscriptions = false
                         self.subredditSubscriptions = subreddits
                         self.userSubscriptions = users
                     }
@@ -89,7 +90,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                         
                         DispatchQueue.main.async {
                             self.after = nil
-                            self.isLoading = false
+                            self.isLoadingSubscriptions = false
                             self.subredditSubscriptions = subreddits
                             self.userSubscriptions = users
                         }
@@ -101,16 +102,41 @@ public class SubscriptionListingViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    /// Reloads posts from the first page
-    func refreshPosts(account: Account) {
+    public func loadMyCustomFeeds() {
+        guard !isLoadingMyCustomFeeds else { return }
+        
+        isLoadingSubscriptions = true
+        
+        subscriptionListingRepository.fetchMyCustomFeeds()
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    DispatchQueue.main.async {
+                        print("Error fetching custom feeds: \(error)")
+                        self?.isLoadingMyCustomFeeds = false
+                    }
+                }
+            }, receiveValue: { [weak self] myCustomFeedListing in
+                guard let self = self else { return }
+                myCustomFeedListing.customFeeds.sort { $0.displayName < $1.displayName }
+                DispatchQueue.main.async {
+                    self.isLoadingMyCustomFeeds = false
+                    self.myCustomFeeds = myCustomFeedListing.customFeeds
+                }
+            })
+            .store(in: &cancellables)
+    }
+    
+    func refreshSubscriptions(account: Account) {
         // This is for user switching accounts. We have to force clear all load
         cancellables.forEach { $0.cancel() }
         
-        isLoading = false
+        isLoadingSubscriptions = false
+        isLoadingMyCustomFeeds = false
         
         after = nil
         subscriptionsPrivate = []
         
         loadSubscriptions()
+        loadMyCustomFeeds()
     }
 }

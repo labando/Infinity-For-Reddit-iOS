@@ -10,4 +10,5 @@ import Alamofire
 
 public protocol SubscriptionListingRepositoryProtocol {
     func fetchSubscriptions(queries: [String: String]) -> AnyPublisher<SubscriptionListing, Error>
+    func fetchMyCustomFeeds() -> AnyPublisher<MyCustomFeedListing, Error>
 }
