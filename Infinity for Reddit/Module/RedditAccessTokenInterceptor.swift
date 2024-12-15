@@ -10,6 +10,8 @@ import Combine
 import Foundation
 
 final class RedditAccessTokenInterceptor: RequestInterceptor {
+    private let lock = NSLock()
+    
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         guard urlRequest.url?.absoluteString.hasPrefix("https://oauth.reddit.com") == true else {
             return completion(.success(urlRequest))
@@ -38,6 +40,13 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
             }
         }
         
+        lock.lock()
+        
+        if request.request?.value(forHTTPHeaderField: "Authorization")?.contains(AccountViewModel.shared.account.accessToken ?? "") != true {
+            lock.unlock()
+            return completion(.retry)
+        }
+        
         refreshAccessToken { [weak self] result in
             guard let self = self else { return }
             
@@ -47,12 +56,15 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
                     try AccountViewModel.shared.updateTokens(accessToken: token.0, refreshToken: token.1)
                     /// After updating the token we can safely retry the original request.
                     completion(.retry)
+                    self.lock.unlock()
                 } catch {
                     // TODO should we really care about the result of database operation?
                     completion(.retry)
+                    self.lock.unlock()
                 }
             case .failure(let error):
                 completion(.doNotRetryWithError(error))
+                self.lock.unlock()
             }
         }
     }
