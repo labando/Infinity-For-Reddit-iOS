@@ -21,8 +21,8 @@ struct SubscribedUserDao {
         }
     }
     
-    func insertAll(subscribedUserDataList: [SubscribedUserData]) throws {
-        try dbPool.write { db in
+    func insertAll(subscribedUserDataList: [SubscribedUserData]) {
+        try? dbPool.write { db in
             for data in subscribedUserDataList {
                 try data.insert(db, onConflict: .replace)
             }

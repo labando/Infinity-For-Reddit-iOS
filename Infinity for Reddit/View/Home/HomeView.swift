@@ -42,7 +42,7 @@ struct HomeView: View {
                         }
                         .tag(Tab.subscriptions)
                     
-                    InboxView()
+                    LoginView()
                         .tabItem {
                             Label("Inbox", systemImage: "envelope")
                         }
@@ -88,6 +88,13 @@ struct HomeView: View {
             .sheet(isPresented: $showProfile) {
                 AccountSheet()
                     .presentationDetents([.medium])
+            }
+            .onAppear {
+                let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+
+                let docsDir = dirPaths[0]
+
+                print(docsDir)
             }
         }
         .onChange(of: colorScheme) {

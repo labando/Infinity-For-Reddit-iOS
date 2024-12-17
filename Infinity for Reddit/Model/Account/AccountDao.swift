@@ -14,6 +14,12 @@ struct AccountDao {
     init(dbPool: DatabasePool) {
         self.dbPool = dbPool
     }
+    
+    func getAccount(username: String) throws -> Account? {
+        try dbPool.write { db in
+            try Account.fetchOne(db, key: username)
+        }
+    }
 
     func insert(_ account: Account) throws {
         try dbPool.write { db in
