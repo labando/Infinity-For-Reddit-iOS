@@ -31,10 +31,10 @@ struct HomeView: View {
                             params: nil
                         )
                     )
-                        .tabItem {
-                            Label("Home", systemImage: "house")
-                        }
-                        .tag(Tab.home)
+                    .tabItem {
+                        Label("Home", systemImage: "house")
+                    }
+                    .tag(Tab.home)
                     
                     SubscriptionsView()
                         .tabItem {
@@ -42,11 +42,19 @@ struct HomeView: View {
                         }
                         .tag(Tab.subscriptions)
                     
-                    LoginView()
-                        .tabItem {
-                            Label("Inbox", systemImage: "envelope")
-                        }
-                        .tag(Tab.inbox)
+                    CommentListingView(
+                        commentListingMetadata: CommentListingMetadata(
+                            commentListingType: .user,
+                            pathComponents: ["sortType": "best"],
+                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                            queries: nil,
+                            params: nil
+                        )
+                    )
+                    .tabItem {
+                        Label("Inbox", systemImage: "envelope")
+                    }
+                    .tag(Tab.inbox)
                     
                     MoreView()
                         .tabItem {

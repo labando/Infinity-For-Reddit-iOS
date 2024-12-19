@@ -285,7 +285,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
                 }
             }
             modReports.append(subArray)
-        }
+        }       
         name = json["name"].stringValue
         numComments = json["num_comments"].intValue
         numCrossposts = json["num_crossposts"].intValue
@@ -1054,7 +1054,7 @@ class Resolution : NSObject, NSCoding{
     
 }
 
-class AuthorFlairRichtext : NSObject, NSCoding{
+public class AuthorFlairRichtext : NSObject, NSCoding{
     
     //Type e.g. "text", "emoji"
     var e : String!
@@ -1104,7 +1104,7 @@ class AuthorFlairRichtext : NSObject, NSCoding{
      * NSCoding required initializer.
      * Fills the data from the passed decoder
      */
-    @objc required init(coder aDecoder: NSCoder)
+    @objc required public init(coder aDecoder: NSCoder)
     {
         e = aDecoder.decodeObject(forKey: "e") as? String
         t = aDecoder.decodeObject(forKey: "t") as? String
@@ -1115,7 +1115,7 @@ class AuthorFlairRichtext : NSObject, NSCoding{
      * NSCoding required method.
      * Encodes mode properties into the decoder
      */
-    func encode(with aCoder: NSCoder)
+    public func encode(with aCoder: NSCoder)
     {
         if e != nil{
             aCoder.encode(e, forKey: "e")

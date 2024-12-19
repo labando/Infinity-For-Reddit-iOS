@@ -19,6 +19,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case vote(params: [String: String])
     case getSubscribedThings(queries: [String: String])
     case getMyCustomFeeds
+    case getUserComments(pathComponents: [String: String], queries: [String: String])
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -26,7 +27,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds:
+        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
             return .get
         case .vote:
             return .post
@@ -55,12 +56,14 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/subreddits/mine/subscriber"
         case .getMyCustomFeeds:
             return "/api/multi/mine"
+        case .getUserComments(let pathComponents, _):
+            return "/user/\(pathComponents["username"] ?? "Hostilenemy")/comments.json"
         }
     }
     
     var parameters: [String: String]? {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds:
+        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
             return nil
         case .vote(let params):
             return params
@@ -87,19 +90,21 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getSubscribedThings(let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
+        case .getUserComments(_, let queries):
+            return ["raw_json": "1", "sort": "best"].merging(queries, uniquingKeysWith: { _, new in new })
         }
     }
     
     var headers: HTTPHeaders? {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds:
+        case .getMyInfo, .getFrontPagePosts, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
             return nil
         }
     }
     
     var encoding: ParameterEncoding {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .vote, .getSubscribedThings, .getMyCustomFeeds:
+        case .getMyInfo, .getFrontPagePosts, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .vote, .getSubscribedThings, .getMyCustomFeeds, .getUserComments:
             return URLEncoding.default
         }
     }
@@ -116,7 +121,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
                 url = updatedURL
             }
         }
-        
+        print(url)
         //Set up method and headers
         var request = URLRequest(url: url)
         request.method = method
