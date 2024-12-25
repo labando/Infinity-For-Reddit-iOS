@@ -15,12 +15,19 @@ public class SubscriptionListingViewModel: ObservableObject {
     @Published var userSubscriptions: [SubscribedUserData] = []
     private var subscriptionsPrivate: [Subscription] = []
     @Published var myCustomFeeds: [CustomFeed] = []
+    
     @Published var isLoadingSubscriptions: Bool = false
     @Published var isLoadingMyCustomFeeds: Bool = false
+    
     private var after: String? = nil
+    
     private var cancellables = Set<AnyCancellable>()
     private let operationqueue: OperationQueue
     private let dbPool: DatabasePool
+    
+    private let searchQueryPublisher = CurrentValueSubject<String, Error>("")
+    private let subredditSubscriptionsPublisher: AnyPublisher<[SubscribedSubredditData], Error>
+    private let userSubscriptionsPublisher: AnyPublisher<[SubscribedUserData], Error>
     
     public let subscriptionListingRepository: SubscriptionListingRepositoryProtocol
     
@@ -37,11 +44,68 @@ public class SubscriptionListingViewModel: ObservableObject {
         
         self.operationqueue = resolvedOperationQueue
         self.dbPool = resolvedDatabasePool
+        
+        let subscribedSubredditDao = SubscribedSubredditDao(dbPool: dbPool)
+        searchQueryPublisher.send("")
+        subredditSubscriptionsPublisher = searchQueryPublisher
+            .flatMap { query in
+                subscribedSubredditDao.getAllSubscribedSubredditsWithSearchQuery(accountName: AccountViewModel.shared.account.username, searchQuery: query)
+            }
+            .eraseToAnyPublisher()
+        
+        let subscribedUserDao = SubscribedUserDao(dbPool: dbPool)
+        userSubscriptionsPublisher = searchQueryPublisher
+            .flatMap { query in
+                subscribedUserDao.getAllSubscribedUsersWithSearchQuery(accountName: AccountViewModel.shared.account.username, searchQuery: query)
+            }
+            .eraseToAnyPublisher()
+        
+        receiveSubscriptions()
     }
     
     // MARK: - Methods
     
-    public func loadSubscriptions() {
+    private func receiveSubscriptions() {
+        subredditSubscriptionsPublisher
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("Finished successfully.")
+                    case .failure(let error):
+                        print("Encountered an error: \(error)")
+                    }
+                },
+                receiveValue: { result in
+                    self.subredditSubscriptions = result
+                }
+            )
+            .store(in: &cancellables)
+        
+        userSubscriptionsPublisher
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("Finished successfully.")
+                    case .failure(let error):
+                        print("Encountered an error: \(error)")
+                    }
+                },
+                receiveValue: { result in
+                    self.userSubscriptions = result
+                }
+            )
+            .store(in: &cancellables)
+    }
+    
+    public func setSearchQuery(_ query: String) {
+        searchQueryPublisher.send(query)
+    }
+    
+    public func loadSubscriptionsOnline() {
+        guard Int64(Date().timeIntervalSince1970) - AccountViewModel.shared.account.subscriptionSyncTime >= 60 * 60 * 24 else { return }
+        
         guard !isLoadingSubscriptions || (isLoadingSubscriptions && after != nil && after?.isEmpty != true) else { return }
         
         isLoadingSubscriptions = true
@@ -61,59 +125,12 @@ public class SubscriptionListingViewModel: ObservableObject {
             guard let self = self else { return }
             if (subscriptionListing.subscriptions.isEmpty) {
                 // No more subscriptions
-                var subreddits = [Subscription]()
-                var users = [Subscription]()
-                for subscription in self.subscriptionsPrivate {
-                    if subscription.subredditType == "user" {
-                        subscription.displayName = String(subscription.displayName[subscription.displayName.index(subscription.displayName.startIndex, offsetBy: 2)...])
-                        users.append(subscription)
-                    } else {
-                        subreddits.append(subscription)
-                    }
-                }
+                transformSubsriptions()
                 
-                subreddits.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
-                users.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
-                
-                let subredditSubscriptionsTemp = subreddits.map {
-                    SubscribedSubredditData(
-                        fullName: $0.name,
-                        name: $0.displayName,
-                        iconUrl: $0.iconImg,
-                        username: AccountViewModel.shared.account.username,
-                        favorite: $0.userHasFavorited
-                    )
-                }
-                
-                let userSubscriptionsTemp = users.map {
-                    SubscribedUserData(
-                        name: $0.displayName,
-                        iconUrl: $0.iconImg,
-                        username: AccountViewModel.shared.account.username,
-                        favorite: $0.userHasFavorited
-                    )
-                }
-                
-                insertSubscribedThings(subredditSubscriptions: subredditSubscriptionsTemp, userSubscriptions: userSubscriptionsTemp, subreddits: subreddits.map {
-                    SubredditData(
-                        id: $0.id,
-                        name: $0.displayName,
-                        iconUrl: $0.iconImg,
-                        bannerUrl: $0.bannerBackgroundImage,
-                        description: $0.description,
-                        sidebarDescription: nil,
-                        nSubscribers: $0.subscribers,
-                        createdUTC: $0.createdUtc,
-                        suggestedCommentSort: $0.suggestedCommentSort,
-                        isNSFW: $0.over18
-                    )
-                })
-                
-                DispatchQueue.main.async {
-                    self.after = nil
-                    self.isLoadingSubscriptions = false
-                    self.subredditSubscriptions = subredditSubscriptionsTemp
-                    self.userSubscriptions = userSubscriptionsTemp
+                do {
+                    try AccountViewModel.shared.updateSubscriptionSyncTime()
+                } catch {
+                    print("Unable to update subscription sync time: \(error)")
                 }
             } else {
                 self.after = subscriptionListing.after
@@ -121,66 +138,76 @@ public class SubscriptionListingViewModel: ObservableObject {
                 subscriptionsPrivate.append(contentsOf: subscriptionListing.subscriptions)
                 
                 if self.after == nil || self.after?.isEmpty == true {
-                    var subreddits = [Subscription]()
-                    var users = [Subscription]()
-                    for subscription in self.subscriptionsPrivate {
-                        if subscription.subredditType == "user" {
-                            subscription.displayName = String(subscription.displayName[subscription.displayName.index(subscription.displayName.startIndex, offsetBy: 2)...])
-                            users.append(subscription)
-                        } else {
-                            subreddits.append(subscription)
-                        }
-                    }
+                    transformSubsriptions()
                     
-                    subreddits.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
-                    users.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
-                    
-                    let subredditSubscriptionsTemp = subreddits.map {
-                        SubscribedSubredditData(
-                            fullName: $0.name,
-                            name: $0.displayName,
-                            iconUrl: $0.iconImg,
-                            username: AccountViewModel.shared.account.username,
-                            favorite: $0.userHasFavorited
-                        )
-                    }
-                    
-                    let userSubscriptionsTemp = users.map {
-                        SubscribedUserData(
-                            name: $0.displayName,
-                            iconUrl: $0.iconImg,
-                            username: AccountViewModel.shared.account.username,
-                            favorite: $0.userHasFavorited
-                        )
-                    }
-                    
-                    insertSubscribedThings(subredditSubscriptions: subredditSubscriptionsTemp, userSubscriptions: userSubscriptionsTemp, subreddits: subreddits.map {
-                        SubredditData(
-                            id: $0.id,
-                            name: $0.displayName,
-                            iconUrl: $0.iconImg,
-                            bannerUrl: $0.bannerBackgroundImage,
-                            description: $0.description,
-                            sidebarDescription: nil,
-                            nSubscribers: $0.subscribers,
-                            createdUTC: $0.createdUtc,
-                            suggestedCommentSort: $0.suggestedCommentSort,
-                            isNSFW: $0.over18
-                        )
-                    })
-                    
-                    DispatchQueue.main.async {
-                        self.after = nil
-                        self.isLoadingSubscriptions = false
-                        self.subredditSubscriptions = subredditSubscriptionsTemp
-                        self.userSubscriptions = userSubscriptionsTemp
+                    do {
+                        try AccountViewModel.shared.updateSubscriptionSyncTime()
+                    } catch {
+                        print("Unable to update subscription sync time: \(error)")
                     }
                 } else {
-                    loadSubscriptions()
+                    loadSubscriptionsOnline()
                 }
             }
         })
         .store(in: &cancellables)
+    }
+    
+    private func transformSubsriptions() {
+        var subreddits = [Subscription]()
+        var users = [Subscription]()
+        for subscription in self.subscriptionsPrivate {
+            if subscription.subredditType == "user" {
+                subscription.displayName = String(subscription.displayName[subscription.displayName.index(subscription.displayName.startIndex, offsetBy: 2)...])
+                users.append(subscription)
+            } else {
+                subreddits.append(subscription)
+            }
+        }
+        
+        subreddits.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
+        users.sort { $0.displayName.lowercased() < $1.displayName.lowercased() }
+        
+        let subredditSubscriptionsTemp = subreddits.map {
+            SubscribedSubredditData(
+                fullName: $0.name,
+                name: $0.displayName,
+                iconUrl: $0.iconImg,
+                username: AccountViewModel.shared.account.username,
+                favorite: $0.userHasFavorited
+            )
+        }
+        
+        let userSubscriptionsTemp = users.map {
+            SubscribedUserData(
+                name: $0.displayName,
+                iconUrl: $0.iconImg,
+                username: AccountViewModel.shared.account.username,
+                favorite: $0.userHasFavorited
+            )
+        }
+        
+        insertSubscribedThings(subredditSubscriptions: subredditSubscriptionsTemp, userSubscriptions: userSubscriptionsTemp, subreddits: subreddits.map {
+            SubredditData(
+                id: $0.id,
+                name: $0.displayName,
+                iconUrl: $0.iconImg,
+                bannerUrl: $0.bannerBackgroundImage,
+                description: $0.description,
+                sidebarDescription: nil,
+                nSubscribers: $0.subscribers,
+                createdUTC: $0.createdUtc,
+                suggestedCommentSort: $0.suggestedCommentSort,
+                isNSFW: $0.over18
+            )
+        })
+        
+        DispatchQueue.main.async {
+            self.after = nil
+            self.isLoadingSubscriptions = false
+            self.subredditSubscriptions = subredditSubscriptionsTemp
+            self.userSubscriptions = userSubscriptionsTemp
+        }
     }
     
     public func loadMyCustomFeeds() {
@@ -217,7 +244,7 @@ public class SubscriptionListingViewModel: ObservableObject {
         after = nil
         subscriptionsPrivate = []
         
-        loadSubscriptions()
+        loadSubscriptionsOnline()
         loadMyCustomFeeds()
     }
     
@@ -240,7 +267,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             }
             
             for unsubscribed in unsubscribedSubreddits {
-                try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: unsubscribed.name ?? "", accountName: accountName)
+                try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: unsubscribed.name, accountName: accountName)
             }
             
             subscribedSubredditDao.insertAll(

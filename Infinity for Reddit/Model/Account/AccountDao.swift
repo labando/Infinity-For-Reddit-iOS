@@ -132,4 +132,13 @@ struct AccountDao {
             )
         }
     }
+    
+    func updateSubscriptionSyncTime(username: String, subscriptionSyncTime: Int64) throws {
+        try dbPool.write { db in
+            try db.execute(
+                sql: "UPDATE accounts SET subscription_sync_time = ? WHERE username = ?",
+                arguments: [subscriptionSyncTime, username]
+            )
+        }
+    }
 }

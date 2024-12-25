@@ -56,7 +56,7 @@ struct SubscriptionsView: View {
         }
         .navigationTitle("Subscriptions")
         .onAppear {
-            subscriptionListingViewModel.loadSubscriptions()
+            subscriptionListingViewModel.loadSubscriptionsOnline()
         }
     }
     
