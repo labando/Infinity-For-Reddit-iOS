@@ -142,7 +142,7 @@ struct LoginView: View {
                                                                                             try accountDao.insert(account)
                                                                                             
                                                                                             OperationQueue.main.addOperation {
-                                                                                                
+                                                                                                AccountViewModel.shared.switchAccount(newAccount: account)
                                                                                             }
                                                                                         } catch {
                                                                                             print("Error: Failed to insert account - \(error.localizedDescription)")

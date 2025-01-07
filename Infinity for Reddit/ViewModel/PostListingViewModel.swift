@@ -14,6 +14,7 @@ public class PostListingViewModel: ObservableObject {
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
     @Published var hasMorePages: Bool = true
+    private let account: Account
     private let postListingMetadata: PostListingMetadata
     private var isInitialLoad: Bool = true
     
@@ -24,7 +25,8 @@ public class PostListingViewModel: ObservableObject {
     public let postListingRepository: PostListingRepositoryProtocol
     
     // MARK: - Initializer
-    init(postListingMetadata: PostListingMetadata, postListingRepository: PostListingRepositoryProtocol) {
+    init(account: Account, postListingMetadata: PostListingMetadata, postListingRepository: PostListingRepositoryProtocol) {
+        self.account = account
         self.postListingMetadata = postListingMetadata
         self.postListingRepository = postListingRepository
     }
@@ -32,7 +34,7 @@ public class PostListingViewModel: ObservableObject {
     // MARK: - Methods
     
     /// Fetches the next page of posts
-    public func loadPosts(account: Account) {
+    public func loadPosts() {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
         if posts.isEmpty {
@@ -51,45 +53,45 @@ public class PostListingViewModel: ObservableObject {
             queries: ["limit": "100", "after": after ?? ""].merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
             params: postListingMetadata.params
         )
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                self?.isInitialLoading = false
-                self?.isLoadingMore = false
+        .receive(on: DispatchQueue.main)
+        .sink(receiveCompletion: { [weak self] completion in
+            self?.isInitialLoading = false
+            self?.isLoadingMore = false
+            
+            if case .failure(let error) = completion {
+                print("Error fetching posts: \(error)")
+            }
+        }, receiveValue: { [weak self] listingData in
+            guard let self = self else { return }
+            if (listingData.posts.isEmpty) {
+                // No more posts
+                hasMorePages = false
+                after = nil
+            } else {
+                let realNewPosts = listingData.posts.filter {
+                    !self.allPostIds.contains($0.id)
+                }
                 
-                if case .failure(let error) = completion {
-                    print("Error fetching posts: \(error)")
-                }
-            }, receiveValue: { [weak self] listingData in
-                guard let self = self else { return }
-                if (listingData.posts.isEmpty) {
-                    // No more posts
-                    hasMorePages = false
-                    after = nil
-                } else {
-                    let realNewPosts = listingData.posts.filter {
-                        !self.allPostIds.contains($0.id)
-                    }
-                    
-                    after = listingData.after
-                    
-                    self.posts.append(contentsOf: realNewPosts)
-                    
-                    allPostIds.formUnion(
-                        realNewPosts
-                            .compactMap {
-                                $0.id
-                            }
-                    )
-                    
-                    hasMorePages = !(realNewPosts.isEmpty || listingData.after == nil || listingData.after.isEmpty)
-                }
-                print("fuck")
-            })
-            .store(in: &cancellables)
+                after = listingData.after
+                
+                self.posts.append(contentsOf: realNewPosts)
+                
+                allPostIds.formUnion(
+                    realNewPosts
+                        .compactMap {
+                            $0.id
+                        }
+                )
+                
+                hasMorePages = !(realNewPosts.isEmpty || listingData.after == nil || listingData.after.isEmpty)
+            }
+            print("fuck")
+        })
+        .store(in: &cancellables)
     }
     
     /// Reloads posts from the first page
-    func refreshPosts(account: Account) {
+    func refreshPosts() {
         // This is for user switching accounts. We have to force clear all load
         cancellables.forEach { $0.cancel() }
         
@@ -101,6 +103,6 @@ public class PostListingViewModel: ObservableObject {
         hasMorePages = true
         posts = []
         
-        loadPosts(account: account)
+        loadPosts()
     }
 }

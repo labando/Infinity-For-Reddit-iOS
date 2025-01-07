@@ -23,6 +23,7 @@ struct HomeView: View {
             VStack {
                 TabView(selection: $selectedTab) {
                     PostListingView(
+                        account: accountViewModel.account,
                         postListingMetadata: PostListingMetadata(
                             postListingType: .frontPage,
                             pathComponents: ["sortType": "best"],
@@ -31,6 +32,7 @@ struct HomeView: View {
                             params: nil
                         )
                     )
+                    .id(accountViewModel.account.username)
                     .tabItem {
                         Label("Home", systemImage: "house")
                     }

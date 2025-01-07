@@ -42,6 +42,11 @@ public class AccountViewModel: ObservableObject {
         //subscribeToCurrentAccount()
     }
     
+    public func switchAccount(newAccount: Account) {
+        account = newAccount
+        objectWillChange.send()
+    }
+    
     public func updateTokens(accessToken: String, refreshToken: String?) throws {
         account.accessToken = accessToken
         print("Access Token: \(accessToken)")
