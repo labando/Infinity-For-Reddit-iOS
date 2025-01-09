@@ -47,10 +47,10 @@ struct ResizeToFit: Layout {
         
         var size = view.sizeThatFits(.unspecified)
         
-        if let width = proposal.width, size.width > width {
+        if size.width != 0 && size.height != 0 {
             let aspectRatio = size.width / size.height
-            size.width = width
-            size.height = width / aspectRatio
+            size.width = proposal.width!
+            size.height = size.width / aspectRatio
         }
         return size
     }

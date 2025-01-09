@@ -3,7 +3,7 @@
 //  Infinity for Reddit
 //
 //  Created by joeylr2042 on 2024-12-17.
-//  
+//
 
 import SwiftUI
 import SDWebImageSwiftUI
@@ -35,10 +35,27 @@ struct CommentViewCard: View {
             }
             .padding(.vertical, 8)
             
-            Markdown(commentViewModel.comment.body)
-                .markdownImageProvider(.webImage)
-                .font(.system(size: 24))
-                .padding(.bottom, 8)
+            let containsTable = MarkdownUtils.detectMarkdownTable(commentViewModel.comment.body)
+                    
+            Group {
+                if containsTable {
+                    ScrollView(.horizontal) {
+                        Markdown(commentViewModel.comment.body)
+                            .markdownImageProvider(.webImage)
+                            .font(.system(size: 24))
+                            .padding(.bottom, 8)
+                    }
+                } else {
+                    Markdown(commentViewModel.comment.body)
+                        .markdownImageProvider(.webImage)
+                        .font(.system(size: 24))
+                        .padding(.bottom, 8)
+                }
+            }
+//            Markdown(commentViewModel.comment.body)
+//                .markdownImageProvider(.webImage)
+//                .font(.system(size: 24))
+//                .padding(.bottom, 8)
             
             HStack(alignment: .center) {
                 Button(action: {
