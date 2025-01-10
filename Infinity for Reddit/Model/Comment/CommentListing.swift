@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftyJSON
+import MarkdownUI
 
 class CommentListingRootClass: NSObject, NSCoding{
     var kind: String!
@@ -163,6 +164,7 @@ public class Comment : NSObject, NSCoding{
     var bannedAtUtc : String!
     var bannedBy : String!
     var body : String!
+    var bodyProcessedMarkdown : MarkdownContent?
     var bodyHtml : String!
     var canGild : Bool!
     var canModPost : Bool!

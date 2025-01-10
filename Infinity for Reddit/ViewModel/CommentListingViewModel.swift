@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import MarkdownUI
 
 public class CommentListingViewModel: ObservableObject {
     // MARK: - Properties
@@ -91,13 +92,15 @@ public class CommentListingViewModel: ObservableObject {
     }
     
     func postProcessComments(_ comments: [Comment]) -> [Comment] {
-        return comments.map { modifyCommentBody($0) }
+        return comments.map {
+            modifyCommentBody($0)
+            $0.bodyProcessedMarkdown = MarkdownContent($0.body)
+            return $0
+        }
     }
     
-    func modifyCommentBody(_ comment: Comment) -> Comment {
+    func modifyCommentBody(_ comment: Comment) {
         comment.body = MarkdownUtils.replaceImageURL(comment)
         comment.body = MarkdownUtils.replaceGifURL(comment)
-        
-        return comment
     }
 }

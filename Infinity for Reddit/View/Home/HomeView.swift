@@ -53,6 +53,7 @@ struct HomeView: View {
                             params: nil
                         )
                     )
+                    .id(accountViewModel.account.username)
                     .tabItem {
                         Label("Inbox", systemImage: "envelope")
                     }

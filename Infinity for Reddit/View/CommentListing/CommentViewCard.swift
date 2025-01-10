@@ -40,16 +40,30 @@ struct CommentViewCard: View {
             Group {
                 if containsTable {
                     ScrollView(.horizontal) {
+                        if commentViewModel.comment.bodyProcessedMarkdown != nil {
+                            Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
+                                .markdownImageProvider(.webImage)
+                                .font(.system(size: 24))
+                                .padding(.bottom, 8)
+                        } else {
+                            Markdown(commentViewModel.comment.body)
+                                .markdownImageProvider(.webImage)
+                                .font(.system(size: 24))
+                                .padding(.bottom, 8)
+                        }
+                    }
+                } else {
+                    if commentViewModel.comment.bodyProcessedMarkdown != nil {
+                        Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
+                            .markdownImageProvider(.webImage)
+                            .font(.system(size: 24))
+                            .padding(.bottom, 8)
+                    } else {
                         Markdown(commentViewModel.comment.body)
                             .markdownImageProvider(.webImage)
                             .font(.system(size: 24))
                             .padding(.bottom, 8)
                     }
-                } else {
-                    Markdown(commentViewModel.comment.body)
-                        .markdownImageProvider(.webImage)
-                        .font(.system(size: 24))
-                        .padding(.bottom, 8)
                 }
             }
 //            Markdown(commentViewModel.comment.body)
