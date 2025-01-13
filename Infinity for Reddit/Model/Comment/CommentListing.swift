@@ -193,7 +193,7 @@ public class Comment : NSObject, NSCoding{
     var modReasonBy : String!
     var modReasonTitle : String!
     var modReports : [[Any]]! = [[Any]]()
-    var mediaMetadata: [String: Any]?
+    var mediaMetadata: [String: MediaMetadata]?
     var name : String!
     var noFollow : Bool!
     var numComments : Int!
@@ -275,8 +275,14 @@ public class Comment : NSObject, NSCoding{
         modNote = json["mod_note"].stringValue
         modReasonBy = json["mod_reason_by"].stringValue
         modReasonTitle = json["mod_reason_title"].stringValue
-        if let mediaMetaData = json["media_metadata"].dictionaryObject {
-            mediaMetadata = mediaMetaData
+        if let mediaMetaData = json["media_metadata"].dictionary {
+            var parsedMediaMetadata = [String: MediaMetadata]()
+            
+            for (key, value) in mediaMetaData {
+                let media = MediaMetadata(fromJson: value)
+                parsedMediaMetadata[key] = media
+            }
+            mediaMetadata = parsedMediaMetadata
         }
         for modReportArray in json["mod_reports"].arrayValue {
             var subArray: [Any] = []
@@ -608,7 +614,7 @@ public class Comment : NSObject, NSCoding{
         modReasonBy = aDecoder.decodeObject(forKey: "mod_reason_by") as? String
         modReasonTitle = aDecoder.decodeObject(forKey: "mod_reason_title") as? String
         modReports = aDecoder.decodeObject(forKey: "mod_reports") as? [[Any]]
-        mediaMetadata = aDecoder.decodeObject(forKey: "media_metadata") as? [String: Any]
+        mediaMetadata = aDecoder.decodeObject(forKey: "media_metadata") as? [String: MediaMetadata]
         name = aDecoder.decodeObject(forKey: "name") as? String
         noFollow = aDecoder.decodeObject(forKey: "no_follow") as? Bool
         numComments = aDecoder.decodeObject(forKey: "num_comments") as? Int

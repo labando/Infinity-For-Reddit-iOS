@@ -12,18 +12,46 @@ import SwiftUI
 // MARK: - WebImageProvider
 
 struct WebImageProvider: ImageProvider {
+    var mediaMetadata: [String: MediaMetadata]?
+    var comment: Comment
+    
+    init(mediaMetadata: [String: MediaMetadata]?, comment: Comment) {
+        self.mediaMetadata = mediaMetadata
+        self.comment = comment
+    }
+    
     func makeImage(url: URL?) -> some View {
-        ResizeToFit {
-            WebImage(url: url)
-                .resizable()
-                .transition(.fade(duration: 0.5))
-                .scaledToFit()
-                .frame(maxWidth: .infinity)
-                .onTapGesture{
-                    if let url = url {
-                        handleImageTap(url: url)
+        if let unescapedUrl = url?.absoluteString.removingPercentEncoding, let media = mediaMetadata?[unescapedUrl] {
+            if media.e == MediaMetadata.gifType {
+                WebImage(url: URL(string: media.s.gif ?? ""))
+                    .resizable()
+                    .indicator(.activity)
+                    .transition(.fade(duration: 0.5))
+                    .scaledToFit()
+                    .frame(width: 140)
+                    .aspectRatio(CGFloat(media.s.y) / CGFloat(media.s.x), contentMode: .fill)
+                    .onTapGesture{
+                        if let url = url {
+                            handleImageTap(url: url)
+                        }
                     }
-                }
+            } else {
+                WebImage(url: URL(string: media.s.u ?? ""))
+                    .resizable()
+                    .indicator(.activity)
+                    .transition(.fade(duration: 0.5))
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(CGFloat(media.s.y) / CGFloat(media.s.x), contentMode: .fill)
+                    .onTapGesture{
+                        if let url = url {
+                            handleImageTap(url: url)
+                        }
+                    }
+            }
+        } else {
+            // When there is no MediaMetadata
+            EmptyView()
         }
     }
     
@@ -32,11 +60,11 @@ struct WebImageProvider: ImageProvider {
     }
 }
 
-extension ImageProvider where Self == WebImageProvider {
-    static var webImage: Self {
-        .init()
-    }
-}
+//extension ImageProvider where Self == WebImageProvider {
+//    static var webImage: Self {
+//        .init()
+//    }
+//}
 
 // MARK: - ResizeToFit
 
@@ -51,7 +79,7 @@ struct ResizeToFit: Layout {
         
         if size.width != 0 && size.height != 0 {
             let aspectRatio = size.width / size.height
-            size.width = proposal.width!
+            size.width = proposal.width ?? size.width
             size.height = size.width / aspectRatio
         }
         return size

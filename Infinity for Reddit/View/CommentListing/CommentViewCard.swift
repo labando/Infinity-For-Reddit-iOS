@@ -42,27 +42,31 @@ struct CommentViewCard: View {
                     ScrollView(.horizontal) {
                         if commentViewModel.comment.bodyProcessedMarkdown != nil {
                             Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
-                                .markdownImageProvider(.webImage)
+                                .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
                                 .font(.system(size: 24))
                                 .padding(.bottom, 8)
+                                .id(commentViewModel.comment.id)
                         } else {
                             Markdown(commentViewModel.comment.body)
-                                .markdownImageProvider(.webImage)
+                                .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
                                 .font(.system(size: 24))
                                 .padding(.bottom, 8)
+                                .id(commentViewModel.comment.id)
                         }
                     }
                 } else {
                     if commentViewModel.comment.bodyProcessedMarkdown != nil {
                         Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
-                            .markdownImageProvider(.webImage)
+                            .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
                             .font(.system(size: 24))
                             .padding(.bottom, 8)
+                            .id(commentViewModel.comment.id)
                     } else {
                         Markdown(commentViewModel.comment.body)
-                            .markdownImageProvider(.webImage)
+                            .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
                             .font(.system(size: 24))
                             .padding(.bottom, 8)
+                            .id(commentViewModel.comment.id)
                     }
                 }
             }

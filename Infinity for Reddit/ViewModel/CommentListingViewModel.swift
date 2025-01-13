@@ -100,7 +100,6 @@ public class CommentListingViewModel: ObservableObject {
     }
     
     func modifyCommentBody(_ comment: Comment) {
-        comment.body = MarkdownUtils.replaceImageURL(comment)
-        comment.body = MarkdownUtils.replaceGifURL(comment)
+        MarkdownUtils.replaceImageURL(comment)
     }
 }
