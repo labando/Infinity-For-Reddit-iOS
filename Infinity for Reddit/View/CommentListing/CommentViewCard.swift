@@ -34,41 +34,20 @@ struct CommentViewCard: View {
                 )
             }
             .padding(.vertical, 8)
-            
-            //let containsTable = MarkdownUtils.detectMarkdownTable(commentViewModel.comment.body)
-            let containsTable = false
                     
             Group {
-                if containsTable {
-                    ScrollView(.horizontal) {
-                        if commentViewModel.comment.bodyProcessedMarkdown != nil {
-                            Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
-                                .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
-                                .font(.system(size: 24))
-                                .padding(.bottom, 8)
-                                .id(commentViewModel.comment.id)
-                        } else {
-                            Markdown(commentViewModel.comment.body)
-                                .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
-                                .font(.system(size: 24))
-                                .padding(.bottom, 8)
-                                .id(commentViewModel.comment.id)
-                        }
-                    }
+                if commentViewModel.comment.bodyProcessedMarkdown != nil {
+                    Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
+                        .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
+                        .font(.system(size: 24))
+                        .padding(.bottom, 8)
+                        .id(commentViewModel.comment.id)
                 } else {
-                    if commentViewModel.comment.bodyProcessedMarkdown != nil {
-                        Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
-                            .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
-                            .font(.system(size: 24))
-                            .padding(.bottom, 8)
-                            .id(commentViewModel.comment.id)
-                    } else {
-                        Markdown(commentViewModel.comment.body)
-                            .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
-                            .font(.system(size: 24))
-                            .padding(.bottom, 8)
-                            .id(commentViewModel.comment.id)
-                    }
+                    Markdown(commentViewModel.comment.body)
+                        .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, comment: commentViewModel.comment))
+                        .font(.system(size: 24))
+                        .padding(.bottom, 8)
+                        .id(commentViewModel.comment.id)
                 }
             }
             

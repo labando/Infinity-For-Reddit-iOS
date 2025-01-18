@@ -11,10 +11,8 @@ class MarkdownUtils {
     private static let REGEX_PATTERNS = {
         do {
             return try [
-                NSRegularExpression(pattern: #"!?\[gif\]\(([^)]+)\)"#, options: []),
                 NSRegularExpression(pattern: #"https:\/\/preview\.redd\.it\/[a-zA-Z0-9]+\.(?:jpeg|jpg|png)\?width=\d+&format=\w+&auto=\w+&s=[a-f0-9]+"#, options: []),
-                NSRegularExpression(pattern: #"\[(.*?)\]\(https:\/\/preview\.redd\.it\/[a-zA-Z0-9]+\.(?:jpeg|jpg|png)\?width=\d+&format=\w+&auto=\w+&s=[a-f0-9]+\)"#, options: []),
-                NSRegularExpression(pattern: #"\|:?|:?\|"#, options: [])
+                NSRegularExpression(pattern: #"\[(.*?)\]\(https:\/\/preview\.redd\.it\/[a-zA-Z0-9]+\.(?:jpeg|jpg|png)\?width=\d+&format=\w+&auto=\w+&s=[a-f0-9]+\)"#, options: [])
             ]
         } catch {
             fatalError("Error creating regular expressions: \(error)")
@@ -29,8 +27,8 @@ class MarkdownUtils {
         
         var replacedBody = commentBody
         
-        let imageURLMatches = MarkdownUtils.REGEX_PATTERNS[1].matches(in: commentBody, options: [], range: NSRange(location: 0, length: commentBody.count))
-        let imageMarkdownMatches = MarkdownUtils.REGEX_PATTERNS[2].matches(in: commentBody, options: [], range: NSRange(location: 0, length: commentBody.count))
+        let imageURLMatches = MarkdownUtils.REGEX_PATTERNS[0].matches(in: commentBody, options: [], range: NSRange(location: 0, length: commentBody.count))
+        let imageMarkdownMatches = MarkdownUtils.REGEX_PATTERNS[1].matches(in: commentBody, options: [], range: NSRange(location: 0, length: commentBody.count))
         guard !imageURLMatches.isEmpty || !imageMarkdownMatches.isEmpty else {
             return
         }
@@ -66,11 +64,11 @@ class MarkdownUtils {
                 if let dotIndex = matchedString[startIndex...].firstIndex(of: ".") {
                     // Extract the substring between `startIndex` and `dotIndex`
                     let id = String(matchedString[startIndex ..< dotIndex])
-                    print(id)
                     let markdownImage = "![](\(id))"
                     replacedBody.replaceSubrange(range, with: markdownImage)
                 } else {
-                    let markdownImage = "![Preview Image](\(matchedString))"
+                    // There may not be an id
+                    let markdownImage = "![](\(matchedString))"
                     replacedBody.replaceSubrange(range, with: markdownImage)
                 }
             }
@@ -109,26 +107,17 @@ class MarkdownUtils {
                         comment.mediaMetadata?[id]?.caption = matchedCaption
                     }
                 } else {
-                    // TODO add caption
+                    // No caption because it's just a URL
                     let markdownImage = "![](\(matchedMarkdown))"
                     replacedBody.replaceSubrange(range, with: markdownImage)
                 }
             } else {
-                // TODO add caption
+                // No caption because it's just a URL
                 let markdownImage = "![](\(matchedMarkdown))"
                 replacedBody.replaceSubrange(range, with: markdownImage)
             }
         }
-        print(replacedBody)
         comment.body = replacedBody
-    }
-    
-    static func detectMarkdownTable(_ text: String) -> Bool {
-        let markdownTableMatches = MarkdownUtils.REGEX_PATTERNS[3].matches(in: text, options: [], range: NSRange(location: 0, length: text.count))
-        if markdownTableMatches.count > 0 {
-            return true
-        }
-        return false
     }
 }
 
