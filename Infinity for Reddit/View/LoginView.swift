@@ -14,6 +14,7 @@ import GRDB
 
 struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var accountViewModel: AccountViewModel
     
     private let session: Session
     private let dbPool: DatabasePool
@@ -99,65 +100,67 @@ struct LoginView: View {
                                                                     print("Refresh Token: \(refreshToken)")
                                                                     
                                                                     session.request(RedditOAuthAPI.getMyInfo(headers: APIUtils.getOAuthHeader(accessToken: accessToken)))
-                                                                    .validate()
-                                                                    .responseString { response in
-                                                                        switch response.result {
-                                                                        case .success(let myInfoResponse):
-                                                                            guard !myInfoResponse.isEmpty else {
-                                                                                print("Error: Empty response from Reddit")
-                                                                                return
-                                                                            }
-                                                                            if let myInfo = myInfoResponse.data(using: .utf8) {
-                                                                                operationQueue.addOperation {
-                                                                                    do {
-                                                                                        let jsonResponse = try JSON(data: myInfo)
-                                                                                        
-                                                                                        // Parse the response
-                                                                                        let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
-                                                                                        let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
-                                                                                        
-                                                                                        var bannerImageUrl: String? = nil
-                                                                                        if let subredditData = jsonResponse[JSONUtils.SUBREDDIT_KEY].dictionary {
-                                                                                            bannerImageUrl = subredditData[JSONUtils.BANNER_IMG_KEY]?.stringValue
-                                                                                        }
-                                                                                        
-                                                                                        let karma = jsonResponse[JSONUtils.TOTAL_KARMA_KEY].intValue
-                                                                                        let isMod = jsonResponse[JSONUtils.IS_MOD_KEY].boolValue
-                                                                                        
-                                                                                        let account = Account(
-                                                                                            username: name,
-                                                                                            isCurrentUser: true,
-                                                                                            profileImageUrl: profileImageUrl,
-                                                                                            bannerImageUrl: bannerImageUrl,
-                                                                                            karma: karma,
-                                                                                            isMod: isMod,
-                                                                                            accessToken: accessToken,
-                                                                                            refreshToken: refreshToken,
-                                                                                            code: authCode
-                                                                                        )
-                                                                                        
-                                                                                        let accountDao = AccountDao(dbPool: dbPool)
+                                                                        .validate()
+                                                                        .responseString { response in
+                                                                            switch response.result {
+                                                                            case .success(let myInfoResponse):
+                                                                                guard !myInfoResponse.isEmpty else {
+                                                                                    print("Error: Empty response from Reddit")
+                                                                                    return
+                                                                                }
+                                                                                if let myInfo = myInfoResponse.data(using: .utf8) {
+                                                                                    operationQueue.addOperation {
                                                                                         do {
-                                                                                            try accountDao.markAllAccountsNonCurrent()
-                                                                                            try accountDao.insert(account)
+                                                                                            let jsonResponse = try JSON(data: myInfo)
                                                                                             
-                                                                                            OperationQueue.main.addOperation {
-                                                                                                AccountViewModel.shared.switchAccount(newAccount: account)
+                                                                                            // Parse the response
+                                                                                            let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
+                                                                                            let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
+                                                                                            
+                                                                                            var bannerImageUrl: String? = nil
+                                                                                            if let subredditData = jsonResponse[JSONUtils.SUBREDDIT_KEY].dictionary {
+                                                                                                bannerImageUrl = subredditData[JSONUtils.BANNER_IMG_KEY]?.stringValue
+                                                                                            }
+                                                                                            
+                                                                                            let karma = jsonResponse[JSONUtils.TOTAL_KARMA_KEY].intValue
+                                                                                            let isMod = jsonResponse[JSONUtils.IS_MOD_KEY].boolValue
+                                                                                            
+                                                                                            let account = Account(
+                                                                                                username: name,
+                                                                                                isCurrentUser: true,
+                                                                                                profileImageUrl: profileImageUrl,
+                                                                                                bannerImageUrl: bannerImageUrl,
+                                                                                                karma: karma,
+                                                                                                isMod: isMod,
+                                                                                                accessToken: accessToken,
+                                                                                                refreshToken: refreshToken,
+                                                                                                code: authCode
+                                                                                            )
+                                                                                            
+                                                                                            let accountDao = AccountDao(dbPool: dbPool)
+                                                                                            do {
+                                                                                                try accountDao.markAllAccountsNonCurrent()
+                                                                                                try accountDao.insert(account)
+                                                                                                
+                                                                                                OperationQueue.main.addOperation {
+                                                                                                    AccountViewModel.shared.switchAccount(newAccount: account)
+                                                                                                    accountViewModel.shouldDismissAccountSheet = true
+                                                                                                    dismiss()
+                                                                                                }
+                                                                                            } catch {
+                                                                                                print("Error: Failed to insert account - \(error.localizedDescription)")
                                                                                             }
                                                                                         } catch {
-                                                                                            print("Error: Failed to insert account - \(error.localizedDescription)")
+                                                                                            print("Error: Failed to parse account JSON - \(error.localizedDescription)")
                                                                                         }
-                                                                                    } catch {
-                                                                                        print("Error: Failed to parse account JSON - \(error.localizedDescription)")
                                                                                     }
                                                                                 }
+                                                                                break
+                                                                            case .failure(let error):
+                                                                                print("Error: \(error.localizedDescription)")
+                                                                                break
                                                                             }
-                                                                            break
-                                                                        case .failure(let error):
-                                                                            print("Error: \(error.localizedDescription)")
-                                                                            break
                                                                         }
-                                                                    }
                                                                 } else {
                                                                     print("Error: Tokens not found in response")
                                                                 }

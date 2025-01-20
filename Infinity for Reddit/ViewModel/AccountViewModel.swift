@@ -23,6 +23,8 @@ public class AccountViewModel: ObservableObject {
     private static var _shared: AccountViewModel?
     
     @Published var account: Account
+    @Published var shouldDismissAccountSheet: Bool = false
+    
     let accountDao: AccountDao
     private var cancellables: Set<AnyCancellable> = []
     

@@ -98,11 +98,10 @@ struct HomeView: View {
             )
             .sheet(isPresented: $showProfile) {
                 AccountSheet()
-                    .presentationDetents([.medium])
+                    .presentationDetents([.height(800)])
             }
             .onAppear {
                 let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-
                 let docsDir = dirPaths[0]
 
                 print(docsDir)

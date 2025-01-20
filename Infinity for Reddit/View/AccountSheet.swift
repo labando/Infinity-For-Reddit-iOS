@@ -99,10 +99,10 @@ struct AccountSheet: View {
                         Button(action: {
                             // Handle Sign Out Logic
                             do {
-                                    try accountViewModel.logoutToAnonymous()
-                                } catch {
-                                    print("Failed to log out: \(error)")
-                                }
+                                try accountViewModel.logoutToAnonymous()
+                            } catch {
+                                print("Failed to log out: \(error)")
+                            }
                         }) {
                             Text("Log out")
                                 .frame(maxWidth: .infinity)
@@ -113,16 +113,15 @@ struct AccountSheet: View {
                         }
                         .padding(.horizontal)
                     } else {
-                        Button(action: {
-                            // Handle Sign Out Logic
-                        }) {
+                        NavigationLink(destination: LoginView().environmentObject(accountViewModel)) {
                             Text("Log in")
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color.red)
+                                .background(Color.blue)
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
+                        .padding(.horizontal)
                     }
                 }
             }
@@ -133,6 +132,12 @@ struct AccountSheet: View {
                     dismiss() // Close the sheet
                 }
             )
+            .onAppear {
+                if accountViewModel.shouldDismissAccountSheet {
+                    accountViewModel.shouldDismissAccountSheet = false
+                    dismiss()
+                }
+            }
         }
     }
 }
