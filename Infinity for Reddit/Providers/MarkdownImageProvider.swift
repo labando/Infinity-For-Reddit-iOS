@@ -38,7 +38,9 @@ struct WebImageProvider: ImageProvider {
                         }
                     
                     if media.caption != nil {
+                        // TODO make sure the text style is correct
                         Text(media.caption!)
+                            .font(.system(size: 18))
                     }
                 }
                 
@@ -58,7 +60,9 @@ struct WebImageProvider: ImageProvider {
                         }
                     
                     if media.caption != nil {
+                        // TODO make sure the text style is correct
                         Text(media.caption!)
+                            .font(.system(size: 18))
                     }
                 }
             }
