@@ -37,6 +37,7 @@ public class SubscriptionListingRepository: SubscriptionListingRepositoryProtoco
                             if let error = json.error {
                                 throw SubscriptionListingRepositoryError.JSONDecodingError(error.localizedDescription)
                             } else {
+                                // TODO need to handle JSON error
                                 let subscriptionListingRootClass = SubscriptionListingRootClass(fromJson: json)
                                 promise(.success(subscriptionListingRootClass.subscriptionListing))
                             }

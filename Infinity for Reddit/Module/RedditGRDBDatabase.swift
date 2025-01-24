@@ -129,6 +129,56 @@ struct RedditGRDBDatabase {
                 t.column("is_favorite", .boolean).notNull().defaults(to: false)
                 t.primaryKey(["path", "username"])
             }
+            
+            try db.create(table: CustomTheme.databaseTableName, ifNotExists: true) { t in
+                // Primary key
+                t.column("id", .integer).primaryKey(autoincrement: true)
+                
+                // String properties
+                t.column("name", .text).notNull()
+                t.column("username", .text).notNull()
+                
+                // Boolean properties
+                t.column("isLightTheme", .boolean).notNull()
+                t.column("isDarkTheme", .boolean).notNull()
+                t.column("isAmoledTheme", .boolean).notNull()
+                t.column("isLightStatusBar", .boolean).notNull()
+                t.column("isLightNavBar", .boolean).notNull()
+                t.column("isChangeStatusBarIconColorAfterToolbarCollapsedInImmersiveInterface", .boolean).notNull()
+                
+                // Integer color properties
+                let colorColumns = [
+                    "colorPrimary", "colorPrimaryDark", "colorAccent", "colorPrimaryLightTheme",
+                    "primaryTextColor", "secondaryTextColor", "postTitleColor", "postContentColor",
+                    "readPostTitleColor", "readPostContentColor", "commentColor", "buttonTextColor",
+                    "backgroundColor", "cardViewBackgroundColor", "readPostCardViewBackgroundColor",
+                    "filledCardViewBackgroundColor", "readPostFilledCardViewBackgroundColor",
+                    "commentBackgroundColor", "bottomAppBarBackgroundColor", "primaryIconColor",
+                    "bottomAppBarIconColor", "postIconAndInfoColor", "commentIconAndInfoColor",
+                    "toolbarPrimaryTextAndIconColor", "toolbarSecondaryTextColor",
+                    "circularProgressBarBackground", "mediaIndicatorIconColor", "mediaIndicatorBackgroundColor",
+                    "tabLayoutWithExpandedCollapsingToolbarTabBackground", "tabLayoutWithExpandedCollapsingToolbarTextColor",
+                    "tabLayoutWithExpandedCollapsingToolbarTabIndicator", "tabLayoutWithCollapsedCollapsingToolbarTabBackground",
+                    "tabLayoutWithCollapsedCollapsingToolbarTextColor", "tabLayoutWithCollapsedCollapsingToolbarTabIndicator",
+                    "navBarColor", "upvoted", "downvoted", "postTypeBackgroundColor", "postTypeTextColor",
+                    "spoilerBackgroundColor", "spoilerTextColor", "nsfwBackgroundColor", "nsfwTextColor",
+                    "flairBackgroundColor", "flairTextColor", "awardsBackgroundColor", "awardsTextColor",
+                    "archivedTint", "lockedIconTint", "crosspostIconTint", "upvoteRatioIconTint",
+                    "stickiedPostIconTint", "noPreviewPostTypeIconTint", "subscribed", "unsubscribed",
+                    "subreddit", "authorFlairTextColor", "submitter", "moderator", "currentUser",
+                    "singleCommentThreadBackgroundColor", "unreadMessageBackgroundColor", "dividerColor",
+                    "noPreviewPostTypeBackgroundColor", "voteAndReplyUnavailableButtonColor",
+                    "commentVerticalBarColor1", "commentVerticalBarColor2", "commentVerticalBarColor3",
+                    "commentVerticalBarColor4", "commentVerticalBarColor5", "commentVerticalBarColor6",
+                    "commentVerticalBarColor7", "fabIconColor", "chipTextColor", "linkColor",
+                    "receivedMessageTextColor", "sentMessageTextColor", "receivedMessageBackgroundColor",
+                    "sentMessageBackgroundColor", "sendMessageIconColor", "fullyCollapsedCommentBackgroundColor",
+                    "awardedCommentBackgroundColor"
+                ]
+                colorColumns.forEach { columnName in
+                    t.column(columnName, .integer).notNull()
+                }
+            }
         }
     }
 }

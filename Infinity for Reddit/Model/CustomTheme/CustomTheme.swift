@@ -9,7 +9,9 @@ import GRDB
 
 
 struct CustomTheme: Codable, FetchableRecord, PersistableRecord {
+    var id: Int?
     var name: String
+    var username: String?
     var isLightTheme: Bool
     var isDarkTheme: Bool
     var isAmoledTheme: Bool
@@ -68,7 +70,6 @@ struct CustomTheme: Codable, FetchableRecord, PersistableRecord {
     var noPreviewPostTypeIconTint: Int
     var subscribed: Int
     var unsubscribed: Int
-    var username: Int
     var subreddit: Int
     var authorFlairTextColor: Int
     var submitter: Int
@@ -106,6 +107,7 @@ struct CustomTheme: Codable, FetchableRecord, PersistableRecord {
     
     init(
         name: String,
+        username: String?,
         isLightTheme: Bool,
         isDarkTheme: Bool,
         isAmoledTheme: Bool,
@@ -164,7 +166,6 @@ struct CustomTheme: Codable, FetchableRecord, PersistableRecord {
         noPreviewPostTypeIconTint: Int,
         subscribed: Int,
         unsubscribed: Int,
-        username: Int,
         subreddit: Int,
         authorFlairTextColor: Int,
         submitter: Int,
@@ -197,6 +198,7 @@ struct CustomTheme: Codable, FetchableRecord, PersistableRecord {
         isChangeStatusBarIconColorAfterToolbarCollapsedInImmersiveInterface: Bool
     ) {
         self.name = name
+        self.username = username
         self.isLightTheme = isLightTheme
         self.isDarkTheme = isDarkTheme
         self.isAmoledTheme = isAmoledTheme
@@ -255,7 +257,6 @@ struct CustomTheme: Codable, FetchableRecord, PersistableRecord {
         self.noPreviewPostTypeIconTint = noPreviewPostTypeIconTint
         self.subscribed = subscribed
         self.unsubscribed = unsubscribed
-        self.username = username
         self.subreddit = subreddit
         self.authorFlairTextColor = authorFlairTextColor
         self.submitter = submitter
