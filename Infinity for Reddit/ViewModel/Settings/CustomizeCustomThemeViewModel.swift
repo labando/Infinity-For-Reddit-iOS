@@ -288,12 +288,12 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator_detail", comment: "")
         )
 
-        customThemeSettingsItems["upvotedColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["upvoted"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_upvoted_color", comment: ""),
             description: NSLocalizedString("theme_item_upvoted_color_detail", comment: "")
         )
 
-        customThemeSettingsItems["downvotedColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["downvoted"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_downvoted_color", comment: ""),
             description: NSLocalizedString("theme_item_downvoted_color_detail", comment: "")
         )
@@ -384,22 +384,22 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_no_preview_post_type_icon_tint_detail", comment: "")
         )
 
-        customThemeSettingsItems["subscribedColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["subscribed"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_subscribed_color", comment: ""),
             description: NSLocalizedString("theme_item_subscribed_color_detail", comment: "")
         )
 
-        customThemeSettingsItems["unsubscribedColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["unsubscribed"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_unsubscribed_color", comment: ""),
             description: NSLocalizedString("theme_item_unsubscribed_color_detail", comment: "")
         )
 
-        customThemeSettingsItems["usernameColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["username"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_username_color", comment: ""),
             description: NSLocalizedString("theme_item_username_color_detail", comment: "")
         )
 
-        customThemeSettingsItems["subredditColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["subreddit"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_subreddit_color", comment: ""),
             description: NSLocalizedString("theme_item_subreddit_color_detail", comment: "")
         )
@@ -413,17 +413,17 @@ class CustomizeCustomThemeViewModel: ObservableObject {
         
         
         
-        customThemeSettingsItems["submitterColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["submitter"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_submitter_color", comment: ""),
             description: NSLocalizedString("theme_item_submitter_color_detail", comment: "")
         )
 
-        customThemeSettingsItems["moderatorColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["moderator"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_moderator_color", comment: ""),
             description: NSLocalizedString("theme_item_moderator_color_detail", comment: "")
         )
 
-        customThemeSettingsItems["currentUserColor"] = CustomThemeSettingsItem(
+        customThemeSettingsItems["currentUser"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_current_user_color", comment: ""),
             description: NSLocalizedString("theme_item_current_user_color_detail", comment: "")
         )
