@@ -479,520 +479,1735 @@
 
     },
     "theme_item_archived_tint" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archived Icon Color"
+          }
+        }
+      }
     },
     "theme_item_archived_tint_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Archived icon"
+          }
+        }
+      }
     },
     "theme_item_author_flair_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Author Flair Color"
+          }
+        }
+      }
     },
     "theme_item_author_flair_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Author flair in comments"
+          }
+        }
+      }
     },
     "theme_item_awarded_comment_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Awarded Comment Background Color"
+          }
+        }
+      }
     },
     "theme_item_awarded_comment_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of awarded comments"
+          }
+        }
+      }
     },
     "theme_item_awards_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Awards Background Color"
+          }
+        }
+      }
     },
     "theme_item_awards_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of the awards tag"
+          }
+        }
+      }
     },
     "theme_item_awards_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Awards Text Color"
+          }
+        }
+      }
     },
     "theme_item_awards_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Text color of the awards tag"
+          }
+        }
+      }
     },
     "theme_item_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Color"
+          }
+        }
+      }
     },
     "theme_item_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of every page and navigation drawer"
+          }
+        }
+      }
     },
     "theme_item_bottom_app_bar_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom Navigation Bar Color"
+          }
+        }
+      }
     },
     "theme_item_bottom_app_bar_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Bottom navigation bar"
+          }
+        }
+      }
     },
     "theme_item_bottom_app_bar_icon_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom Navigation Bar Icon Color"
+          }
+        }
+      }
     },
     "theme_item_bottom_app_bar_icon_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Icons in the bottom navigation bar"
+          }
+        }
+      }
     },
     "theme_item_button_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Button Text Color"
+          }
+        }
+      }
     },
     "theme_item_button_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Text on button"
+          }
+        }
+      }
     },
     "theme_item_card_view_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card View Background Color"
+          }
+        }
+      }
     },
     "theme_item_card_view_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Post background and message background"
+          }
+        }
+      }
     },
     "theme_item_change_status_bar_icon_color_after_toolbar_collapsed_in_immersive_interface" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Status Bar Icon Color After Toolbar Collapsed In Immersive Interface"
+          }
+        }
+      }
     },
     "theme_item_chip_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chip Text Color"
+          }
+        }
+      }
     },
     "theme_item_chip_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Subscribe Button"
+          }
+        }
+      }
     },
     "theme_item_circular_progress_bar_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circular Progress Bar Background Color"
+          }
+        }
+      }
     },
     "theme_item_circular_progress_bar_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of Circular progress bar"
+          }
+        }
+      }
     },
     "theme_item_color_accent" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color Accent"
+          }
+        }
+      }
     },
     "theme_item_color_accent_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Progress Bar and background of Floating Action Button, etc"
+          }
+        }
+      }
     },
     "theme_item_color_primary" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color Primary"
+          }
+        }
+      }
     },
     "theme_item_color_primary_dark" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color Primary Dark"
+          }
+        }
+      }
     },
     "theme_item_color_primary_dark_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Status Bar"
+          }
+        }
+      }
     },
     "theme_item_color_primary_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Toolbar"
+          }
+        }
+      }
     },
     "theme_item_color_primary_light_theme" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color Primary Light Theme"
+          }
+        }
+      }
     },
     "theme_item_color_primary_light_theme_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Button"
+          }
+        }
+      }
     },
     "theme_item_comment_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Background Color"
+          }
+        }
+      }
     },
     "theme_item_comment_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment background"
+          }
+        }
+      }
     },
     "theme_item_comment_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Color"
+          }
+        }
+      }
     },
     "theme_item_comment_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment"
+          }
+        }
+      }
     },
     "theme_item_comment_icon_and_info_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Icon and Info Color"
+          }
+        }
+      }
     },
     "theme_item_comment_icon_and_info_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Icons and score in comments"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_1" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Vertical Bar Color 1"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_1_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment Vertical Bar (Level 1)"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_2" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Vertical Bar Color 2"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_2_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment Vertical Bar (Level 2)"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_3" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Vertical Bar Color 3"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_3_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment Vertical Bar (Level 3)"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_4" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Vertical Bar Color 4"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_4_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment Vertical Bar (Level 4)"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_5" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Vertical Bar Color 5"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_5_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment Vertical Bar (Level 5)"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_6" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Vertical Bar Color 6"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_6_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment Vertical Bar (Level 6)"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_7" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Vertical Bar Color 7"
+          }
+        }
+      }
     },
     "theme_item_comment_vertical_bar_color_7_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment Vertical Bar (Level 7)"
+          }
+        }
+      }
     },
     "theme_item_crosspost_icon_tint" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crosspost Icon Color"
+          }
+        }
+      }
     },
     "theme_item_crosspost_icon_tint_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Crosspost icon"
+          }
+        }
+      }
     },
     "theme_item_current_user_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current User"
+          }
+        }
+      }
     },
     "theme_item_current_user_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Current user in comments"
+          }
+        }
+      }
     },
     "theme_item_divider_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Divider Color"
+          }
+        }
+      }
     },
     "theme_item_divider_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Comment divider, dividers in pages for submitting posts, etc."
+          }
+        }
+      }
     },
     "theme_item_downvoted_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downvoted Color"
+          }
+        }
+      }
     },
     "theme_item_downvoted_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Vote buttons and scores (downvoted)"
+          }
+        }
+      }
     },
     "theme_item_fab_icon_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Floating Action Button Icon Color"
+          }
+        }
+      }
     },
     "theme_item_fab_icon_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Floating action button icon"
+          }
+        }
+      }
     },
     "theme_item_filled_card_view_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filled Card View Background Color"
+          }
+        }
+      }
     },
     "theme_item_filled_card_view_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of a post in a filled card view, some edit text fields"
+          }
+        }
+      }
     },
     "theme_item_flair_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flair Background Color"
+          }
+        }
+      }
     },
     "theme_item_flair_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of the flair tag"
+          }
+        }
+      }
     },
     "theme_item_flair_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flair Text Color"
+          }
+        }
+      }
     },
     "theme_item_flair_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Text color of the flair tag"
+          }
+        }
+      }
     },
     "theme_item_fully_collapsed_comment_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fully-Collapsed Comment Background Color"
+          }
+        }
+      }
     },
     "theme_item_fully_collapsed_comment_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of fully-collapsed comments"
+          }
+        }
+      }
     },
     "theme_item_is_amoled_theme" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set as Amoled Theme"
+          }
+        }
+      }
     },
     "theme_item_is_dark_theme" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set as Dark Theme"
+          }
+        }
+      }
     },
     "theme_item_is_light_theme" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set as Light Theme"
+          }
+        }
+      }
     },
     "theme_item_light_nav_bar" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark Navigation Bar Icon Color"
+          }
+        }
+      }
     },
     "theme_item_light_status_bar" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark Status Bar Icon Color"
+          }
+        }
+      }
     },
     "theme_item_link_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link Color"
+          }
+        }
+      }
     },
     "theme_item_link_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: URL"
+          }
+        }
+      }
     },
     "theme_item_locked_icon_tint" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locked Icon Color"
+          }
+        }
+      }
     },
     "theme_item_locked_icon_tint_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Locked icon"
+          }
+        }
+      }
     },
     "theme_item_media_indicator_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media Indicator Background Color"
+          }
+        }
+      }
     },
     "theme_item_media_indicator_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of video or gallery icon on post preview"
+          }
+        }
+      }
     },
     "theme_item_media_indicator_icon_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Media Indicator Icon Color"
+          }
+        }
+      }
     },
     "theme_item_media_indicator_icon_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Video or gallery icon on post preview"
+          }
+        }
+      }
     },
     "theme_item_moderator_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderator"
+          }
+        }
+      }
     },
     "theme_item_moderator_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Moderator in comments"
+          }
+        }
+      }
     },
     "theme_item_nav_bar_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigation Bar Color"
+          }
+        }
+      }
     },
     "theme_item_nav_bar_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Navigation bar"
+          }
+        }
+      }
     },
     "theme_item_no_preview_post_type_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No-preview Post Type Background Color"
+          }
+        }
+      }
     },
     "theme_item_no_preview_post_type_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Placeholder indicating the type of post when there is no preview available"
+          }
+        }
+      }
     },
     "theme_item_no_preview_post_type_icon_tint" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No-preview Post Type Icon Color"
+          }
+        }
+      }
     },
     "theme_item_no_preview_post_type_icon_tint_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Icon indicating the type of post when there is no preview available"
+          }
+        }
+      }
     },
     "theme_item_nsfw_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sensitive Tag Background Color"
+          }
+        }
+      }
     },
     "theme_item_nsfw_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of the sensitive tag"
+          }
+        }
+      }
     },
     "theme_item_nsfw_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sensitive Tag Text Color"
+          }
+        }
+      }
     },
     "theme_item_nsfw_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Text color of the sensitive tag"
+          }
+        }
+      }
     },
     "theme_item_post_content_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Content Color"
+          }
+        }
+      }
     },
     "theme_item_post_content_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Post content"
+          }
+        }
+      }
     },
     "theme_item_post_icon_and_info_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Icon and Info Color"
+          }
+        }
+      }
     },
     "theme_item_post_icon_and_info_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Icons, score and the number of comments in posts"
+          }
+        }
+      }
     },
     "theme_item_post_title_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Title Color"
+          }
+        }
+      }
     },
     "theme_item_post_title_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Post title"
+          }
+        }
+      }
     },
     "theme_item_post_type_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Type Background Color"
+          }
+        }
+      }
     },
     "theme_item_post_type_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of the post type (IMAGE, TEXT, VIDEO, GIF, LINK)"
+          }
+        }
+      }
     },
     "theme_item_post_type_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Type Text Color"
+          }
+        }
+      }
     },
     "theme_item_post_type_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Text color of the post type (IMAGE, TEXT, VIDEO, GIF LINK)"
+          }
+        }
+      }
     },
     "theme_item_primary_icon_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Icon Color"
+          }
+        }
+      }
     },
     "theme_item_primary_icon_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Icons in the navigation drawer."
+          }
+        }
+      }
     },
     "theme_item_primary_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Text Color"
+          }
+        }
+      }
     },
     "theme_item_primary_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Primary text"
+          }
+        }
+      }
     },
     "theme_item_read_post_card_view_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read Post Card View Background Color"
+          }
+        }
+      }
     },
     "theme_item_read_post_card_view_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Read Post background"
+          }
+        }
+      }
     },
     "theme_item_read_post_content_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read Post Content Color"
+          }
+        }
+      }
     },
     "theme_item_read_post_content_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Read Post Content"
+          }
+        }
+      }
     },
     "theme_item_read_post_filled_card_view_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read Post Filled Card View Background Color"
+          }
+        }
+      }
     },
     "theme_item_read_post_filled_card_view_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of a read post in a filled card view"
+          }
+        }
+      }
     },
     "theme_item_read_post_title_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read Post Title Color"
+          }
+        }
+      }
     },
     "theme_item_read_post_title_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Read Post Title"
+          }
+        }
+      }
     },
     "theme_item_received_message_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Received Message Background Color"
+          }
+        }
+      }
     },
     "theme_item_received_message_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of received private messages"
+          }
+        }
+      }
     },
     "theme_item_received_message_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Received Message Text Color"
+          }
+        }
+      }
     },
     "theme_item_received_message_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Received Private Messages"
+          }
+        }
+      }
     },
     "theme_item_secondary_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secondary Text Color"
+          }
+        }
+      }
     },
     "theme_item_secondary_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Secondary text"
+          }
+        }
+      }
     },
     "theme_item_send_message_icon_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Message Icon Color"
+          }
+        }
+      }
     },
     "theme_item_send_message_icon_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: send private message icon"
+          }
+        }
+      }
     },
     "theme_item_sent_message_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent Message Background Color"
+          }
+        }
+      }
     },
     "theme_item_sent_message_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of sent private messages"
+          }
+        }
+      }
     },
     "theme_item_sent_message_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent Message Text Color"
+          }
+        }
+      }
     },
     "theme_item_sent_message_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Sent Private Messages"
+          }
+        }
+      }
     },
     "theme_item_single_comment_thread_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Single Comment Thread Background Color"
+          }
+        }
+      }
     },
     "theme_item_single_comment_thread_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Single Comment"
+          }
+        }
+      }
     },
     "theme_item_spoiler_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spoiler Background Color"
+          }
+        }
+      }
     },
     "theme_item_spoiler_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Background of the spoiler tag"
+          }
+        }
+      }
     },
     "theme_item_spoiler_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spoiler Text Color"
+          }
+        }
+      }
     },
     "theme_item_spoiler_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Text color in the spoiler tag"
+          }
+        }
+      }
     },
     "theme_item_stickied_post_icon_tint" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stickied Post Icon Color"
+          }
+        }
+      }
     },
     "theme_item_stickied_post_icon_tint_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Stickied post icon"
+          }
+        }
+      }
     },
     "theme_item_submitter_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submitter"
+          }
+        }
+      }
     },
     "theme_item_submitter_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Submitter in comments"
+          }
+        }
+      }
     },
     "theme_item_subreddit_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subreddit Color"
+          }
+        }
+      }
     },
     "theme_item_subreddit_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Subreddit name"
+          }
+        }
+      }
     },
     "theme_item_subscribed_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribed"
+          }
+        }
+      }
     },
     "theme_item_subscribed_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Unsubscribe button"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Color of Tab Layout in Collapsed Toolbar"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Tab layout background (collapsed toolbar)"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab Indicator Color of Tab Layout in Collapsed Toolbar"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Tab indicator color in tab layout (collapsed toolbar)"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Color of Tab Layout in Collapsed Toolbar"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Tab layout text color (collapsed toolbar)"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Color of Tab Layout in Expanded Toolbar"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Tab layout background (expanded toolbar)"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab Indicator Color of Tab Layout in Expanded Toolbar"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Tab indicator color in tab layout (expanded toolbar)"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Color of Tab Layout in Expanded Toolbar"
+          }
+        }
+      }
     },
     "theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Tab layout text color (expanded toolbar)"
+          }
+        }
+      }
     },
     "theme_item_toolbar_primary_text_and_icon_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toolbar Primary Text and Icon Color"
+          }
+        }
+      }
     },
     "theme_item_toolbar_primary_text_and_icon_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Primary texts and icons in toolbars"
+          }
+        }
+      }
     },
     "theme_item_toolbar_secondary_text_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toolbar Secondary Text Color"
+          }
+        }
+      }
     },
     "theme_item_toolbar_secondary_text_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Secondary texts in toolbars"
+          }
+        }
+      }
     },
     "theme_item_unread_message_background_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unread Message Background Color"
+          }
+        }
+      }
     },
     "theme_item_unread_message_background_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Unread Message Background Color"
+          }
+        }
+      }
     },
     "theme_item_unsubscribed_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsubscribed"
+          }
+        }
+      }
     },
     "theme_item_unsubscribed_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Subscribe button"
+          }
+        }
+      }
     },
     "theme_item_upvote_ratio_icon_tint" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upvote Ratio Icon Color"
+          }
+        }
+      }
     },
     "theme_item_upvote_ratio_icon_tint_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Upvote ratio icon"
+          }
+        }
+      }
     },
     "theme_item_upvoted_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upvoted Color"
+          }
+        }
+      }
     },
     "theme_item_upvoted_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Vote buttons and scores (upvoted)"
+          }
+        }
+      }
     },
     "theme_item_username_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Username Color"
+          }
+        }
+      }
     },
     "theme_item_username_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Username"
+          }
+        }
+      }
     },
     "theme_item_vote_and_reply_unavailable_button_color" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vote and Reply Unavailable Button Color"
+          }
+        }
+      }
     },
     "theme_item_vote_and_reply_unavailable_button_color_detail" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Vote and reply buttons (Unavailable)"
+          }
+        }
+      }
+    },
+    "theme_name_description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to change the name of this theme."
+          }
+        }
+      }
     },
     "This is where you will add UI for filtering out content." : {
 
