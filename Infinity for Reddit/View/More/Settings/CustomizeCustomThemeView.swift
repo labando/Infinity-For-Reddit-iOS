@@ -9,6 +9,9 @@ import SwiftUI
 
 struct CustomizeCustomThemeView: View {
     @StateObject var customizeCustomThemeViewModel: CustomizeCustomThemeViewModel
+    var changingColor: Binding<Int>?
+    var title: String?
+    @State var showColorPicker: Bool = false
     
     init(customTheme: CustomTheme) {
         _customizeCustomThemeViewModel = StateObject(wrappedValue: CustomizeCustomThemeViewModel(customTheme: customTheme))
@@ -37,9 +40,16 @@ struct CustomizeCustomThemeView: View {
                             description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? "",
                             color: colorBinding.wrappedValue
                         )
+                        .onTapGesture {
+                            showColorPicker.toggle()
+                        }
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showColorPicker) {
+            AccountSheet()
+                .presentationDetents([.height(800)])
         }
     }
     
