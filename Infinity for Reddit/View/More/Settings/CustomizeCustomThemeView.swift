@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CustomizeCustomThemeView: View {
     @StateObject var customizeCustomThemeViewModel: CustomizeCustomThemeViewModel
-    var changingColor: Binding<Int>?
-    var title: String?
+    @State var changingColor: IdentifiableBinding<Int>?
+    @State var title: String?
     @State var showColorPicker: Bool = false
     
     init(customTheme: CustomTheme) {
@@ -38,18 +38,19 @@ struct CustomizeCustomThemeView: View {
                             fieldName: fieldName,
                             title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
                             description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? "",
-                            color: colorBinding.wrappedValue
+                            color: getWrappedBinding(for: colorBinding)
                         )
-                        .onTapGesture {
-                            showColorPicker.toggle()
-                        }
                     }
                 }
             }
         }
-        .sheet(isPresented: $showColorPicker) {
-            AccountSheet()
-                .presentationDetents([.height(800)])
+        .sheet(item: $changingColor) { currentColor in
+            ColorPicker("Select a color", selection: Binding(
+                get: { Color(hex: currentColor.binding.wrappedValue) },
+                set: { newColor in
+                    currentColor.binding.wrappedValue = newColor.toHex()
+                }
+            ))
         }
     }
     
@@ -67,10 +68,10 @@ struct CustomizeCustomThemeView: View {
         }
     }
     
-    private func ColorEntry(fieldName: String, title: String, description: String, color: Int) -> some View {
+    private func ColorEntry(fieldName: String, title: String, description: String, color: IdentifiableBinding<Int>) -> some View {
         return HStack(alignment: .center) {
             Circle()
-                .fill(Color(hex: color))
+                .fill(Color(hex: color.binding.wrappedValue))
                 .frame(width: 24, height: 24)
             
             Spacer()
@@ -89,6 +90,14 @@ struct CustomizeCustomThemeView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity)
+        .onTapGesture {
+            DispatchQueue.main.async {
+                changingColor = color
+                showColorPicker = true
+            }
+            
+            //color.wrappedValue = 0
+        }
     }
     
     private func BooleanEntry(fieldName: String, title: String, description: String, isEnabled: Binding<Bool>) -> some View {
@@ -112,6 +121,16 @@ struct CustomizeCustomThemeView: View {
                 .labelsHidden()
         }
         .frame(maxWidth: .infinity)
+    }
+    
+    private func getWrappedBinding<T>(for binding: Binding<T>) -> IdentifiableBinding<T> {
+        return IdentifiableBinding(binding: Binding(
+            get: { binding.wrappedValue },
+            set: { newValue in
+                binding.wrappedValue = newValue
+                customizeCustomThemeViewModel.objectWillChange.send()
+            }
+        ))
     }
     
     private func getBooleanBinding(for fieldName: String) -> Binding<Bool>? {

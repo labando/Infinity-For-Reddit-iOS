@@ -15,3 +15,13 @@ extension Color {
         self.init(red: red, green: green, blue: blue, opacity: opacity)
     }
 }
+
+extension Color {
+    func toHex() -> Int {
+        guard let components = UIColor(self).cgColor.components else { return 0x000000 }
+        let r = Int(components[0] * 255)
+        let g = Int(components[1] * 255)
+        let b = Int(components[2] * 255)
+        return (r << 16) | (g << 8) | b
+    }
+}
