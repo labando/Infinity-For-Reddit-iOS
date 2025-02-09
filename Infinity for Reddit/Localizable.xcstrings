@@ -148,6 +148,9 @@
     "Fixed Height in Card" : {
 
     },
+    "Follow" : {
+
+    },
     "Font" : {
 
     },
@@ -239,6 +242,9 @@
 
     },
     "Is loading" : {
+
+    },
+    "Karma: %lld   Cake day: Dec 30, 2024" : {
 
     },
     "Lazy Mode Interval" : {
@@ -2251,6 +2257,9 @@
 
     },
     "Use Bottom Toolbar in Media Viewer" : {
+
+    },
+    "User Details" : {
 
     },
     "Users" : {
