@@ -59,7 +59,7 @@ struct HomeView: View {
                     }
                     .tag(Tab.inbox)
                     
-                    SettingsView()
+                    MoreView()
                         .tabItem {
                             Label("More", systemImage: "person")
                         }

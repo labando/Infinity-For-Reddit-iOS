@@ -103,7 +103,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
     
     
     static var databaseTableName: String {
-        return "custom_theme"
+        return "custom_themes"
     }
     
     init(

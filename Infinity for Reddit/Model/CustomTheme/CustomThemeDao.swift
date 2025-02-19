@@ -109,19 +109,19 @@ class CustomThemeDao {
 
     func unsetLightTheme() throws {
         try dbPool.write { db in
-            try db.execute(sql: "UPDATE custom_themes SET is_light_theme = 0 WHERE is_light_theme = 1")
+            try db.execute(sql: "UPDATE custom_themes SET isLightTheme = 0 WHERE isLightTheme = 1")
         }
     }
 
     func unsetDarkTheme() throws {
         try dbPool.write { db in
-            try db.execute(sql: "UPDATE custom_themes SET is_dark_theme = 0 WHERE is_dark_theme = 1")
+            try db.execute(sql: "UPDATE custom_themes SET isDarkTheme = 0 WHERE isDarkTheme = 1")
         }
     }
 
     func unsetAmoledTheme() throws {
         try dbPool.write { db in
-            try db.execute(sql: "UPDATE custom_themes SET is_amoled_theme = 0 WHERE is_amoled_theme = 1")
+            try db.execute(sql: "UPDATE custom_themes SET isAmoledTheme = 0 WHERE isAmoledTheme = 1")
         }
     }
 

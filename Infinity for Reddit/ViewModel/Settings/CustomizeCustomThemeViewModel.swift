@@ -30,6 +30,23 @@ class CustomizeCustomThemeViewModel: ObservableObject {
         initializeCustomThemeSettingsItems(customThemeSettingsItems: &customThemeSettingsItems)
     }
     
+    func saveCustomTheme() {
+        do {
+            if customTheme.isLightTheme {
+                try customThemeDao.unsetLightTheme()
+            } else if customTheme.isDarkTheme {
+                try customThemeDao.unsetDarkTheme()
+            } else if customTheme.isAmoledTheme {
+                try customThemeDao.unsetAmoledTheme()
+            }
+            
+            try customThemeDao.insert(customTheme: customTheme)
+        } catch {
+            // TODO handle error
+            print("fuck")
+        }
+    }
+    
     class CustomThemeSettingsItem {
         let title: String
         let description: String?

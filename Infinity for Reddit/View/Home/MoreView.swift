@@ -16,19 +16,19 @@ struct MoreView: View {
         List {
             Section(header: Text("Account")) {
                 NavigationLink(destination: ProfileView()) {
-                Text("Profile")
+                    Text("Profile")
                 }
                 NavigationLink(destination: MultiredditView()) {
-                Text("Multireddit")
+                    Text("Multireddit")
                 }
                 NavigationLink(destination: HistoryView()) {
-                Text("History")
+                    Text("History")
                 }
             }
             Section(header: Text("Post")) {
                 NavigationLink(destination: UpvotedView()) {
-                Text("Upvoted")
-            }
+                    Text("Upvoted")
+                }
                 NavigationLink(destination: DownvotedView()) {
                     Text("Downvoted")
                 }

@@ -43,6 +43,15 @@ struct CustomizeCustomThemeView: View {
                 }
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    customizeCustomThemeViewModel.saveCustomTheme()
+                }) {
+                    SwiftUI.Image(systemName: "tray.and.arrow.down")
+                }
+            }
+        }
     }
     
     private func NameEntry() -> some View {
