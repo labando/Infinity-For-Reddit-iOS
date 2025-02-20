@@ -54,13 +54,15 @@ struct CustomThemeSettingsView: View {
                             icon: "upvoted")
                     }
                     
-                    HStack {
-                        SwiftUI.Image("upvote")
-                        
-                        Spacer()
-                            .frame(width: 16)
-                        
-                        Text("Manage Themes")
+                    NavigationLink(destination: CustomThemeListingView()) {
+                        HStack {
+                            SwiftUI.Image("upvote")
+                            
+                            Spacer()
+                                .frame(width: 16)
+                            
+                            Text("Manage Themes")
+                        }
                     }
                 }
             }
