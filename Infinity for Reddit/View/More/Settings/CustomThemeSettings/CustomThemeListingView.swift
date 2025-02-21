@@ -23,7 +23,9 @@ struct CustomThemeListingView: View {
     var body: some View {
         List {
             ForEach(customThemeListingViewModel.customThemes, id: \.self.id) { customTheme in
-                ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary))
+                NavigationLink(destination: CustomizeCustomThemeView(customTheme: customTheme)) {
+                    ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary))
+                }
             }
         }
     }

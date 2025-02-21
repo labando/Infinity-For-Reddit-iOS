@@ -34,21 +34,21 @@ struct CustomThemeSettingsView: View {
             Section(header: Text("Customization")) {
                 List {
                     NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo())) {
-                        themeListItem(
+                        ThemeListItem(
                             themeType: "Light Theme",
                             themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
                             icon: "upvoted")
                     }
                     
                     NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentDarkCustomTheme ?? CustomTheme.getIndigoDark())) {
-                        themeListItem(
+                        ThemeListItem(
                             themeType: "Dark Theme",
                             themeName: customThemeViewModel.currentDarkCustomTheme?.name ?? "Indigo Dark",
                             icon: "upvoted")
                     }
                     
                     NavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled())) {
-                        themeListItem(
+                        ThemeListItem(
                             themeType: "Amoled Theme",
                             themeName: customThemeViewModel.currentAmoledCustomTheme?.name ?? "Indigo Amoled",
                             icon: "upvoted")
@@ -70,7 +70,7 @@ struct CustomThemeSettingsView: View {
         .navigationTitle("Theme")
     }
     
-    func themeListItem(themeType: String, themeName: String, icon: String) -> some View {
+    func ThemeListItem(themeType: String, themeName: String, icon: String) -> some View {
         HStack {
             SwiftUI.Image(icon)
             
