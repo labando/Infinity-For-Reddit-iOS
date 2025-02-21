@@ -25,6 +25,7 @@ struct MoreView: View {
                     Text("History")
                 }
             }
+            .listPlainItem()
             Section(header: Text("Post")) {
                 NavigationLink(destination: UpvotedView()) {
                     Text("Upvoted")
@@ -39,11 +40,14 @@ struct MoreView: View {
                     Text("Saved")
                 }
             }
+            .listPlainItem()
             Section(header: Text("Preferences")) {
                 NavigationLink(destination: SettingsView()) {
                     Text("Settings")
                 }
             }
+            .listPlainItem()
         }
+        .applyCustomThemeToList()
     }
 }
