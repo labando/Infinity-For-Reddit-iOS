@@ -31,6 +31,27 @@ struct TestView: View {
         }
         .themedList()
         .listItemTint(Color.clear)
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                            Button("About") {
+                                print("About tapped!")
+                            }
+
+                            Button("Help") {
+                                print("Help tapped!")
+                            }
+                        }
+
+                        ToolbarItemGroup(placement: .secondaryAction) {
+                            Button("Settings") {
+                                print("Credits tapped")
+                            }
+
+                            Button("Email Me") {
+                                print("Email tapped")
+                            }
+                        }
+        }
         .navigationTitle("Settings")
     }
 }

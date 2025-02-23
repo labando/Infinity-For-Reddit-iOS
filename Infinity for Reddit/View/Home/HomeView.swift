@@ -66,36 +66,47 @@ struct HomeView: View {
                         .tag(Tab.more)
                 }
             }
-            .navigationBarTitle(selectedTab.navigationTitle, displayMode: .inline)
-            .navigationBarItems(
-                leading: selectedTab.leadingButton,
-                trailing: Button(action: {
-                    showProfile.toggle()
-                }) {
-                    if let profileImageUrl = accountViewModel.account.profileImageUrl {
-                        AsyncImage(url: URL(string: profileImageUrl)) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            case .failure:
-                                SwiftUI.Image(systemName: "person.circle.circle")
-                            @unknown default:
-                                EmptyView()
-                            }
-                        }
-                        .frame(width: 48, height: 48)
-                        .clipShape(.circle)
-                    } else {
-                        SwiftUI.Image(systemName: "person.crop.circle")
-                            .resizable()
-                            .frame(width: 30, height: 30)
+            .toolbar {
+                if let leadingButton = selectedTab.leadingButton {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        leadingButton
+                            .navigationBarButton()
                     }
                 }
-            )
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showProfile.toggle()
+                    }) {
+                        if let profileImageUrl = accountViewModel.account.profileImageUrl {
+                            AsyncImage(url: URL(string: profileImageUrl)) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                case .failure:
+                                    SwiftUI.Image(systemName: "person.circle.circle")
+                                        .navigationBarImage()
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                            .frame(width: 48, height: 48)
+                            .clipShape(Circle())
+                        } else {
+                            SwiftUI.Image(systemName: "person.crop.circle")
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                                .navigationBarImage()
+                        }
+                    }
+                }
+            }
+            .themedNavigationBar()
+            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
             .sheet(isPresented: $showProfile) {
                 AccountSheet()
                     .presentationDetents([.height(800)])

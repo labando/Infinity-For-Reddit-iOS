@@ -13,6 +13,17 @@ struct PrimaryTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             //.font()
-            .foregroundColor(Color(hex: themeViewModel.currentLightCustomTheme?.primaryTextColor ?? Color.black.toHex()))
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+    }
+}
+
+struct NavigationBarPrimaryTextViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            //.font()
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+            .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -10,6 +10,8 @@ import Combine
 import GRDB
 
 public class CustomThemeViewModel: ObservableObject {
+    // The default theme is Indigo
+    @Published var currentCustomTheme: CustomTheme = CustomTheme.getIndigo()
     @Published var isDarkTheme: Bool = false
     @Published var allCustomThemes: [CustomTheme] = []
     @Published var currentLightCustomTheme: CustomTheme?
