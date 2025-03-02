@@ -15,6 +15,7 @@ import SwiftyJSON
 
 class UserDetailsViewModel: ObservableObject {
     let session: Session
+    @Published var users: [String: UserData] = [:]
     @Published var isSubscribed: Bool = false
     @EnvironmentObject var accountViewModel: AccountViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -114,6 +115,7 @@ class UserDetailsViewModel: ObservableObject {
                             )
                             
                             completion(.success(userData))
+                            self.users[name] = userData
                             
                         } catch {
                             print("Error: Failed to parse account JSON - \(error.localizedDescription)")

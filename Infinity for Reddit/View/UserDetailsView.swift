@@ -10,7 +10,7 @@ import SwiftUI
 struct UserDetailsView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var accountViewModel: AccountViewModel
-    @StateObject private var userDetailsViewModel = UserDetailsViewModel()
+    @EnvironmentObject var userDetailsViewModel : UserDetailsViewModel
     private var username: String
     @State private var selectedTab = 0
     @State private var isCurrentUserProfile: Bool = true
@@ -21,109 +21,111 @@ struct UserDetailsView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                // Top Section (User Info)
-                if let userData = userData {
-                    HStack(spacing: 0) {
-                        if let profileImageUrl = userData.iconUrl {
-                            AsyncImage(url: URL(string: profileImageUrl)) { phase in
-                                switch phase {
-                                case .empty:
-                                    ProgressView()
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                case .failure:
-                                    SwiftUI.Image(systemName: "person.circle.fill")
-                                @unknown default:
-                                    EmptyView()
-                                }
+        VStack(spacing: 0) {
+            // Top Section (User Info)
+            if let userData = userData {
+                HStack(spacing: 0) {
+                    if let profileImageUrl = userData.iconUrl {
+                        AsyncImage(url: URL(string: profileImageUrl)) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            case .failure:
+                                SwiftUI.Image(systemName: "person.circle.fill")
+                            @unknown default:
+                                EmptyView()
                             }
-                            .frame(width: 80, height: 80)
-                            .clipShape(Circle())
-                            .padding(.leading, 20)
-                            .padding(.vertical, 20)
                         }
+                        .frame(width: 80, height: 80)
+                        .clipShape(Circle())
+                        .padding(.leading, 20)
+                        .padding(.vertical, 20)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("u/\(userData.name)")
+                            .font(.title2)
+                            .bold()
                         
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("u/\(userData.name)")
-                                .font(.title2)
-                                .bold()
-                            
-                            Button(action: {
-                                userDetailsViewModel.toggleSubscription(username: accountViewModel.account.username)
-                            }) {
-                                Text(userDetailsViewModel.isSubscribed ? "Followed" : "Follow")
-                                    .padding(.horizontal, 15)
-                                    .padding(.vertical, 8)
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(20)
-                            }
+                        Button(action: {
+                            userDetailsViewModel.toggleSubscription(username: accountViewModel.account.username)
+                        }) {
+                            Text(userDetailsViewModel.isSubscribed ? "Followed" : "Follow")
+                                .padding(.horizontal, 15)
+                                .padding(.vertical, 8)
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
                         }
-                        .padding(.leading, 10)
-                        Spacer()
                     }
-                    .frame(maxWidth: .infinity)
-                    
-                    // Stats Section
-                    Text("Karma: \(userData.totalKarma ?? 0)  Cake day: \(userDetailsViewModel.formattedCakeDay(userData.cakeday ?? 0.0))")
-                        .padding(.leading, 30)
-                        .frame(maxWidth:.infinity, alignment:.leading)
-                    
-                    
-                    // Posts and Comments Tabs
-                    HStack(spacing: 0) {
-                        TabButton(
-                            text: "Posts",
-                            isSelected: selectedTab == 0,
-                            action: { selectedTab = 0 }
-                        )
-                        TabButton(
-                            text: "Comments",
-                            isSelected: selectedTab == 1,
-                            action: { selectedTab = 1 }
-                        )
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 20)
-                    
-                    if selectedTab == 1 {
-                        VStack {
-                            CommentListingView(
-                                commentListingMetadata: CommentListingMetadata(
-                                    commentListingType:.user,
-                                    pathComponents: ["sortType": "best", "username": "\(userData.name)"],
-                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                    queries: nil,
-                                    params: nil
-                                )
+                    .padding(.leading, 10)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                
+                // Stats Section
+                Text("Karma: \(userData.totalKarma ?? 0)  Cake day: \(userDetailsViewModel.formattedCakeDay(userData.cakeday ?? 0.0))")
+                    .padding(.leading, 30)
+                    .frame(maxWidth:.infinity, alignment:.leading)
+                
+                
+                // Posts and Comments Tabs
+                HStack(spacing: 0) {
+                    TabButton(
+                        text: "Posts",
+                        isSelected: selectedTab == 0,
+                        action: { selectedTab = 0 }
+                    )
+                    TabButton(
+                        text: "Comments",
+                        isSelected: selectedTab == 1,
+                        action: { selectedTab = 1 }
+                    )
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 20)
+                
+                if selectedTab == 1 {
+                    VStack {
+                        CommentListingView(
+                            commentListingMetadata: CommentListingMetadata(
+                                commentListingType:.user,
+                                pathComponents: ["sortType": "best", "username": "\(userData.name)"],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil,
+                                params: nil
                             )
-                            .id(userData.name)
-                        }
-                        .frame(maxHeight:.infinity)
-                        Spacer()
-                    } else {
-                        VStack{
-                            PostListingView(
-                                account: accountViewModel.account,
-                                postListingMetadata:PostListingMetadata(
-                                    postListingType:.user,
-                                    pathComponents: ["sortType": "best", "username": "\(userData.name)"],
-                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                    queries: nil,
-                                    params: nil
-                                )
-                            )
-                            .id(userData.name)
-                        }.frame(maxHeight:.infinity)
-                        Spacer()
+                        )
+                        .id(userData.name)
                     }
+                    .frame(maxHeight:.infinity)
+                    Spacer()
+                } else {
+                    VStack{
+                        PostListingView(
+                            account: accountViewModel.account,
+                            postListingMetadata:PostListingMetadata(
+                                postListingType:.user,
+                                pathComponents: ["sortType": "best", "username": "\(userData.name)"],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil,
+                                params: nil
+                            )
+                        )
+                        .id(userData.name)
+                    }.frame(maxHeight:.infinity)
+                    Spacer()
                 }
             }
-            .onAppear {
+        }
+        .onAppear {
+            if let userData = userDetailsViewModel.users[username] {
+                self.userData = userData
+            } else {
                 userDetailsViewModel.fetchUserDetails(username: username) { result in
                     DispatchQueue.main.async {
                         switch result {
@@ -134,11 +136,13 @@ struct UserDetailsView: View {
                         }
                     }
                 }
+//                print(userDetailsViewModel.users)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)))
-            .edgesIgnoringSafeArea(.bottom)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)))
+        .edgesIgnoringSafeArea(.bottom)
+        
         .navigationTitle("User Details")
     }
 }

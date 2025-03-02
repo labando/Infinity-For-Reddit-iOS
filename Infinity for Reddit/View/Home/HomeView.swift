@@ -60,7 +60,7 @@ struct HomeView: View {
                         }
                         .tag(Tab.inbox)
                         
-                        UserDetailsView(username: "joeylr2042")
+                        UserDetailsView(username: "infinityAN")
                             .tabItem {
                                 Label("More", systemImage: "person")
                             }
