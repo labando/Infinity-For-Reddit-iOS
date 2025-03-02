@@ -21,7 +21,7 @@ extension View {
     }
     
     func secondaryText() -> some View {
-        self.modifier(PrimaryTextViewModifier())
+        self.modifier(SecondaryTextViewModifier())
     }
     
     func navigationBarPrimaryText() -> some View {
