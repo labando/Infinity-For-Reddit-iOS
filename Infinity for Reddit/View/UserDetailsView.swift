@@ -10,20 +10,24 @@ import SwiftUI
 struct UserDetailsView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var accountViewModel: AccountViewModel
-    @EnvironmentObject var userDetailsViewModel : UserDetailsViewModel
-    private var username: String
+    
+    @StateObject var userDetailsViewModel : UserDetailsViewModel
     @State private var selectedTab = 0
     @State private var isCurrentUserProfile: Bool = true
-    @State private var userData: UserData?
     
-    init(username: String){
-        self.username = username
+    init(username: String) {
+        _userDetailsViewModel = StateObject(
+            wrappedValue: UserDetailsViewModel(
+                username: username,
+                userDetailsRepository: UserDetailsRepository()
+            )
+        )
     }
     
     var body: some View {
         VStack(spacing: 0) {
             // Top Section (User Info)
-            if let userData = userData {
+            if let userData = userDetailsViewModel.userData {
                 HStack(spacing: 0) {
                     if let profileImageUrl = userData.iconUrl {
                         AsyncImage(url: URL(string: profileImageUrl)) { phase in
@@ -52,7 +56,7 @@ struct UserDetailsView: View {
                             .bold()
                         
                         Button(action: {
-                            userDetailsViewModel.toggleSubscription(username: accountViewModel.account.username)
+                            userDetailsViewModel.toggleFollowUser()
                         }) {
                             Text(userDetailsViewModel.isSubscribed ? "Followed" : "Follow")
                                 .padding(.horizontal, 15)
@@ -123,20 +127,8 @@ struct UserDetailsView: View {
             }
         }
         .onAppear {
-            if let userData = userDetailsViewModel.users[username] {
-                self.userData = userData
-            } else {
-                userDetailsViewModel.fetchUserDetails(username: username) { result in
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let userData):
-                            self.userData = userData
-                        case .failure(let error):
-                            print("Error fetching user data:", error)
-                        }
-                    }
-                }
-//                print(userDetailsViewModel.users)
+            if userDetailsViewModel.userData == nil {
+                userDetailsViewModel.fetchUserDetails()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

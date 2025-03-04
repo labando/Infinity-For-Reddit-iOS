@@ -60,17 +60,17 @@ struct HomeView: View {
                         }
                         .tag(Tab.inbox)
                         
-                        //UserDetailsView(username: "infinityAN")
+                        UserDetailsView(username: "infinityAN")
 //                        UserDetailsView(username: "Hostilenemy")
-//                            .tabItem {
-//                                Label("More", systemImage: "person")
-//                            }
-//                            .tag(Tab.more)
-                        MoreView()
                             .tabItem {
                                 Label("More", systemImage: "person")
                             }
                             .tag(Tab.more)
+//                        MoreView()
+//                            .tabItem {
+//                                Label("More", systemImage: "person")
+//                            }
+//                            .tag(Tab.more)
                     }
                     .themedTabViewGroup()
                 }

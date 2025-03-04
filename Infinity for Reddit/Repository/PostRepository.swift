@@ -15,6 +15,7 @@ public class PostRepository: PostRepositoryProtocol {
         case NetworkError(String)
         case JSONDecodingError(String)
     }
+    
     private let session: Session
     
     public init() {
