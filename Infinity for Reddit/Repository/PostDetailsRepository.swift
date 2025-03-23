@@ -1,18 +1,17 @@
 //
-//  CommentListingRepository.swift
+//  PostDetailsRepository.swift
 //  Infinity for Reddit
 //
-//  Created by joeylr2042 on 2024-12-15.
-//  
+//  Created by Docile Alligator on 2025-03-23.
+//
 
 import Combine
 import Alamofire
 import SwiftyJSON
 import Foundation
 
-public class CommentListingRepository: CommentListingRepositoryProtocol {
-
-    enum CommentListingRepositoryError: Error {
+public class PostDetailsRepository: PostDetailsRepositoryProtocol {
+    enum PostDetailsRepositoryError: Error {
         case NetworkError(String)
         case JSONDecodingError(String)
     }
@@ -26,20 +25,12 @@ public class CommentListingRepository: CommentListingRepositoryProtocol {
     }
     
     public func fetchComments(
-        commentListingType: CommentListingType,
-        pathComponents: [String: String]? = nil,
-        queries: [String: String]? = [:],
-        params: [String: String]? = [:]
-    ) -> AnyPublisher<CommentListing, any Error> {
-        let apiRequest: URLRequestConvertible
-        switch commentListingType {
-        case .user:
-            apiRequest = RedditOAuthAPI.getUserComments(pathComponents: pathComponents!, queries: queries!)
-        }
-        
-        return Future<CommentListing, any Error> { promise in
+        postId: String,
+        queries: [String: String] = [:]
+    ) -> AnyPublisher<PostDetailsRootClass, any Error> {
+        return Future<PostDetailsRootClass, any Error> { promise in
             self.session.request(
-                apiRequest
+                RedditOAuthAPI.getPostAndCommentsById(postId: postId, queries: queries)
             )
                 .validate()
                 .responseData { response in
@@ -48,10 +39,10 @@ public class CommentListingRepository: CommentListingRepositoryProtocol {
                         do {
                             let json = JSON(data)
                             if let error = json.error {
-                                throw CommentListingRepositoryError.JSONDecodingError(error.localizedDescription)
+                                throw PostDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
                             } else {
-                                let commentListingRootClass = try CommentListingRootClass(fromJson: json)
-                                promise(.success(commentListingRootClass.data))
+                                let postDetails = try PostDetailsRootClass(fromJson: json)
+                                promise(.success(postDetails))
                             }
                         } catch {
                             promise(.failure(error))

@@ -9,26 +9,26 @@ import Foundation
 import SwiftyJSON
 import MarkdownUI
 
-class CommentListingRootClass: NSObject, NSCoding{
+public class CommentListingRootClass: NSObject, NSCoding{
     var kind: String!
     var data: CommentListing!
     
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!){
+    init(fromJson json: JSON!) throws {
         if json.isEmpty{
             return
         }
         let dataJson = json["data"]
         if !dataJson.isEmpty{
-            data = CommentListing(fromJson: dataJson)
+            data = try CommentListing(fromJson: dataJson)
         }
         kind = json["kind"].stringValue
     }
     
     /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
+     * Returns all the available property values in the form of [String:Any] object where the key is the appropriate json key and the value is the value of the corresponding property
      */
     func toDictionary() -> [String:Any]
     {
@@ -47,7 +47,7 @@ class CommentListingRootClass: NSObject, NSCoding{
      * NSCoding required initializer.
      * Fills the data from the passed decoder
      */
-    @objc required init(coder aDecoder: NSCoder)
+    @objc required public init(coder aDecoder: NSCoder)
     {
         data = aDecoder.decodeObject(forKey: "data") as? CommentListing
         kind = aDecoder.decodeObject(forKey: "kind") as? String
@@ -57,7 +57,7 @@ class CommentListingRootClass: NSObject, NSCoding{
      * NSCoding required method.
      * Encodes mode properties into the decoder
      */
-    func encode(with aCoder: NSCoder)
+    public func encode(with aCoder: NSCoder)
     {
         if data != nil{
             aCoder.encode(data, forKey: "data")
@@ -69,9 +69,9 @@ class CommentListingRootClass: NSObject, NSCoding{
     }
 }
 
-public class CommentListing : NSObject, NSCoding{
-    
+public class CommentListing : NSObject, NSCoding, Validatable {
     var comments : [Comment]! = [Comment]()
+    var commentMore: CommentMore?
     var after : String!
     var before : String!
     var dist : Int!
@@ -79,15 +79,26 @@ public class CommentListing : NSObject, NSCoding{
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!) {
+    init(fromJson json: JSON!) throws {
+        try Self.validate(json: json)
+        
         if json.isEmpty{
             return
         }
+        
         let childrenArray = json["children"].arrayValue
         for childJSON in childrenArray {
             let dataJson = childJSON["data"]
-            if !dataJson.isEmpty{
-                comments.append(Comment(fromJson: dataJson))
+            if !dataJson.isEmpty {
+                do {
+                    try comments.append(Comment(fromJson: dataJson))
+                } catch {
+                    do {
+                        commentMore = try CommentMore(fromJson: dataJson)
+                    } catch {
+                        // Ignore
+                    }
+                }
             }
         }
         after = json["after"].stringValue
@@ -142,7 +153,7 @@ public class CommentListing : NSObject, NSCoding{
     }
 }
 
-public class Comment : NSObject, NSCoding{
+public class Comment : NSObject, NSCoding, Validatable {
     //    var allAwardings : [AnyObject]!
     var approvedAtUtc : String!
     var approvedBy : String!
@@ -203,7 +214,7 @@ public class Comment : NSObject, NSCoding{
     var permalink : String!
     var quarantine : Bool!
     var removalReason : String!
-    var replies : String!
+    var replies : CommentListing?
     var reportReasons : String!
     var saved : Bool!
     var score : Int!
@@ -223,10 +234,13 @@ public class Comment : NSObject, NSCoding{
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!){
-        if json.isEmpty{
+    init(fromJson json: JSON!) throws {
+        try Self.validate(json: json)
+        
+        if json.isEmpty {
             return
         }
+        
         approvedAtUtc = json["approved_at_utc"].stringValue
         approvedBy = json["approved_by"].stringValue
         archived = json["archived"].boolValue
@@ -306,7 +320,14 @@ public class Comment : NSObject, NSCoding{
         permalink = json["permalink"].stringValue
         quarantine = json["quarantine"].boolValue
         removalReason = json["removal_reason"].stringValue
-        replies = json["replies"].stringValue
+        if (json["replies"].string == nil) {
+            // It has replies
+            do {
+                replies = try CommentListing(fromJson: json["replies"])
+            } catch {
+                // Ignore
+            }
+        }
         reportReasons = json["report_reasons"].stringValue
         saved = json["saved"].boolValue
         score = json["score"].intValue
@@ -624,7 +645,7 @@ public class Comment : NSObject, NSCoding{
         permalink = aDecoder.decodeObject(forKey: "permalink") as? String
         quarantine = aDecoder.decodeObject(forKey: "quarantine") as? Bool
         removalReason = aDecoder.decodeObject(forKey: "removal_reason") as? String
-        replies = aDecoder.decodeObject(forKey: "replies") as? String
+        replies = aDecoder.decodeObject(forKey: "replies") as? CommentListing
         reportReasons = aDecoder.decodeObject(forKey: "report_reasons") as? String
         saved = aDecoder.decodeObject(forKey: "saved") as? Bool
         score = aDecoder.decodeObject(forKey: "score") as? Int
@@ -868,8 +889,103 @@ public class Comment : NSObject, NSCoding{
         if userReports != nil{
             aCoder.encode(userReports, forKey: "user_reports")
         }
-        
     }
-    
 }
 
+class CommentMore: NSObject, NSCoding, Validatable {
+    var children : [String]!
+    var count : Int!
+    var depth : Int!
+    var id : String!
+    var name : String!
+    var parentFullname : String!
+
+    /**
+     * Instantiate the instance using the passed json values to set the properties values
+     */
+    init(fromJson json: JSON!) throws {
+        try Self.validate(json: json)
+        
+        if json.isEmpty {
+            return
+        }
+        
+        children = [String]()
+        let childrenArray = json["children"].arrayValue
+        for childrenJson in childrenArray{
+            children.append(childrenJson.stringValue)
+        }
+        count = json["count"].intValue
+        depth = json["depth"].intValue
+        id = json["id"].stringValue
+        name = json["name"].stringValue
+        parentFullname = json["parent_id"].stringValue
+    }
+
+    /**
+     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
+     */
+    func toDictionary() -> [String:Any]
+    {
+        var dictionary = [String:Any]()
+        if children != nil{
+            dictionary["children"] = children
+        }
+        if count != nil{
+            dictionary["count"] = count
+        }
+        if depth != nil{
+            dictionary["depth"] = depth
+        }
+        if id != nil{
+            dictionary["id"] = id
+        }
+        if name != nil{
+            dictionary["name"] = name
+        }
+        if parentFullname != nil{
+            dictionary["parent_id"] = parentFullname
+        }
+        return dictionary
+    }
+
+    /**
+    * NSCoding required initializer.
+    * Fills the data from the passed decoder
+    */
+    @objc required init(coder aDecoder: NSCoder)
+    {
+         children = aDecoder.decodeObject(forKey: "children") as? [String]
+         count = aDecoder.decodeObject(forKey: "count") as? Int
+         depth = aDecoder.decodeObject(forKey: "depth") as? Int
+         id = aDecoder.decodeObject(forKey: "id") as? String
+         name = aDecoder.decodeObject(forKey: "name") as? String
+         parentFullname = aDecoder.decodeObject(forKey: "parent_id") as? String
+    }
+
+    /**
+    * NSCoding required method.
+    * Encodes mode properties into the decoder
+    */
+    func encode(with aCoder: NSCoder)
+    {
+        if children != nil{
+            aCoder.encode(children, forKey: "children")
+        }
+        if count != nil{
+            aCoder.encode(count, forKey: "count")
+        }
+        if depth != nil{
+            aCoder.encode(depth, forKey: "depth")
+        }
+        if id != nil{
+            aCoder.encode(id, forKey: "id")
+        }
+        if name != nil{
+            aCoder.encode(name, forKey: "name")
+        }
+        if parentFullname != nil{
+            aCoder.encode(parentFullname, forKey: "parent_id")
+        }
+    }
+}
