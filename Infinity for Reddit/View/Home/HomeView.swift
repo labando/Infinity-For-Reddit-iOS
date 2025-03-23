@@ -104,7 +104,7 @@ struct HomeView: View {
                                     EmptyView()
                                 }
                             }
-                            .frame(width: 48, height: 48)
+                            .frame(width: 30, height: 30)
                             .clipShape(Circle())
                         } else {
                             SwiftUI.Image(systemName: "person.crop.circle")
