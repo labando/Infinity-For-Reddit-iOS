@@ -196,7 +196,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             SubscribedSubredditData(
                 fullName: $0.name,
                 name: $0.displayName,
-                iconUrl: $0.iconImg,
+                iconUrl: $0.iconImg == nil || $0.iconImg.isEmpty ? $0.communityIcon : $0.iconImg,
                 username: AccountViewModel.shared.account.username,
                 favorite: $0.userHasFavorited
             )
@@ -205,7 +205,7 @@ public class SubscriptionListingViewModel: ObservableObject {
         let userSubscriptionsTemp = users.map {
             SubscribedUserData(
                 name: $0.displayName,
-                iconUrl: $0.iconImg,
+                iconUrl: $0.iconImg == nil || $0.iconImg.isEmpty ? $0.communityIcon : $0.iconImg,
                 username: AccountViewModel.shared.account.username,
                 favorite: $0.userHasFavorited
             )
@@ -215,7 +215,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             SubredditData(
                 id: $0.id,
                 name: $0.displayName,
-                iconUrl: $0.iconImg,
+                iconUrl: $0.iconImg == nil || $0.iconImg.isEmpty ? $0.communityIcon : $0.iconImg,
                 bannerUrl: $0.bannerBackgroundImage,
                 description: $0.description,
                 sidebarDescription: nil,
@@ -254,7 +254,21 @@ public class SubscriptionListingViewModel: ObservableObject {
                 myCustomFeedListing.customFeeds.sort { $0.displayName < $1.displayName }
                 
                 let myCustomFeedsTemp = myCustomFeedListing.customFeeds.map {
-                    MyCustomFeed(path: $0.path, displayName: $0.displayName, name: $0.name, owner: $0.owner, nSubscribers: $0.numSubscribers, createdUTC: Int64($0.createdUtc), over18: $0.over18, isSubscriber: $0.isSubscriber, isFavorite: $0.isFavorited)
+                    MyCustomFeed(
+                        path: $0.path,
+                        displayName: $0.displayName,
+                        name: $0.name,
+                        description: $0.descriptionMd,
+                        copiedFrom: $0.copiedFrom,
+                        iconUrl: $0.iconUrl,
+                        visibility: $0.visibility,
+                        owner: $0.owner,
+                        nSubscribers: $0.numSubscribers,
+                        createdUTC: Int64($0.createdUtc),
+                        over18: $0.over18,
+                        isSubscriber: $0.isSubscriber,
+                        isFavorite: $0.isFavorited
+                    )
                 }
                 
                 insertMyCustomFeeds(myCustomFeeds: myCustomFeedsTemp)

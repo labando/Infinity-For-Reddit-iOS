@@ -79,6 +79,7 @@ public class MyCustomFeedListing : NSObject, NSCoding{
 class CustomFeed : NSObject, NSCoding{
     
     var canEdit : Bool!
+    var copiedFrom: String!
     var created : Float!
     var createdUtc : Int64!
     var descriptionHtml : String!
@@ -105,6 +106,7 @@ class CustomFeed : NSObject, NSCoding{
             return
         }
         canEdit = json["can_edit"].boolValue
+        copiedFrom = json["copied_from"].stringValue
         created = json["created"].floatValue
         createdUtc = json["created_utc"].int64Value
         descriptionHtml = json["description_html"].stringValue
@@ -136,6 +138,9 @@ class CustomFeed : NSObject, NSCoding{
         var dictionary = [String:Any]()
         if canEdit != nil{
             dictionary["can_edit"] = canEdit
+        }
+        if copiedFrom != nil {
+            dictionary["copied_from"] = copiedFrom
         }
         if created != nil{
             dictionary["created"] = created
@@ -199,6 +204,7 @@ class CustomFeed : NSObject, NSCoding{
     @objc required init(coder aDecoder: NSCoder)
     {
         canEdit = aDecoder.decodeObject(forKey: "can_edit") as? Bool
+        copiedFrom = aDecoder.decodeObject(forKey: "copied_from") as? String
         created = aDecoder.decodeObject(forKey: "created") as? Float
         createdUtc = aDecoder.decodeObject(forKey: "created_utc") as? Int64
         descriptionHtml = aDecoder.decodeObject(forKey: "description_html") as? String
@@ -226,6 +232,9 @@ class CustomFeed : NSObject, NSCoding{
     {
         if canEdit != nil{
             aCoder.encode(canEdit, forKey: "can_edit")
+        }
+        if copiedFrom != nil {
+            aCoder.encode(copiedFrom, forKey: "copied_from")
         }
         if created != nil{
             aCoder.encode(created, forKey: "created")

@@ -9,6 +9,7 @@ import SwiftUI
 import Swinject
 import GRDB
 import Alamofire
+import SDWebImageSwiftUI
 
 struct SubscriptionsView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -67,8 +68,36 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
-                            Text(subscription.name)
-                                .listPlainItem()
+                            HStack {
+                                if let iconUrl = subscription.iconUrl, iconUrl.count > 0 {
+                                    WebImage(url: URL(string: iconUrl)) { image in
+                                        image
+                                            .resizable()
+                                            
+                                    }  placeholder: {
+                                        
+                                    }
+                                    .onSuccess { image, data, cacheType in
+                                        // Success
+                                        // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+                                    }
+                                    .indicator(.activity)
+                                    .clipShape(Circle())
+                                    .transition(.fade(duration: 0.5))
+                                    .scaledToFit()
+                                    .frame(width: 30, height: 30)
+                                } else {
+                                    SwiftUI.Image(systemName: "person.crop.circle")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                }
+                                
+                                Spacer()
+                                    .frame(width: 16)
+                                
+                                Text(subscription.name)
+                            }
+                            .listPlainItem()
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)
@@ -90,8 +119,36 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
-                            Text(subscription.name)
-                                .listPlainItem()
+                            HStack {
+                                if let iconUrl = subscription.iconUrl, iconUrl.count > 0 {
+                                    WebImage(url: URL(string: iconUrl)) { image in
+                                        image
+                                            .resizable()
+                                            
+                                    }  placeholder: {
+                                        
+                                    }
+                                    .onSuccess { image, data, cacheType in
+                                        // Success
+                                        // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+                                    }
+                                    .indicator(.activity)
+                                    .clipShape(Circle())
+                                    .transition(.fade(duration: 0.5))
+                                    .scaledToFit()
+                                    .frame(width: 30, height: 30)
+                                } else {
+                                    SwiftUI.Image(systemName: "person.crop.circle")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                }
+                                
+                                Spacer()
+                                    .frame(width: 16)
+                                
+                                Text(subscription.name)
+                            }
+                            .listPlainItem()
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)
@@ -113,8 +170,36 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
-                            Text(customFeed.displayName)
-                                .listPlainItem()
+                            HStack {
+                                if let iconUrl = customFeed.iconUrl, iconUrl.count > 0 {
+                                    WebImage(url: URL(string: iconUrl)) { image in
+                                        image
+                                            .resizable()
+                                            
+                                    }  placeholder: {
+                                        
+                                    }
+                                    .onSuccess { image, data, cacheType in
+                                        // Success
+                                        // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+                                    }
+                                    .indicator(.activity)
+                                    .clipShape(Circle())
+                                    .transition(.fade(duration: 0.5))
+                                    .scaledToFit()
+                                    .frame(width: 30, height: 30)
+                                } else {
+                                    SwiftUI.Image(systemName: "person.crop.circle")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                }
+                                
+                                Spacer()
+                                    .frame(width: 16)
+                                
+                                Text(customFeed.displayName)
+                            }
+                            .listPlainItem()
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)
