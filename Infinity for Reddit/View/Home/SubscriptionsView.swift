@@ -83,7 +83,10 @@ struct SubscriptionsView: View {
                                     .frame(width: 16)
                                 
                                 Text(subscription.name)
+                                
+                                Spacer()
                             }
+                            .contentShape(Rectangle())
                             .listPlainItem()
                         }
                     }
@@ -124,7 +127,10 @@ struct SubscriptionsView: View {
                                     .frame(width: 16)
                                 
                                 Text(subscription.name)
+                                
+                                Spacer()
                             }
+                            .contentShape(Rectangle())
                             .listPlainItem()
                             .onTapGesture {
                                 navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
@@ -167,7 +173,10 @@ struct SubscriptionsView: View {
                                     .frame(width: 16)
                                 
                                 Text(customFeed.displayName)
+                                
+                                Spacer()
                             }
+                            .contentShape(Rectangle())
                             .listPlainItem()
                         }
                     }
