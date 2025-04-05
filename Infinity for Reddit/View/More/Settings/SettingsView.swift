@@ -16,7 +16,7 @@ struct SettingsView: View {
     
     var body: some View {
         List {
-            Text("Notification")
+            RowText("Notification")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
@@ -24,116 +24,116 @@ struct SettingsView: View {
                     //navigationManager.path.append(AppNavigation.userDetails(username: "Hostilenemy"))
                 }
             
-            Text("Interface")
+            RowText("Interface")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.interface)
                 }
             
-            Text("Theme")
+            RowText("Theme")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.theme)
                 }
             
-            Text("Gesture & Buttons")
+            RowText("Gesture & Buttons")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.gestureAndButtons)
                 }
             
-            Text("Video")
+            RowText("Video")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.video)
                 }
             
-            Text("Lazy Mode Interval")
+            RowText("Lazy Mode Interval")
                 .primaryText()
                 .listPlainItem()
             
-            Text("Download Location")
+            RowText("Download Location")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.downloadLocation)
                 }
             
-            Text("Security")
+            RowText("Security")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.security)
                 }
             
-            Text("Content Sensitivity Filter")
+            RowText("Content Sensitivity Filter")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.contentSensitivityFilter)
                 }
             
-            Text("Post History")
+            RowText("Post History")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.postHistory)
                 }
             
-            Text("Post Filter")
+            RowText("Post Filter")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.postFilter)
                 }
             
-            Text("Comment Filter")
+            RowText("Comment Filter")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.commentFilter)
                 }
             
-            Text("Miscellaneous")
+            RowText("Miscellaneous")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.miscellaneous)
                 }
             
-            Text("Advanced")
+            RowText("Advanced")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.advanced)
                 }
             
-            Text("Manage Subscription")
+            RowText("Manage Subscription")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.manageSubscription)
                 }
             
-            Text("About")
+            RowText("About")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.about)
                 }
             
-            Text("Privacy Policy")
+            RowText("Privacy Policy")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
                     navigationManager.path.append(SettingsViewNavigation.privacyPolicy)
                 }
             
-            Text("Reddit User Agreement")
+            RowText("Reddit User Agreement")
                 .primaryText()
                 .listPlainItem()
                 .onTapGesture {
@@ -143,5 +143,43 @@ struct SettingsView: View {
         .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Settings")
+        .navigationDestination(for: SettingsViewNavigation.self) { destination in
+            switch destination {
+            case .notification:
+                NotificationSettingsView()
+            case .interface:
+                InterfaceSettingsView()
+            case .theme:
+                CustomThemeSettingsView()
+            case .gestureAndButtons:
+                GestureButtonsSettingsView()
+            case .video:
+                VideoSettingsView()
+            case .downloadLocation:
+                DownloadLocationSettingsView()
+            case .security:
+                SecuritySettingsView()
+            case .contentSensitivityFilter:
+                ContentSensitivityFilterSettingsView()
+            case .postHistory:
+                PostHistorySettingsView()
+            case .postFilter:
+                PostFilterSettingsView()
+            case .commentFilter:
+                CommentFilterSettingsView()
+            case .miscellaneous:
+                MiscellaneousSettingsView()
+            case .advanced:
+                AdvancedSettingsView()
+            case .manageSubscription:
+                ManageSubscriptionSettingsView()
+            case .about:
+                AboutSettingsView()
+            case .privacyPolicy:
+                PrivacyPolicySettingsView()
+            case .redditUserAgreement:
+                RedditUserAgreementSettingsView()
+            }
+        }
     }
 }

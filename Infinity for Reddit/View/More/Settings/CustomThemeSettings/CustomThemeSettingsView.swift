@@ -10,6 +10,7 @@ import Swinject
 import GRDB
 
 struct CustomThemeSettingsView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject private var customThemeSettingsViewModel = CustomThemeSettingsViewModel()
@@ -36,42 +37,40 @@ struct CustomThemeSettingsView: View {
                 .listPlainItem()
 
             Section(header: Text("Customization")) {
-                CustomNavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo())) {
-                    themeListItem(
-                        themeType: "Light Theme",
-                        themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
-                        icon: "upvoted")
-                }
-                CustomNavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo())) {
-                    themeListItem(
-                        themeType: "Light Theme",
-                        themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
-                        icon: "upvoted")
+                themeListItem(
+                    themeType: "Light Theme",
+                    themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
+                    icon: "upvoted")
+                .onTapGesture {
+                    navigationManager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo()))
                 }
                 
-                CustomNavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentDarkCustomTheme ?? CustomTheme.getIndigoDark())) {
-                    themeListItem(
-                        themeType: "Dark Theme",
-                        themeName: customThemeViewModel.currentDarkCustomTheme?.name ?? "Indigo Dark",
-                        icon: "upvoted")
+                themeListItem(
+                    themeType: "Dark Theme",
+                    themeName: customThemeViewModel.currentDarkCustomTheme?.name ?? "Indigo Dark",
+                    icon: "upvoted")
+                .onTapGesture {
+                    navigationManager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentDarkCustomTheme ?? CustomTheme.getIndigoDark()))
                 }
                 
-                CustomNavigationLink(destination: CustomizeCustomThemeView(customTheme: customThemeViewModel.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled())) {
-                    themeListItem(
-                        themeType: "Amoled Theme",
-                        themeName: customThemeViewModel.currentAmoledCustomTheme?.name ?? "Indigo Amoled",
-                        icon: "upvoted")
+                themeListItem(
+                    themeType: "Amoled Theme",
+                    themeName: customThemeViewModel.currentAmoledCustomTheme?.name ?? "Indigo Amoled",
+                    icon: "upvoted")
+                .onTapGesture {
+                    navigationManager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled()))
                 }
                 
-                CustomNavigationLink(destination: CustomThemeListingView()) {
-                    HStack {
-                        SwiftUI.Image("upvote")
-                        
-                        Spacer()
-                            .frame(width: 16)
-                        
-                        Text("Manage Themes")
-                    }
+                HStack {
+                    SwiftUI.Image("upvote")
+                    
+                    Spacer()
+                        .frame(width: 16)
+                    
+                    Text("Manage Themes")
+                }
+                .onTapGesture {
+                    navigationManager.path.append(CustomThemeSettingsViewNavigation.customThemeListing)
                 }
             }
             .listPlainItem()
@@ -79,6 +78,14 @@ struct CustomThemeSettingsView: View {
         .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Theme")
+        .navigationDestination(for: CustomThemeSettingsViewNavigation.self) { destination in
+            switch destination {
+            case .customizeCustomTheme(let customTheme):
+                CustomizeCustomThemeView(customTheme: customTheme)
+            case .customThemeListing:
+                CustomThemeListingView()
+            }
+        }
     }
     
     func themeListItem(themeType: String, themeName: String, icon: String) -> some View {

@@ -16,13 +16,13 @@ struct MoreView: View {
     var body: some View {
         List {
             Section(header: Text("Account").listSectionHeader()) {
-                Text("Profile")
+                RowText("Profile")
                     .primaryText()
                     .onTapGesture {
                         navigationManager.path.append(MoreViewNavigation.profile)
                     }
                 
-                Text("History")
+                RowText("History")
                     .primaryText()
                     .onTapGesture {
                         navigationManager.path.append(MoreViewNavigation.history)
@@ -31,25 +31,25 @@ struct MoreView: View {
             .listPlainItem()
             
             Section(header: Text("Post").listSectionHeader()) {
-                Text("Upvoted")
+                RowText("Upvoted")
                     .primaryText()
                     .onTapGesture {
                         navigationManager.path.append(MoreViewNavigation.upvoted)
                     }
                 
-                Text("Downvoted")
+                RowText("Downvoted")
                     .primaryText()
                     .onTapGesture {
                         navigationManager.path.append(MoreViewNavigation.downvoted)
                     }
                 
-                Text("Hidden")
+                RowText("Hidden")
                     .primaryText()
                     .onTapGesture {
                         navigationManager.path.append(MoreViewNavigation.hidden)
                     }
                 
-                Text("Saved")
+                RowText("Saved")
                     .primaryText()
                     .onTapGesture {
                         navigationManager.path.append(MoreViewNavigation.saved)
@@ -58,13 +58,13 @@ struct MoreView: View {
             .listPlainItem()
             
             Section(header: Text("Preferences").listSectionHeader()) {
-                Text("Settings")
+                RowText("Settings")
                     .primaryText()
                     .onTapGesture {
                         navigationManager.path.append(MoreViewNavigation.settings)
                     }
                 
-                Text("Test")
+                RowText("Test")
                     .primaryText()
                     .onTapGesture {
                         navigationManager.path.append(MoreViewNavigation.test)
