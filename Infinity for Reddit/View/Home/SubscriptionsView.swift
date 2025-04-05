@@ -69,28 +69,17 @@ struct SubscriptionsView: View {
                     List {
                         ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
                             HStack {
-                                if let iconUrl = subscription.iconUrl, iconUrl.count > 0 {
-                                    WebImage(url: URL(string: iconUrl)) { image in
-                                        image
+                                CustomWebImage(
+                                    subscription.iconUrl,
+                                    width: 30,
+                                    height: 30,
+                                    circleClipped: true,
+                                    fallbackView: {
+                                        SwiftUI.Image(systemName: "person.crop.circle")
                                             .resizable()
-                                            
-                                    }  placeholder: {
-                                        
+                                            .frame(width: 30, height: 30)
                                     }
-                                    .onSuccess { image, data, cacheType in
-                                        // Success
-                                        // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-                                    }
-                                    .indicator(.activity)
-                                    .clipShape(Circle())
-                                    .transition(.fade(duration: 0.5))
-                                    .scaledToFit()
-                                    .frame(width: 30, height: 30)
-                                } else {
-                                    SwiftUI.Image(systemName: "person.crop.circle")
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                }
+                                )
                                 
                                 Spacer()
                                     .frame(width: 16)
@@ -121,28 +110,17 @@ struct SubscriptionsView: View {
                     List {
                         ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
                             HStack {
-                                if let iconUrl = subscription.iconUrl, iconUrl.count > 0 {
-                                    WebImage(url: URL(string: iconUrl)) { image in
-                                        image
+                                CustomWebImage(
+                                    subscription.iconUrl,
+                                    width: 30,
+                                    height: 30,
+                                    circleClipped: true,
+                                    fallbackView: {
+                                        SwiftUI.Image(systemName: "person.crop.circle")
                                             .resizable()
-                                            
-                                    }  placeholder: {
-                                        
+                                            .frame(width: 30, height: 30)
                                     }
-                                    .onSuccess { image, data, cacheType in
-                                        // Success
-                                        // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-                                    }
-                                    .indicator(.activity)
-                                    .clipShape(Circle())
-                                    .transition(.fade(duration: 0.5))
-                                    .scaledToFit()
-                                    .frame(width: 30, height: 30)
-                                } else {
-                                    SwiftUI.Image(systemName: "person.crop.circle")
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                }
+                                )
                                 
                                 Spacer()
                                     .frame(width: 16)
@@ -175,28 +153,17 @@ struct SubscriptionsView: View {
                     List {
                         ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
                             HStack {
-                                if let iconUrl = customFeed.iconUrl, iconUrl.count > 0 {
-                                    WebImage(url: URL(string: iconUrl)) { image in
-                                        image
+                                CustomWebImage(
+                                    customFeed.iconUrl,
+                                    width: 30,
+                                    height: 30,
+                                    circleClipped: true,
+                                    fallbackView: {
+                                        SwiftUI.Image(systemName: "person.crop.circle")
                                             .resizable()
-                                            
-                                    }  placeholder: {
-                                        
+                                            .frame(width: 30, height: 30)
                                     }
-                                    .onSuccess { image, data, cacheType in
-                                        // Success
-                                        // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-                                    }
-                                    .indicator(.activity)
-                                    .clipShape(Circle())
-                                    .transition(.fade(duration: 0.5))
-                                    .scaledToFit()
-                                    .frame(width: 30, height: 30)
-                                } else {
-                                    SwiftUI.Image(systemName: "person.crop.circle")
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                }
+                                )
                                 
                                 Spacer()
                                     .frame(width: 16)

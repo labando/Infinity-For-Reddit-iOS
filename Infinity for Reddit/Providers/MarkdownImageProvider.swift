@@ -22,18 +22,16 @@ struct WebImageProvider: ImageProvider {
         if let unescapedUrl = url?.absoluteString.removingPercentEncoding, let media = mediaMetadata?[unescapedUrl] {
             if media.e == MediaMetadata.gifType {
                 VStack {
-                    WebImage(url: URL(string: media.s.gif ?? ""))
-                        .resizable()
-                        .indicator(.activity)
-                        .transition(.fade(duration: 0.5))
-                        .scaledToFit()
-                        .frame(width: 140)
-                        .aspectRatio(CGFloat(media.s.y) / CGFloat(media.s.x), contentMode: .fill)
-                        .onTapGesture{
-                            if let url = url {
-                                handleImageTap(url: url)
-                            }
+                    CustomWebImage(
+                        media.s.gif,
+                        width: 140,
+                        aspectRatio: media.s.aspectRatio
+                    )
+                    .onTapGesture{
+                        if let url = url {
+                            handleImageTap(url: url)
                         }
+                    }
                     
                     if media.caption != nil {
                         // TODO make sure the text style is correct
@@ -44,18 +42,15 @@ struct WebImageProvider: ImageProvider {
                 
             } else {
                 VStack {
-                    WebImage(url: URL(string: media.s.u ?? ""))
-                        .resizable()
-                        .indicator(.activity)
-                        .transition(.fade(duration: 0.5))
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .aspectRatio(CGFloat(media.s.y) / CGFloat(media.s.x), contentMode: .fill)
-                        .onTapGesture{
-                            if let url = url {
-                                handleImageTap(url: url)
-                            }
+                    CustomWebImage(
+                        media.s.u,
+                        aspectRatio: media.s.aspectRatio
+                    )
+                    .onTapGesture{
+                        if let url = url {
+                            handleImageTap(url: url)
                         }
+                    }
                     
                     if media.caption != nil {
                         // TODO make sure the text style is correct

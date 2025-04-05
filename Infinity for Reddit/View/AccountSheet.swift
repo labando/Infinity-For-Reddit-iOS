@@ -28,29 +28,6 @@ struct AccountSheet: View {
                         }
                     )
                     
-//                    if let profileImageUrl = accountViewModel.account.profileImageUrl {
-//                        WebImage(url: URL(string: profileImageUrl)) { image in
-//                            image
-//                                .resizable()
-//                        }  placeholder: {
-//                            
-//                        }
-//                        .onSuccess { image, data, cacheType in
-//                            // Success
-//                            // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-//                        }
-//                        .indicator(.activity)
-//                        
-//                        .clipShape(Circle())
-//                        .transition(.fade(duration: 0.5))
-//                        .scaledToFit()
-//                        .frame(width: 96, height: 96)
-//                    } else {
-//                        SwiftUI.Image(systemName: "person.crop.circle")
-//                            .resizable()
-//                            .frame(width: 96, height: 96)
-//                    }
-                    
                     // User's Name
                     Text(accountViewModel.account.isAnonymous() == true ? "Anonymous" : accountViewModel.account.username)
                         .font(.largeTitle)

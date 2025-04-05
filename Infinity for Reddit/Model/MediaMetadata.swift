@@ -203,6 +203,9 @@ class MediaMetadataSource : NSObject, NSCoding{
     var x : Int!
     // Height
     var y : Int!
+    var aspectRatio : CGSize {
+        return CGSize(width: x, height: y)
+    }
     
     
     /**

@@ -86,28 +86,18 @@ struct HomeView: View {
                     Button(action: {
                         showProfile.toggle()
                     }) {
-                        if let profileImageUrl = accountViewModel.account.profileImageUrl {
-                            WebImage(url: URL(string: profileImageUrl)) { image in
-                                image
+                        CustomWebImage(
+                            accountViewModel.account.profileImageUrl,
+                            width: 30,
+                            height: 30,
+                            circleClipped: true,
+                            fallbackView: {
+                                SwiftUI.Image(systemName: "person.crop.circle")
                                     .resizable()
-                            }  placeholder: {
-                                
+                                    .frame(width: 30, height: 30)
+                                    .navigationBarImage()
                             }
-                            .onSuccess { image, data, cacheType in
-                                // Success
-                                // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-                            }
-                            .indicator(.activity)
-                            .clipShape(Circle())
-                            .transition(.fade(duration: 0.5))
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
-                        } else {
-                            SwiftUI.Image(systemName: "person.crop.circle")
-                                .resizable()
-                                .frame(width: 30, height: 30)
-                                .navigationBarImage()
-                        }
+                        )
                     }
                 }
             }

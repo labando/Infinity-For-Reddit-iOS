@@ -30,25 +30,14 @@ struct UserDetailsView: View {
             // Top Section (User Info)
             if let userData = userDetailsViewModel.userData {
                 HStack(spacing: 0) {
-                    if let profileImageUrl = userData.iconUrl {
-                        WebImage(url: URL(string: profileImageUrl)) { image in
-                            image
-                                .resizable()
-                        }  placeholder: {
-                            
-                        }
-                        .onSuccess { image, data, cacheType in
-                            // Success
-                            // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-                        }
-                        .indicator(.activity)
-                        .clipShape(Circle())
-                        .transition(.fade(duration: 0.5))
-                        .scaledToFit()
-                        .frame(width: 80, height: 80)
-                        .padding(.leading, 20)
-                        .padding(.vertical, 20)
-                    }
+                    CustomWebImage(
+                        userData.iconUrl,
+                        width: 80,
+                        height: 80,
+                        circleClipped: true
+                    )
+                    .padding(.leading, 20)
+                    .padding(.vertical, 20)
                     
                     VStack(alignment: .leading, spacing: 5) {
                         Text("u/\(userData.name)")

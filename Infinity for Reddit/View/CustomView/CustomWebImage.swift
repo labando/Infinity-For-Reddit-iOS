@@ -12,7 +12,7 @@ struct CustomWebImage<Content: View>: View {
     var urlString: String?
     var width: CGFloat?
     var height: CGFloat?
-    var aspectRatio: CGFloat?
+    var aspectRatio: CGSize?
     var circleClipped: Bool?
     var placeholderView: (() -> Content)?
     var fallbackView: (() -> Content)?
@@ -24,10 +24,37 @@ struct CustomWebImage<Content: View>: View {
         self.circleClipped = circleClipped
     }
     
+    init(_ urlString: String?, aspectRatio: CGSize, circleClipped: Bool = false) where Content == EmptyView {
+        self.urlString = urlString
+        self.aspectRatio = aspectRatio
+        self.circleClipped = circleClipped
+    }
+    
     init(_ urlString: String?, circleClipped: Bool = false, @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
         self.circleClipped = circleClipped
         self.fallbackView = fallbackView
+    }
+    
+    init(_ urlString: String?, aspectRatio: CGSize, circleClipped: Bool = false, @ViewBuilder placeholderView: @escaping () -> Content) {
+        self.urlString = urlString
+        self.aspectRatio = aspectRatio
+        self.circleClipped = circleClipped
+        self.placeholderView = placeholderView
+    }
+    
+    init(_ urlString: String?, width: CGFloat, aspectRatio: CGSize, circleClipped: Bool = false) where Content == EmptyView {
+        self.urlString = urlString
+        self.width = width
+        self.aspectRatio = aspectRatio
+        self.circleClipped = circleClipped
+    }
+    
+    init(_ urlString: String?, width: CGFloat, height: CGFloat, circleClipped: Bool = false) where Content == EmptyView {
+        self.urlString = urlString
+        self.width = width
+        self.height = height
+        self.circleClipped = circleClipped
     }
     
     init(_ urlString: String?, width: CGFloat, height: CGFloat, circleClipped: Bool = false, @ViewBuilder fallbackView: @escaping () -> Content) {
@@ -46,8 +73,8 @@ struct CustomWebImage<Content: View>: View {
         self.fallbackView = fallbackView
     }
     
-    init(_ urlString: String?, width: CGFloat?, height: CGFloat?, aspectRatio: CGFloat?, circleClipped: Bool = false,
-         @ViewBuilder placeholderView: @escaping () -> Content, fallbackImage: SwiftUI.Image?) {
+    init(_ urlString: String?, width: CGFloat?, height: CGFloat?, aspectRatio: CGSize?, circleClipped: Bool = false,
+         @ViewBuilder placeholderView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
         self.height = height
@@ -56,7 +83,7 @@ struct CustomWebImage<Content: View>: View {
         self.placeholderView = placeholderView
     }
     
-    init(_ urlString: String?, width: CGFloat?, height: CGFloat?, aspectRatio: CGFloat?, circleClipped: Bool = false,
+    init(_ urlString: String?, width: CGFloat?, height: CGFloat?, aspectRatio: CGSize?, circleClipped: Bool = false,
          @ViewBuilder placeholderView: @escaping () -> Content,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
