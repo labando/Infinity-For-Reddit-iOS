@@ -85,7 +85,7 @@ class UserDetailRootClass : NSObject, NSCoding{
             isFriend : data.isFriend,
             canBeFollowed : data.acceptFollowers,
             isNSFW : data.subreddit.over18,
-            description : data.subreddit.descriptionField,
+            description : data.subreddit.publicDescription,
             title : data.subreddit.title
         )
     }

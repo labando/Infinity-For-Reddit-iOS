@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import MarkdownUI
 
 struct UserDetailsView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
@@ -28,51 +29,60 @@ struct UserDetailsView: View {
         VStack(spacing: 0) {
             // Top Section (User Info)
             if let userData = userDetailsViewModel.userData {
-                HStack(spacing: 0) {
-                    CustomWebImage(
-                        userData.iconUrl,
-                        width: 80,
-                        height: 80,
-                        circleClipped: true
-                    )
-                    .padding(.leading, 20)
-                    .padding(.vertical, 20)
-                    
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text("u/\(userData.name)")
-                            .font(.title2)
-                            .bold()
+                VStack(spacing: 0) {
+                    HStack(spacing: 0) {
+                        CustomWebImage(
+                            userData.iconUrl,
+                            width: 80,
+                            height: 80,
+                            circleClipped: true
+                        )
+                        .padding(.vertical, 20)
                         
-                        Button(action: {
-                            userDetailsViewModel.toggleFollowUser()
-                        }) {
-                            Text(userDetailsViewModel.isSubscribed ? "Followed" : "Follow")
-                                .padding(.horizontal, 15)
-                                .padding(.vertical, 8)
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(20)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("u/\(userData.name)")
+                                .username()
+                                .font(.title2)
+                                .bold()
+                            
+                            Button(action: {
+                                userDetailsViewModel.toggleFollowUser()
+                            }) {
+                                Text(userDetailsViewModel.isSubscribed ? "Followed" : "Follow")
+                                    .padding(.horizontal, 15)
+                                    .padding(.vertical, 8)
+                                    .background(Color.blue)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(20)
+                            }
                         }
+                        .padding(.leading, 10)
+                        
+                        Spacer()
                     }
-                    .padding(.leading, 10)
                     
-                    Spacer()
-                }
-                
-                HStack {
-                    Text("Karma: \(userData.totalKarma ?? 0)")
-                        .primaryText()
+                    HStack {
+                        Text("Karma: \(userData.totalKarma ?? 0)")
+                            .primaryText()
+                        
+                        Spacer()
+                        
+                        Text("Cake day: \(userDetailsViewModel.formattedCakeDay(userData.cakeday ?? 0))")
+                            .primaryText()
+                            .padding(.leading, 20)
+                    }
+                    .padding(.bottom, 10)
                     
-                    Spacer()
+                    userData.description.map {
+                        Markdown($0)
+                            .themedMarkdown()
+                            .padding(0)
+                    }
                     
-                    Text("Cake day: \(userDetailsViewModel.formattedCakeDay(userData.cakeday ?? 0))")
-                        .primaryText()
-                        .padding(.leading, 20)
+                    SegmentedPicker(selectedValue: $selectedTab, values: ["Posts", "Comments"])
+                        .padding(4)
                 }
                 .padding(.horizontal, 20)
-                
-                SegmentedPicker(selectedValue: $selectedTab, values: ["Posts", "Comments"])
-                    .padding(4)
                 
                 ZStack {
                     PostListingView(
