@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct UserDetailsView: View {
     @Environment(\.dismiss) var dismiss
@@ -30,22 +31,21 @@ struct UserDetailsView: View {
             if let userData = userDetailsViewModel.userData {
                 HStack(spacing: 0) {
                     if let profileImageUrl = userData.iconUrl {
-                        AsyncImage(url: URL(string: profileImageUrl)) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            case .failure:
-                                SwiftUI.Image(systemName: "person.circle.fill")
-                            @unknown default:
-                                EmptyView()
-                            }
+                        WebImage(url: URL(string: profileImageUrl)) { image in
+                            image
+                                .resizable()
+                        }  placeholder: {
+                            
                         }
-                        .frame(width: 80, height: 80)
+                        .onSuccess { image, data, cacheType in
+                            // Success
+                            // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+                        }
+                        .indicator(.activity)
                         .clipShape(Circle())
+                        .transition(.fade(duration: 0.5))
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
                         .padding(.leading, 20)
                         .padding(.vertical, 20)
                     }
