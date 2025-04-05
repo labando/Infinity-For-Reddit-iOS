@@ -34,15 +34,18 @@ struct SubscriptionsView: View {
             SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
                 .padding(4)
 
-            if selectedOption == 0 {
+            ZStack {
                 SubredditsView(subscriptionListingViewModel: subscriptionListingViewModel)
-            } else if selectedOption == 1 {
+                    .opacity(selectedOption == 0 ? 1 : 0)
+                
                 UsersView(subscriptionListingViewModel: subscriptionListingViewModel)
-            } else {
+                    .opacity(selectedOption == 1 ? 1 : 0)
+                
                 CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel)
+                    .opacity(selectedOption == 2 ? 1 : 0)
             }
 
-            Spacer() // Push content to the top
+            Spacer()
         }
         .navigationTitle("Subscriptions")
         .onAppear {

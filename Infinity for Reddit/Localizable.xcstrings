@@ -25,6 +25,9 @@
     "Anonymous" : {
 
     },
+    "Cake day: %@" : {
+
+    },
     "Cancel" : {
 
     },
@@ -250,15 +253,8 @@
     "Is loading" : {
 
     },
-    "Karma: %lld  Cake day: %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Karma: %1$lld  Cake day: %2$@"
-          }
-        }
-      }
+    "Karma: %lld" : {
+
     },
     "Lazy Mode Interval" : {
 

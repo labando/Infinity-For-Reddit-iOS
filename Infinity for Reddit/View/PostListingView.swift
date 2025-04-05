@@ -60,7 +60,7 @@ struct PostListingView: View {
             //print(colorScheme == .dark)
         }
         .onAppear {
-            postListingViewModel.loadPosts()
+            postListingViewModel.initialLoadPosts()
         }
         .themedList()
     }

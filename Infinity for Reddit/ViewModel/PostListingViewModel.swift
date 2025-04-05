@@ -34,6 +34,14 @@ public class PostListingViewModel: ObservableObject {
     
     // MARK: - Methods
     
+    public func initialLoadPosts() {
+        guard isInitialLoad else {
+            return
+        }
+        
+        loadPosts()
+    }
+    
     /// Fetches the next page of posts
     public func loadPosts() {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }

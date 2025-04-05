@@ -9,7 +9,6 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct UserDetailsView: View {
-    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var accountViewModel: AccountViewModel
     
     @StateObject var userDetailsViewModel : UserDetailsViewModel
@@ -56,63 +55,53 @@ struct UserDetailsView: View {
                         }
                     }
                     .padding(.leading, 10)
+                    
                     Spacer()
                 }
-                .frame(maxWidth: .infinity)
                 
-                // Stats Section
-                Text("Karma: \(userData.totalKarma ?? 0)  Cake day: \(userDetailsViewModel.formattedCakeDay(userData.cakeday ?? 0.0))")
-                    .padding(.leading, 30)
-                    .frame(maxWidth:.infinity, alignment:.leading)
-                
-                
-                // Posts and Comments Tabs
-                HStack(spacing: 0) {
-                    TabButton(
-                        text: "Posts",
-                        isSelected: selectedTab == 0,
-                        action: { selectedTab = 0 }
-                    )
-                    TabButton(
-                        text: "Comments",
-                        isSelected: selectedTab == 1,
-                        action: { selectedTab = 1 }
-                    )
+                HStack {
+                    Text("Karma: \(userData.totalKarma ?? 0)")
+                        .primaryText()
+                    
+                    Spacer()
+                    
+                    Text("Cake day: \(userDetailsViewModel.formattedCakeDay(userData.cakeday ?? 0))")
+                        .primaryText()
+                        .padding(.leading, 20)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 20)
+                .padding(.horizontal, 20)
                 
-                if selectedTab == 1 {
-                    VStack {
-                        CommentListingView(
-                            commentListingMetadata: CommentListingMetadata(
-                                commentListingType:.user,
-                                pathComponents: ["sortType": "best", "username": "\(userData.name)"],
-                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                queries: nil,
-                                params: nil
-                            )
+                SegmentedPicker(selectedValue: $selectedTab, values: ["Posts", "Comments"])
+                    .padding(4)
+                
+                ZStack {
+                    PostListingView(
+                        account: accountViewModel.account,
+                        postListingMetadata:PostListingMetadata(
+                            postListingType:.user,
+                            pathComponents: ["sortType": "best", "username": "\(userData.name)"],
+                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                            queries: nil,
+                            params: nil
                         )
-                        .id(userData.name)
-                    }
-                    .frame(maxHeight:.infinity)
-                    Spacer()
-                } else {
-                    VStack{
-                        PostListingView(
-                            account: accountViewModel.account,
-                            postListingMetadata:PostListingMetadata(
-                                postListingType:.user,
-                                pathComponents: ["sortType": "best", "username": "\(userData.name)"],
-                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                queries: nil,
-                                params: nil
-                            )
+                    )
+                    .id(accountViewModel.account.username)
+                    .opacity(selectedTab == 0 ? 1 : 0)
+                    
+                    CommentListingView(
+                        commentListingMetadata: CommentListingMetadata(
+                            commentListingType:.user,
+                            pathComponents: ["sortType": "best", "username": "\(userData.name)"],
+                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                            queries: nil,
+                            params: nil
                         )
-                        .id(userData.name)
-                    }.frame(maxHeight:.infinity)
-                    Spacer()
+                    )
+                    .id(accountViewModel.account.username)
+                    .opacity(selectedTab == 1 ? 1 : 0)
                 }
+                
+                Spacer()
             }
         }
         .onAppear {
@@ -120,35 +109,6 @@ struct UserDetailsView: View {
                 userDetailsViewModel.fetchUserDetails()
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)))
-        .edgesIgnoringSafeArea(.bottom)
         .themedNavigationBar()
     }
 }
-
-struct TabButton: View {
-    let text: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 0) {
-                Text(text)
-                    .foregroundColor(isSelected ? .blue : .black)
-                    .bold()
-                    .font(.system(size: 18))
-                
-                Rectangle()
-                    .frame(height: 2)
-                    .foregroundColor(isSelected ? .blue : .clear)
-                    .frame(maxWidth: .infinity)
-            }
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity)
-        }
-    }
-}
-
-
