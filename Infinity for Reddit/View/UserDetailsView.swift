@@ -15,6 +15,7 @@ struct UserDetailsView: View {
     @StateObject var userDetailsViewModel : UserDetailsViewModel
     @State private var selectedTab = 0
     @State private var isCurrentUserProfile: Bool = true
+    @State private var subscribeTask: Task<Void, Never>?
     
     init(username: String) {
         _userDetailsViewModel = StateObject(
@@ -46,7 +47,10 @@ struct UserDetailsView: View {
                                 .bold()
                             
                             Button(action: {
-                                userDetailsViewModel.toggleFollowUser()
+                                subscribeTask?.cancel()
+                                subscribeTask = Task {
+                                    await userDetailsViewModel.toggleFollowUser()
+                                }
                             }) {
                                 Text(userDetailsViewModel.isSubscribed ? "Followed" : "Follow")
                                     .padding(.horizontal, 15)
@@ -114,9 +118,9 @@ struct UserDetailsView: View {
                 Spacer()
             }
         }
-        .onAppear {
+        .task {
             if userDetailsViewModel.userData == nil {
-                userDetailsViewModel.fetchUserDetails()
+                await userDetailsViewModel.fetchUserDetails()
             }
         }
         .themedNavigationBar()

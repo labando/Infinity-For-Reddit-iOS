@@ -8,6 +8,6 @@
 import Combine
 
 public protocol UserDetailsRepositoryProtocol {
-    func fetchUserDetails(username: String) -> AnyPublisher<UserData, Error>
-    func followUser(username: String, action: String) -> AnyPublisher<Void, Error>
+    func fetchUserDetails(username: String) async throws -> UserData
+    func followUser(username: String, action: String) async throws
 }

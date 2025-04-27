@@ -25,51 +25,28 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
         self.session = resolvedSession
     }
     
-    public func fetchUserDetails(username: String) -> AnyPublisher<UserData, Error> {
-        let apiRequest: URLRequestConvertible
-        apiRequest = RedditAPI.getUserData(username: username)
-        return Future<UserData, any Error> { promise in
-            self.session.request(
-                apiRequest
-            )
-            .validate()
-            .responseData { response in
-                switch response.result {
-                case .success(let data):
-                    do {
-                        let json = JSON(data)
-                        if let error = json.error {
-                            throw UserDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
-                        } else {
-                            let userDetailRootClass = UserDetailRootClass(fromJson: json)
-                            promise(.success(userDetailRootClass.toUserData()))
-                        }
-                    } catch {
-                        promise(.failure(error))
-                    }
-                case .failure(let error):
-                    promise(.failure(error))
-                }
-            }
+    public func fetchUserDetails(username: String) async throws -> UserData {
+        let data = try await self.session.request(
+            RedditAPI.getUserData(username: username)
+        )
+        .validate()
+        .serializingData()
+        .value
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw UserDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
         }
-        .eraseToAnyPublisher()
+        
+        return UserDetailRootClass(fromJson: json).toUserData()
     }
     
-    public func followUser(username: String, action: String) -> AnyPublisher<Void, any Error> {
+    public func followUser(username: String, action: String) async throws {
         let params = ["action": action, "sr_name": "u_\(username)"]
         
-        return Future<Void, any Error> { promise in
-            self.session.request(RedditOAuthAPI.subsrcribeToSubreddit(params: params))
-                .validate()
-                .responseData { response in
-                    switch response.result {
-                    case .success(_):
-                        promise(.success(Void()))
-                    case .failure(let error):
-                        promise(.failure(error))
-                    }
-                }
-        }
-        .eraseToAnyPublisher()
+        _ = try await self.session.request(RedditOAuthAPI.subsrcribeToSubreddit(params: params))
+            .validate()
+            .serializingDecodable(Empty.self)
+            .value
     }
 }

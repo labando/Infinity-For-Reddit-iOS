@@ -13,15 +13,16 @@ import Alamofire
 import SwiftUI
 import SwiftyJSON
 
+@MainActor
 class UserDetailsViewModel: ObservableObject {
     @EnvironmentObject var accountViewModel: AccountViewModel
 
     @Published var username: String
     @Published var userData: UserData?
     @Published var isSubscribed: Bool = false
+    @Published var error: Error?
     
     private let session: Session
-    private var cancellables = Set<AnyCancellable>()
     
     private let userDetailsRepository: UserDetailsRepositoryProtocol
     
@@ -48,35 +49,26 @@ class UserDetailsViewModel: ObservableObject {
         return dateFormatter.string(from: date)
     }
     
-    func toggleFollowUser() {
-        followUser(username: username, action: isSubscribed ? "unsub" : "sub")
+    func toggleFollowUser() async {
+        await followUser(username: username, action: isSubscribed ? "unsub" : "sub")
     }
     
-    private func followUser(username: String, action: String) {
-        userDetailsRepository.followUser(username: username, action: action)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(let failure) = completion {
-                    print("Error \(action == "sub" ? "following to" : "unfollowing from") \(username): \(failure)")
-                    self?.objectWillChange.send()
-                } else {
-                    self?.isSubscribed = action == "sub"
-                    self?.objectWillChange.send()
-                }
-            }, receiveValue: {})
-            .store(in: &cancellables)
+    private func followUser(username: String, action: String) async {
+        do {
+            try await userDetailsRepository.followUser(username: username, action: action)
+            self.isSubscribed = action == "sub"
+        } catch {
+            self.error = error
+            print("Error \(action == "sub" ? "following to" : "unfollowing from") \(username): \(error)")
+        }
     }
     
-    func fetchUserDetails() {
-        userDetailsRepository.fetchUserDetails(username: username)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(let failure) = completion {
-                    print("Error fetching user data:", failure)
-                }
-            }, receiveValue: { userData in
-                self.userData = userData
-            })
-            .store(in: &cancellables)
+    func fetchUserDetails() async {
+        do {
+            self.userData = try await userDetailsRepository.fetchUserDetails(username: username)
+        } catch {
+            self.error = error
+            print("Error fetching user data: \(error)")
+        }
     }
 }
