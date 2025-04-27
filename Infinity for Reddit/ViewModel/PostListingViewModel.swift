@@ -9,12 +9,14 @@ import Foundation
 import Combine
 import MarkdownUI
 
+@MainActor
 public class PostListingViewModel: ObservableObject {
     // MARK: - Properties
     @Published var posts: [Post] = []
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
     @Published var hasMorePages: Bool = true
+    @Published var error: Error?
     private let account: Account
     private let postListingMetadata: PostListingMetadata
     private var isInitialLoad: Bool = true
@@ -34,16 +36,16 @@ public class PostListingViewModel: ObservableObject {
     
     // MARK: - Methods
     
-    public func initialLoadPosts() {
+    public func initialLoadPosts() async {
         guard isInitialLoad else {
             return
         }
         
-        loadPosts()
+        await loadPosts()
     }
     
     /// Fetches the next page of posts
-    public func loadPosts() {
+    public func loadPosts() async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
         if posts.isEmpty {
@@ -56,28 +58,23 @@ public class PostListingViewModel: ObservableObject {
             isInitialLoad = false
         }
         
-        postListingRepository.fetchPosts(
-            postListingType: postListingMetadata.postListingType,
-            pathComponents: postListingMetadata.pathComponents,
-            queries: ["limit": "100", "after": after ?? ""].merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
-            params: postListingMetadata.params
-        )
-        .subscribe(on: DispatchQueue.global(qos: .userInitiated))
-        .map { listingData -> (posts: [Post], after: String) in
-            // Perform post-processing in the background thread
-            let processedPosts = self.postProcessPosts(listingData.posts)
-            return (processedPosts, listingData.after)
+        defer {
+            isInitialLoading = false
+            isLoadingMore = false
         }
-        .receive(on: DispatchQueue.main)
-        .sink(receiveCompletion: { [weak self] completion in
-            self?.isInitialLoading = false
-            self?.isLoadingMore = false
+        
+        do {
+            let postListing = try await postListingRepository.fetchPosts(
+                postListingType: postListingMetadata.postListingType,
+                pathComponents: postListingMetadata.pathComponents,
+                queries: ["limit": "100", "after": after ?? ""].merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
+                params: postListingMetadata.params
+            )
             
-            if case .failure(let error) = completion {
-                print("Error fetching posts: \(error)")
-            }
-        }, receiveValue: { [weak self] (processedPosts, after) in
-            guard let self = self else { return }
+            let processedPosts = await Task.detached {
+                await self.postProcessPosts(postListing.posts)
+            }.value
+            
             if (processedPosts.isEmpty) {
                 // No more posts
                 hasMorePages = false
@@ -87,7 +84,7 @@ public class PostListingViewModel: ObservableObject {
                     !self.allPostIds.contains($0.id)
                 }
                 
-                self.after = after
+                self.after = postListing.after
                 
                 self.posts.append(contentsOf: realNewPosts)
                 
@@ -98,18 +95,16 @@ public class PostListingViewModel: ObservableObject {
                         }
                 )
                 
-                hasMorePages = !(realNewPosts.isEmpty || after == nil || after.isEmpty)
+                hasMorePages = !(realNewPosts.isEmpty || postListing.after == nil || postListing.after.isEmpty)
             }
-            print("fuck")
-        })
-        .store(in: &cancellables)
+        } catch {
+            self.error = error
+            print("Error fetching posts: \(error)")
+        }
     }
     
     /// Reloads posts from the first page
-    func refreshPosts() {
-        // This is for user switching accounts. We have to force clear all load
-        cancellables.forEach { $0.cancel() }
-        
+    func refreshPosts() async {
         isInitialLoad = true
         isInitialLoading = false
         isLoadingMore = false
@@ -118,7 +113,7 @@ public class PostListingViewModel: ObservableObject {
         hasMorePages = true
         posts = []
         
-        loadPosts()
+        await loadPosts()
     }
     
     func postProcessPosts(_ posts: [Post]) -> [Post] {

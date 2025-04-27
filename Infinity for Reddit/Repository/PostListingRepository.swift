@@ -29,47 +29,36 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         pathComponents: [String: String]? = nil,
         queries: [String: String]? = [:],
         params: [String: String]? = [:]
-    ) -> AnyPublisher<PostListing, any Error> {
-        let apiRequest: URLRequestConvertible
-        switch postListingType {
-        case .frontPage:
-            apiRequest = RedditOAuthAPI.getFrontPagePosts(pathComponents: pathComponents!, queries: queries!)
-        case .subreddit:
-            apiRequest = RedditOAuthAPI.getSubredditPosts(pathComponents: pathComponents!, queries: queries!)
-        case .user:
-            apiRequest = RedditOAuthAPI.getUserPosts(pathComponents: pathComponents!, queries: queries!)
-        case .search:
-            apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
-        case .multireddit:
-            apiRequest = RedditOAuthAPI.getMultiredditPosts(pathComponents: pathComponents!, queries: queries!)
-        case .subredditConcat:
-            apiRequest = RedditOAuthAPI.getSubredditConcatPosts(pathComponents: pathComponents!, queries: queries!)
-        }
-        
-        return Future<PostListing, any Error> { promise in
-            self.session.request(
-                apiRequest
-            )
-                .validate()
-                .responseData { response in
-                    switch response.result {
-                    case .success(let data):
-                        do {
-                            let json = JSON(data)
-                            if let error = json.error {
-                                throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
-                            } else {
-                                let postListingRootClass = PostListingRootClass(fromJson: json)
-                                promise(.success(postListingRootClass.data))
-                            }
-                        } catch {
-                            promise(.failure(error))
-                        }
-                    case .failure(let error):
-                        promise(.failure(error))
-                    }
-                }
-        }
-        .eraseToAnyPublisher()
+    ) async throws -> PostListing {
+        return try await Task.detached {
+            let apiRequest: URLRequestConvertible
+            switch postListingType {
+            case .frontPage:
+                apiRequest = RedditOAuthAPI.getFrontPagePosts(pathComponents: pathComponents!, queries: queries!)
+            case .subreddit:
+                apiRequest = RedditOAuthAPI.getSubredditPosts(pathComponents: pathComponents!, queries: queries!)
+            case .user:
+                apiRequest = RedditOAuthAPI.getUserPosts(pathComponents: pathComponents!, queries: queries!)
+            case .search:
+                apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
+            case .multireddit:
+                apiRequest = RedditOAuthAPI.getMultiredditPosts(pathComponents: pathComponents!, queries: queries!)
+            case .subredditConcat:
+                apiRequest = RedditOAuthAPI.getSubredditConcatPosts(pathComponents: pathComponents!, queries: queries!)
+            }
+            
+            try Task.checkCancellation()
+            
+            let data = try await self.session.request(apiRequest).validate().serializingData().value
+            
+            try Task.checkCancellation()
+            
+            let json = JSON(data)
+            if let error = json.error {
+                throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
+            }
+            
+            return PostListingRootClass(fromJson: json).data
+        }.value
     }
 }

@@ -48,8 +48,8 @@ struct PostListingView: View {
                     }
                     if postListingViewModel.hasMorePages {
                         Text("Loading more pages")
-                            .onAppear {
-                                postListingViewModel.loadPosts()
+                            .task {
+                                await postListingViewModel.loadPosts()
                             }
                             .listPlainItem()
                     }
@@ -59,8 +59,8 @@ struct PostListingView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .onAppear {
-            postListingViewModel.initialLoadPosts()
+        .task {
+            await postListingViewModel.initialLoadPosts()
         }
         .themedList()
     }
