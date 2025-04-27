@@ -12,6 +12,7 @@ import Combine
 public class CommentViewModel: ObservableObject {
     let account: Account
     @Published var comment: Comment
+    @Published var error: Error?
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -23,7 +24,7 @@ public class CommentViewModel: ObservableObject {
         self.commentRepository = commentRepository
     }
     
-    func voteComment(vote: Int) {
+    func voteComment(vote: Int) async {
         guard let _ = account.accessToken, let fullName = comment.name else { return }
         
         let previousVote = comment.likes
@@ -41,16 +42,17 @@ public class CommentViewModel: ObservableObject {
         }
         self.objectWillChange.send()
         
-        commentRepository.voteComment(comment: comment, point: point)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(_) = completion {
-                    self?.comment.likes = previousVote
-                } else {
-                    self?.comment.likes = finalVote
-                }
-                self?.objectWillChange.send()
-            }, receiveValue: {})
-            .store(in: &cancellables)
+        defer {
+            self.objectWillChange.send()
+        }
+        
+        do {
+            try await commentRepository.voteComment(comment: comment, point: point)
+            self.comment.likes = finalVote
+        } catch {
+            self.comment.likes = previousVote
+            self.error = error
+            print("Error voting comment: \(error)")
+        }
     }
 }

@@ -11,6 +11,7 @@ import MarkdownUI
 
 struct CommentViewCard: View {
     @StateObject var commentViewModel: CommentViewModel
+    @State private var voteTask: Task<Void, Never>? = nil
     
     let formatter = DateFormatter()
     private let isInPostDetails: Bool
@@ -63,7 +64,10 @@ struct CommentViewCard: View {
             
             HStack(alignment: .center) {
                 Button(action: {
-                    commentViewModel.voteComment(vote: 1)
+                    voteTask?.cancel()
+                    voteTask = Task {
+                        await commentViewModel.voteComment(vote: 1)
+                    }
                 }) {
                     SwiftUI.Image(commentViewModel.comment.likes == 1 ? "upvoted" : "upvote")
                         .commentIconTemplateRendering()
@@ -76,7 +80,10 @@ struct CommentViewCard: View {
                     .commentInfo()
                 
                 Button(action: {
-                    commentViewModel.voteComment(vote: -1)
+                    voteTask?.cancel()
+                    voteTask = Task {
+                        await commentViewModel.voteComment(vote: -1)
+                    }
                 }) {
                     SwiftUI.Image(commentViewModel.comment.likes == -1 ? "downvoted" : "downvote")
                         .commentIconTemplateRendering()

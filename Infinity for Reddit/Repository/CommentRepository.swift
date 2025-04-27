@@ -28,21 +28,13 @@ public class CommentRepository: CommentRepositoryProtocol {
     public func voteComment(
         comment: Comment,
         point: String
-    ) -> AnyPublisher<Void, any Error> {
-        let params = ["dir": point, "id": comment.name!, "rank": "10"]
-        
-        return Future<Void, any Error> { promise in
-            self.session.request(RedditOAuthAPI.vote(params: params))
+    ) async throws {
+        do {
+            let params = ["dir": point, "id": comment.name!, "rank": "10"]
+            _ = try await self.session.request(RedditOAuthAPI.vote(params: params))
                 .validate()
-                .responseData { response in
-                    switch response.result {
-                    case .success(let data):
-                        promise(.success(Void()))
-                    case .failure(let error):
-                        promise(.failure(error))
-                    }
-                }
+                .serializingDecodable(Empty.self)
+                .value
         }
-        .eraseToAnyPublisher()
     }
 }

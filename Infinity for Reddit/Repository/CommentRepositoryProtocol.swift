@@ -9,5 +9,5 @@ import Combine
 import Alamofire
 
 public protocol CommentRepositoryProtocol {
-    func voteComment(comment: Comment, point: String) -> AnyPublisher<Void, Error>
+    func voteComment(comment: Comment, point: String) async throws
 }
