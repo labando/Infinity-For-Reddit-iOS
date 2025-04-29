@@ -32,7 +32,7 @@ struct PostListingView: View {
     
     var body: some View {
         Group {
-            if postListingViewModel.isInitialLoading {
+            if postListingViewModel.isInitialLoading || postListingViewModel.isInitialLoad {
                 Text("Is loading")
             } else if postListingViewModel.posts.isEmpty {
                 Text("No posts")

@@ -12,13 +12,13 @@ import MarkdownUI
 public class PostListingViewModel: ObservableObject {
     // MARK: - Properties
     @Published var posts: [Post] = []
+    @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
     @Published var hasMorePages: Bool = true
     @Published var error: Error?
     private let account: Account
     private let postListingMetadata: PostListingMetadata
-    private var isInitialLoad: Bool = true
     
     private var allPostIds = Set<String>()
     private var after: String? = nil
@@ -47,6 +47,8 @@ public class PostListingViewModel: ObservableObject {
     public func loadPosts() async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
+        let isInitailLoadCopy = isInitialLoad
+        
         await MainActor.run {
             if posts.isEmpty {
                 isInitialLoading = true
@@ -60,6 +62,8 @@ public class PostListingViewModel: ObservableObject {
         }
         
         do {
+            try Task.checkCancellation()
+            
             let postListing = try await postListingRepository.fetchPosts(
                 postListingType: postListingMetadata.postListingType,
                 pathComponents: postListingMetadata.pathComponents,
@@ -109,6 +113,7 @@ public class PostListingViewModel: ObservableObject {
                 
                 isInitialLoading = false
                 isLoadingMore = false
+                isInitialLoad = isInitailLoadCopy
             }
             
             print("Error fetching posts: \(error)")
