@@ -152,7 +152,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                 await transformSubsriptions()
                 
                 do {
-                    try AccountViewModel.shared.updateSubscriptionSyncTime()
+                    try await AccountViewModel.shared.updateSubscriptionSyncTime()
                 } catch {
                     print("Unable to update subscription sync time: \(error)")
                 }
@@ -171,7 +171,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                     await transformSubsriptions()
                     
                     do {
-                        try AccountViewModel.shared.updateSubscriptionSyncTime()
+                        try await AccountViewModel.shared.updateSubscriptionSyncTime()
                     } catch {
                         print("Unable to update subscription sync time: \(error)")
                     }

@@ -8,7 +8,7 @@
 import Foundation
 import SwiftyJSON
 
-class MediaMetadata : NSObject, NSCoding{
+class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
     
     static let imageType = "Image"
     static let gifType = "AnimatedImage"
@@ -121,7 +121,7 @@ class MediaMetadata : NSObject, NSCoding{
     }
 }
 
-class MediaMetadataPreview : NSObject, NSCoding{
+class MediaMetadataPreview : NSObject, NSCoding, ObservableObject, Identifiable {
     
     //URL
     var u : String!

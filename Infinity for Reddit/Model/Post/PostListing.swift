@@ -157,6 +157,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var domain : String!
     var downs : Int!
     var edited : Bool!
+    var galleryData : GalleryData?
     var hidden : Bool!
     var id : String!
     var isCrosspostable : Bool!
@@ -252,6 +253,10 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         domain = json["domain"].stringValue
         downs = json["downs"].intValue
         edited = json["edited"].boolValue
+        let galleryDataJson = json["gallery_data"]
+        if !galleryDataJson.isEmpty {
+            galleryData = GalleryData(fromJson: galleryDataJson)
+        }
         hidden = json["hidden"].boolValue
         id = json["id"].stringValue
         isCrosspostable = json["is_crosspostable"].boolValue
@@ -399,6 +404,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if edited != nil{
             dictionary["edited"] = edited
+        }
+        if galleryData != nil{
+            dictionary["gallery_data"] = galleryData
         }
         if hidden != nil{
             dictionary["hidden"] = hidden
@@ -586,6 +594,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         domain = aDecoder.decodeObject(forKey: "domain") as? String
         downs = aDecoder.decodeObject(forKey: "downs") as? Int
         edited = aDecoder.decodeObject(forKey: "edited") as? Bool
+        galleryData = aDecoder.decodeObject(forKey: "gallery_data") as? GalleryData
         hidden = aDecoder.decodeObject(forKey: "hidden") as? Bool
         id = aDecoder.decodeObject(forKey: "id") as? String
         isCrosspostable = aDecoder.decodeObject(forKey: "is_crosspostable") as? Bool
@@ -691,6 +700,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if edited != nil{
             aCoder.encode(edited, forKey: "edited")
+        }
+        if galleryData != nil{
+            aCoder.encode(galleryData, forKey: "gallery_data")
         }
         if hidden != nil{
             aCoder.encode(hidden, forKey: "hidden")

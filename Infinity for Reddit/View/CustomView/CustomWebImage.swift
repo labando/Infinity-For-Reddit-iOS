@@ -24,6 +24,11 @@ struct CustomWebImage<Content: View>: View {
         self.circleClipped = circleClipped
     }
     
+    init(_ urlString: String?, @ViewBuilder placeholderView: @escaping () -> Content) where Content == EmptyView {
+        self.urlString = urlString
+        self.placeholderView = placeholderView
+    }
+    
     init(_ urlString: String?, aspectRatio: CGSize, circleClipped: Bool = false) where Content == EmptyView {
         self.urlString = urlString
         self.aspectRatio = aspectRatio

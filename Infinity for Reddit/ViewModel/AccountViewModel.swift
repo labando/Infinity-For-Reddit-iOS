@@ -72,8 +72,10 @@ public class AccountViewModel: ObservableObject {
         }
     }
     
-    public func updateSubscriptionSyncTime() throws {
-        account.subscriptionSyncTime = Int64(Date().timeIntervalSince1970)
+    public func updateSubscriptionSyncTime() async throws {
+        await MainActor.run {
+            account.subscriptionSyncTime = Int64(Date().timeIntervalSince1970)
+        }
         try accountDao.updateSubscriptionSyncTime(username: account.username, subscriptionSyncTime: account.subscriptionSyncTime)
     }
     
