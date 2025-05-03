@@ -7,22 +7,22 @@
 
 import GRDB
 
-struct SubredditData: Codable, FetchableRecord, PersistableRecord {
-    static let databaseTableName = "subreddits"
+public struct SubredditData: Codable, FetchableRecord, PersistableRecord {
+    public static let databaseTableName = "subreddits"
     
     var id: String
-    var name: String?
+    var name: String
     var iconUrl: String?
     var bannerUrl: String?
     var description: String?
     var sidebarDescription: String?
-    var nSubscribers: Int
-    var createdUTC: Int64
+    var nSubscribers: Int?
+    var createdUTC: Int64?
     var suggestedCommentSort: String?
-    var isNSFW: Bool
+    var isNSFW: Bool?
     var isSelected: Bool = false
     
-    init(id: String, name: String? = nil, iconUrl: String? = nil, bannerUrl: String? = nil,
+    init(id: String, name: String, iconUrl: String? = nil, bannerUrl: String? = nil,
          description: String? = nil, sidebarDescription: String? = nil, nSubscribers: Int, createdUTC: Int64,
          suggestedCommentSort: String? = nil, isNSFW: Bool) {
         self.id = id

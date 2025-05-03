@@ -118,6 +118,8 @@ struct HomeView: View {
                     PostDetailsView(account: accountViewModel.account, post: post)
                 } else if case .userDetails(let username) = destination {
                     UserDetailsView(username: username)
+                } else if case .subredditDetails(let subredditName) = destination {
+                    SubredditDetailsView(subredditName: subredditName)
                 }
             }
             .navigationDestination(for: MoreViewNavigation.self) { destination in

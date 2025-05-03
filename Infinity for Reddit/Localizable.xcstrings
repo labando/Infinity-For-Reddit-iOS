@@ -469,7 +469,19 @@
     "Show Top-level Comments First" : {
 
     },
+    "Since: %@" : {
+
+    },
     "Sort Type" : {
+
+    },
+    "Subscribe" : {
+
+    },
+    "Subscribed" : {
+
+    },
+    "Subscribers: %lld" : {
 
     },
     "Subscriptions" : {

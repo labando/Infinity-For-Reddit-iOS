@@ -27,6 +27,9 @@ struct PostViewCard: View {
                 VStack(alignment: .leading) {
                     Text(postViewModel.post.subredditNamePrefixed)
                         .subreddit()
+                        .onTapGesture {
+                            navigationManager.path.append(AppNavigation.subredditDetails(subredditName: postViewModel.post.subreddit))
+                        }
                     
                     Text("u/\(postViewModel.post.author)")
                         .username()
