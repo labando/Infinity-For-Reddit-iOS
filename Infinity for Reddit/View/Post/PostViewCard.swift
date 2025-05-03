@@ -60,10 +60,12 @@ struct PostViewCard: View {
                 }
                 .frame(maxWidth: .infinity)
                 .aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
-            } else if let galleryData = postViewModel.post.galleryData, !galleryData.items.isEmpty, let mediaMetadata = postViewModel.post.mediaMetadata {
-                GeometryReader { geo in
-                    GalleryCarousel(galleryData: galleryData, mediaMetadata: mediaMetadata)
-                }
+            } else if let galleryData = postViewModel.post.galleryData,
+                      !galleryData.items.isEmpty,
+                      let mediaMetadata = postViewModel.post.mediaMetadata,
+                      let preview = mediaMetadata[galleryData.items[0].mediaId] {
+                GalleryCarousel(galleryData: galleryData, mediaMetadata: mediaMetadata)
+                    .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
             } else if let selftextTruncated = postViewModel.post.selftextTruncated {
                 Text(selftextTruncated)
             }

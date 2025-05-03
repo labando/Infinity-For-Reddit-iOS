@@ -116,7 +116,7 @@ struct CustomWebImage<Content: View>: View {
                         image
                             .resizable()
                     }
-                }  placeholder: {
+                } placeholder: {
                     placeholderView?()
                 }
                 .onSuccess { image, data, cacheType in
@@ -136,7 +136,12 @@ struct CustomWebImage<Content: View>: View {
                 }
                 .transition(.fade(duration: 0.5))
                 .scaledToFit()
-                .frame(width: width, height: height)
+                .applyIf(width != nil) {
+                    $0.frame(width: width!)
+                }
+                .applyIf(height != nil) {
+                    $0.frame(height: height!)
+                }
             }
         }
     }
