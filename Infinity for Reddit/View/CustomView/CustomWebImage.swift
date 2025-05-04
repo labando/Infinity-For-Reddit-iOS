@@ -9,6 +9,8 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct CustomWebImage<Content: View>: View {
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     var urlString: String?
     var width: CGFloat?
     var height: CGFloat?
@@ -148,5 +150,15 @@ struct CustomWebImage<Content: View>: View {
                 }
             }
         }
+        .contentShape(Rectangle())
+        .highPriorityGesture(
+            TapGesture()
+                .onEnded {
+                    print("urlString: \(urlString ?? "nil")")
+                    if let urlString = urlString {
+                        navigationManager.path.append(MediaNavigation.image(url: urlString, post: nil))
+                    }
+                }
+        )
     }
 }

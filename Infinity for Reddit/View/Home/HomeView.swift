@@ -142,6 +142,11 @@ struct HomeView: View {
                     TestView()
                 }
             }
+            .navigationDestination(for: MediaNavigation.self) { destination in
+                if case let .image(urlString, post) = destination {
+                    ImageFullScreenView()
+                }
+            }
         }
         .onChange(of: colorScheme) {
             customThemeViewModel.isDarkTheme = colorScheme == .dark
