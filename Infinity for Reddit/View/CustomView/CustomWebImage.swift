@@ -11,90 +11,49 @@ import SDWebImageSwiftUI
 struct CustomWebImage<Content: View>: View {
     @EnvironmentObject var navigationManager: NavigationManager
     
+    @State private var shouldLoadFallbackImage = false
+    
     var urlString: String?
     var width: CGFloat?
     var height: CGFloat?
     var aspectRatio: CGSize?
     var circleClipped: Bool?
+    var handleImageTapGesture: Bool
     var placeholderView: (() -> Content)?
     var fallbackView: (() -> Content)?
     
-    @State private var shouldLoadFallbackImage = false
-    
-    init(_ urlString: String?) {
-        self.urlString = urlString
-    }
-    
-    init(_ urlString: String?, circleClipped: Bool = false) where Content == EmptyView {
-        self.urlString = urlString
-        self.circleClipped = circleClipped
-    }
-    
-    init(_ urlString: String?, @ViewBuilder placeholderView: @escaping () -> Content) where Content == EmptyView {
-        self.urlString = urlString
-        self.placeholderView = placeholderView
-    }
-    
-    init(_ urlString: String?, aspectRatio: CGSize, circleClipped: Bool = false) where Content == EmptyView {
-        self.urlString = urlString
-        self.aspectRatio = aspectRatio
-        self.circleClipped = circleClipped
-    }
-    
-    init(_ urlString: String?, circleClipped: Bool = false, @ViewBuilder fallbackView: @escaping () -> Content) {
-        self.urlString = urlString
-        self.circleClipped = circleClipped
-        self.fallbackView = fallbackView
-    }
-    
-    init(_ urlString: String?, aspectRatio: CGSize, circleClipped: Bool = false, @ViewBuilder placeholderView: @escaping () -> Content) {
-        self.urlString = urlString
-        self.aspectRatio = aspectRatio
-        self.circleClipped = circleClipped
-        self.placeholderView = placeholderView
-    }
-    
-    init(_ urlString: String?, width: CGFloat, aspectRatio: CGSize, circleClipped: Bool = false) where Content == EmptyView {
-        self.urlString = urlString
-        self.width = width
-        self.aspectRatio = aspectRatio
-        self.circleClipped = circleClipped
-    }
-    
-    init(_ urlString: String?, width: CGFloat, height: CGFloat, circleClipped: Bool = false) where Content == EmptyView {
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true) where Content == EmptyView {
         self.urlString = urlString
         self.width = width
         self.height = height
+        self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
+        self.handleImageTapGesture = handleImageTapGesture
     }
     
-    init(_ urlString: String?, width: CGFloat, height: CGFloat, circleClipped: Bool = false, @ViewBuilder fallbackView: @escaping () -> Content) {
-        self.urlString = urlString
-        self.width = width
-        self.height = height
-        self.circleClipped = circleClipped
-        self.fallbackView = fallbackView
-    }
-    
-    init(_ urlString: String?, circleClipped: Bool = false, @ViewBuilder placeholderView: @escaping () -> Content,
-         @ViewBuilder fallbackView: @escaping () -> Content) {
-        self.urlString = urlString
-        self.circleClipped = circleClipped
-        self.placeholderView = placeholderView
-        self.fallbackView = fallbackView
-    }
-    
-    init(_ urlString: String?, width: CGFloat?, height: CGFloat?, aspectRatio: CGSize?, circleClipped: Bool = false,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true,
          @ViewBuilder placeholderView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
         self.height = height
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
+        self.handleImageTapGesture = handleImageTapGesture
         self.placeholderView = placeholderView
     }
     
-    init(_ urlString: String?, width: CGFloat?, height: CGFloat?, aspectRatio: CGSize?, circleClipped: Bool = false,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true,
+         @ViewBuilder fallbackView: @escaping () -> Content) {
+        self.urlString = urlString
+        self.width = width
+        self.height = height
+        self.aspectRatio = aspectRatio
+        self.circleClipped = circleClipped
+        self.handleImageTapGesture = handleImageTapGesture
+        self.fallbackView = fallbackView
+    }
+    
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true,
          @ViewBuilder placeholderView: @escaping () -> Content,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
@@ -102,6 +61,7 @@ struct CustomWebImage<Content: View>: View {
         self.height = height
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
+        self.handleImageTapGesture = handleImageTapGesture
         self.placeholderView = placeholderView
         self.fallbackView = fallbackView
     }
@@ -150,15 +110,17 @@ struct CustomWebImage<Content: View>: View {
                 }
             }
         }
-        .contentShape(Rectangle())
-        .highPriorityGesture(
-            TapGesture()
-                .onEnded {
-                    print("urlString: \(urlString ?? "nil")")
-                    if let urlString = urlString {
-                        navigationManager.path.append(MediaNavigation.image(url: urlString, post: nil))
-                    }
-                }
-        )
+        .applyIf(handleImageTapGesture == true) {
+            $0.contentShape(Rectangle())
+                .highPriorityGesture(
+                    TapGesture()
+                        .onEnded {
+                            print("urlString: \(urlString ?? "nil")")
+                            if let urlString = urlString {
+                                navigationManager.path.append(MediaNavigation.image(url: urlString, post: nil))
+                            }
+                        }
+                )
+        }
     }
 }
