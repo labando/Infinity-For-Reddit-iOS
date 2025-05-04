@@ -73,8 +73,8 @@ class SubredditDetailRootClass : NSObject, NSCoding{
         return SubredditData(
             id: data.id,
             name: data.displayName,
-            iconUrl: data.iconImg,
-            bannerUrl: data.bannerImg,
+            iconUrl: data.communityIcon,
+            bannerUrl: data.bannerBackgroundImage,
             description: data.descriptionField,
             sidebarDescription: data.publicDescription,
             nSubscribers: data.subscribers,
