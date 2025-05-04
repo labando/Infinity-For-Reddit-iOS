@@ -111,18 +111,6 @@ struct CustomWebImage<Content: View>: View {
                 }
             }
         }
-//        .applyIf(handleImageTapGesture == true) {
-//            $0.contentShape(Rectangle())
-//                .highPriorityGesture(
-//                    TapGesture()
-//                        .onEnded {
-//                            print("urlString: \(urlString ?? "nil")")
-//                            if let urlString = urlString {
-//                                navigationManager.path.append(MediaNavigation.image(url: urlString, post: nil))
-//                            }
-//                        }
-//                )
-//        }
         .applyIf(handleImageTapGesture == true) {
             $0.contentShape(Rectangle())
                 .highPriorityGesture(
