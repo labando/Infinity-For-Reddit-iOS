@@ -15,14 +15,15 @@ struct HomeView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
     @StateObject private var navigationManager = NavigationManager()
     
     var body: some View {
-        NavigationStack(path: $navigationManager.path) {
-            VStack {
+        ZStack {
+            NavigationStack(path: $navigationManager.path) {
                 TabView(selection: $selectedTab) {
                     Group {
                         PostListingView(
@@ -73,86 +74,89 @@ struct HomeView: View {
                     .themedTabViewGroup()
                 }
                 .themedTabView()
-            }
-            .toolbar {
-                if let leadingButton = selectedTab.leadingButton {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        leadingButton
-                            .navigationBarButton()
+                .toolbar {
+                    if let leadingButton = selectedTab.leadingButton {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            leadingButton
+                                .navigationBarButton()
+                        }
+                    }
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            showProfile.toggle()
+                        }) {
+                            CustomWebImage(
+                                accountViewModel.account.profileImageUrl,
+                                width: 30,
+                                height: 30,
+                                circleClipped: true,
+                                handleImageTapGesture: false,
+                                fallbackView: {
+                                    SwiftUI.Image(systemName: "person.crop.circle")
+                                        .resizable()
+                                        .frame(width: 30, height: 30)
+                                        .navigationBarImage()
+                                }
+                            )
+                        }
                     }
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showProfile.toggle()
-                    }) {
-                        CustomWebImage(
-                            accountViewModel.account.profileImageUrl,
-                            width: 30,
-                            height: 30,
-                            circleClipped: true,
-                            handleImageTapGesture: false,
-                            fallbackView: {
-                                SwiftUI.Image(systemName: "person.crop.circle")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                    .navigationBarImage()
-                            }
-                        )
+                .themedNavigationBar()
+                .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                .sheet(isPresented: $showProfile) {
+                    AccountSheet()
+                        .presentationDetents([.height(800)])
+                }
+                .onAppear {
+                    let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+                    let docsDir = dirPaths[0]
+                    
+                    print(docsDir)
+                }
+                .navigationDestination(for: AppNavigation.self) { destination in
+                    if case .postDetails(let post) = destination {
+                        PostDetailsView(account: accountViewModel.account, post: post)
+                    } else if case .userDetails(let username) = destination {
+                        UserDetailsView(username: username)
+                    } else if case .subredditDetails(let subredditName) = destination {
+                        SubredditDetailsView(subredditName: subredditName)
+                    }
+                }
+                .navigationDestination(for: MoreViewNavigation.self) { destination in
+                    switch destination {
+                    case .profile:
+                        ProfileView()
+                    case .history:
+                        HistoryView()
+                    case .upvoted:
+                        UpvotedView()
+                    case .downvoted:
+                        DownvotedView()
+                    case .hidden:
+                        HiddenView()
+                    case .saved:
+                        SavedView()
+                    case .settings:
+                        SettingsView()
+                    case .test:
+                        TestView()
                     }
                 }
             }
-            .themedNavigationBar()
-            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
-            .sheet(isPresented: $showProfile) {
-                AccountSheet()
-                    .presentationDetents([.height(800)])
-            }
-            .onAppear {
-                let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-                let docsDir = dirPaths[0]
-
-                print(docsDir)
-            }
-            .navigationDestination(for: AppNavigation.self) { destination in
-                if case .postDetails(let post) = destination {
-                    PostDetailsView(account: accountViewModel.account, post: post)
-                } else if case .userDetails(let username) = destination {
-                    UserDetailsView(username: username)
-                } else if case .subredditDetails(let subredditName) = destination {
-                    SubredditDetailsView(subredditName: subredditName)
-                }
-            }
-            .navigationDestination(for: MoreViewNavigation.self) { destination in
-                switch destination {
-                case .profile:
-                    ProfileView()
-                case .history:
-                    HistoryView()
-                case .upvoted:
-                    UpvotedView()
-                case .downvoted:
-                    DownvotedView()
-                case .hidden:
-                    HiddenView()
-                case .saved:
-                    SavedView()
-                case .settings:
-                    SettingsView()
-                case .test:
-                    TestView()
-                }
-            }
-            .navigationDestination(for: MediaNavigation.self) { destination in
-                if case let .image(urlString, post) = destination {
-                    ImageFullScreenView()
+            .themedNavigationBarBackButton()
+            
+            if let media = fullScreenMediaViewModel.media {
+                if case let .image(urlString, post) = media {
+                    ImageFullScreenView(url: URL(string: urlString)) {
+                        fullScreenMediaViewModel.dismiss()
+                    }
                 }
             }
         }
         .onChange(of: colorScheme) {
             customThemeViewModel.isDarkTheme = colorScheme == .dark
         }
-        .themedNavigationBarBackButton()
         .environmentObject(navigationManager)
     }
     

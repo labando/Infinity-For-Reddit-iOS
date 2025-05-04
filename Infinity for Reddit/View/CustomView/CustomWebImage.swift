@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 
 struct CustomWebImage<Content: View>: View {
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @State private var shouldLoadFallbackImage = false
     
@@ -110,15 +111,24 @@ struct CustomWebImage<Content: View>: View {
                 }
             }
         }
+//        .applyIf(handleImageTapGesture == true) {
+//            $0.contentShape(Rectangle())
+//                .highPriorityGesture(
+//                    TapGesture()
+//                        .onEnded {
+//                            print("urlString: \(urlString ?? "nil")")
+//                            if let urlString = urlString {
+//                                navigationManager.path.append(MediaNavigation.image(url: urlString, post: nil))
+//                            }
+//                        }
+//                )
+//        }
         .applyIf(handleImageTapGesture == true) {
             $0.contentShape(Rectangle())
                 .highPriorityGesture(
                     TapGesture()
                         .onEnded {
-                            print("urlString: \(urlString ?? "nil")")
-                            if let urlString = urlString {
-                                navigationManager.path.append(MediaNavigation.image(url: urlString, post: nil))
-                            }
+                            fullScreenMediaViewModel.show(.image(url: urlString ?? "", post: nil))
                         }
                 )
         }
