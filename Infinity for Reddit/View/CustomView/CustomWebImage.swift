@@ -96,12 +96,6 @@ struct CustomWebImage<Content: View>: View {
                         }
                     } placeholder: {
                         placeholderView?()
-                            .applyIf(handleImageTapGesture == true && fullScreenMediaViewModel.currentId != (urlString ?? "")) {
-                                $0.matchedGeometryEffect(id: urlString ?? "", in: namespaceManager.animation)
-                            }
-                            .applyIf(handleImageTapGesture == false) {
-                                $0.matchedGeometryEffect(id: urlString ?? "", in: namespaceManager.animation)
-                            }
                     }
                     .onSuccess { image, data, cacheType in
                         // Success
