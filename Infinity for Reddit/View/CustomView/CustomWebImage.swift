@@ -21,45 +21,50 @@ struct CustomWebImage<Content: View>: View {
     var aspectRatio: CGSize?
     var circleClipped: Bool?
     var handleImageTapGesture: Bool
+    var centerCrop: Bool
     var post: Post?
     var placeholderView: (() -> Content)?
     var fallbackView: (() -> Content)?
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, post: Post? = nil) where Content == EmptyView {
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, post: Post? = nil) where Content == EmptyView {
         self.urlString = urlString
         self.width = width
         self.height = height
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
+        self.centerCrop = centerCrop
         self.handleImageTapGesture = handleImageTapGesture
         self.post = post
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, post: Post? = nil,
+
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, post: Post? = nil,
          @ViewBuilder placeholderView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
         self.height = height
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
+        self.centerCrop = centerCrop
         self.handleImageTapGesture = handleImageTapGesture
         self.post = post
         self.placeholderView = placeholderView
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, post: Post? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, post: Post? = nil,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
         self.height = height
         self.aspectRatio = aspectRatio
         self.circleClipped = circleClipped
+        self.centerCrop = centerCrop
         self.handleImageTapGesture = handleImageTapGesture
         self.post = post
         self.fallbackView = fallbackView
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, post: Post? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, post: Post? = nil,
          @ViewBuilder placeholderView: @escaping () -> Content,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
@@ -69,6 +74,7 @@ struct CustomWebImage<Content: View>: View {
         self.circleClipped = circleClipped
         self.handleImageTapGesture = handleImageTapGesture
         self.post = post
+        self.centerCrop = centerCrop
         self.placeholderView = placeholderView
         self.fallbackView = fallbackView
     }
@@ -114,13 +120,13 @@ struct CustomWebImage<Content: View>: View {
                         }
                     }
                     .indicator(.activity)
-                    .scaledToFit()
+//                    .scaledToFit()
                     .applyIf(circleClipped == true) {
                         $0.clipShape(Circle())
                     }
-//                    .applyIf(handleImageTapGesture != true) {
-//                        $0.transition(.fade(duration: 0.5))
-//                    }
+                    //                    .applyIf(handleImageTapGesture != true) {
+                    //                        $0.transition(.fade(duration: 0.5))
+                    //                    }
                     .applyIf(width != nil) {
                         $0.frame(width: width!)
                     }
@@ -132,6 +138,13 @@ struct CustomWebImage<Content: View>: View {
                     }
                     .applyIf(handleImageTapGesture == false) {
                         $0.matchedGeometryEffect(id: urlString ?? "", in: namespaceManager.animation)
+                    }
+                    .applyIf(centerCrop == true) {
+                        $0.scaledToFill()
+                            .clipped()
+                    }
+                    .applyIf(centerCrop == false) {
+                        $0.scaledToFit()
                     }
                 }
             }

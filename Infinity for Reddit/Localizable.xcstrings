@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "%@" : {
+
+    },
     "%lld/%lld" : {
       "localizations" : {
         "en" : {
@@ -344,6 +347,9 @@
     "Notification" : {
 
     },
+    "Online: %lld" : {
+
+    },
     "Only Sensitive Content" : {
 
     },
@@ -473,7 +479,7 @@
     "Show Top-level Comments First" : {
 
     },
-    "Since: %@" : {
+    "Since: " : {
 
     },
     "Sort Type" : {
