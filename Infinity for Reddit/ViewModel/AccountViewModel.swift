@@ -23,7 +23,6 @@ public class AccountViewModel: ObservableObject {
     private static var _shared: AccountViewModel?
     
     @Published var account: Account
-    @Published var shouldDismissAccountSheet: Bool = false
     
     let accountDao: AccountDao
     private var cancellables: Set<AnyCancellable> = []
@@ -79,9 +78,15 @@ public class AccountViewModel: ObservableObject {
         try accountDao.updateSubscriptionSyncTime(username: account.username, subscriptionSyncTime: account.subscriptionSyncTime)
     }
     
-    public func logoutToAnonymous() throws {
+    public func switchToAnonymous() throws {
         account = Account.ANONYMOUS_ACCOUNT
         try accountDao.markAllAccountsNonCurrent()
+        objectWillChange.send()
+    }
+    
+    public func logout() throws {
+        account = Account.ANONYMOUS_ACCOUNT
+        try accountDao.deleteCurrentAccount()
         objectWillChange.send()
     }
     

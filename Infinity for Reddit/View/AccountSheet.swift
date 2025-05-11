@@ -7,130 +7,85 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import GRDB
 
 struct AccountSheet: View {
-    @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var accountViewModel: AccountViewModel
+    @Environment(\.dismiss) var dismiss
+    
+    @StateObject var accountListingViewModel: AccountListingViewModel
+    
+    init() {
+        guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
+            fatalError("Failed to resolve DatabasePool")
+        }
+        
+        _accountListingViewModel = StateObject(wrappedValue: AccountListingViewModel(dbPool: resolvedDBPool))
+    }
     
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    CustomWebImage(
-                        accountViewModel.account.profileImageUrl,
-                        width: 96,
-                        height: 96,
-                        circleClipped: true,
-                        fallbackView: {
-                            SwiftUI.Image(systemName: "person.crop.circle")
-                                .resizable()
-                                .frame(width: 96, height: 96)
+        ScrollView {
+            VStack(spacing: 20) {
+                Spacer()
+                    .frame(height: 20)
+                
+                CustomWebImage(
+                    accountViewModel.account.profileImageUrl,
+                    width: 96,
+                    height: 96,
+                    circleClipped: true,
+                    fallbackView: {
+                        SwiftUI.Image(systemName: "person.crop.circle")
+                            .resizable()
+                            .frame(width: 96, height: 96)
+                    }
+                )
+                
+                Text(accountViewModel.account.isAnonymous() == true ? "Anonymous" : accountViewModel.account.username)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                ForEach(accountListingViewModel.otherAccounts, id: \.username) { account in
+                    IconTextButton(iconUrl: account.profileImageUrl ?? "", isWebImage: true, text: account.username) {
+                        do {
+                            AccountViewModel.shared.switchAccount(newAccount: account)
+                            try AccountViewModel.shared.updateTokens(accessToken: account.accessToken ?? "", refreshToken: account.refreshToken ?? "")
                         }
-                    )
+                        catch{
+                            print("Error: switching account failed")
+                        }
+                        
+                        dismiss()
+                    }
+                }
+                
+                IconTextButton(iconUrl: "person.crop.circle.badge.plus", text: "Add account") {
+                    dismiss()
+                    navigationManager.path.append(AppNavigation.login)
+                }
+                
+                if accountViewModel.account.isAnonymous() == false {
+                    IconTextButton(iconUrl: "person.fill.questionmark", text: "Anonymous") {
+                        do {
+                            try accountViewModel.switchToAnonymous()
+                        } catch {
+                            print("Failed to log out: \(error)")
+                        }
+                        dismiss()
+                    }
                     
-                    // User's Name
-                    Text(accountViewModel.account.isAnonymous() == true ? "Anonymous" : accountViewModel.account.username)
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    if accountViewModel.account.isAnonymous() == false {
-                        // Navigate to User Details Page
-                        NavigationLink(destination: UserDetailsView(username: accountViewModel.account.username)) {
-                            Text("View User Details")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
+                    IconTextButton(iconUrl: "rectangle.portrait.and.arrow.right", text: "Log out") {
+                        do {
+                            try accountViewModel.logout()
+                        } catch {
+                            print("Failed to log out: \(error)")
                         }
-                        .padding(.horizontal)
-                        
-                        Spacer()
-
-                        
-                        NavigationLink(destination: AccountListingView(dismissAccountSheet: {
-                            self.dismiss()
-                        })) {
-                            Text("Switch account")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.red)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
-                        
-                        Button(action: {
-                            // Handle Sign Out Logic
-                            do {
-                                try accountViewModel.logoutToAnonymous()
-                            } catch {
-                                print("Failed to log out: \(error)")
-                            }
-                        }) {
-                            Text("Anonymous")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.red)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
-                        
-                        Button(action: {
-                            // Handle Sign Out Logic
-                            do {
-                                try accountViewModel.logoutToAnonymous()
-                            } catch {
-                                print("Failed to log out: \(error)")
-                            }
-                            accountViewModel.shouldDismissAccountSheet = true
-                        }) {
-                            Text("Log out")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.red)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
-                    } else {
-                        NavigationLink(destination: LoginView().environmentObject(accountViewModel)) {
-                            Text("Log in")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
-                        
-                        NavigationLink(destination: AccountListingView(dismissAccountSheet: {
-                            self.dismiss()
-                        })) {
-                            Text("Switch account")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.red)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
+                        dismiss()
                     }
                 }
             }
-            .padding(.top, 20)
-            .navigationBarTitle("Account", displayMode: .inline)
-            .navigationBarItems(
-                leading: Button("Close") {
-                    dismiss() // Close the sheet
-                }
-            )
-            .onChange(of: accountViewModel.shouldDismissAccountSheet) {
-                accountViewModel.shouldDismissAccountSheet = false
-                dismiss()
-            }
-            
         }
+        .padding(.horizontal, 24)
     }
 }

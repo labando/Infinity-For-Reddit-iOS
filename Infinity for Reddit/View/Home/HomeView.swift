@@ -108,7 +108,8 @@ struct HomeView: View {
                 .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                 .sheet(isPresented: $showProfile) {
                     AccountSheet()
-                        .presentationDetents([.height(800)])
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
                 }
                 .onAppear {
                     let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
@@ -117,7 +118,9 @@ struct HomeView: View {
                     print(docsDir)
                 }
                 .navigationDestination(for: AppNavigation.self) { destination in
-                    if case .postDetails(let post) = destination {
+                    if case .login = destination {
+                        LoginView()
+                    } else if case .postDetails(let post) = destination {
                         PostDetailsView(account: accountViewModel.account, post: post)
                     } else if case .userDetails(let username) = destination {
                         UserDetailsView(username: username)
