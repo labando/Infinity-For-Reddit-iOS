@@ -128,7 +128,7 @@ struct HomeView: View {
                 .navigationDestination(for: MoreViewNavigation.self) { destination in
                     switch destination {
                     case .profile:
-                        ProfileView()
+                        UserDetailsView(username: accountViewModel.account.username)
                     case .history:
                         HistoryView()
                     case .upvoted:

@@ -26,6 +26,7 @@ struct UpvotedView: View {
         )
         .id(accountViewModel.account.username)
         .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Upvoted")
     }
 }
 
