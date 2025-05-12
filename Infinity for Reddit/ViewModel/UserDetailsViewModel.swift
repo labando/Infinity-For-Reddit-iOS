@@ -59,6 +59,7 @@ class UserDetailsViewModel: ObservableObject {
             self.isSubscribed = action == "sub"
         } catch {
             self.error = error
+            
             print("Error \(action == "sub" ? "following to" : "unfollowing from") \(username): \(error)")
         }
     }
@@ -71,13 +72,10 @@ class UserDetailsViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
-            await MainActor.run {
-                self.userData = fetchData
-            }
+            self.userData = fetchData
         } catch {
-            await MainActor.run {
-                self.error = error
-            }
+            self.error = error
+            
             print("Error fetching user data: \(error)")
         }
     }
