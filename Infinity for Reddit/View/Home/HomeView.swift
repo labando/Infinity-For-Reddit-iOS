@@ -54,7 +54,7 @@ struct HomeView: View {
                         CommentListingView(
                             commentListingMetadata: CommentListingMetadata(
                                 commentListingType: .user,
-                                pathComponents: ["sortType": "best"],
+                                pathComponents: ["username": accountViewModel.account.username, "sortType": "best"],
                                 headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                 queries: nil,
                                 params: nil
