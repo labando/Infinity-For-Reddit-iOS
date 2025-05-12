@@ -7,13 +7,14 @@
 
 import Foundation
 import Combine
+import MarkdownUI
 
-@MainActor
 public class PostDetailsViewModel: ObservableObject {
     // MARK: - Properties
     @Published var post: Post
     @Published var comments: [Comment] = []
     @Published var isSingleThread: Bool =  false
+    @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
     @Published var hasMoreComments: Bool = true
@@ -21,7 +22,6 @@ public class PostDetailsViewModel: ObservableObject {
     private let account: Account
     private var postId: String?
     private var commentMore: CommentMore?
-    private var isInitialLoad: Bool = true
     
     private var after: String? = nil
     
@@ -39,46 +39,78 @@ public class PostDetailsViewModel: ObservableObject {
     public func fetchComments() async {
         guard !isInitialLoading, !isLoadingMore, hasMoreComments else { return }
         
-        if comments.isEmpty {
-            isInitialLoading = true
-        } else {
-            isLoadingMore = true
-        }
+        let isInitailLoadCopy = isInitialLoad
         
-        if isInitialLoad {
-            isInitialLoad = false
-        }
-        
-        defer {
-            self.isInitialLoading = false
-            self.isLoadingMore = false
+        await MainActor.run {
+            if comments.isEmpty {
+                isInitialLoading = true
+            } else {
+                isLoadingMore = true
+            }
+            
+            if isInitialLoad {
+                isInitialLoad = false
+            }
         }
         
         do {
+            try Task.checkCancellation()
+            
             let postDetails = try await postDetailsRepository.fetchComments(
                 postId: post.id,
                 queries: ["after": after ?? ""]
             )
             
-            self.comments.append(contentsOf: postDetails.comments)
+            try Task.checkCancellation()
             
-            hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
+            let processedComments = postProcessComments(postDetails.comments)
+            
+            try Task.checkCancellation()
+            
+            await MainActor.run {
+                self.comments.append(contentsOf: processedComments)
+                
+                hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
+                
+                self.isInitialLoading = false
+                self.isLoadingMore = false
+            }
         } catch {
-            self.error = error
+            await MainActor.run {
+                self.error = error
+                
+                self.isInitialLoad = isInitailLoadCopy
+                self.isInitialLoading = false
+                self.isLoadingMore = false
+            }
             print("Error fetching comments: \(error)")
         }
     }
     
     /// Reloads posts from the first page
     func refreshPosts() async {
-        isInitialLoad = true
-        isInitialLoading = false
-        isLoadingMore = false
-        
-        after = nil
-        hasMoreComments = true
-        comments = []
+        await MainActor.run {
+            isInitialLoad = true
+            isInitialLoading = false
+            isLoadingMore = false
+            
+            after = nil
+            hasMoreComments = true
+            comments = []
+        }
         
         await fetchComments()
+    }
+    
+    func postProcessComments(_ comments: [Comment]) -> [Comment] {
+        return comments.map {
+            modifyCommentBody($0)
+            $0.bodyProcessedMarkdown = MarkdownContent($0.body)
+            return $0
+        }
+    }
+    
+    func modifyCommentBody(_ comment: Comment) {
+        MarkdownUtils.parseRedditImagesBlock(comment)
     }
 }

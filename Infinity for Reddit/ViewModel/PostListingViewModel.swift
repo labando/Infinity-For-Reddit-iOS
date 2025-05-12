@@ -120,13 +120,15 @@ public class PostListingViewModel: ObservableObject {
     
     /// Reloads posts from the first page
     func refreshPosts() async {
-        isInitialLoad = true
-        isInitialLoading = false
-        isLoadingMore = false
-        
-        after = nil
-        hasMorePages = true
-        posts = []
+        await MainActor.run {
+            isInitialLoad = true
+            isInitialLoading = false
+            isLoadingMore = false
+            
+            after = nil
+            hasMorePages = true
+            posts = []
+        }
         
         await initialLoadPosts()
     }

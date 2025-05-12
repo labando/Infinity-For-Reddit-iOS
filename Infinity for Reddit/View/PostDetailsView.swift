@@ -38,7 +38,7 @@ struct PostDetailsView: View {
                 PostDetailsViewCard(account: account, post: post)
                     .listPlainItem()
                 
-                if postDetailsViewModel.isInitialLoading {
+                if postDetailsViewModel.isInitialLoading || postDetailsViewModel.isInitialLoad {
                     ProgressIndicator()
                         .listPlainItem()
                 } else if postDetailsViewModel.comments.isEmpty {
