@@ -11,7 +11,7 @@ enum FullScreenMediaType {
     case image(url: String, aspectRatio: CGSize?, post: Post?)
     case gif(url: String, post: Post?)
     case video(url: String, post: Post?)
-    case gallery(items: [GalleryItem], mediaMetadata: [String: MediaMetadata], galleryScrollState: GalleryScrollState)
+    case gallery(currentUrl: String, items: [GalleryItem], mediaMetadata: [String: MediaMetadata], galleryScrollState: GalleryScrollState)
 }
 
 class GalleryScrollState: ObservableObject {
@@ -25,8 +25,10 @@ class GalleryScrollState: ObservableObject {
 class FullScreenMediaViewModel: ObservableObject {
     @Published var media: FullScreenMediaType?
     @Published var currentId: String?
+    @Published var isTransitioning: Bool = false
     
     func show(_ media: FullScreenMediaType) {
+        isTransitioning = true
         self.media = media
         switch media {
         case .image(let url, _, _):
@@ -35,13 +37,23 @@ class FullScreenMediaViewModel: ObservableObject {
             self.currentId = url
         case .video(let url, _):
             self.currentId = url
-        default:
-            self.currentId = nil
+        case .gallery(let currentUrl, _, _, _):
+            self.currentId = currentUrl
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            self.isTransitioning = false
         }
     }
     
     func dismiss() {
+        isTransitioning = true
+        
         self.media = nil
         self.currentId = nil
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            self.isTransitioning = false
+        }
     }
 }

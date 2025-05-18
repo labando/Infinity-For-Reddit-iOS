@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct GalleryFullScreenView: View {
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    @EnvironmentObject private var namespaceManager: NamespaceManager
+    
     @ObservedObject private var galleryScrollState: GalleryScrollState
-    //@State private var scrollID: Int?
-    @State private var scale: CGFloat = 1.0
     @GestureState private var dragOffset: CGSize = .zero
-    @State private var currentDragOffset: CGSize = .zero
+    @State private var currentDragOffset = 0.0
     @State private var hasStartedDragging: Bool = false
     @State private var isAnimatingBack: Bool = false
     
@@ -41,12 +42,11 @@ struct GalleryFullScreenView: View {
                         CustomWebImage(preview.u, handleImageTapGesture: false)
                             .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
                             .tag(index)
+                            .offset(y: currentDragOffset)
                     }
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .scaleEffect(scale)
-            .offset(currentDragOffset)
         }
         .gesture(
             DragGesture()
@@ -55,28 +55,30 @@ struct GalleryFullScreenView: View {
                     if !hasStartedDragging && abs(value.translation.height) > abs(value.translation.width) {
                         hasStartedDragging = true
                     }
-                    
                     if hasStartedDragging {
                         state = value.translation
                     }
                 }
                 .onChanged { value in
                     // Adjust the scale based on the drag distance
-                    if hasStartedDragging {
-                        currentDragOffset.height = value.translation.height
-                        currentDragOffset.width = value.translation.width
-                        scale = max(1 - (abs(currentDragOffset.height) / 1000), 0.5) // Minimum scale of 0.7
-                    }
+                    currentDragOffset = value.translation.height
                 }
                 .onEnded { value in
                     if hasStartedDragging && abs(value.translation.height) > 100 {
-                        withAnimation {
+                        withAnimation(.linear(duration: 0.25)) {
+                            if value.translation.height < 0 {
+                                // Dragged up
+                                currentDragOffset = -UIScreen.main.bounds.height
+                            } else {
+                                // Dragged down
+                                currentDragOffset = UIScreen.main.bounds.height
+                            }
+                        } completion: {
                             onDismiss()
                         }
                     } else {
                         withAnimation {
-                            currentDragOffset = .zero
-                            scale = 1.0
+                            currentDragOffset = 0.0
                         }
                     }
                     hasStartedDragging = false
@@ -85,8 +87,8 @@ struct GalleryFullScreenView: View {
     }
     
     private func opacityForBackground() -> Double {
-        let maxOffset: CGFloat = 300
-        let offset = min(abs(currentDragOffset.height), maxOffset)
+        let maxOffset: CGFloat = UIScreen.main.bounds.height
+        let offset = min(abs(currentDragOffset), maxOffset)
         return Double(1 - (offset / maxOffset))
     }
 }

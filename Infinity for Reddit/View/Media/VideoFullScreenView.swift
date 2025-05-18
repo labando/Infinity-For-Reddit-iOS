@@ -44,6 +44,7 @@ struct VideoFullScreenView: View {
                     videoFullScreenViewModel.player.play()
                 }
                 .frame(height: 400)
+                .offset(currentDragOffset)
         }
         .gesture(
             DragGesture()

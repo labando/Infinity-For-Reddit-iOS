@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GalleryCarousel: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    @EnvironmentObject private var namespaceManager: NamespaceManager
     
     @StateObject private var galleryScrollState = GalleryScrollState(scrollId: 0)
     
@@ -31,10 +32,14 @@ struct GalleryCarousel: View {
                                 TapGesture()
                                     .onEnded {
                                         withAnimation {
-                                            fullScreenMediaViewModel.show(.gallery(items: items, mediaMetadata: mediaMetadata, galleryScrollState: galleryScrollState))
+                                            fullScreenMediaViewModel.show(.gallery(currentUrl: preview.u, items: items, mediaMetadata: mediaMetadata, galleryScrollState: galleryScrollState))
                                         }
                                     }
                             )
+                            .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                            .tag(index)
+                    } else {
+                        Color.clear
                             .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
                             .tag(index)
                     }
