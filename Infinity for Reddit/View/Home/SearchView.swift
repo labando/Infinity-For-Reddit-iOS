@@ -51,7 +51,7 @@ struct SearchView: View {
                         .font(.headline)
                     Spacer()
                     Button("Clear All") {
-                        // Clear logic here
+                        searchViewModel.clearAllRecentSearchQueries()
                     }
                     .font(.subheadline)
                     .foregroundColor(.blue)
@@ -64,17 +64,14 @@ struct SearchView: View {
                 ForEach(searchViewModel.recentSearchQueries, id: \.time) { search in
                     VStack(alignment: .leading, spacing: 2) {
                         Text(search.searchQuery)
-                            .font(.body)
-                            .fontWeight(.medium)
+                            .primaryText()
+                        
                         Text(search.searchQuery)
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                            .secondaryText()
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                     .padding(.vertical, 6)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
                 }
             }
             Spacer()

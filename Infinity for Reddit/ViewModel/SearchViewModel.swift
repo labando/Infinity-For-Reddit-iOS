@@ -60,4 +60,8 @@ class SearchViewModel: ObservableObject {
     func saveSearchQuery() {
         searchRepository.saveSearchQuery(username: username, query: query, searchInSubredditOrUserName: nil, multiRedditPath: nil, searchInThingType: SearchInThingType.all.rawValue, time: Int64(Date().timeIntervalSince1970))
     }
+    
+    func clearAllRecentSearchQueries() {
+        searchRepository.clearAllRecentSearchQueries(username: username)
+    }
 }

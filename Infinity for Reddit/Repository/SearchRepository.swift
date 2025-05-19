@@ -33,4 +33,15 @@ class SearchRepository: SearchRepositoryProtocol {
             }
         }
     }
+    
+    func clearAllRecentSearchQueries(username: String) {
+        operationQueue.addOperation {
+            do {
+                try self.recentSearchQueryDao.deleteAllRecentSearchQueries(username: username)
+            } catch {
+                // No need to handle error
+                print(error)
+            }
+        }
+    }
 }
