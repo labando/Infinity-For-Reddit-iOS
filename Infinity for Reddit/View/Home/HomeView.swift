@@ -133,6 +133,8 @@ struct HomeView: View {
                         UserDetailsView(username: username)
                     } else if case .subredditDetails(let subredditName) = destination {
                         SubredditDetailsView(subredditName: subredditName)
+                    } else if case .search(let query, let searchInSubredditOrUserName, let searchInMultiReddit, let searchInThingType) = destination {
+                        SearchResultsView(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

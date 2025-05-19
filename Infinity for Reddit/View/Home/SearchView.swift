@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SearchView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
+    @EnvironmentObject var navigationManager: NavigationManager
     
     @StateObject private var searchViewModel: SearchViewModel
     @FocusState private var isTextFieldFocused: Bool
@@ -24,12 +25,14 @@ struct SearchView: View {
                 SwiftUI.Image(systemName: "magnifyingglass")
                     .foregroundColor(.gray)
                 
-                TextField("Search", text: $searchViewModel.query)
-                    .focused($isTextFieldFocused)
-                    .font(.system(size: 16))
-                    .foregroundColor(.primary)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
+                TextField("Search", text: $searchViewModel.query, onCommit: {
+                    navigationManager.path.append(AppNavigation.search(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearhInThingType.subreddit))
+                })
+                .focused($isTextFieldFocused)
+                .font(.system(size: 16))
+                .foregroundColor(.primary)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
