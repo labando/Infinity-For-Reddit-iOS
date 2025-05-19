@@ -10,7 +10,7 @@ import SwiftUI
 struct SearchResultsView: View {
     @StateObject private var searchResultsViewModel: SearchResultsViewModel
     
-    init(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearhInThingType?) {
+    init(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType?) {
         _searchResultsViewModel = StateObject(wrappedValue: SearchResultsViewModel(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType))
     }
     

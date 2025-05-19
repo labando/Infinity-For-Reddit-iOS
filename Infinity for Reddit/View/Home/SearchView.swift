@@ -33,7 +33,8 @@ struct SearchView: View {
                 .disableAutocorrection(true)
                 .submitLabel(.search)
                 .onSubmit {
-                    navigationManager.path.append(AppNavigation.search(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearhInThingType.subreddit))
+                    searchViewModel.saveSearchQuery()
+                    navigationManager.path.append(AppNavigation.search(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearchInThingType.subreddit))
                 }
             }
             .padding(.vertical, 8)

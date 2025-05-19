@@ -6,5 +6,5 @@
 //
 
 public protocol SearchRepositoryProtocol {
-    
+    func saveSearchQuery(username: String, query: String, searchInSubredditOrUserName: String?, multiRedditPath: String?, searchInThingType: Int, time: Int64)
 }

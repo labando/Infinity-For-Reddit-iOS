@@ -14,10 +14,11 @@ class SearchViewModel: ObservableObject {
     @Published var recentSearchQueries: [RecentSearchQuery] = []
     
     private let dbPool: DatabasePool
+    private let searchRepository: SearchRepository
     
+    private let username: String
     private let recentSearchQueriesPublisher: AnyPublisher<[RecentSearchQuery], Error>
     
-    private let operationqueue: OperationQueue
     private var cancellables = Set<AnyCancellable>()
     
     init(username: String) {
@@ -29,10 +30,11 @@ class SearchViewModel: ObservableObject {
             fatalError("Could not resolve DatabasePool")
         }
         
-        self.operationqueue = resolvedOperationQueue
+        self.username = username
         self.dbPool = resolvedDatabasePool
         
         let recentSearchQueryDao = RecentSearchQueryDao(dbPool: dbPool)
+        self.searchRepository = SearchRepository(recentSearchQueryDao: recentSearchQueryDao, operationQueue: resolvedOperationQueue)
         recentSearchQueriesPublisher = recentSearchQueryDao.getAllRecentSearchQueriesLiveData(username: username)
         
         receiveRecentSearchQueries()
@@ -53,5 +55,9 @@ class SearchViewModel: ObservableObject {
             }
         )
         .store(in: &cancellables)
+    }
+    
+    func saveSearchQuery() {
+        searchRepository.saveSearchQuery(username: username, query: query, searchInSubredditOrUserName: nil, multiRedditPath: nil, searchInThingType: SearchInThingType.all.rawValue, time: Int64(Date().timeIntervalSince1970))
     }
 }

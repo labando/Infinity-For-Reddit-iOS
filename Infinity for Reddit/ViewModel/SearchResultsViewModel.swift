@@ -11,9 +11,9 @@ class SearchResultsViewModel: ObservableObject {
     @Published var query: String
     @Published var searchInSubredditOrUserName: String?
     @Published var searchInMultiReddit: String?
-    @Published var searchInThingType: SearhInThingType?
+    @Published var searchInThingType: SearchInThingType?
     
-    init(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearhInThingType?) {
+    init(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType?) {
         self.query = query
         self.searchInSubredditOrUserName = searchInSubredditOrUserName
         self.searchInMultiReddit = searchInMultiReddit
