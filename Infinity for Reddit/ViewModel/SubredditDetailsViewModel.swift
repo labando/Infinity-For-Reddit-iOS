@@ -13,13 +13,14 @@ import SwiftUI
 import SwiftyJSON
 
 @MainActor
-class SubredditDetailsViewModel: ObservableObject {
-    private let session: Session
-    
+class SubredditDetailsViewModel: ObservableObject {    
     @Published var subredditName: String
     @Published var subredditData: SubredditData?
     @Published var isSubscribed: Bool = false
     @Published var error: Error?
+    
+    private let session: Session
+    private let dbPool: DatabasePool
     
     public let subredditDetailsRepository: SubredditDetailsRepositoryProtocol
     
@@ -28,7 +29,11 @@ class SubredditDetailsViewModel: ObservableObject {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
             fatalError("Failed to resolve Session")
         }
+        guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
+            fatalError( "Failed to resolve DatabasePool")
+        }
         self.session = resolvedSession
+        self.dbPool = resolvedDBPool
         self.subredditName = subredditName
         self.subredditDetailsRepository = subredditDetailsRepository
         
@@ -46,7 +51,13 @@ class SubredditDetailsViewModel: ObservableObject {
             try await subredditDetailsRepository.subsribeSubreddit(subredditName: subredditName, action: action)
             
             try Task.checkCancellation()
-            
+            do {
+                let subredditDao = SubredditDao(dbPool: dbPool)
+                try subredditDao.updateSubscription(isSubscribed: action == "sub" ? true : false)
+            } catch {
+                print("Error: Failed to update subscription in subredditData: \(error)")
+            }
+
             self.isSubscribed = action == "sub"
             
         } catch {
@@ -77,6 +88,13 @@ class SubredditDetailsViewModel: ObservableObject {
             let fetchData = try await subredditDetailsRepository.fetchSubredditDetails(subredditName: subredditName)
             
             try Task.checkCancellation()
+            
+            do {
+                let subredditDao = SubredditDao(dbPool: dbPool)
+                try subredditDao.insert(subredditData: fetchData)
+            } catch {
+                print("Error: Failed to insert subredditData - \(error.localizedDescription)")
+            }
              
             self.subredditData = fetchData
             if let isJoined = self.subredditData?.isSubscribed {

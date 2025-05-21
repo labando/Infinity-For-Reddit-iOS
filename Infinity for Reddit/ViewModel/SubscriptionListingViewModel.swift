@@ -375,7 +375,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                 print("Error fetching row count: \(error)")
             }
             
-            SubredditDao(dbPool: dbPool).insertAll(subredditData: subreddits)
+            try SubredditDao(dbPool: dbPool).insertAll(subredditData: subreddits)
             
             do {
                 let count = try dbPool.read { db in

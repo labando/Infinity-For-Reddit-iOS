@@ -23,6 +23,7 @@ class UserDetailsViewModel: ObservableObject {
     @Published var error: Error?
     
     private let session: Session
+    private let dbPool: DatabasePool
     
     private let userDetailsRepository: UserDetailsRepositoryProtocol
     
@@ -30,7 +31,11 @@ class UserDetailsViewModel: ObservableObject {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
             fatalError("Failed to resolve Session")
         }
+        guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
+            fatalError( "Failed to resolve DatabasePool")
+        }
         self.session = resolvedSession
+        self.dbPool = resolvedDBPool
         self.username = username
         self.userDetailsRepository = userDetailsRepository
     }
@@ -77,6 +82,13 @@ class UserDetailsViewModel: ObservableObject {
             let fetchData = try await userDetailsRepository.fetchUserDetails(username: username)
             
             try Task.checkCancellation()
+            
+            do {
+                let userDao = UserDao(dbPool: dbPool)
+                try userDao.insert(userData: fetchData)
+            } catch {
+                print("Error: Failed to insert userData - \(error.localizedDescription)")
+            }
             
             self.userData = fetchData
             if let isFollowed = self.userData?.isSubscribed {

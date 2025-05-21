@@ -47,7 +47,7 @@ public struct SubredditData: Codable, FetchableRecord, PersistableRecord {
         case name
         case iconUrl = "icon_url"
         case bannerUrl = "banner_url"
-        case description
+        case description = "description"
         case sidebarDescription = "sidebar_description"
         case nSubscribers = "n_subscribers"
         case createdUTC = "created_utc"
@@ -55,6 +55,7 @@ public struct SubredditData: Codable, FetchableRecord, PersistableRecord {
         case activeUsers = "active_users"
         case isNSFW = "is_nsfw"
         case isSubscribed = "is_subscribed"
+        case isSelected = "is_selected"
     }
     
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }

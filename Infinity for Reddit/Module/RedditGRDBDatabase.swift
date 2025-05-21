@@ -130,6 +130,7 @@ struct RedditGRDBDatabase {
                 t.column("suggested_comment_sort", .text)
                 t.column("active_users", .integer).notNull().defaults(to: 0)
                 t.column("is_nsfw", .boolean).notNull().defaults(to: false)
+                t.column("is_subscribed", .boolean).notNull().defaults(to: false)
                 t.column("is_selected", .boolean).notNull().defaults(to: false)
                 t.primaryKey(["id"])
             }

@@ -15,13 +15,13 @@ struct SubredditDao {
         self.dbPool = dbPool
     }
     
-    func insert(subredditData: SubredditData) {
+    func insert(subredditData: SubredditData) throws {
         try? dbPool.write { db in
             try subredditData.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(subredditData: [SubredditData]) {
+    func insertAll(subredditData: [SubredditData]) throws {
         try? dbPool.write { db in
             for data in subredditData{
                 try data.insert(db, onConflict: .replace)
@@ -35,7 +35,7 @@ struct SubredditDao {
         }
     }
     
-    func getSubredditLiveDataByName(namePrefixed: String) -> AnyPublisher<SubredditData?, Error> {
+    func getSubredditLiveDataByName(namePrefixed: String) throws -> AnyPublisher<SubredditData?, Error> {
         ValueObservation.tracking { db in
             try SubredditData.fetchOne(db, sql: "SELECT * FROM subreddits WHERE name = ? COLLATE NOCASE LIMIT 1", arguments: [namePrefixed])
         }
@@ -46,6 +46,18 @@ struct SubredditDao {
     func getSubredditDataByName(namePrefixed: String) throws -> [SubredditData] {
         try dbPool.read { db in
             try SubredditData.fetchAll(db, sql: "SELECT * FROM subreddits WHERE name = ? COLLATE NOCASE LIMIT 1", arguments: [namePrefixed])
+        }
+    }
+    
+    func updateSubscription(isSubscribed: Bool) throws {
+        try dbPool.write { db in
+            try db.execute(
+                sql: """
+                UPDATE subreddits 
+                SET is_subscribed = ?
+                """,
+                arguments: [isSubscribed]
+            )
         }
     }
 }
