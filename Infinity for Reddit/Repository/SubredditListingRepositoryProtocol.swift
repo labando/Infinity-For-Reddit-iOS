@@ -8,5 +8,5 @@
 import Combine
 
 public protocol SubredditListingRepositoryProtocol {
-    //func fetchSubredditListing(after: String?) -> AnyPublisher<SubredditListingResponse, Error>
+    func fetchSubredditListing(queries: [String: String]) async throws -> SubredditListing
 }
