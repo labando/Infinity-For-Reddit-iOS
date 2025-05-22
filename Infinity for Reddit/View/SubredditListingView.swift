@@ -37,20 +37,28 @@ struct SubredditListingView: View {
                         HStack {
                             CustomWebImage(
                                 subreddit.iconImg,
-                                width: 30,
-                                height: 30,
+                                width: 40,
+                                height: 40,
                                 circleClipped: true,
                                 fallbackView: {
                                     SwiftUI.Image(systemName: "person.crop.circle")
                                         .resizable()
-                                        .frame(width: 30, height: 30)
+                                        .frame(width: 40, height: 40)
                                 }
                             )
                             
                             Spacer()
-                                .frame(width: 16)
+                                .frame(width: 24)
                             
-                            Text(subreddit.displayNamePrefixed)
+                            VStack {
+                                Text(subreddit.displayNamePrefixed)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .primaryText()
+                                
+                                Text("Subscribers: " + subreddit.subscribers.formatted())
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .secondaryText()
+                            }
                             
                             Spacer()
                         }
