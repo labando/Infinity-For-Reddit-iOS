@@ -29,8 +29,8 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
         try Task.checkCancellation()
         
         let data = try await self.session.request(
-//            RedditAPI.getUserData(username: username)
-            RedditOAuthAPI.getUserData(username: username)
+            RedditAPI.getUserData(username: username)
+//            RedditOAuthAPI.getUserData(username: username)
         )
         .validate()
         .serializingData()

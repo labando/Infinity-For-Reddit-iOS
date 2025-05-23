@@ -16,7 +16,7 @@ import SwiftyJSON
 @MainActor
 class UserDetailsViewModel: ObservableObject {
     @EnvironmentObject var accountViewModel: AccountViewModel
-
+    
     @Published var username: String
     @Published var userData: UserData?
     @Published var isSubscribed: Bool = false
@@ -66,8 +66,24 @@ class UserDetailsViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
+            let subscribedUserDao = SubscribedUserDao(dbPool: dbPool)
+            guard !AccountViewModel.shared.account.isAnonymous() else {
+                return
+            }
+            if action == "unsub" {
+                try subscribedUserDao.deleteSubscribedUser(name: username, accountName: AccountViewModel.shared.account.username)
+                print(try subscribedUserDao.getSubscribedUser(name: username, accountName: AccountViewModel.shared.account.username) == nil)
+            } else {
+                let subscribedUserData = SubscribedUserData(
+                    name: username,
+                    iconUrl: userData?.iconUrl,
+                    username: AccountViewModel.shared.account.username,
+                    favorite: false
+                )
+                try subscribedUserDao.insert(subscribedUserData: subscribedUserData)
+            }
+            
             self.isSubscribed = action == "sub"
-
         } catch {
             self.error = error
             
@@ -83,6 +99,12 @@ class UserDetailsViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
+            self.userData = fetchData
+            
+            let subscribedUserDao = SubscribedUserDao(dbPool: dbPool)
+            let isSubscribedUser = try subscribedUserDao.getSubscribedUser(name: fetchData.name, accountName: AccountViewModel.shared.account.username) != nil
+            self.isSubscribed = isSubscribedUser
+            
             do {
                 let userDao = UserDao(dbPool: dbPool)
                 try userDao.insert(userData: fetchData)
@@ -90,11 +112,6 @@ class UserDetailsViewModel: ObservableObject {
                 print("Error: Failed to insert userData - \(error.localizedDescription)")
             }
             
-            self.userData = fetchData
-            if let isFollowed = self.userData?.isSubscribed {
-                isSubscribed = isFollowed
-            }
-                
         } catch {
             self.error = error
             
