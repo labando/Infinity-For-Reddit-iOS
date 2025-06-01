@@ -14,6 +14,7 @@ struct PostListingView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
     @StateObject var postListingViewModel: PostListingViewModel
     private let account: Account
@@ -59,5 +60,19 @@ struct PostListingView: View {
             await postListingViewModel.initialLoadPosts()
         }
         .themedList()
+        .onAppear {
+            navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "New Post") {
+                    print("new post")
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    print("sort")
+                }
+            ])
+        }
+        .onDisappear {
+            navigationBarMenuManager.pop()
+        }
     }
 }

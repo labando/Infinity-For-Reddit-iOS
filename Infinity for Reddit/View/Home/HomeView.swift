@@ -17,17 +17,22 @@ struct HomeView: View {
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     
+    @StateObject private var tab1NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
+    @StateObject private var tab2NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
+    @StateObject private var tab3NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
+    @StateObject private var tab4NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
+    @StateObject private var tab5NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
+    
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
-    @StateObject private var navigationManager = NavigationManager()
     
     @Namespace private var animation
     
     var body: some View {
         ZStack {
-            NavigationStack(path: $navigationManager.path) {
-                TabView(selection: $selectedTab) {
-                    Group {
+            TabView(selection: $selectedTab) {
+                Group {
+                    CustomNavigationStack {
                         PostListingView(
                             account: accountViewModel.account,
                             postListingMetadata: PostListingMetadata(
@@ -38,123 +43,75 @@ struct HomeView: View {
                                 params: nil
                             )
                         )
-                        .id(accountViewModel.account.username)
-                        .tabItem {
-                            Label("Home", systemImage: "house")
-                        }
-                        .tag(Tab.home)
-                        
+                        .setUpHomeTabViewChildNavigationBar()
+                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                    }
+                    .id(accountViewModel.account.username)
+                    .tabItem {
+                        Label("Home", systemImage: "house")
+                    }
+                    .tag(Tab.home)
+                    .environmentObject(tab1NavigationBarMenuManager)
+                    
+                    CustomNavigationStack {
                         SubscriptionsView()
-                            .id(accountViewModel.account.username)
-                            .tabItem {
-                                Label("Subscriptions", systemImage: "book")
-                            }
-                            .tag(Tab.subscriptions)
-                        
+                            .setUpHomeTabViewChildNavigationBar()
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                    }
+                    .id(accountViewModel.account.username)
+                    .tabItem {
+                        Label("Subscriptions", systemImage: "book")
+                    }
+                    .tag(Tab.subscriptions)
+                    .environmentObject(tab2NavigationBarMenuManager)
+                    
+                    CustomNavigationStack {
                         InboxView(
                             account: accountViewModel.account
                         )
-                        .id(accountViewModel.account.username)
-                        .tabItem {
-                            Label("Inbox", systemImage: "envelope")
-                        }
-                        .tag(Tab.inbox)
-                        
+                        .setUpHomeTabViewChildNavigationBar()
+                        .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                    }
+                    .id(accountViewModel.account.username)
+                    .tabItem {
+                        Label("Inbox", systemImage: "envelope")
+                    }
+                    .tag(Tab.inbox)
+                    .environmentObject(tab3NavigationBarMenuManager)
+                    
+                    CustomNavigationStack {
                         SearchView(username: accountViewModel.account.username)
-                            .id(accountViewModel.account.username)
-                            .tabItem {
-                                Label("Search", systemImage: "magnifyingglass")
-                            }
-                            .tag(Tab.search)
-                        
+                            .setUpHomeTabViewChildNavigationBar()
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
+                    }
+                    .id(accountViewModel.account.username)
+                    .tabItem {
+                        Label("Search", systemImage: "magnifyingglass")
+                    }
+                    .tag(Tab.search)
+                    .environmentObject(tab4NavigationBarMenuManager)
+                    
+                    CustomNavigationStack {
                         MoreView()
-                            .id(accountViewModel.account.username)
-                            .tabItem {
-                                Label("More", systemImage: "person")
-                            }
-                            .tag(Tab.more)
+                            .setUpHomeTabViewChildNavigationBar()
+                            .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                     }
-                    .themedTabViewGroup()
-                }
-                .themedTabView()
-                .toolbar {
-                    if let leadingButton = selectedTab.leadingButton {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            leadingButton
-                                .navigationBarButton()
-                        }
+                    .id(accountViewModel.account.username)
+                    .tabItem {
+                        Label("More", systemImage: "person")
                     }
-                    
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            showProfile.toggle()
-                        }) {
-                            CustomWebImage(
-                                accountViewModel.account.profileImageUrl,
-                                width: 30,
-                                height: 30,
-                                circleClipped: true,
-                                handleImageTapGesture: false,
-                                fallbackView: {
-                                    SwiftUI.Image(systemName: "person.crop.circle")
-                                        .resizable()
-                                        .frame(width: 30, height: 30)
-                                        .navigationBarImage()
-                                }
-                            )
-                        }
-                    }
+                    .tag(Tab.more)
+                    .environmentObject(tab5NavigationBarMenuManager)
                 }
-                .themedNavigationBar()
-                .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
-                .sheet(isPresented: $showProfile) {
-                    AccountSheet()
-                        .presentationDetents([.medium, .large])
-                        .presentationDragIndicator(.visible)
-                }
-                .onAppear {
-                    let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-                    let docsDir = dirPaths[0]
-                    
-                    print(docsDir)
-                }
-                .navigationDestination(for: AppNavigation.self) { destination in
-                    if case .login = destination {
-                        LoginView()
-                    } else if case .postDetails(let post) = destination {
-                        PostDetailsView(account: accountViewModel.account, post: post)
-                    } else if case .userDetails(let username) = destination {
-                        UserDetailsView(username: username)
-                    } else if case .subredditDetails(let subredditName) = destination {
-                        SubredditDetailsView(subredditName: subredditName)
-                    } else if case .search(let query, let searchInSubredditOrUserName, let searchInMultiReddit, let searchInThingType) = destination {
-                        SearchResultsView(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType)
-                    } else if case .customFeed(let myCustomFeed) = destination {
-                        CustomFeedDetailsView(myCustomFeed: myCustomFeed)
-                    }
-                }
-                .navigationDestination(for: MoreViewNavigation.self) { destination in
-                    switch destination {
-                    case .profile:
-                        UserDetailsView(username: accountViewModel.account.username)
-                    case .history:
-                        HistoryView()
-                    case .upvoted:
-                        UpvotedView()
-                    case .downvoted:
-                        DownvotedView()
-                    case .hidden:
-                        HiddenView()
-                    case .saved:
-                        SavedView()
-                    case .settings:
-                        SettingsView()
-                    case .test:
-                        TestView()
-                    }
-                }
+                .themedTabViewGroup()
             }
-            .themedNavigationBarBackButton()
+            .themedTabView()
+            .onAppear {
+                let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+                let docsDir = dirPaths[0]
+                
+                print(docsDir)
+            }
             
             if let media = fullScreenMediaViewModel.media {
                 if case let .image(urlString, aspectRatio, post) = media {
@@ -180,7 +137,6 @@ struct HomeView: View {
         .onChange(of: colorScheme) {
             customThemeViewModel.isDarkTheme = colorScheme == .dark
         }
-        .environmentObject(navigationManager)
         .environmentObject(NamespaceManager(animation))
     }
     
@@ -194,21 +150,6 @@ struct HomeView: View {
             case .inbox: return "Inbox"
             case .search: return "Search"
             case .more: return "More"
-            }
-        }
-        
-        var leadingButton: AnyView? {
-            switch self {
-            case .home: return AnyView(Button(action: { print("Leading Action") }) { Text("Edit") })
-            default: return nil
-            }
-        }
-        
-        var trailingButton: AnyView? {
-            switch self {
-            case .home: return AnyView(Button(action: { print("Search Home") }) { SwiftUI.Image(systemName: "magnifyingglass") })
-            case .subscriptions: return AnyView(Button(action: { print("Manage Subscriptions") }) { Text("Manage") })
-            default: return nil
             }
         }
     }

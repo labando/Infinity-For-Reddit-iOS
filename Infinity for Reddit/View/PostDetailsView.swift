@@ -59,8 +59,6 @@ struct PostDetailsView: View {
                     }
                 }
             }.scrollBounceBehavior(.basedOnSize)
-            
-            
         }
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
@@ -70,5 +68,8 @@ struct PostDetailsView: View {
         }
         .themedList()
         .themedNavigationBar()
+        .toolbar {
+            NavigationBarMenu()
+        }
     }
 }

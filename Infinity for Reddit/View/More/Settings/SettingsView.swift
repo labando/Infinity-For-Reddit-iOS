@@ -143,43 +143,5 @@ struct SettingsView: View {
         .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Settings")
-        .navigationDestination(for: SettingsViewNavigation.self) { destination in
-            switch destination {
-            case .notification:
-                NotificationSettingsView()
-            case .interface:
-                InterfaceSettingsView()
-            case .theme:
-                CustomThemeSettingsView()
-            case .gestureAndButtons:
-                GestureButtonsSettingsView()
-            case .video:
-                VideoSettingsView()
-            case .downloadLocation:
-                DownloadLocationSettingsView()
-            case .security:
-                SecuritySettingsView()
-            case .contentSensitivityFilter:
-                ContentSensitivityFilterSettingsView()
-            case .postHistory:
-                PostHistorySettingsView()
-            case .postFilter:
-                PostFilterSettingsView()
-            case .commentFilter:
-                CommentFilterSettingsView()
-            case .miscellaneous:
-                MiscellaneousSettingsView()
-            case .advanced:
-                AdvancedSettingsView()
-            case .manageSubscription:
-                ManageSubscriptionSettingsView()
-            case .about:
-                AboutSettingsView()
-            case .privacyPolicy:
-                PrivacyPolicySettingsView()
-            case .redditUserAgreement:
-                RedditUserAgreementSettingsView()
-            }
-        }
     }
 }

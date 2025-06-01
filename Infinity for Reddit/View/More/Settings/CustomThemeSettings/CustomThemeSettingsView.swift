@@ -78,14 +78,6 @@ struct CustomThemeSettingsView: View {
         .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Theme")
-        .navigationDestination(for: CustomThemeSettingsViewNavigation.self) { destination in
-            switch destination {
-            case .customizeCustomTheme(let customTheme):
-                CustomizeCustomThemeView(customTheme: customTheme)
-            case .customThemeListing:
-                CustomThemeListingView()
-            }
-        }
     }
     
     func themeListItem(themeType: String, themeName: String, icon: String) -> some View {

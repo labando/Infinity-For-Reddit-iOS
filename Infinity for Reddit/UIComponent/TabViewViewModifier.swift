@@ -25,7 +25,6 @@ struct TabViewGroupViewModifier: ViewModifier {
                 tabBar.barTintColor = UIColor(Color(hex: themeViewModel.currentCustomTheme.bottomAppBarBackgroundColor))
                 tabBar.backgroundColor = UIColor(Color(hex: themeViewModel.currentCustomTheme.bottomAppBarBackgroundColor))
                 tabBar.layer.borderColor = UIColor(Color(hex: themeViewModel.currentCustomTheme.bottomAppBarBackgroundColor)).cgColor
-                tabBar.isTranslucent = false
                 tabBar.unselectedItemTintColor = UIColor(Color(hex: themeViewModel.currentCustomTheme.bottomAppBarIconColor))
             })
     }

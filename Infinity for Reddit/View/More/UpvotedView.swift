@@ -27,6 +27,39 @@ struct UpvotedView: View {
         .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Upvoted")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    
+                }) {
+                    Text("leading")
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    
+                }) {
+                    Text("huh")
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    
+                }) {
+                    Text("faf")
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    
+                }) {
+                    Text("faasdfasdff")
+                }
+            }
+        }
     }
 }
 
