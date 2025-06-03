@@ -31,19 +31,19 @@ struct SubredditDetailsView: View {
         VStack(spacing: 0) {
             if let subredditData = subredditDetailsViewModel.subredditData {
                 VStack {
-                        if let bannerUrl = subredditData.bannerUrl, !bannerUrl.isEmpty {
+                        if let bannerUrl = subredditData.bannerUrl {
                             CustomWebImage(
-                                subredditData.bannerUrl,
+                                bannerUrl,
                                 width: UIScreen.main.bounds.width,
                                 height: 150,
-                                centerCrop: true
+                                centerCrop: true,
+                                fallbackView: {
+                                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                        .frame(height: 150)
+                                }
                             )
-                        } else {
-                            Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                .frame(height: 150)
-                            
                         }
-                        
+                    
                         VStack(spacing: 0) {
                             HStack(spacing: 0) {
                                 CustomWebImage(
