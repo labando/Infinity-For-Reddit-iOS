@@ -50,21 +50,23 @@ struct CommentViewCard: View {
                 )
                 .secondaryText()
             }
-            .padding(.vertical, 8)
-                    
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 8)
+            
             Group {
                 if commentViewModel.comment.bodyProcessedMarkdown != nil {
                     Markdown(commentViewModel.comment.bodyProcessedMarkdown!)
                         .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata))
                         .font(.system(size: 24))
-                        .padding(.bottom, 8)
+                        .padding(.horizontal, 16)
                         .themedCommentMarkdown()
                         .id(commentViewModel.comment.id)
                 } else {
                     Markdown(commentViewModel.comment.body)
                         .markdownImageProvider(WebImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata))
                         .font(.system(size: 24))
-                        .padding(.bottom, 8)
+                        .padding(.horizontal, 16)
                         .themedCommentMarkdown()
                         .id(commentViewModel.comment.id)
                 }
@@ -111,10 +113,9 @@ struct CommentViewCard: View {
                 }
                 .buttonStyle(.borderless)
             }
-            .padding(.vertical, 8)
-            
-            Divider()
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 8)
         }
-        .padding(.vertical, -11)
     }
 }
