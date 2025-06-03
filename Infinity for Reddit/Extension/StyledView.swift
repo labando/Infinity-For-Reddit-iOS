@@ -16,6 +16,10 @@ extension View {
         self.modifier(ListPlainItemThemeViewModifier())
     }
     
+    func listPlainItemNoInsets() -> some View {
+        self.modifier(ListPlainItemNoInsetsThemeViewModifier())
+    }
+    
     func primaryText() -> some View {
         self.modifier(PrimaryTextViewModifier())
     }

@@ -41,7 +41,7 @@ struct PostListingView: View {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
                         PostViewCard(account: account, post: post)
                             .id(post.id)
-                            .listPlainItem()
+                            .listPlainItemNoInsets()
                     }
                     if postListingViewModel.hasMorePages {
                         ProgressIndicator()
@@ -50,7 +50,9 @@ struct PostListingView: View {
                             }
                             .listPlainItem()
                     }
-                }.scrollBounceBehavior(.basedOnSize)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .themedList()
             }
         }
         .onChange(of: colorScheme) {
@@ -59,7 +61,6 @@ struct PostListingView: View {
         .task {
             await postListingViewModel.initialLoadPosts()
         }
-        .themedList()
         .onAppear {
             navigationBarMenuManager.push([
                 NavigationBarMenuItem(title: "New Post") {

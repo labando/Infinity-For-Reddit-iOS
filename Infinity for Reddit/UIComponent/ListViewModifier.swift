@@ -20,11 +20,18 @@ struct ListCustomThemeViewModifier: ViewModifier {
 }
 
 struct ListPlainItemThemeViewModifier: ViewModifier {
-    @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    
     func body(content: Content) -> some View {
         content
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
+    }
+}
+
+struct ListPlainItemNoInsetsThemeViewModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
 }

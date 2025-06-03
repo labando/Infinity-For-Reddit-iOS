@@ -41,6 +41,12 @@
     "Cancel" : {
 
     },
+    "card.answer" : {
+
+    },
+    "card.prompt" : {
+
+    },
     "Check Notifications Interval" : {
 
     },
@@ -174,9 +180,6 @@
 
     },
     "Font Size" : {
-
-    },
-    "fuck you" : {
 
     },
     "Fully Collapse Comment" : {

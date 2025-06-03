@@ -14,44 +14,28 @@ struct TestView: View {
     
     var body: some View {
         ZStack {
-            VStack {
-                Spacer()
-                
-                Text("fuck you")
-                    .applyIf(!flip) {
-                        $0.matchedGeometryEffect(id: "test", in: namespaceManager.animation)
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(.white)
+                        .shadow(radius: 10)
+                        .padding(10)
+
+                    VStack {
+                        Text("card.prompt")
+                            .font(.largeTitle)
+                            .foregroundStyle(.black)
+
+                        Text("card.answer")
+                            .font(.title)
+                            .foregroundStyle(.secondary)
                     }
-            }
-            
-            if flip {
-                TestViewFullScreen()
-            }
-        }
-        .onTapGesture {
-//            withAnimation(.smooth(duration: 5)) {
-//                flip.toggle()
-//            }
-            
-//            GalleryFullScreenView(items: nil, mediaMetadata: nil, galleryScrollState: <#GalleryScrollState#>) {
-//                                    
-//                                }
-//                                .id(UUID())
-        }
+                    .padding(20)
+                    .multilineTextAlignment(.center)
+                }
+                .frame(width: 250, height: 250)
     }
 }
 
-struct TestViewFullScreen: View {
-    @EnvironmentObject private var namespaceManager: NamespaceManager
-    
-    @State private var flip: Bool = false
-    
-    var body: some View {
-        ZStack {
-            Color.green
-                .ignoresSafeArea()
-            
-            Text("fuck you")
-                .matchedGeometryEffect(id: "test", in: namespaceManager.animation)
-        }
-    }
+#Preview(traits: .fixedLayout(width: 400, height: 60)) {
+    return TestView()
+        .background(Color.red)
 }
