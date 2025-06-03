@@ -86,7 +86,6 @@ struct PostViewCard: View {
                     Text(selftextTruncated)
                         .postContent()
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 8)
                 }
                 
                 HStack(alignment: .center) {
@@ -143,6 +142,7 @@ struct PostViewCard: View {
                     .buttonStyle(.borderless)
                 }
                 .padding(.horizontal, 16)
+                .padding(.top, 8)
                 .padding(.bottom, 16)
             }
             .padding(.vertical, 8)
