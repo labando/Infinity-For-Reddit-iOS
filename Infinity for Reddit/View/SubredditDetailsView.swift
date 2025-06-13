@@ -153,13 +153,13 @@ struct SubredditDetailsView: View {
                                         .padding(.leading, 4)
                                         .padding(.bottom, 16)
                                 }
-                                .padding(.bottom, 10)
                             }
                         }
                         .padding(.horizontal, 16)
                         .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
                     }
                     .listPlainItemNoInsets()
+                    .zIndex(2)
                     
                     Picker("Select Section", selection: $selectedSection) {
                         ForEach(ProfileSection.allCases) { section in
@@ -169,28 +169,33 @@ struct SubredditDetailsView: View {
                     .pickerStyle(.segmented)
                     .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                     .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
+                    .zIndex(0)
+                    .animation(.easeInOut, value: selectedSection)
                     
-                    switch selectedSection {
-                    case .posts:
-                        PostListingView(
-                            account: accountViewModel.account,
-                            postListingMetadata:PostListingMetadata(
-                                postListingType:.subreddit,
-                                pathComponents: ["sortType": "hot", "subreddit": "\(subredditData.name)"],
-                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                queries: nil,
-                                params: nil
-                            ),
-                            isRootView: false
-                        )
-                        .id(accountViewModel.account.username)
-                        .listRowSeparator(.hidden)
-                        .padding(.horizontal, 16)
-                        .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
-                    case .about:
-                        SubredditAboutView(description: subredditData.description)
+                    Group {
+                        switch selectedSection {
+                        case .posts:
+                            PostListingView(
+                                account: accountViewModel.account,
+                                postListingMetadata:PostListingMetadata(
+                                    postListingType:.subreddit,
+                                    pathComponents: ["sortType": "hot", "subreddit": "\(subredditData.name)"],
+                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                    queries: nil,
+                                    params: nil
+                                ),
+                                isRootView: false
+                            )
+                            .id(accountViewModel.account.username)
                             .listRowSeparator(.hidden)
+                            .padding(.horizontal, 16)
+                            .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
+                        case .about:
+                            SubredditAboutView(description: subredditData.description)
+                                .listRowSeparator(.hidden)
+                        }
                     }
+                    .animation(.easeInOut, value: selectedSection)
                 }
             }
             .coordinateSpace(name: "SCROLL")
@@ -209,7 +214,7 @@ struct SubredditDetailsView: View {
                 }
             }
             .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
+                DragGesture(minimumDistance: 5)
                     .onChanged { _ in
                         if !self.isDragging {
                             self.isDragging = true
