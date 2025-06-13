@@ -56,6 +56,7 @@ struct SubscriptionsView: View {
     }
     
     struct SubredditsView: View {
+        @EnvironmentObject var navigationManager: NavigationManager
         @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
         
         var body: some View {
@@ -89,6 +90,9 @@ struct SubscriptionsView: View {
                             }
                             .contentShape(Rectangle())
                             .listPlainItem()
+                            .onTapGesture {
+                                navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                            }
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)
