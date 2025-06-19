@@ -132,13 +132,9 @@ struct CustomWebImage<Content: View>: View {
                     .applyIf(centerCrop == false) {
                         $0.scaledToFit()
                     }
-//                    .applyIf(handleImageTapGesture == true && fullScreenMediaViewModel.currentId != (urlString ?? "")) {
-//                        $0.matchedGeometryEffect(id: urlString ?? "", in: namespaceManager.animation)
-//                    }
-                    applyIf(enableMatchedGeometryEffect) {
+                    .applyIf(enableMatchedGeometryEffect) {
                         $0.matchedGeometryEffect(id: urlString ?? "", in: namespaceManager.animation)
                     }
-                    //.matchedGeometryEffect(id: urlString ?? "", in: namespaceManager.animation)
                 }
             }
         }

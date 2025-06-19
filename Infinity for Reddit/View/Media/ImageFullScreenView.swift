@@ -36,11 +36,11 @@ struct ImageFullScreenView: View {
                 handleImageTapGesture: false,
                 enableMatchedGeometryEffect: true,
                 placeholderView: {
-//                    Spacer()
-//                        .frame(width: UIScreen.main.bounds.width)
-//                        .applyIf(aspectRatio != nil) {
-//                            $0.aspectRatio(aspectRatio!, contentMode: .fit)
-//                        }
+                    Spacer()
+                        .frame(width: UIScreen.main.bounds.width)
+                        .applyIf(aspectRatio != nil) {
+                            $0.aspectRatio(aspectRatio!, contentMode: .fit)
+                        }
                 }
             )
             .offset(currentDragOffset)
