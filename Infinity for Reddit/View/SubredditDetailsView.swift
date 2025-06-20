@@ -8,13 +8,6 @@ import SwiftUI
 import MarkdownUI
 import SDWebImageSwiftUI
 
-enum ProfileSection: String, CaseIterable, Identifiable {
-    case posts = "Posts"
-    case about = "About"
-    
-    var id: String { self.rawValue }
-}
-
 struct SubredditDetailsView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
@@ -23,7 +16,7 @@ struct SubredditDetailsView: View {
     @State private var isHeaderVisible = false
     @State private var isToolbarBackgroundVisible = true
     @State private var subscribeTask: Task<Void, Never>?
-    @State private var selectedSection: ProfileSection = .posts
+    @State private var selectedSection: Int = 0
     @State private var headerMinY: CGFloat = 0
     @State private var isManuallyRefreshing = false
     @State private var isDragging = false
@@ -162,8 +155,9 @@ struct SubredditDetailsView: View {
                     .zIndex(2)
                     
                     Picker("Select Section", selection: $selectedSection) {
-                        ForEach(ProfileSection.allCases) { section in
-                            Text(section.rawValue).tag(section)
+                        ForEach(0..<2, id: \.self) { index in
+                            Text(index == 0 ? "Posts" : "About")
+                                .tag(index)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -173,8 +167,7 @@ struct SubredditDetailsView: View {
                     .animation(.easeInOut, value: selectedSection)
                     
                     Group {
-                        switch selectedSection {
-                        case .posts:
+                        if selectedSection == 0 {
                             PostListingView(
                                 account: accountViewModel.account,
                                 postListingMetadata:PostListingMetadata(
@@ -188,9 +181,8 @@ struct SubredditDetailsView: View {
                             )
                             .id(accountViewModel.account.username)
                             .listRowSeparator(.hidden)
-                            .padding(.horizontal, 16)
                             .offset(y: isManuallyRefreshing || isReadyToRefresh ? 30 : 0)
-                        case .about:
+                        } else if selectedSection == 1 {
                             SubredditAboutView(description: subredditData.description)
                                 .listRowSeparator(.hidden)
                         }
