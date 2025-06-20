@@ -307,9 +307,7 @@ struct PostViewCard: View {
                     
                     Spacer()
                     
-                    Button {
-                        
-                    } label: {
+                    ShareLink(item: postViewModel.post.url) {
                         SwiftUI.Image(systemName: "square.and.arrow.up")
                             .postIconTemplateRendering()
                             .postIcon()
