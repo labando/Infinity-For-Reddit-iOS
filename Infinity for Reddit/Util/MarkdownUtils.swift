@@ -14,7 +14,8 @@ class MarkdownUtils {
                 NSRegularExpression(pattern: #"((?<=[\\s])|^)/[rRuU]/[\\w-]+/{0,1}"#, options: []),
                 NSRegularExpression(pattern: #"((?<=[\\s])|^)[rRuU]/[\\w-]+/{0,1}"#, options: []),
                 NSRegularExpression(pattern: #"\\^{2,}"#, options: []),
-                NSRegularExpression(pattern: #"((?:\[(?:(?!(?:(?<!\\)\[)).)*?]\()?https://preview\.redd\.it/\w+\.(?:jpg|png|jpeg)(?:(?:\?+[-a-zA-Z0-9()@:%_+.~#?&/=]*)|))|((?:\[(?:(?!(?:(?<!\\)\[)).)*?]\()?https://i\.redd\.it/\w+\.(?:jpg|png|jpeg|gif))"#, options: [])
+                NSRegularExpression(pattern: #"((?:\[(?:(?!(?:(?<!\\)\[)).)*?]\()?https://preview\.redd\.it/\w+\.(?:jpg|png|jpeg)(?:(?:\?+[-a-zA-Z0-9()@:%_+.~#?&/=]*)|))|((?:\[(?:(?!(?:(?<!\\)\[)).)*?]\()?https://i\.redd\.it/\w+\.(?:jpg|png|jpeg|gif))"#, options: []),
+                NSRegularExpression(pattern: #"(?:\[(.*?)\]\()?(https:\/\/reddit\.com\/link\/([^\/]+)\/video\/([^\/]+)\/player)(?:\))?"#, options: []),
             ]
         } catch {
             fatalError("Error creating regular expressions: \(error)")
@@ -68,26 +69,49 @@ class MarkdownUtils {
         
         let previewRedditLength = "https://preview.redd.it/".count
         let iRedditLength = "https://i.redd.it/".count
+        let redditVideoLength = "https://reddit.com/link/".count
 
         var startIndex = 0
         
         while true {
             // Apply regex starting from the current index
             let rangeToSearch = NSRange(location: startIndex, length: markdownString.count - startIndex)
-            guard let match = REGEX_PATTERNS[3].firstMatch(in: markdownString, options: [], range: rangeToSearch) else {
+            if let match = REGEX_PATTERNS[3].firstMatch(in: markdownString, options: [], range: rangeToSearch) {
+                if let group1Range = Range(match.range(at: 1), in: markdownString) {
+                    // Handle preview.redd.it
+                    startIndex = processMediaMatch(matchRange: group1Range, markdownString: &markdownString, baseURLLength: previewRedditLength, mediaMetadataMap: mediaMetadataMap)
+                } else if let group2Range = Range(match.range(at: 2), in: markdownString) {
+                    // Handle i.redd.it
+                    startIndex = processMediaMatch(matchRange: group2Range, markdownString: &markdownString, baseURLLength: iRedditLength, mediaMetadataMap: mediaMetadataMap)
+                } else {
+                    // If no groups matched, move the index past this match
+                    startIndex = match.range.location + match.range.length
+                }
+            } else if let videoMatch = REGEX_PATTERNS[4].firstMatch(in: markdownString, options: [], range: rangeToSearch) {
+                if let matchRange = Range(videoMatch.range, in: markdownString) {
+                    let videoID = (markdownString as NSString).substring(with: videoMatch.range(at: 4))
+                    
+                    guard let mediaMetadata = mediaMetadataMap[videoID] else {
+                        startIndex = matchRange.upperBound.utf16Offset(in: markdownString)
+                        continue
+                    }
+                    
+                    let linkID = (markdownString as NSString).substring(with: videoMatch.range(at: 3))
+                    mediaMetadata.caption = videoMatch.range(at: 1).location != NSNotFound ? (markdownString as NSString).substring(with: videoMatch.range(at: 1)) : nil
+                    
+                    let replacingText = "![](\(videoID))"
+                    markdownString.replaceSubrange(matchRange, with: replacingText)
+                    print(replacingText)
+                    startIndex = matchRange.lowerBound.utf16Offset(in: markdownString) + replacingText.count
+                    
+                    print("Link ID: \(linkID)")
+                    print("Video ID: \(videoID)")
+                }
+            } else {
                 break
             }
             
-            if let group1Range = Range(match.range(at: 1), in: markdownString) {
-                // Handle preview.redd.it
-                startIndex = processMediaMatch(matchRange: group1Range, markdownString: &markdownString, baseURLLength: previewRedditLength, mediaMetadataMap: mediaMetadataMap)
-            } else if let group2Range = Range(match.range(at: 2), in: markdownString) {
-                // Handle i.redd.it
-                startIndex = processMediaMatch(matchRange: group2Range, markdownString: &markdownString, baseURLLength: iRedditLength, mediaMetadataMap: mediaMetadataMap)
-            } else {
-                // If no groups matched, move the index past this match
-                startIndex = match.range.location + match.range.length
-            }
+            
             
             post.selftext = markdownString
         }

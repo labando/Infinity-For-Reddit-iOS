@@ -12,6 +12,8 @@ import SwiftUI
 // MARK: - WebImageProvider
 
 struct WebImageProvider: ImageProvider {
+    @ObservedObject var playerManager = PlayerManager()
+    
     var mediaMetadata: [String: MediaMetadata]?
     
     init(mediaMetadata: [String: MediaMetadata]?) {
@@ -39,8 +41,7 @@ struct WebImageProvider: ImageProvider {
                             .font(.system(size: 18))
                     }
                 }
-                
-            } else {
+            } else if media.e == MediaMetadata.imageType {
                 VStack {
                     CustomWebImage(
                         media.s.u,
@@ -50,6 +51,19 @@ struct WebImageProvider: ImageProvider {
                         if let url = url {
                             handleImageTap(url: url)
                         }
+                    }
+                    
+                    if media.caption != nil {
+                        // TODO make sure the text style is correct
+                        Text(media.caption!)
+                            .font(.system(size: 18))
+                    }
+                }
+            } else if media.e == MediaMetadata.redditVideoType {
+                VStack {
+                    if let url = URL(string: media.hlsUrl) {
+                        MarkdownVideoPlayer(videoURL: url, aspectRatio: CGSize(width: media.x, height: media.y))
+                            .id(url)
                     }
                     
                     if media.caption != nil {

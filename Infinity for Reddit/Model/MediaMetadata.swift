@@ -12,6 +12,7 @@ class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
     
     static let imageType = "Image"
     static let gifType = "AnimatedImage"
+    static let redditVideoType = "RedditVideo"
     
     // Type (image: Image, gif: AnimatedImage)
     var e : String!
@@ -25,6 +26,13 @@ class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
     //E.g. "Valid"
     var status : String!
     var caption: String?
+    // For video
+    var x: Int!
+    var y: Int!
+    var dashUrl: String!
+    var hlsUrl: String!
+    var isGif: Bool!
+    
     
     
     /**
@@ -47,6 +55,11 @@ class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
             s = MediaMetadataSource(fromJson: sJson)
         }
         status = json["status"].stringValue
+        x = json["x"].intValue
+        y = json["y"].intValue
+        dashUrl = json["dashUrl"].stringValue
+        hlsUrl = json["hlsUrl"].stringValue
+        isGif = json["isGif"].boolValue
     }
     
     /**
@@ -77,6 +90,21 @@ class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
         if status != nil{
             dictionary["status"] = status
         }
+        if x != nil {
+            dictionary["x"] = x
+        }
+        if y != nil {
+            dictionary["y"] = y
+        }
+        if dashUrl != nil {
+            dictionary["dashUrl"] = dashUrl
+        }
+        if hlsUrl != nil {
+            dictionary["hlsUrl"] = hlsUrl
+        }
+        if isGif != nil {
+            dictionary["isGif"] = isGif
+        }
         return dictionary
     }
     
@@ -92,6 +120,11 @@ class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
         p = aDecoder.decodeObject(forKey: "p") as? [MediaMetadataPreview]
         s = aDecoder.decodeObject(forKey: "s") as? MediaMetadataSource
         status = aDecoder.decodeObject(forKey: "status") as? String
+        x = aDecoder.decodeObject(forKey: "x") as? Int
+        y = aDecoder.decodeObject(forKey: "y") as? Int
+        dashUrl = aDecoder.decodeObject(forKey: "dashUrl") as? String
+        hlsUrl = aDecoder.decodeObject(forKey: "hlsUrl") as? String
+        isGif = aDecoder.decodeObject(forKey: "isGif") as? Bool
     }
     
     /**
@@ -117,6 +150,21 @@ class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if status != nil{
             aCoder.encode(status, forKey: "status")
+        }
+        if x != nil{
+            aCoder.encode(x, forKey: "x")
+        }
+        if y != nil{
+            aCoder.encode(y, forKey: "y")
+        }
+        if dashUrl != nil{
+            aCoder.encode(dashUrl, forKey: "dashUrl")
+        }
+        if hlsUrl != nil{
+            aCoder.encode(hlsUrl, forKey: "hlsUrl")
+        }
+        if isGif != nil{
+            aCoder.encode(isGif, forKey: "isGif")
         }
     }
 }

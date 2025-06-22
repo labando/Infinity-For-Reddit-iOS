@@ -15,6 +15,7 @@ struct PostDetailsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
+    @StateObject var playerManager = PlayerManager()
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     private let account: Account
     private let post: Post
