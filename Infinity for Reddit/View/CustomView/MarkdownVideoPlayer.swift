@@ -95,7 +95,7 @@ private struct MarkdownVideoPlayerWithControls: View {
                         }
                     })
                     .accentColor(.white)
-                    .onChange(of: manager.currentTime) { _ in
+                    .onChange(of: manager.currentTime, initial: false) { _, _  in
                         if manager.isDragging {
                             manager.resetControlsTimer()
                         }
