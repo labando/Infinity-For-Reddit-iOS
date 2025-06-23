@@ -26,7 +26,7 @@ public class CommentViewModel: ObservableObject {
     }
     
     func voteComment(vote: Int) async {
-        guard let _ = account.accessToken, let fullName = comment.name else { return }
+        guard let _ = account.accessToken, let _ = comment.name else { return }
         
         let previousVote = comment.likes
         
@@ -54,6 +54,28 @@ public class CommentViewModel: ObservableObject {
             self.comment.likes = previousVote
             self.error = error
             print("Error voting comment: \(error)")
+        }
+    }
+    
+    func saveComment(save: Bool) async {
+        guard let _ = account.accessToken, let _ = comment.name else { return }
+        
+        let previousSaved = comment.saved
+        
+        comment.saved = save
+        
+        self.objectWillChange.send()
+        
+        defer {
+            self.objectWillChange.send()
+        }
+        
+        do {
+            try await commentRepository.saveComment(comment: comment, save: save)
+        } catch {
+            self.comment.saved = previousSaved
+            self.error = error
+            print("Error (un)saving comment: \(error)")
         }
     }
 }

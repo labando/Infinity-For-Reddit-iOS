@@ -10,4 +10,5 @@ import Alamofire
 
 public protocol CommentRepositoryProtocol {
     func voteComment(comment: Comment, point: String) async throws
+    func saveComment(comment: Comment, save: Bool) async throws
 }

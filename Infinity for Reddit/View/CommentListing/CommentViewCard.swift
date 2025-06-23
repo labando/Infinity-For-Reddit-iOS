@@ -14,6 +14,7 @@ struct CommentViewCard: View {
     
     @StateObject var commentViewModel: CommentViewModel
     @State private var voteTask: Task<Void, Never>? = nil
+    @State private var saveTask: Task<Void, Never>? = nil
     
     let formatter = DateFormatter()
     private let isInPostDetails: Bool
@@ -107,9 +108,20 @@ struct CommentViewCard: View {
                     
                     Spacer()
                     
-                    Button {
-                        
-                    } label: {
+                    Button(action: {
+                        saveTask?.cancel()
+                        saveTask = Task {
+                            await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
+                        }
+                    }) {
+                        SwiftUI.Image(systemName: commentViewModel.comment.saved ? "bookmark.fill" : "bookmark")
+                            .commentIconTemplateRendering()
+                            .commentIcon()
+                    }
+                    .padding(.trailing, 16)
+                    .buttonStyle(.borderless)
+                    
+                    ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
                         SwiftUI.Image(systemName: "square.and.arrow.up")
                             .commentIconTemplateRendering()
                             .commentIcon()

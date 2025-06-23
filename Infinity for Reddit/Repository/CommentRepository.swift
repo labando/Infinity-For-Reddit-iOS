@@ -40,4 +40,20 @@ public class CommentRepository: CommentRepositoryProtocol {
                 .value
         }
     }
+    
+    public func saveComment(
+        comment: Comment,
+        save: Bool
+    ) async throws {
+        do {
+            let params = ["id": comment.name!]
+            
+            try Task.checkCancellation()
+            
+            _ = try await self.session.request(save ? RedditOAuthAPI.saveThing(params: params) : RedditOAuthAPI.unsaveThing(params: params))
+                .validate()
+                .serializingDecodable(Empty.self, automaticallyCancelling: true)
+                .value
+        }
+    }
 }
