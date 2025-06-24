@@ -153,7 +153,7 @@ public class CommentListing : NSObject, NSCoding, Validatable {
     }
 }
 
-public class Comment : NSObject, NSCoding, Validatable {
+public class Comment : NSObject, NSCoding, Validatable, Identifiable {
     //    var allAwardings : [AnyObject]!
     var approvedAtUtc : String!
     var approvedBy : String!
@@ -192,7 +192,7 @@ public class Comment : NSObject, NSCoding, Validatable {
     var downs : Int!
     var edited : Bool!
     var gilded : Int!
-    var id : String!
+    public var id : String
     var isSubmitter : Bool!
     @Published var likes: Int!
     var linkAuthor : String!
@@ -232,6 +232,8 @@ public class Comment : NSObject, NSCoding, Validatable {
     var ups : Int!
     var userReports : [[Any]]! = [[Any]]()
     
+    var isCollasped: Bool = false
+    
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
@@ -239,6 +241,7 @@ public class Comment : NSObject, NSCoding, Validatable {
         try Self.validate(json: json)
         
         if json.isEmpty {
+            id = UUID().uuidString
             return
         }
         
@@ -279,7 +282,7 @@ public class Comment : NSObject, NSCoding, Validatable {
         downs = json["downs"].intValue
         edited = json["edited"].boolValue
         gilded = json["gilded"].intValue
-        id = json["id"].stringValue
+        self.id = json["id"].stringValue
         isSubmitter = json["is_submitter"].boolValue
         likes = json["likes"] == JSON.null ? 0 : json["likes"].boolValue == true ? 1 : -1
         linkAuthor = json["link_author"].stringValue
@@ -357,7 +360,6 @@ public class Comment : NSObject, NSCoding, Validatable {
             }
             userReports.append(subArray)
         }
-        
     }
     
     /**
@@ -468,9 +470,7 @@ public class Comment : NSObject, NSCoding, Validatable {
         if gilded != nil{
             dictionary["gilded"] = gilded
         }
-        if id != nil{
-            dictionary["id"] = id
-        }
+        dictionary["id"] = id
         if isSubmitter != nil{
             dictionary["is_submitter"] = isSubmitter
         }
@@ -628,7 +628,7 @@ public class Comment : NSObject, NSCoding, Validatable {
         downs = aDecoder.decodeObject(forKey: "downs") as? Int
         edited = aDecoder.decodeObject(forKey: "edited") as? Bool
         gilded = aDecoder.decodeObject(forKey: "gilded") as? Int
-        id = aDecoder.decodeObject(forKey: "id") as? String
+        id = aDecoder.decodeObject(forKey: "id") as? String ?? UUID().uuidString
         isSubmitter = aDecoder.decodeObject(forKey: "is_submitter") as? Bool
         likes = aDecoder.decodeObject(forKey: "likes") as? Int
         linkAuthor = aDecoder.decodeObject(forKey: "link_author") as? String

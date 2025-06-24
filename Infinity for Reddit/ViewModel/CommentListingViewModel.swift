@@ -8,10 +8,12 @@
 import Foundation
 import Combine
 import MarkdownUI
+import IdentifiedCollections
 
 public class CommentListingViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var comments: [Comment] = []
+    @Published var visibleComments: IdentifiedArrayOf<Comment> = []
+    var allComments: IdentifiedArrayOf<Comment> = []
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
@@ -46,7 +48,7 @@ public class CommentListingViewModel: ObservableObject {
         let isInitailLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if comments.isEmpty {
+            if visibleComments.isEmpty {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true
@@ -79,9 +81,11 @@ public class CommentListingViewModel: ObservableObject {
                     self.after = nil
                 } else {
                     self.after = commentListing.after
-                    self.comments.append(contentsOf: processedComments)
+                    self.visibleComments.append(contentsOf: processedComments)
                     self.hasMorePages = !(processedComments.isEmpty || after == nil || after?.isEmpty == true)
                 }
+                
+                printDuplicateCommentIDs(in: visibleComments)
                 
                 isInitialLoading = false
                 isLoadingMore = false
@@ -99,6 +103,26 @@ public class CommentListingViewModel: ObservableObject {
         }
     }
     
+    func printDuplicateCommentIDs(in comments: IdentifiedArrayOf<Comment>) {
+        var seen: Set<String> = []
+        var duplicates: Set<String> = []
+
+        for comment in comments {
+            if !seen.insert(comment.id).inserted {
+                duplicates.insert(comment.id)
+            }
+        }
+
+        if duplicates.isEmpty {
+            print("✅ No duplicate comment IDs found.")
+        } else {
+            print("❌ Duplicate comment IDs found:")
+            for id in duplicates {
+                print(" - \(id)")
+            }
+        }
+    }
+    
     /// Reloads posts from the first page
     func refreshComments() async {
         isInitialLoad = true
@@ -107,7 +131,7 @@ public class CommentListingViewModel: ObservableObject {
         
         after = nil
         hasMorePages = true
-        comments = []
+        visibleComments = []
         
         await initialLoadComments()
     }

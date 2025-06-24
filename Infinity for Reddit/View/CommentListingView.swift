@@ -30,11 +30,11 @@ struct CommentListingView: View {
         Group {
             if commentListingViewModel.isInitialLoading || commentListingViewModel.isInitialLoad {
                 ProgressIndicator()
-            } else if commentListingViewModel.comments.isEmpty {
+            } else if commentListingViewModel.visibleComments.isEmpty {
                 Text("No Comments")
             } else {
                 List {
-                    ForEach(commentListingViewModel.comments, id: \.id) { comment in
+                    ForEach(commentListingViewModel.visibleComments, id: \.id) { comment in
                         CommentViewCard(account: accountViewModel.account, comment: comment, isInPostDetails: false)
                             .listPlainItemNoInsets()
                             .id(comment.id)

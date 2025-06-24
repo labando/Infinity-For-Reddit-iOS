@@ -42,14 +42,21 @@ struct PostDetailsView: View {
                 if postDetailsViewModel.isInitialLoading || postDetailsViewModel.isInitialLoad {
                     ProgressIndicator()
                         .listPlainItem()
-                } else if postDetailsViewModel.comments.isEmpty {
+                } else if postDetailsViewModel.visibleComments.isEmpty {
                     Text("No comments")
                         .listPlainItem()
                 } else {
-                    ForEach(postDetailsViewModel.comments, id: \.id) { comment in
+                    ForEach(postDetailsViewModel.visibleComments, id: \.id) { comment in
                         CommentViewCard(account: account, comment: comment, isInPostDetails: true)
                             .listPlainItemNoInsets()
                             .id(comment.id)
+                            .onLongPressGesture {
+                                if comment.isCollasped {
+                                    postDetailsViewModel.expandComments(comment: comment)
+                                } else {
+                                    postDetailsViewModel.collapseComments(comment: comment)
+                                }
+                            }
                     }
                     if postDetailsViewModel.hasMoreComments {
                         Text("Loading more comments")

@@ -8,11 +8,13 @@
 import Foundation
 import Combine
 import MarkdownUI
+import IdentifiedCollections
 
 public class PostDetailsViewModel: ObservableObject {
     // MARK: - Properties
     @Published var post: Post
-    @Published var comments: [Comment] = []
+    @Published var visibleComments: IdentifiedArrayOf<Comment> = []
+    var allComments: IdentifiedArrayOf<Comment> = []
     @Published var isSingleThread: Bool =  false
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
@@ -42,7 +44,7 @@ public class PostDetailsViewModel: ObservableObject {
         let isInitailLoadCopy = isInitialLoad
         
         await MainActor.run {
-            if comments.isEmpty {
+            if allComments.isEmpty {
                 isInitialLoading = true
             } else {
                 isLoadingMore = true
@@ -68,8 +70,10 @@ public class PostDetailsViewModel: ObservableObject {
             try Task.checkCancellation()
             
             await MainActor.run {
-                self.comments.append(contentsOf: processedComments)
+                self.visibleComments.append(contentsOf: processedComments)
+                self.allComments.append(contentsOf: processedComments)
                 
+                printDuplicateCommentIDs(in: visibleComments)
                 hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
                 
                 self.isInitialLoading = false
@@ -96,7 +100,8 @@ public class PostDetailsViewModel: ObservableObject {
             
             after = nil
             hasMoreComments = true
-            comments = []
+            visibleComments = []
+            allComments = []
         }
         
         await fetchComments()
@@ -112,5 +117,73 @@ public class PostDetailsViewModel: ObservableObject {
     
     func modifyCommentBody(_ comment: Comment) {
         MarkdownUtils.parseRedditImagesBlock(comment)
+    }
+    
+    func printDuplicateCommentIDs(in comments: IdentifiedArrayOf<Comment>) {
+        var seen: Set<String> = []
+        var duplicates: Set<String> = []
+
+        for comment in comments {
+            if !seen.insert(comment.id).inserted {
+                duplicates.insert(comment.id)
+            }
+        }
+
+        if duplicates.isEmpty {
+            print("✅ No duplicate comment IDs found.")
+        } else {
+            print("❌ Duplicate comment IDs found:")
+            for id in duplicates {
+                print(" - \(id)")
+            }
+        }
+    }
+    
+    public func collapseComments(comment: Comment) {
+        guard let index = visibleComments.index(id: comment.id) else { return }
+
+        let parentDepth = comment.depth
+        var endIndex = index + 1
+
+        while endIndex < visibleComments.count,
+              let depth = visibleComments[endIndex].depth,
+              depth > (parentDepth ?? 0) {
+            endIndex += 1
+        }
+
+        comment.isCollasped = true
+        visibleComments.removeSubrange((index + 1)..<endIndex)
+    }
+    
+    public func expandComments(comment: Comment) {
+        guard let index = visibleComments.index(id: comment.id),
+              let parentIndexInAll = allComments.index(id: comment.id),
+              let parentDepth = comment.depth else {
+            return
+        }
+
+        var insertIndex = index + 1
+        var childIndex = parentIndexInAll + 1
+
+        while childIndex < allComments.count {
+            let child = allComments[childIndex]
+
+            // Stop when we reach a sibling or ancestor
+            guard let childDepth = child.depth, childDepth > parentDepth else {
+                break
+            }
+
+            // Avoid inserting if already visible
+            if !visibleComments.contains(where: { $0.id == child.id }) {
+                visibleComments.insert(child, at: insertIndex)
+                insertIndex += 1
+            } else {
+                break
+            }
+
+            childIndex += 1
+        }
+        
+        comment.isCollasped = false
     }
 }

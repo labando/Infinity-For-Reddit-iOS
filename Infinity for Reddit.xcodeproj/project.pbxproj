@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		55155AE12CFD5BCF003D5F14 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 55155AE02CFD5BCF003D5F14 /* GRDB */; };
 		555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */; };
+		5588B8552E0A30A1004CDAA2 /* IdentifiedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 5588B8542E0A30A1004CDAA2 /* IdentifiedCollections */; };
 		55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 55949B872CFA7EAD002D1C46 /* Swinject */; };
 		55AAB5322D3A9E3E006816B2 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 55AAB5312D3A9E3E006816B2 /* MarkdownUI */; };
 		55C7421F2CFD1E4300853D4E /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 55C7421E2CFD1E4300853D4E /* SwiftyJSON */; };
@@ -65,6 +66,7 @@
 				55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */,
 				55C7421F2CFD1E4300853D4E /* SwiftyJSON in Frameworks */,
 				55AAB5322D3A9E3E006816B2 /* MarkdownUI in Frameworks */,
+				5588B8552E0A30A1004CDAA2 /* IdentifiedCollections in Frameworks */,
 				824357B22CFCFF1A0091EFF1 /* Alamofire in Frameworks */,
 				55155AE12CFD5BCF003D5F14 /* GRDB in Frameworks */,
 			);
@@ -133,6 +135,7 @@
 				55155AE02CFD5BCF003D5F14 /* GRDB */,
 				555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */,
 				55AAB5312D3A9E3E006816B2 /* MarkdownUI */,
+				5588B8542E0A30A1004CDAA2 /* IdentifiedCollections */,
 			);
 			productName = "Infinity for Reddit";
 			productReference = 559BD2332CF7D58500621685 /* Infinity for Reddit.app */;
@@ -223,6 +226,7 @@
 				55155ADF2CFD5BCF003D5F14 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 				555F0B822D07AD53003A1CA7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				55AAB5302D3A9E3E006816B2 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				5588B8532E0A30A1004CDAA2 /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 559BD2342CF7D58500621685 /* Products */;
@@ -603,6 +607,14 @@
 				minimumVersion = 3.1.3;
 			};
 		};
+		5588B8532E0A30A1004CDAA2 /* XCRemoteSwiftPackageReference "swift-identified-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-identified-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
 		55949B862CFA7EAD002D1C46 /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
@@ -647,6 +659,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 555F0B822D07AD53003A1CA7 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
+		};
+		5588B8542E0A30A1004CDAA2 /* IdentifiedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5588B8532E0A30A1004CDAA2 /* XCRemoteSwiftPackageReference "swift-identified-collections" */;
+			productName = IdentifiedCollections;
 		};
 		55949B872CFA7EAD002D1C46 /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
