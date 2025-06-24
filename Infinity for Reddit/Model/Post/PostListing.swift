@@ -362,8 +362,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
             userReports.append(subArray)
         }
         
-        postType = crosspostParent == nil ? Post.checkPostType(url: url, preview: preview, galleryData: galleryData, media: media, isVideo: isVideo, permalink: permalink) :
-        Post.checkPostType(url: crosspostParent.url, preview: crosspostParent.preview, galleryData: crosspostParent.galleryData, media: crosspostParent.media, isVideo: crosspostParent.isVideo, permalink: crosspostParent.permalink)
+        postType = Post.checkPostType(url: url, preview: preview, galleryData: galleryData, media: media, isVideo: isVideo, permalink: permalink)
     }
     
     static func checkPostType(url: String,

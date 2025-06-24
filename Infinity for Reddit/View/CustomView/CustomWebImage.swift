@@ -178,7 +178,7 @@ struct CustomWebImage<Content: View>: View {
                                 case .streamable(let shortCode):
                                     print("streamable")
                                 default:
-                                    print("other types")
+                                    print(post?.postType ?? "other types")
                                 }
                             }
                         }
