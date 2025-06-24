@@ -88,7 +88,7 @@ struct UserDetailsView: View {
                 }
                 .padding(.horizontal, 20)
                 
-                ZStack {
+                TabView {
                     PostListingView(
                         account: accountViewModel.account,
                         postListingMetadata:PostListingMetadata(
@@ -100,7 +100,7 @@ struct UserDetailsView: View {
                         )
                     )
                     .id(accountViewModel.account.username)
-                    .opacity(selectedTab == 0 ? 1 : 0)
+                    .tag(0)
                     
                     CommentListingView(
                         commentListingMetadata: CommentListingMetadata(
@@ -112,8 +112,9 @@ struct UserDetailsView: View {
                         )
                     )
                     .id(accountViewModel.account.username)
-                    .opacity(selectedTab == 1 ? 1 : 0)
+                    .tag(1)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
                 
                 Spacer()
             }
