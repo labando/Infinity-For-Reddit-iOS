@@ -186,4 +186,23 @@ public class PostDetailsViewModel: ObservableObject {
         
         comment.isCollasped = false
     }
+    
+    public func loadIcon(comment: Comment) {
+        guard comment.authorIconUrl == nil else { return }
+        
+        let startIndex = visibleComments.firstIndex(where: { $0.id == comment.id }) ?? 0
+        let commentBatch = Array(
+            visibleComments[startIndex..<min(visibleComments.count, startIndex + UserProfileImageBatchLoader.batchSize)]
+        )
+
+        Task {
+            let iconUrl = await UserProfileImageBatchLoader.shared.loadIcons(for: commentBatch)
+            
+            if let iconUrl {
+                await MainActor.run {
+                    comment.authorIconUrl = iconUrl
+                }
+            }
+        }
+    }
 }

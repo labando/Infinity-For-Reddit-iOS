@@ -75,7 +75,7 @@ class UserDetailRootClass : NSObject, NSCoding{
             id: data.id,
             name: data.name,
             iconUrl: data.iconImg,
-            banner: data.subreddit.bannerImg,
+            banner: data.subreddit?.bannerImg,
             commentKarma: data.commentKarma,
             linkKarma: data.linkKarma,
             awarderKarma: data.awarderKarma,
@@ -84,9 +84,9 @@ class UserDetailRootClass : NSObject, NSCoding{
             cakeday : data.createdUtc,
             isGold : data.isGold,
             canBeFollowed : data.acceptFollowers,
-            isNSFW : data.subreddit.over18,
-            description : data.subreddit.publicDescription,
-            title : data.subreddit.title
+            isNSFW : data.subreddit?.over18,
+            description : data.subreddit?.publicDescription,
+            title : data.subreddit?.title
         )
     }
 }

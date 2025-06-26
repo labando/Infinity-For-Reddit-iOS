@@ -60,6 +60,9 @@ struct PostDetailsView: View {
                                 }
                             }
                             .transition(.slide)
+                            .onAppear {
+                                postDetailsViewModel.loadIcon(comment: comment)
+                            }
                     }
                     if postDetailsViewModel.hasMoreComments {
                         Text("Loading more comments")

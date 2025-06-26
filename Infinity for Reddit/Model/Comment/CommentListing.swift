@@ -153,7 +153,7 @@ public class CommentListing : NSObject, NSCoding, Validatable {
     }
 }
 
-public class Comment : NSObject, NSCoding, Validatable, Identifiable {
+public class Comment : NSObject, NSCoding, Validatable, Identifiable, ObservableObject {
     //    var allAwardings : [AnyObject]!
     var approvedAtUtc : String!
     var approvedBy : String!
@@ -233,6 +233,7 @@ public class Comment : NSObject, NSCoding, Validatable, Identifiable {
     var userReports : [[Any]]! = [[Any]]()
     
     var isCollasped: Bool = false
+    @Published var authorIconUrl: URL? = nil
     
     /**
      * Instantiate the instance using the passed json values to set the properties values

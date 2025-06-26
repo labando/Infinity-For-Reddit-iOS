@@ -31,6 +31,20 @@ struct CommentViewCard: View {
             
             VStack(alignment: .leading) {
                 HStack(alignment: .center) {
+                    CustomWebImage(
+                        commentViewModel.comment.authorIconUrl?.absoluteString,
+                        width: 24,
+                        height: 24,
+                        circleClipped: true,
+                        handleImageTapGesture: false,
+                        fallbackView: {
+                            SwiftUI.Image(systemName: "person.crop.circle")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                        }
+                    )
+                    .frame(width: 24, height: 24)
+                    
                     VStack(alignment: .leading) {
                         if !isInPostDetails {
                             Text(commentViewModel.comment.subredditNamePrefixed)

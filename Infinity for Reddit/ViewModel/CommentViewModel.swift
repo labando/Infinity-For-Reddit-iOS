@@ -23,6 +23,11 @@ public class CommentViewModel: ObservableObject {
         self.account = account
         self.comment = comment
         self.commentRepository = commentRepository
+        comment.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
     
     func voteComment(vote: Int) async {

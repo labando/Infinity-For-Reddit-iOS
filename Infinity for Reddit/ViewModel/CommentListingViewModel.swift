@@ -124,4 +124,15 @@ public class CommentListingViewModel: ObservableObject {
     func modifyCommentBody(_ comment: Comment) {
         MarkdownUtils.parseRedditImagesBlock(comment)
     }
+    
+    func loadIcons() {
+//        for index in comments.indices {
+//            let authorFullName = comments[index].authorFullName
+//            UserProfileImageBatchLoader.shared.loadIcon(for: authorFullName) { [weak self] url in
+//                Task { @MainActor in
+//                    self?.comments[index].iconURL = url
+//                }
+//            }
+//        }
+    }
 }

@@ -30,6 +30,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
                 return completion(.success(urlRequest))
             }
         } else {
+            print(urlRequest.url?.absoluteString ?? "Empty URL?")
             return completion(.success(urlRequest))
         }
         
