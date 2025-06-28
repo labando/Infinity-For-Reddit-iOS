@@ -902,11 +902,11 @@ public class Comment : NSObject, NSCoding, Validatable, Identifiable, Observable
     }
 }
 
-class CommentMore: NSObject, NSCoding, Validatable, Identifiable {
+public class CommentMore: NSObject, Validatable, Identifiable {
     var children : [String]!
     var count : Int!
     var depth : Int!
-    var id : String
+    public var id : String
     var name : String!
     var parentFullname : String!
 
@@ -931,71 +931,6 @@ class CommentMore: NSObject, NSCoding, Validatable, Identifiable {
         id = json["id"].stringValue
         name = json["name"].stringValue
         parentFullname = json["parent_id"].stringValue
-    }
-
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if children != nil{
-            dictionary["children"] = children
-        }
-        if count != nil{
-            dictionary["count"] = count
-        }
-        if depth != nil{
-            dictionary["depth"] = depth
-        }
-        if id != nil{
-            dictionary["id"] = id
-        }
-        if name != nil{
-            dictionary["name"] = name
-        }
-        if parentFullname != nil{
-            dictionary["parent_id"] = parentFullname
-        }
-        return dictionary
-    }
-
-    /**
-    * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        children = aDecoder.decodeObject(forKey: "children") as? [String]
-        count = aDecoder.decodeObject(forKey: "count") as? Int
-        depth = aDecoder.decodeObject(forKey: "depth") as? Int
-        id = aDecoder.decodeObject(forKey: "id") as? String ?? UUID().uuidString
-        name = aDecoder.decodeObject(forKey: "name") as? String
-        parentFullname = aDecoder.decodeObject(forKey: "parent_id") as? String
-    }
-
-    /**
-    * NSCoding required method.
-    * Encodes mode properties into the decoder
-    */
-    func encode(with aCoder: NSCoder)
-    {
-        if children != nil{
-            aCoder.encode(children, forKey: "children")
-        }
-        if count != nil{
-            aCoder.encode(count, forKey: "count")
-        }
-        if depth != nil{
-            aCoder.encode(depth, forKey: "depth")
-        }
-        aCoder.encode(id, forKey: "id")
-        if name != nil{
-            aCoder.encode(name, forKey: "name")
-        }
-        if parentFullname != nil{
-            aCoder.encode(parentFullname, forKey: "parent_id")
-        }
     }
 }
 

@@ -40,7 +40,10 @@ public class PostDetailsRootClass: NSObject, NSCoding, Validatable {
     }
     
     private func makeCommentList(commentListing: CommentListing) {
-        guard !commentListing.comments.isEmpty else { return }
+        guard !commentListing.comments.isEmpty else {
+            return
+        }
+        
         for comment in commentListing.comments {
             guard let childrenCommentListing = comment.replies else {
                 comments.append(CommentItem.comment(comment))
@@ -50,6 +53,7 @@ public class PostDetailsRootClass: NSObject, NSCoding, Validatable {
             comments.append(CommentItem.comment(comment))
             makeCommentList(commentListing: childrenCommentListing)
         }
+        
         if let commentMore = commentListing.commentMore {
             comments.append(CommentItem.more(commentMore))
         }

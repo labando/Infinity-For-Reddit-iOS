@@ -50,4 +50,28 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         
         return postDetails
     }
+    
+    public func fetchMoreCommentsForCommentMore(params: [String: String]) async throws -> MoreChildren {
+        try Task.checkCancellation()
+        
+        let data = try await self.session.request(
+            RedditOAuthAPI.getMoreCommentsForCommentMore(params: params)
+        )
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        try Task.checkCancellation()
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw PostDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        let moreChildren = try MoreChildren(fromJson: json)
+        moreChildren.makeCommentList()
+        print(moreChildren.commentItems.count)
+        
+        return moreChildren
+    }
 }

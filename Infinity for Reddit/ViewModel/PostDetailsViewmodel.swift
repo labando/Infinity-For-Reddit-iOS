@@ -91,6 +91,39 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
+    public func fetchMoreCommentsInCommentMore(commentMore: CommentMore) async {
+        do {
+            try Task.checkCancellation()
+            
+            let moreChildren = try await postDetailsRepository.fetchMoreCommentsForCommentMore(
+                params: ["link_id": post.name, "children": commentMore.children.joined(separator: ",")]
+            )
+            
+            try Task.checkCancellation()
+            
+            let processedComments = postProcessComments(moreChildren.commentItems)
+            
+            try Task.checkCancellation()
+            
+            await MainActor.run {
+                guard let visibleIndex = visibleComments.index(id: commentMore.id) else { return }
+                guard let allIndex = allComments.index(id: commentMore.id) else { return }
+                
+                // Remove the CommentMore item
+                self.visibleComments.remove(at: visibleIndex)
+                self.allComments.remove(at: allIndex)
+                
+                self.visibleComments.insert(contentsOf: processedComments, at: visibleIndex)
+                self.allComments.insert(contentsOf: processedComments, at: allIndex)
+            }
+        } catch {
+            await MainActor.run {
+                self.error = error
+            }
+            print("Error fetching more comments for CommentMore: \(error)")
+        }
+    }
+    
     /// Reloads posts from the first page
     func refreshPosts() async {
         await MainActor.run {

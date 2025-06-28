@@ -57,20 +57,27 @@ struct PostDetailsView: View {
                                     }
                                 }
                             })
-                                .listPlainItemNoInsets()
-                                .id(comment.id)
-                                .onLongPressGesture {
-                                    withAnimation {
-                                        if comment.isCollasped {
-                                            postDetailsViewModel.expandComments(comment: comment)
-                                        } else {
-                                            postDetailsViewModel.collapseComments(comment: comment)
-                                        }
+                            .listPlainItemNoInsets()
+                            .id(comment.id)
+                            .onLongPressGesture {
+                                withAnimation {
+                                    if comment.isCollasped {
+                                        postDetailsViewModel.expandComments(comment: comment)
+                                    } else {
+                                        postDetailsViewModel.collapseComments(comment: comment)
                                     }
                                 }
-                                .transition(.slide)
-                                .onAppear {
-                                    postDetailsViewModel.loadIcon(comment: comment)
+                            }
+                            .transition(.slide)
+                            .onAppear {
+                                postDetailsViewModel.loadIcon(comment: comment)
+                            }
+                        } else if case let .more(commentMore) = commentItem {
+                            CommentMoreViewCard(commentMore: commentMore)
+                                .onTapGesture {
+                                    Task {
+                                        await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: commentMore)
+                                    }
                                 }
                         }
                     }
