@@ -14,8 +14,13 @@ struct CommentMoreViewCard: View {
         HStack(spacing: 0) {
             CommentIndentationView(depth: commentMore.depth)
             
+            Spacer()
+            
             Text("Load more comments")
                 .commentText()
+                .padding(.horizontal, 16)
+            
+            Spacer()
         }
     }
 }

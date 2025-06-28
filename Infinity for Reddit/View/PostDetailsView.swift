@@ -74,6 +74,8 @@ struct PostDetailsView: View {
                             }
                         } else if case let .more(commentMore) = commentItem {
                             CommentMoreViewCard(commentMore: commentMore)
+                                .listPlainItemNoInsets()
+                                .id(commentMore.id)
                                 .onTapGesture {
                                     Task {
                                         await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: commentMore)
