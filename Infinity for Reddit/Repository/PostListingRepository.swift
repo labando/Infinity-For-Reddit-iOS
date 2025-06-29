@@ -79,13 +79,17 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             if "u/\(post.author)" == post.subredditNamePrefixed {
                 // User's own subreddit
                 if subredditOrUserIcons[post.author] != nil {
-                    post.subredditOrUserIcon = subredditOrUserIcons[post.author]
+                    await MainActor.run {
+                        post.subredditOrUserIcon = subredditOrUserIcons[post.author]
+                    }
                 } else {
                     try await loadUserIcon(post: post)
                 }
             } else {
                 if subredditOrUserIcons[post.subreddit] != nil {
-                    post.subredditOrUserIcon = subredditOrUserIcons[post.subreddit]
+                    await MainActor.run {
+                        post.subredditOrUserIcon = subredditOrUserIcons[post.subreddit]
+                    }
                 } else {
                     try await loadSubredditIcon(post: post)
                 }
@@ -93,7 +97,9 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         } else {
             if !post.isAuthorDeleted() {
                 if subredditOrUserIcons[post.author] != nil {
-                    post.subredditOrUserIcon = subredditOrUserIcons[post.author]
+                    await MainActor.run {
+                        post.subredditOrUserIcon = subredditOrUserIcons[post.author]
+                    }
                 } else {
                     try await loadUserIcon(post: post)
                 }
