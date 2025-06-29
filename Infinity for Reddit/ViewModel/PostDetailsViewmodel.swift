@@ -263,4 +263,21 @@ public class PostDetailsViewModel: ObservableObject {
             }
         }
     }
+    
+    func loadIcon(isFromSubredditPostListing: Bool) async {
+        guard post.subredditOrUserIconInPostDetails == nil else { return }
+        
+        if !isFromSubredditPostListing && post.subredditOrUserIcon != nil {
+            await MainActor.run {
+                post.subredditOrUserIconInPostDetails = post.subredditOrUserIcon
+            }
+            return
+        }
+        
+        do {
+            try await postDetailsRepository.loadPostIcon(post: post, isFromSubredditPostListing: isFromSubredditPostListing)
+        } catch {
+            print("Load icon failed")
+        }
+    }
 }

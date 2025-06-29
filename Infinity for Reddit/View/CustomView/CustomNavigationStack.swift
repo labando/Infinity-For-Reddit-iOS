@@ -21,8 +21,8 @@ struct CustomNavigationStack<Content: View>: View {
                     if case .login = destination {
                         LoginView()
                             .environmentObject(navigationManager)
-                    } else if case .postDetails(let post) = destination {
-                        PostDetailsView(account: self.accountViewModel.account, post: post)
+                    } else if case .postDetails(let post, let isFromSubredditPostListing) = destination {
+                        PostDetailsView(account: self.accountViewModel.account, post: post, isFromSubredditPostListing: isFromSubredditPostListing)
                             .environmentObject(navigationManager)
                     } else if case .userDetails(let username) = destination {
                         UserDetailsView(username: username)

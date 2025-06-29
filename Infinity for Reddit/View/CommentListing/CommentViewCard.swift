@@ -23,7 +23,6 @@ struct CommentViewCard: View {
     init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil) {
         formatter.dateFormat = "y-MM-dd H:mm"
         self.isInPostDetails = isInPostDetails
-        print(isInPostDetails)
         self.onToggleExpand = onToggleExpand
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository()))
     }

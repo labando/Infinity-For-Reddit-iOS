@@ -17,15 +17,34 @@ struct PostDetailsViewCard: View {
     @State var saveTask: Task<Void, Never>?
     
     let formatter = DateFormatter()
+    let isFromSubredditPostListing: Bool
     
-    init(account: Account, post: Post) {
+    init(account: Account, post: Post, isFromSubredditPostListing: Bool) {
         formatter.dateFormat = "y-MM-dd H:mm"
+        self.isFromSubredditPostListing = isFromSubredditPostListing
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
     }
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .center) {
+                CustomWebImage(
+                    postViewModel.post.subredditOrUserIconInPostDetails,
+                    width: 24,
+                    height: 24,
+                    circleClipped: true,
+                    handleImageTapGesture: false,
+                    fallbackView: {
+                        SwiftUI.Image(systemName: "person.crop.circle")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                    }
+                )
+                .frame(width: 24, height: 24)
+                .onTapGesture {
+                    navigationManager.path.append(AppNavigation.subredditDetails(subredditName: postViewModel.post.subreddit))
+                }
+                
                 VStack(alignment: .leading) {
                     Text(postViewModel.post.subredditNamePrefixed)
                         .subreddit()
@@ -36,6 +55,7 @@ struct PostDetailsViewCard: View {
                             navigationManager.path.append(AppNavigation.userDetails(username: postViewModel.post.author))
                         }
                 }
+                .padding(.leading, 4)
                 
                 Spacer()
                 

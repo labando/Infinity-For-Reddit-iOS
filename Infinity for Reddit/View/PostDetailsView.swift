@@ -19,10 +19,12 @@ struct PostDetailsView: View {
     @StateObject var postDetailsViewModel: PostDetailsViewModel
     private let account: Account
     private let post: Post
+    private let isFromSubredditPostListing: Bool
     
-    init(account: Account, post: Post) {
+    init(account: Account, post: Post, isFromSubredditPostListing: Bool) {
         self.account = account
         self.post = post
+        self.isFromSubredditPostListing = isFromSubredditPostListing
         
         _postDetailsViewModel = StateObject(
             wrappedValue: PostDetailsViewModel(
@@ -36,8 +38,15 @@ struct PostDetailsView: View {
     var body: some View {
         Group {
             List {
-                PostDetailsViewCard(account: account, post: post)
+                PostDetailsViewCard(account: account, post: post, isFromSubredditPostListing: isFromSubredditPostListing)
                     .listPlainItemNoInsets()
+                    .onAppear {
+                        if post.subredditOrUserIconInPostDetails == nil {
+                            Task {
+                                await postDetailsViewModel.loadIcon(isFromSubredditPostListing: isFromSubredditPostListing)
+                            }
+                        }
+                    }
                 
                 if postDetailsViewModel.isInitialLoading || postDetailsViewModel.isInitialLoad {
                     ProgressIndicator()

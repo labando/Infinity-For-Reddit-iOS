@@ -230,6 +230,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     
     var postType: PostType!
     @Published var subredditOrUserIcon: String?
+    @Published var subredditOrUserIconInPostDetails: String?
     
     enum PostType: Equatable {
         case text, image, imageWithUrlPreview(urlPreview: String), gif, video(videoUrl: String, downloadUrl: String), gallery, link, noPreviewLink, poll, imgurVideo(url: String), redgifs(redgifsId: String), streamable(shortCode: String)
