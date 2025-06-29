@@ -67,8 +67,10 @@ struct PostListingView: View {
                                 .id(post.id)
                                 .listPlainItemNoInsets()
                                 .onAppear {
-                                    Task {
-                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                                    if post.subredditOrUserIcon == nil {
+                                        Task {
+                                            await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                                        }
                                     }
                                 }
                         }
@@ -88,8 +90,10 @@ struct PostListingView: View {
                             .id(post.id)
                             .listPlainItemNoInsets()
                             .onAppear {
-                                Task {
-                                    await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                                if post.subredditOrUserIcon == nil {
+                                    Task {
+                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+                                    }
                                 }
                             }
                     }

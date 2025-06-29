@@ -74,6 +74,8 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     public func loadIcon(post: Post, displaySubredditIcon: Bool) async throws {
         try Task.checkCancellation()
         
+        guard post.subredditOrUserIcon == nil else { return }
+        
         if displaySubredditIcon {
             if "u/\(post.author)" == post.subredditNamePrefixed {
                 // User's own subreddit
@@ -89,12 +91,16 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     }
     
     private func loadSubredditIcon(post: Post) async throws {
+        try Task.checkCancellation()
+        
+        guard post.subredditOrUserIcon == nil else { return }
+        
         do {
             let subredditDataList = try subredditDao.getSubredditDataByName(name: post.subreddit)
             if !subredditDataList.isEmpty {
                 await MainActor.run {
                     print("database icon!!!!!!!!")
-                    post.subredditOrUserIcon = subredditDataList[0].iconUrl
+                    post.subredditOrUserIcon = subredditDataList[0].iconUrl ?? ""
                 }
                 return
             }
@@ -117,12 +123,14 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         }
         
         await MainActor.run {
-            post.subredditOrUserIcon = SubredditDetailRootClass(fromJson: json).toSubredditData().iconUrl
+            post.subredditOrUserIcon = SubredditDetailRootClass(fromJson: json).toSubredditData().iconUrl ?? ""
         }
     }
     
     private func loadUserIcon(post: Post) async throws {
         try Task.checkCancellation()
+        
+        guard post.subredditOrUserIcon == nil else { return }
         
         let data = try await self.session.request(
             RedditAPI.getUserData(username: post.author)
@@ -139,7 +147,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         }
         
         await MainActor.run {
-            post.subredditOrUserIcon = UserDetailRootClass(fromJson: json).toUserData().iconUrl
+            post.subredditOrUserIcon = UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
         }
     }
 }

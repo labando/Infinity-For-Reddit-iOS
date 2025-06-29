@@ -146,6 +146,8 @@ public class PostListingViewModel: ObservableObject {
     }
     
     func loadIcon(post: Post, displaySubredditIcon: Bool) async {
+        guard post.subredditOrUserIcon == nil else { return }
+        
         do {
             try await postListingRepository.loadIcon(post: post, displaySubredditIcon: displaySubredditIcon)
         } catch {
