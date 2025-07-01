@@ -88,6 +88,9 @@ struct PostListingView: View {
                     }
                     .scrollBounceBehavior(.basedOnSize)
                     .themedList()
+                    .refreshable {
+                        postListingViewModel.refreshPosts()
+                    }
                 } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
                         PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing)
@@ -114,18 +117,22 @@ struct PostListingView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .task(id: postListingViewModel.sortType) {
+        .task(id: postListingViewModel.loadPostsTaskId) {
             await postListingViewModel.initialLoadPosts()
         }
         .onAppear {
             navigationBarMenuManager.push([
-                NavigationBarMenuItem(title: "New Post") {
-                    showNewPostMenu = true
+                NavigationBarMenuItem(title: "Refresh") {
+                    postListingViewModel.refreshPosts()
                 },
                 
                 NavigationBarMenuItem(title: "Sort") {
                     showSortTypeSheet = true
-                }
+                },
+                
+                NavigationBarMenuItem(title: "New Post") {
+                    showNewPostMenu = true
+                },
             ])
         }
         .onDisappear {
@@ -139,7 +146,7 @@ struct PostListingView: View {
         }
         .sheet(isPresented: $showSortTypeSheet) {
             SortTypeSheet(postListingType: postListingMetadata.postListingType, currentSortType: postListingViewModel.sortType) { sortType in
-                postListingViewModel.sortType = sortType
+                postListingViewModel.changeSortType(sortType: sortType)
             }
             .presentationDetents([.medium, .large])
         }

@@ -19,6 +19,7 @@ public class PostListingViewModel: ObservableObject {
     @Published var hasMorePages: Bool = true
     @Published var error: Error?
     @Published var sortType: SortType.Kind
+    @Published var loadPostsTaskId = UUID()
     
     private let postListingMetadata: PostListingMetadata
     private var lastLoadedSortType: SortType.Kind? = nil
@@ -130,10 +131,9 @@ public class PostListingViewModel: ObservableObject {
     }
     
     /// Reloads posts from the first page
-    func refreshPosts() async {
-        await resetPostLoadingState()
-        
-        await initialLoadPosts()
+    func refreshPosts() {
+        lastLoadedSortType = nil
+        loadPostsTaskId = UUID()
     }
     
     private func resetPostLoadingState() async {
@@ -145,6 +145,8 @@ public class PostListingViewModel: ObservableObject {
             after = nil
             hasMorePages = true
             posts = []
+            
+            allPostIds = Set<String>()
         }
     }
     
@@ -167,6 +169,13 @@ public class PostListingViewModel: ObservableObject {
             try await postListingRepository.loadIcon(post: post, displaySubredditIcon: displaySubredditIcon)
         } catch {
             print("Load icon failed")
+        }
+    }
+    
+    func changeSortType(sortType: SortType.Kind) {
+        if sortType != self.sortType {
+            self.sortType = sortType
+            loadPostsTaskId = UUID()
         }
     }
 }
