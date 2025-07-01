@@ -29,6 +29,7 @@ public class PostListingViewModel: ObservableObject {
     public let postListingRepository: PostListingRepositoryProtocol
     
     private var cancellables: Set<AnyCancellable> = []
+    private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
     // MARK: - Initializer
     init(postListingMetadata: PostListingMetadata, postListingRepository: PostListingRepositoryProtocol) {
@@ -48,11 +49,11 @@ public class PostListingViewModel: ObservableObject {
             return
         }
         
-        await loadPosts()
+        await loadPosts(isRefreshWithContinuation: refreshPostsContinuation != nil)
     }
     
     /// Fetches the next page of posts
-    public func loadPosts() async {
+    public func loadPosts(isRefreshWithContinuation: Bool = true) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
         let isInitailLoadCopy = isInitialLoad
@@ -106,8 +107,15 @@ public class PostListingViewModel: ObservableObject {
                 )
                 
                 await MainActor.run {
+                    if isRefreshWithContinuation {
+                        self.posts.removeAll()
+                    }
                     self.posts.append(contentsOf: realNewPosts)
                     hasMorePages = !(after == nil || after?.isEmpty == true)
+                    
+                    if isRefreshWithContinuation {
+                        finishPullToRefresh()
+                    }
                 }
             }
             
@@ -131,6 +139,14 @@ public class PostListingViewModel: ObservableObject {
     }
     
     /// Reloads posts from the first page
+    func refreshPostsWithContinuation() async {
+        await withCheckedContinuation { continuation in
+            refreshPostsContinuation = continuation
+            lastLoadedSortType = nil
+            loadPostsTaskId = UUID()
+        }
+    }
+    
     func refreshPosts() {
         lastLoadedSortType = nil
         loadPostsTaskId = UUID()
@@ -144,10 +160,17 @@ public class PostListingViewModel: ObservableObject {
             
             after = nil
             hasMorePages = true
-            posts = []
+            if refreshPostsContinuation == nil {
+                posts = []
+            }
             
             allPostIds = Set<String>()
         }
+    }
+    
+    func finishPullToRefresh() {
+        refreshPostsContinuation?.resume()
+        refreshPostsContinuation = nil
     }
     
     func postProcessPosts(_ posts: [Post]) -> [Post] {

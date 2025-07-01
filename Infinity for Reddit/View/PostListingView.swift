@@ -59,10 +59,12 @@ struct PostListingView: View {
     
     var body: some View {
         Group {
-            if postListingViewModel.isInitialLoading || postListingViewModel.isInitialLoad {
-                ProgressIndicator()
-            } else if postListingViewModel.posts.isEmpty {
-                Text("No posts")
+            if postListingViewModel.posts.isEmpty {
+                if postListingViewModel.isInitialLoading || postListingViewModel.isInitialLoad {
+                    ProgressIndicator()
+                } else {
+                    Text("No posts")
+                }
             } else {
                 if isRootView {
                     List {
@@ -81,7 +83,7 @@ struct PostListingView: View {
                         if postListingViewModel.hasMorePages {
                             ProgressIndicator()
                                 .task {
-                                    await postListingViewModel.loadPosts()
+                                    await postListingViewModel.loadPosts(isRefreshWithContinuation: false)
                                 }
                                 .listPlainItem()
                         }
@@ -89,7 +91,7 @@ struct PostListingView: View {
                     .scrollBounceBehavior(.basedOnSize)
                     .themedList()
                     .refreshable {
-                        postListingViewModel.refreshPosts()
+                        await postListingViewModel.refreshPostsWithContinuation()
                     }
                 } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
