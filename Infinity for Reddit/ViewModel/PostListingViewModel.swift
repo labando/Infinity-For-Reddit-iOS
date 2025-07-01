@@ -28,7 +28,6 @@ public class PostListingViewModel: ObservableObject {
     
     public let postListingRepository: PostListingRepositoryProtocol
     
-    private var cancellables: Set<AnyCancellable> = []
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
     // MARK: - Initializer
@@ -138,7 +137,7 @@ public class PostListingViewModel: ObservableObject {
         }
     }
     
-    /// Reloads posts from the first page
+    @MainActor
     func refreshPostsWithContinuation() async {
         await withCheckedContinuation { continuation in
             refreshPostsContinuation = continuation

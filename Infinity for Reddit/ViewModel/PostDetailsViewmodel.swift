@@ -21,24 +21,33 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var isLoadingMore: Bool = false
     @Published var hasMoreComments: Bool = true
     @Published var error: Error?
+    @Published var sortType: SortType.Kind
+    @Published var loadPostsTaskId = UUID()
     private let account: Account
     private var postId: String?
     private var commentMore: CommentMore?
-    
     private var after: String? = nil
+    private var lastLoadedSortType: SortType.Kind? = nil
     
     public let postDetailsRepository: PostDetailsRepositoryProtocol
+    
+    private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
     // MARK: - Initializer
     init(account: Account, post: Post, postDetailsRepository: PostDetailsRepositoryProtocol) {
         self.account = account
         self.post = post
+        self.sortType = .best
         self.postDetailsRepository = postDetailsRepository
     }
     
     // MARK: - Methods
     
     public func fetchComments() async {
+        if refreshPostsContinuation != nil {
+            await resetPostAndCommentsLoadingState()
+        }
+        
         guard !isInitialLoading, !isLoadingMore, hasMoreComments else { return }
         
         let isInitailLoadCopy = isInitialLoad
@@ -60,7 +69,7 @@ public class PostDetailsViewModel: ObservableObject {
             
             let postDetails = try await postDetailsRepository.fetchComments(
                 postId: post.id,
-                queries: ["after": after ?? ""]
+                queries: ["sort": sortType.rawValue, "after": after ?? ""]
             )
             
             try Task.checkCancellation()
@@ -70,6 +79,10 @@ public class PostDetailsViewModel: ObservableObject {
             try Task.checkCancellation()
             
             await MainActor.run {
+                if refreshPostsContinuation != nil {
+                    self.visibleComments.removeAll()
+                    self.allComments.removeAll()
+                }
                 self.visibleComments.append(contentsOf: processedComments)
                 self.allComments.append(contentsOf: processedComments)
                 
@@ -78,6 +91,11 @@ public class PostDetailsViewModel: ObservableObject {
                 
                 self.isInitialLoading = false
                 self.isLoadingMore = false
+                self.lastLoadedSortType = self.sortType
+                
+                if refreshPostsContinuation != nil {
+                    finishPullToRefresh()
+                }
             }
         } catch {
             await MainActor.run {
@@ -92,6 +110,8 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     public func fetchMoreCommentsInCommentMore(commentMore: CommentMore) async {
+        guard refreshPostsContinuation == nil else { return }
+        
         do {
             try Task.checkCancellation()
             
@@ -124,8 +144,21 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    /// Reloads posts from the first page
-    func refreshPosts() async {
+    @MainActor
+    func refreshPostAndCommentsWithContinuation() async {
+        await withCheckedContinuation { continuation in
+            refreshPostsContinuation = continuation
+            lastLoadedSortType = nil
+            loadPostsTaskId = UUID()
+        }
+    }
+    
+    func refreshPostAndComments() {
+        lastLoadedSortType = nil
+        loadPostsTaskId = UUID()
+    }
+    
+    func resetPostAndCommentsLoadingState() async {
         await MainActor.run {
             isInitialLoad = true
             isInitialLoading = false
@@ -133,11 +166,16 @@ public class PostDetailsViewModel: ObservableObject {
             
             after = nil
             hasMoreComments = true
-            visibleComments = []
-            allComments = []
+            if refreshPostsContinuation == nil {
+                visibleComments = []
+                allComments = []
+            }
         }
-        
-        await fetchComments()
+    }
+    
+    func finishPullToRefresh() {
+        refreshPostsContinuation?.resume()
+        refreshPostsContinuation = nil
     }
     
     func postProcessComments(_ comments: [CommentItem]) -> [CommentItem] {

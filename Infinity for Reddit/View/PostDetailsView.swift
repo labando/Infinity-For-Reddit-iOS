@@ -109,8 +109,11 @@ struct PostDetailsView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .task {
+        .task(id: postDetailsViewModel.loadPostsTaskId) {
             await postDetailsViewModel.fetchComments()
+        }
+        .refreshable {
+            await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
         }
         .themedList()
         .themedNavigationBar()
