@@ -179,7 +179,7 @@ struct SubredditDetailsView: View {
                                 account: accountViewModel.account,
                                 postListingMetadata:PostListingMetadata(
                                     postListingType:.subreddit,
-                                    pathComponents: ["sortType": "hot", "subreddit": "\(subredditData.name)"],
+                                    pathComponents: ["subreddit": "\(subredditData.name)"],
                                     headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                     queries: nil,
                                     params: nil

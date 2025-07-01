@@ -29,7 +29,6 @@ struct SearchResultsView: View {
                         searchInMultiReddit: searchResultsViewModel.searchInMultiReddit,
                         searchInThingType: searchResultsViewModel.searchInThingType
                     ),
-                    pathComponents: [:],
                     headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                     queries: ["q": searchResultsViewModel.query, "include_over_18": "1", "type": "link"],
                     params: nil

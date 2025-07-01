@@ -114,7 +114,7 @@ struct PostListingView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .task {
+        .task(id: postListingViewModel.sortType) {
             await postListingViewModel.initialLoadPosts()
         }
         .onAppear {

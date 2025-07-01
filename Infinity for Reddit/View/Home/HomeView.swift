@@ -37,7 +37,6 @@ struct HomeView: View {
                             account: accountViewModel.account,
                             postListingMetadata: PostListingMetadata(
                                 postListingType: .frontPage,
-                                pathComponents: ["sortType": "best"],
                                 headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                 queries: nil,
                                 params: nil

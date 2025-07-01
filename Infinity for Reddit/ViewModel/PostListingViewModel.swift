@@ -19,12 +19,15 @@ public class PostListingViewModel: ObservableObject {
     @Published var hasMorePages: Bool = true
     @Published var error: Error?
     @Published var sortType: SortType.Kind
-    private let postListingMetadata: PostListingMetadata
     
+    private let postListingMetadata: PostListingMetadata
+    private var lastLoadedSortType: SortType.Kind? = nil
     private var allPostIds = Set<String>()
     private var after: String? = nil
     
     public let postListingRepository: PostListingRepositoryProtocol
+    
+    private var cancellables: Set<AnyCancellable> = []
     
     // MARK: - Initializer
     init(postListingMetadata: PostListingMetadata, postListingRepository: PostListingRepositoryProtocol) {
@@ -36,6 +39,10 @@ public class PostListingViewModel: ObservableObject {
     // MARK: - Methods
     
     public func initialLoadPosts() async {
+        if sortType != lastLoadedSortType {
+            await resetPostLoadingState()
+        }
+        
         guard isInitialLoad else {
             return
         }
@@ -66,7 +73,7 @@ public class PostListingViewModel: ObservableObject {
             
             let postListing = try await postListingRepository.fetchPosts(
                 postListingType: postListingMetadata.postListingType,
-                pathComponents: postListingMetadata.pathComponents,
+                pathComponents: ["sortType": sortType.rawValue].merging(postListingMetadata.pathComponents, uniquingKeysWith: { _, new in new }),
                 queries: ["limit": "100", "after": after ?? ""].merging(postListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
                 params: postListingMetadata.params
             )
@@ -106,6 +113,8 @@ public class PostListingViewModel: ObservableObject {
             await MainActor.run {
                 isInitialLoading = false
                 isLoadingMore = false
+                
+                self.lastLoadedSortType = self.sortType
             }
         } catch {
             await MainActor.run {
@@ -122,6 +131,12 @@ public class PostListingViewModel: ObservableObject {
     
     /// Reloads posts from the first page
     func refreshPosts() async {
+        await resetPostLoadingState()
+        
+        await initialLoadPosts()
+    }
+    
+    private func resetPostLoadingState() async {
         await MainActor.run {
             isInitialLoad = true
             isInitialLoading = false
@@ -131,8 +146,6 @@ public class PostListingViewModel: ObservableObject {
             hasMorePages = true
             posts = []
         }
-        
-        await initialLoadPosts()
     }
     
     func postProcessPosts(_ posts: [Post]) -> [Post] {
