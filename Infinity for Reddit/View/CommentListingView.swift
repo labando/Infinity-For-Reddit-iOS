@@ -14,8 +14,11 @@ struct CommentListingView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var accountViewModel: AccountViewModel
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
     @StateObject var commentListingViewModel: CommentListingViewModel
+    @State private var showSortTypeSheet: Bool = false
+    @State private var navigationBarMenuKey: UUID?
     
     init(commentListingMetadata: CommentListingMetadata) {
         _commentListingViewModel = StateObject(
@@ -28,10 +31,12 @@ struct CommentListingView: View {
     
     var body: some View {
         Group {
-            if commentListingViewModel.isInitialLoading || commentListingViewModel.isInitialLoad {
-                ProgressIndicator()
-            } else if commentListingViewModel.comments.isEmpty {
-                Text("No Comments")
+            if commentListingViewModel.comments.isEmpty {
+                if commentListingViewModel.isInitialLoading || commentListingViewModel.isInitialLoad {
+                    ProgressIndicator()
+                } else {
+                    Text("No Comments")
+                }
             } else {
                 List {
                     ForEach(commentListingViewModel.comments, id: \.id) { comment in
@@ -52,10 +57,37 @@ struct CommentListingView: View {
         .onChange(of: colorScheme) {
             //print(colorScheme == .dark)
         }
-        .task {
+        .task(id: commentListingViewModel.loadCommentsTaskId) {
             await commentListingViewModel.initialLoadComments()
         }
+        .refreshable {
+            await commentListingViewModel.refreshCommentsWithContinuation()
+        }
         .listStyle(.plain)
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Refresh") {
+                    commentListingViewModel.refreshComments()
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    showSortTypeSheet = true
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+        .sheet(isPresented: $showSortTypeSheet) {
+            SortTypeSheet(sortTypeKindSource: OtherSortTypeKindSource.commentListing, currentSortType: commentListingViewModel.sortType) { sortType in
+                commentListingViewModel.changeSortType(sortType: sortType)
+            }
+            .presentationDetents([.medium, .large])
+        }
     }
 }
 

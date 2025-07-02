@@ -125,5 +125,10 @@ struct UserDetailsView: View {
             }
         }
         .themedNavigationBar()
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationBarMenu()
+            }
+        }
     }
 }

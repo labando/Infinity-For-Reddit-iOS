@@ -12,6 +12,15 @@ enum OtherSortTypeKindSource: SortTypeKindSource {
     case userListing
     
     var availableSortTypes: [SortType.Kind] {
-        return [.best, .top, .new, .controversial, .old, .random, .qa, .live]
+        switch self {
+        case .postDetails:
+            return [.best, .top, .new, .controversial, .old, .random, .qa, .live]
+        case .commentListing:
+            return [.new, .hot, .top, .controversial]
+        case .subredditListing:
+            return [.relevance, .activity]
+        case .userListing:
+            return [.relevance, .activity]
+        }
     }
 }

@@ -55,7 +55,7 @@ public class PostDetailsViewModel: ObservableObject {
         await fetchComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
     }
     
-    public func fetchComments(isRefreshWithContinuation: Bool = true) async {
+    public func fetchComments(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMoreComments else { return }
         
         let isInitailLoadCopy = isInitialLoad

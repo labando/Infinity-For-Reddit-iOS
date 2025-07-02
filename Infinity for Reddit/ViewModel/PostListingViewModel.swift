@@ -52,7 +52,7 @@ public class PostListingViewModel: ObservableObject {
     }
     
     /// Fetches the next page of posts
-    public func loadPosts(isRefreshWithContinuation: Bool = true) async {
+    public func loadPosts(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
         let isInitailLoadCopy = isInitialLoad

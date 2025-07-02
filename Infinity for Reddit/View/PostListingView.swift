@@ -84,7 +84,7 @@ struct PostListingView: View {
                         if postListingViewModel.hasMorePages {
                             ProgressIndicator()
                                 .task {
-                                    await postListingViewModel.loadPosts(isRefreshWithContinuation: false)
+                                    await postListingViewModel.loadPosts()
                                 }
                                 .listPlainItem()
                         }
