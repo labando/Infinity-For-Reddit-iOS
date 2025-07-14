@@ -145,8 +145,11 @@ struct PostDetailsView: View {
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
         .sheet(isPresented: $showSortTypeSheet) {
-            SortTypeKindSheet(sortTypeKindSource: OtherSortTypeKindSource.postDetails, currentSortTypeKind: postDetailsViewModel.sortType) { sortType in
-                postDetailsViewModel.changeSortType(sortType: sortType)
+            SortTypeKindSheet(
+                sortTypeKindSource: OtherSortTypeKindSource.postDetails,
+                currentSortTypeKind: postDetailsViewModel.sortTypeKind
+            ) { sortTypeKind in
+                postDetailsViewModel.changeSortTypeKind(sortTypeKind: sortTypeKind)
             }
             .presentationDetents([.medium, .large])
         }

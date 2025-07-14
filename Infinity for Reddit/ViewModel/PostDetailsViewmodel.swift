@@ -21,13 +21,13 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var isLoadingMore: Bool = false
     @Published var hasMoreComments: Bool = true
     @Published var error: Error?
-    @Published var sortType: SortType.Kind
+    @Published var sortTypeKind: SortType.Kind
     @Published var loadPostAndCommentsTaskId = UUID()
     private let account: Account
     private var postId: String?
     private var commentMore: CommentMore?
     private var after: String? = nil
-    private var lastLoadedSortType: SortType.Kind? = nil
+    private var lastLoadedSortTypeKind: SortType.Kind? = nil
     
     public let postDetailsRepository: PostDetailsRepositoryProtocol
     
@@ -37,14 +37,14 @@ public class PostDetailsViewModel: ObservableObject {
     init(account: Account, post: Post, postDetailsRepository: PostDetailsRepositoryProtocol) {
         self.account = account
         self.post = post
-        self.sortType = .best
+        self.sortTypeKind = .best
         self.postDetailsRepository = postDetailsRepository
     }
     
     // MARK: - Methods
     
     public func initialLoadComments() async {
-        if sortType != lastLoadedSortType {
+        if sortTypeKind != lastLoadedSortTypeKind {
             await resetPostAndCommentsLoadingState()
         }
         
@@ -77,7 +77,7 @@ public class PostDetailsViewModel: ObservableObject {
             
             let postDetails = try await postDetailsRepository.fetchComments(
                 postId: post.id,
-                queries: ["sort": sortType.rawValue, "after": after ?? ""]
+                queries: ["sort": sortTypeKind.rawValue, "after": after ?? ""]
             )
             
             try Task.checkCancellation()
@@ -99,7 +99,7 @@ public class PostDetailsViewModel: ObservableObject {
                 
                 self.isInitialLoading = false
                 self.isLoadingMore = false
-                self.lastLoadedSortType = self.sortType
+                self.lastLoadedSortTypeKind = self.sortTypeKind
                 
                 if isRefreshWithContinuation {
                     finishPullToRefresh()
@@ -156,13 +156,13 @@ public class PostDetailsViewModel: ObservableObject {
     func refreshPostAndCommentsWithContinuation() async {
         await withCheckedContinuation { continuation in
             refreshPostsContinuation = continuation
-            lastLoadedSortType = nil
+            lastLoadedSortTypeKind = nil
             loadPostAndCommentsTaskId = UUID()
         }
     }
     
     func refreshPostAndComments() {
-        lastLoadedSortType = nil
+        lastLoadedSortTypeKind = nil
         loadPostAndCommentsTaskId = UUID()
     }
     
@@ -322,9 +322,9 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    func changeSortType(sortType: SortType.Kind) {
-        if sortType != self.sortType {
-            self.sortType = sortType
+    func changeSortTypeKind(sortTypeKind: SortType.Kind) {
+        if sortTypeKind != self.sortTypeKind {
+            self.sortTypeKind = sortTypeKind
             loadPostAndCommentsTaskId = UUID()
         }
     }
