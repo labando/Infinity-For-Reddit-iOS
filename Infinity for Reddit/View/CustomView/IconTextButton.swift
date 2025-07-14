@@ -47,13 +47,10 @@ struct IconTextButton: View {
                             .frame(width: 24, height: 24)
                             .primaryIcon()
                     }
-                } else {
+                    
                     Spacer()
-                        .frame(width: 24)
+                        .frame(width: 32)
                 }
-                
-                Spacer()
-                    .frame(width: 32)
                 
                 Text(text)
                     .primaryText()
