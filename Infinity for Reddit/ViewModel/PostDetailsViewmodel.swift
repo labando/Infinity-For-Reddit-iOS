@@ -12,7 +12,7 @@ import IdentifiedCollections
 
 public class PostDetailsViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var post: Post
+    @Published var post: Post?
     @Published var visibleComments: IdentifiedArrayOf<CommentItem> = []
     var allComments: IdentifiedArrayOf<CommentItem> = []
     @Published var isSingleThread: Bool =  false
@@ -24,7 +24,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var sortTypeKind: SortType.Kind
     @Published var loadPostAndCommentsTaskId = UUID()
     private let account: Account
-    private var postId: String?
+    private let postDetailsInput: PostDetailsInput
     private var commentMore: CommentMore?
     private var after: String? = nil
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
@@ -34,16 +34,16 @@ public class PostDetailsViewModel: ObservableObject {
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
     // MARK: - Initializer
-    init(account: Account, post: Post, postDetailsRepository: PostDetailsRepositoryProtocol) {
+    init(account: Account, postDetailsInput: PostDetailsInput, postDetailsRepository: PostDetailsRepositoryProtocol) {
         self.account = account
-        self.post = post
+        self.postDetailsInput = postDetailsInput
         self.sortTypeKind = .best
         self.postDetailsRepository = postDetailsRepository
     }
     
     // MARK: - Methods
     
-    public func initialLoadComments() async {
+    public func initialLoadPostAndComments() async {
         if sortTypeKind != lastLoadedSortTypeKind {
             await resetPostAndCommentsLoadingState()
         }
@@ -52,10 +52,32 @@ public class PostDetailsViewModel: ObservableObject {
             return
         }
         
-        await fetchComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
+        if post == nil {
+            switch postDetailsInput {
+            case .post(let post):
+                self.post = post
+                await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
+            case .postAndCommentId(let postId, let commentId):
+                await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil, shouldLoadPost: true)
+            }
+        } else {
+            await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
+        }
     }
     
-    public func fetchComments(isRefreshWithContinuation: Bool = false) async {
+//    public func initialLoadComments() async {
+//        if sortTypeKind != lastLoadedSortTypeKind {
+//            await resetPostAndCommentsLoadingState()
+//        }
+//        
+//        guard isInitialLoad else {
+//            return
+//        }
+//        
+//        await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
+//    }
+    
+    public func fetchPostAndComments(isRefreshWithContinuation: Bool = false, shouldLoadPost: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMoreComments else { return }
         
         let isInitailLoadCopy = isInitialLoad
@@ -75,14 +97,26 @@ public class PostDetailsViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            let postDetails = try await postDetailsRepository.fetchComments(
-                postId: post.id,
-                queries: ["sort": sortTypeKind.rawValue, "after": after ?? ""]
-            )
+            let postDetails: PostDetailsRootClass
+            switch postDetailsInput {
+            case .post(let post):
+                postDetails = try await postDetailsRepository.fetchComments(
+                    postId: post.id,
+                    queries: ["sort": sortTypeKind.rawValue, "after": after ?? ""]
+                )
+            case .postAndCommentId(let postId, let commentId):
+                postDetails = try await postDetailsRepository.fetchComments(
+                    postId: postId,
+                    queries: ["sort": sortTypeKind.rawValue, "after": after ?? ""]
+                )
+            }
             
             try Task.checkCancellation()
             
             let processedComments = postProcessComments(postDetails.comments)
+            if shouldLoadPost {
+                
+            }
             
             try Task.checkCancellation()
             
@@ -119,6 +153,7 @@ public class PostDetailsViewModel: ObservableObject {
     
     public func fetchMoreCommentsInCommentMore(commentMore: CommentMore) async {
         guard refreshPostsContinuation == nil else { return }
+        guard let post else { return }
         
         do {
             try Task.checkCancellation()
@@ -306,6 +341,7 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     func loadIcon(isFromSubredditPostListing: Bool) async {
+        guard let post else { return }
         guard post.subredditOrUserIconInPostDetails == nil else { return }
         
         if !isFromSubredditPostListing && post.subredditOrUserIcon != nil {

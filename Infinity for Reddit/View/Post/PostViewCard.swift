@@ -218,7 +218,7 @@ struct PostViewCard: View {
             .padding(.vertical, 8)
         }
         .onTapGesture {
-            navigationManager.path.append(AppNavigation.postDetails(post: postViewModel.post, isFromSubredditPostListing: isSubredditPostListing))
+            navigationManager.path.append(AppNavigation.postDetails(postDetailsInput: .post(postViewModel.post), isFromSubredditPostListing: isSubredditPostListing))
         }
         .onAppear {
             

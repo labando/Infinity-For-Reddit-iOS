@@ -168,5 +168,8 @@ struct CommentViewCard: View {
                 .padding(.bottom, 8)
             }
         }
+        .onTapGesture {
+            
+        }
     }
 }

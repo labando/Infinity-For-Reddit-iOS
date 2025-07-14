@@ -7,7 +7,8 @@
 
 enum AppNavigation: Hashable {
     case login
-    case postDetails(post: Post, isFromSubredditPostListing: Bool)
+    case postDetails(postDetailsInput: PostDetailsInput, isFromSubredditPostListing: Bool)
+    case postDetailsWithId(postId: String, commentId: String?)
     case subredditDetails(subredditName: String)
     case userDetails(username: String)
     case search(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: Int)

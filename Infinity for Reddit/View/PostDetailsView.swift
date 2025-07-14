@@ -22,18 +22,16 @@ struct PostDetailsView: View {
     @State private var navigationBarMenuKey: UUID?
     
     private let account: Account
-    private let post: Post
     private let isFromSubredditPostListing: Bool
     
-    init(account: Account, post: Post, isFromSubredditPostListing: Bool) {
+    init(account: Account, postDetailsInput: PostDetailsInput, isFromSubredditPostListing: Bool) {
         self.account = account
-        self.post = post
         self.isFromSubredditPostListing = isFromSubredditPostListing
         
         _postDetailsViewModel = StateObject(
             wrappedValue: PostDetailsViewModel(
                 account: account,
-                post: post,
+                postDetailsInput: postDetailsInput,
                 postDetailsRepository: PostDetailsRepository()
             )
         )
@@ -42,15 +40,17 @@ struct PostDetailsView: View {
     var body: some View {
         Group {
             List {
-                PostDetailsViewCard(account: account, post: post, isFromSubredditPostListing: isFromSubredditPostListing)
-                    .listPlainItemNoInsets()
-                    .onAppear {
-                        if post.subredditOrUserIconInPostDetails == nil {
-                            Task {
-                                await postDetailsViewModel.loadIcon(isFromSubredditPostListing: isFromSubredditPostListing)
+                if let post = postDetailsViewModel.post {
+                    PostDetailsViewCard(account: account, post: post, isFromSubredditPostListing: isFromSubredditPostListing)
+                        .listPlainItemNoInsets()
+                        .onAppear {
+                            if post.subredditOrUserIconInPostDetails == nil {
+                                Task {
+                                    await postDetailsViewModel.loadIcon(isFromSubredditPostListing: isFromSubredditPostListing)
+                                }
                             }
                         }
-                    }
+                }
                 
                 if postDetailsViewModel.visibleComments.isEmpty {
                     if postDetailsViewModel.isInitialLoading || postDetailsViewModel.isInitialLoad {
@@ -105,7 +105,7 @@ struct PostDetailsView: View {
                     if postDetailsViewModel.hasMoreComments {
                         Text("Loading more comments")
                             .task {
-                                await postDetailsViewModel.fetchComments()
+                                await postDetailsViewModel.fetchPostAndComments()
                             }
                             .listPlainItem()
                     }
@@ -116,7 +116,7 @@ struct PostDetailsView: View {
             //print(colorScheme == .dark)
         }
         .task(id: postDetailsViewModel.loadPostAndCommentsTaskId) {
-            await postDetailsViewModel.initialLoadComments()
+            await postDetailsViewModel.initialLoadPostAndComments()
         }
         .refreshable {
             await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
