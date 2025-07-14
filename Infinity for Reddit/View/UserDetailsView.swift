@@ -89,29 +89,33 @@ struct UserDetailsView: View {
                 .padding(.horizontal, 20)
                 
                 TabView(selection: $selectedTab) {
-                    PostListingView(
-                        account: accountViewModel.account,
-                        postListingMetadata:PostListingMetadata(
-                            postListingType:.user(username: userData.name, userWhere: .submitted),
-                            pathComponents: ["username": "\(userData.name)"],
-                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                            queries: nil,
-                            params: nil
+                    ZStack {
+                        PostListingView(
+                            account: accountViewModel.account,
+                            postListingMetadata:PostListingMetadata(
+                                postListingType:.user(username: userData.name, userWhere: .submitted),
+                                pathComponents: ["username": "\(userData.name)"],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil,
+                                params: nil
+                            )
                         )
-                    )
-                    .id(accountViewModel.account.username)
+                        .id(accountViewModel.account.username)
+                    }
                     .tag(0)
                     
-                    CommentListingView(
-                        commentListingMetadata: CommentListingMetadata(
-                            commentListingType:.user,
-                            pathComponents: ["username": "\(userData.name)", "sortType": "best"],
-                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                            queries: nil,
-                            params: nil
+                    ZStack {
+                        CommentListingView(
+                            commentListingMetadata: CommentListingMetadata(
+                                commentListingType:.user,
+                                pathComponents: ["username": "\(userData.name)", "sortType": "best"],
+                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                                queries: nil,
+                                params: nil
+                            )
                         )
-                    )
-                    .id(accountViewModel.account.username)
+                        .id(accountViewModel.account.username)
+                    }
                     .tag(1)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
