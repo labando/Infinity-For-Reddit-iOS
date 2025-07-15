@@ -234,6 +234,15 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     
     enum PostType: Equatable {
         case text, image, imageWithUrlPreview(urlPreview: String), gif, video(videoUrl: String, downloadUrl: String), gallery, link, noPreviewLink, poll, imgurVideo(url: String), redgifs(redgifsId: String), streamable(shortCode: String)
+        
+        var isMedia: Bool {
+            switch self {
+            case .image, .imageWithUrlPreview(urlPreview: _), .gif, .video(videoUrl: _, downloadUrl: _), .gallery, .link, .imgurVideo(url: _), .redgifs(redgifsId: _), .streamable(shortCode: _):
+                return true
+            default:
+                return false
+            }
+        }
     }
     
     /**

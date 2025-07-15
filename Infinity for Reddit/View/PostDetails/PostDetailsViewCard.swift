@@ -135,6 +135,13 @@ struct PostDetailsViewCard: View {
                 }
                 .frame(maxWidth: .infinity)
                 .aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
+            } else if postViewModel.post.postType.isMedia {
+                // No preview media
+                ZStack {
+                    SwiftUI.Image(systemName: "photo")
+                        .noPreviewPostTypeIndicator()
+                }
+                .noPreviewPostTypeIndicatorBackground()
             }
             
             if let selftext = postViewModel.post.selftextProcessedMarkdown {
