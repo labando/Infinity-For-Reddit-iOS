@@ -88,6 +88,9 @@ struct CommentViewCard: View {
                             .font(.system(size: 24))
                             .padding(.horizontal, 16)
                             .themedCommentMarkdown()
+                            .markdownLinkHandler { url in
+                                LinkHandler.shared.handle(url: url)
+                            }
                             .id(commentViewModel.comment.id)
                     } else {
                         Markdown(commentViewModel.comment.body)
@@ -95,6 +98,9 @@ struct CommentViewCard: View {
                             .font(.system(size: 24))
                             .padding(.horizontal, 16)
                             .themedCommentMarkdown()
+                            .markdownLinkHandler { url in
+                                LinkHandler.shared.handle(url: url)
+                            }
                             .id(commentViewModel.comment.id)
                     }
                 }

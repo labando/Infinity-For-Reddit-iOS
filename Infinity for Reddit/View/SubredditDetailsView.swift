@@ -146,6 +146,9 @@ struct SubredditDetailsView: View {
                                     Markdown($0)
                                         .themedMarkdown()
                                         .padding(.bottom, 8)
+                                        .markdownLinkHandler { url in
+                                            LinkHandler.shared.handle(url: url)
+                                        }
                                 }
                             }
                         }

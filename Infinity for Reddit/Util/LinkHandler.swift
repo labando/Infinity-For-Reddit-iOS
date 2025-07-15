@@ -56,7 +56,9 @@ class LinkHandler {
             handleRedgifsURL(path: path)
             
         case _ where host.contains("google.com"):
-            handleGoogleAmp(path: path)
+            if !handleGoogleAmp(path: path) {
+                openInSafari(finalURL)
+            }
             
         case "streamable.com":
             handleStreamable(path: path, segments: segments)
@@ -127,15 +129,15 @@ class LinkHandler {
         }
     }
     
-    private func handleGoogleAmp(path: String) {
+    private func handleGoogleAmp(path: String) -> Bool {
         if path.matches("/amp/s/amp.reddit.com/.*") {
             let newPath = String(path.dropFirst("/amp/s/".count))
             if let redirected = URL(string: "https://\(newPath)") {
                 handle(url: redirected)
+                return true
             }
-        } else {
-            openInSafari(URL(string: "https://google.com")!)
         }
+        return false
     }
     
     private func handleStreamable(path: String, segments: [String]) {

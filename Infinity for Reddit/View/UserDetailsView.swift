@@ -82,6 +82,9 @@ struct UserDetailsView: View {
                         Markdown($0)
                             .themedMarkdown()
                             .padding(0)
+                            .markdownLinkHandler { url in
+                                LinkHandler.shared.handle(url: url)
+                            }
                     }
                     
                     SegmentedPicker(selectedValue: $selectedTab, values: ["Posts", "Comments"])

@@ -17,6 +17,9 @@ struct SubredditAboutView: View {
                     Markdown(desc)
                         .themedMarkdown()
                         .padding(0)
+                        .markdownLinkHandler { url in
+                            LinkHandler.shared.handle(url: url)
+                        }
                 }
             }
         }
