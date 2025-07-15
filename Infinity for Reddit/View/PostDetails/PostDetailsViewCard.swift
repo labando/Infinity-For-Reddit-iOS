@@ -73,12 +73,22 @@ struct PostDetailsViewCard: View {
                 .postTitle()
             
             switch postViewModel.post.postType {
-            case .link, .noPreviewLink:
+            case .link:
                 if let url = URL(string: postViewModel.post.url), let domain = url.host {
                     Text(domain)
                         .secondaryText()
                         .padding(.horizontal, 16)
                         .padding(.bottom, 8)
+                }
+            case .noPreviewLink:
+                if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                    Text(domain)
+                        .noPreviewPostTypeIndicatorBackground()
+                        .noPreviewPostTypeIndicator()
+                        .padding(.bottom, 8)
+                        .onTapGesture {
+                            LinkHandler.shared.handle(url: url)
+                        }
                 }
             default:
                 EmptyView()

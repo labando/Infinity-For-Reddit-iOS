@@ -147,4 +147,12 @@ extension View {
     func mediaIndicator() -> some View {
         self.modifier(MediaIndicatorViewModifier())
     }
+    
+    func noPreviewPostTypeIndicatorBackground() -> some View {
+        self.modifier(NoPreviewPostTypeIndicatorBackgroundViewModifier())
+    }
+    
+    func noPreviewPostTypeIndicator() -> some View {
+        self.modifier(NoPreviewPostTypeIndicatorViewModifier())
+    }
 }
