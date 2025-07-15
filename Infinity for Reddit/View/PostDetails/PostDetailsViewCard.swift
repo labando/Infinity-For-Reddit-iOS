@@ -144,6 +144,7 @@ struct PostDetailsViewCard: View {
                         .noPreviewPostTypeIndicator()
                 }
                 .noPreviewPostTypeIndicatorBackground()
+                .mediaTapGesture(post: postViewModel.post, aspectRatio: nil, matchedGeometryEffectId: nil)
             }
             
             if let selftext = postViewModel.post.selftextProcessedMarkdown {

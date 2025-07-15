@@ -164,6 +164,7 @@ struct PostViewCard: View {
                             .noPreviewPostTypeIndicator()
                     }
                     .noPreviewPostTypeIndicatorBackground()
+                    .mediaTapGesture(post: postViewModel.post, aspectRatio: nil, matchedGeometryEffectId: nil)
                 }
                 
                 HStack(alignment: .center) {
