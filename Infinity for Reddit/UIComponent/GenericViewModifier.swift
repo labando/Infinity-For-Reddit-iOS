@@ -91,7 +91,7 @@ struct PostTypeTagViewModifier: ViewModifier {
         content
             .padding(4)
             .background(Color(hex: themeViewModel.currentCustomTheme.postTypeBackgroundColor))
-            .cornerRadius(6)
+            .cornerRadius(4)
             .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.postTypeTextColor))
             .font(.system(size: 12))
     }
@@ -117,7 +117,7 @@ struct SensitiveTagViewModifier: ViewModifier {
         content
             .padding(4)
             .background(Color(hex: themeViewModel.currentCustomTheme.nsfwBackgroundColor))
-            .cornerRadius(6)
+            .cornerRadius(4)
             .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.nsfwTextColor))
             .font(.system(size: 12))
     }
@@ -130,7 +130,7 @@ struct PostFlairBackgroundViewModifier: ViewModifier {
         content
             .padding(4)
             .background(Color(hex: themeViewModel.currentCustomTheme.flairBackgroundColor))
-            .cornerRadius(6)
+            .cornerRadius(4)
     }
 }
 
