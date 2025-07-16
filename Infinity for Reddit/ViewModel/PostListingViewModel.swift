@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import MarkdownUI
 import GRDB
+import SwiftUI
 
 public class PostListingViewModel: ObservableObject {
     // MARK: - Properties
@@ -22,10 +23,12 @@ public class PostListingViewModel: ObservableObject {
     @Published var loadPostsTaskId = UUID()
     
     private let postListingMetadata: PostListingMetadata
-    private var allowSensitive: Bool
     private var lastLoadedSortType: SortType? = nil
     private var allPostIds = Set<String>()
     private var after: String? = nil
+    
+    // UserDefaults
+    private var sensitiveContent: Bool
     
     public let postListingRepository: PostListingRepositoryProtocol
     
@@ -38,8 +41,9 @@ public class PostListingViewModel: ObservableObject {
             time: postListingMetadata.postListingType.defaultSortTime
         )
         self.postListingMetadata = postListingMetadata
-        self.allowSensitive = true
         self.postListingRepository = postListingRepository
+        
+        self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
     }
     
     // MARK: - Methods
@@ -82,7 +86,7 @@ public class PostListingViewModel: ObservableObject {
             case .inPath:
                 var queries = ["t": sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""]
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
-                    queries["include_over_18"] = allowSensitive ? "1" : "0"
+                    queries["include_over_18"] = sensitiveContent ? "1" : "0"
                 }
                 postListing = try await postListingRepository.fetchPosts(
                     postListingType: postListingMetadata.postListingType,
@@ -93,7 +97,7 @@ public class PostListingViewModel: ObservableObject {
             case .inQuery(let key):
                 var queries = [key: sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""]
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
-                    queries["include_over_18"] = allowSensitive ? "1" : "0"
+                    queries["include_over_18"] = sensitiveContent ? "1" : "0"
                 }
                 postListing = try await postListingRepository.fetchPosts(
                     postListingType: postListingMetadata.postListingType,
@@ -218,17 +222,24 @@ public class PostListingViewModel: ObservableObject {
         }
     }
     
-    func changeSortTypeKind(sortTypeKind: SortType.Kind) {
+    func changeSortTypeKind(_ sortTypeKind: SortType.Kind) {
         if sortTypeKind != self.sortType.type {
             self.sortType = self.sortType.with(type: sortTypeKind)
             loadPostsTaskId = UUID()
         }
     }
     
-    func changeSortType(sortType: SortType) {
+    func changeSortType(_ sortType: SortType) {
         if sortType != self.sortType {
             self.sortType = sortType
             loadPostsTaskId = UUID()
+        }
+    }
+    
+    func setSensitiveContent(_ sensitiveContent: Bool) {
+        if sensitiveContent != self.sensitiveContent {
+            self.sensitiveContent = sensitiveContent
+            refreshPosts()
         }
     }
 }

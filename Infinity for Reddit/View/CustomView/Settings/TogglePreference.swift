@@ -1,0 +1,53 @@
+//
+//  TogglePreference.swift
+//  Infinity for Reddit
+//
+//  Created by Docile Alligator on 2025-07-16.
+//
+
+import SwiftUI
+
+struct TogglePreference: View {
+    @Binding var isEnabled: Bool
+    
+    let title: String
+    let subtitle: String?
+    let icon: String?
+    
+    init(isEnabled: Binding<Bool>, title: String, subtitle: String? = nil, icon: String? = nil) {
+        self._isEnabled = isEnabled
+        self.title = title
+        self.subtitle = subtitle
+        self.icon = icon
+    }
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            if let icon = icon {
+                SwiftUI.Image(systemName: icon)
+                    .primaryIcon()
+                    .frame(width: 24, height: 24, alignment: .leading)
+                    .padding(0)
+            } else {
+                Spacer()
+                    .frame(width: 24)
+            }
+            
+            Spacer()
+                .frame(width: 24)
+            
+            Toggle(isOn: $isEnabled) {
+                Text(title)
+                    .primaryText()
+                
+                if let subtitle = subtitle {
+                    Text(subtitle)
+                        .secondaryText()
+                }
+            }
+            .themedToggle()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+    }
+}

@@ -25,6 +25,8 @@ struct PostListingView: View {
     @State private var upcomingSortTypeKind: SortType.Kind?
     @State private var navigationBarMenuKey: UUID?
     
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey, store: .contentSensitivityFilter) private var sensitiveContent: Bool = false
+    
     private let account: Account
     private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
@@ -157,6 +159,9 @@ struct PostListingView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .onChange(of: sensitiveContent) {
+            postListingViewModel.setSensitiveContent($0)
+        }
         .sheet(isPresented: $showNewPostMenu) {
             NewPostSheet()
                 .themedList()
@@ -172,7 +177,7 @@ struct PostListingView: View {
                     upcomingSortTypeKind = sortTypeKind
                     showSortTypeTimeSheet = true
                 } else {
-                    postListingViewModel.changeSortTypeKind(sortTypeKind: sortTypeKind)
+                    postListingViewModel.changeSortTypeKind(sortTypeKind)
                 }
             }
             .presentationDetents([.medium, .large])
@@ -183,7 +188,7 @@ struct PostListingView: View {
                 currentSortTypeTime: postListingViewModel.sortType.time
             ) { sortTypeTime in
                 if let upcomingSortTypeKind = upcomingSortTypeKind {
-                    postListingViewModel.changeSortType(sortType: SortType(type: upcomingSortTypeKind, time: sortTypeTime))
+                    postListingViewModel.changeSortType(SortType(type: upcomingSortTypeKind, time: sortTypeTime))
                 }
             }
             .presentationDetents([.medium, .large])
