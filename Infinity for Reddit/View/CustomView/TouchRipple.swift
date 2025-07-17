@@ -12,7 +12,10 @@ struct TouchRipple<Content: View, BackgroundShape: Shape>: View {
     var action: (() -> Void)? = nil
     let content: () -> Content
 
-    @GestureState private var isPressed = false
+    @State private var isPressed = false
+    @State private var dragStartLocation: CGPoint? = nil
+    
+    let maxTapMovement: CGFloat = 10
 
     var body: some View {
         content()
@@ -23,11 +26,36 @@ struct TouchRipple<Content: View, BackgroundShape: Shape>: View {
             )
             .simultaneousGesture(
                 DragGesture(minimumDistance: 0)
-                    .updating($isPressed) { value, state, _ in
-                        state = true
+                    .onChanged { value in
+                        if dragStartLocation == nil {
+                            dragStartLocation = value.startLocation
+                        }
+                        
+                        guard let start = dragStartLocation else { return }
+                        let distance = hypot(value.location.x - start.x, value.location.y - start.y)
+                        
+                        if distance <= maxTapMovement {
+                            if !isPressed {
+                                isPressed = true
+                            }
+                        } else {
+                            if isPressed {
+                                isPressed = false
+                            }
+                        }
                     }
-                    .onEnded { _ in
-                        action?()
+                    .onEnded { value in
+                        defer {
+                            dragStartLocation = nil
+                            isPressed = false
+                        }
+                        
+                        guard let start = dragStartLocation else { return }
+                        let dragDistance = hypot(value.location.x - start.x, value.location.y - start.y)
+                        
+                        if dragDistance <= maxTapMovement {
+                            action?()
+                        }
                     }
             )
     }
