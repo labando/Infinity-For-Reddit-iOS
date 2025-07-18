@@ -68,6 +68,25 @@ struct UsernameTextViewModifier: ViewModifier {
     }
 }
 
+struct UsernameOnPostTextViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    let post: Post
+    
+    var usernameColor: Color {
+        if post.distinguished == "moderator" {
+            Color(hex: themeViewModel.currentCustomTheme.moderator)
+        } else {
+            Color(hex: themeViewModel.currentCustomTheme.username)
+        }
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            //.font()
+            .foregroundColor(usernameColor)
+    }
+}
+
 struct SubredditTextViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     

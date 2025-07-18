@@ -155,6 +155,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     var created : Int64!
     var createdUtc : Int64!
     var crosspostParent: Post!
+    var distinguished: String!
     var domain : String!
     var downs : Int!
     var edited : Bool!
@@ -289,6 +290,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         if let crosspostParentListArray = json["crosspost_parent_list"].array, !crosspostParentListArray.isEmpty {
             crosspostParent = Post(fromJson: crosspostParentListArray[0])
         }
+        distinguished = json["distinguished"].stringValue
         domain = json["domain"].stringValue
         downs = json["downs"].intValue
         edited = json["edited"].boolValue
@@ -512,6 +514,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         if crosspostParent != nil {
             dictionary["crosspost_parent_list"] = crosspostParent
         }
+        if distinguished != nil{
+            dictionary["distinguished"] = distinguished
+        }
         if domain != nil{
             dictionary["domain"] = domain
         }
@@ -708,6 +713,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         created = aDecoder.decodeObject(forKey: "created") as? Int64
         createdUtc = aDecoder.decodeObject(forKey: "created_utc") as? Int64
         crosspostParent = aDecoder.decodeObject(forKey: "crosspost_parent_list") as? Post
+        distinguished = aDecoder.decodeObject(forKey: "distinguished") as? String
         domain = aDecoder.decodeObject(forKey: "domain") as? String
         downs = aDecoder.decodeObject(forKey: "downs") as? Int
         edited = aDecoder.decodeObject(forKey: "edited") as? Bool
@@ -813,6 +819,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         }
         if crosspostParent != nil {
             aCoder.encode(crosspostParent, forKey: "crosspost_parent_list")
+        }
+        if distinguished != nil{
+            aCoder.encode(distinguished, forKey: "distinguished")
         }
         if domain != nil{
             aCoder.encode(domain, forKey: "domain")

@@ -14,6 +14,7 @@ public class PostViewModel: ObservableObject {
     let account: Account
     @Published var post: Post
     @Published var error: Error?
+    @Published var shouldBlurMedia: Bool = false
     
     private var cancellables = Set<AnyCancellable>()
     

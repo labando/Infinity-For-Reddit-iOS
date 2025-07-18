@@ -18,6 +18,9 @@ struct PostViewCard: View {
     @State var voteTask: Task<Void, Never>?
     @State var saveTask: Task<Void, Never>?
     
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
+    
     let isSubredditPostListing: Bool
     
     let formatter = DateFormatter()
@@ -72,7 +75,7 @@ struct PostViewCard: View {
                             }
                         
                         Text("u/\(postViewModel.post.author)")
-                            .username()
+                            .usernameOnPost(post: postViewModel.post)
                             .onTapGesture {
                                 navigationManager.path.append(AppNavigation.userDetails(username: postViewModel.post.author))
                             }
@@ -176,6 +179,7 @@ struct PostViewCard: View {
                                 aspectRatio: preview.images[0].source.aspectRatio,
                                 matchedGeometryEffectId: UUID().uuidString,
                                 post: postViewModel.post,
+                                blur: (postViewModel.post.over18 && blurSensitiveImages) || (postViewModel.post.spoiler && blurSpoilerImages),
                                 placeholderView: {
                                     Spacer()
                                         .frame(width: geo.size.width, height: CGFloat(geo.size.width) / (CGFloat(preview.images[0].source.width) / CGFloat(preview.images[0].source.height)))

@@ -24,10 +24,11 @@ struct CustomWebImage<Content: View>: View {
     var centerCrop: Bool
     var matchedGeometryEffectId: String?
     var post: Post?
+    var blur: Bool
     var placeholderView: (() -> Content)?
     var fallbackView: (() -> Content)?
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil) where Content == EmptyView {
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false) where Content == EmptyView {
         self.urlString = urlString
         self.width = width
         self.height = height
@@ -37,10 +38,11 @@ struct CustomWebImage<Content: View>: View {
         self.handleImageTapGesture = handleImageTapGesture
         self.matchedGeometryEffectId = matchedGeometryEffectId
         self.post = post
+        self.blur = blur
     }
     
 
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false,
          @ViewBuilder placeholderView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
@@ -51,10 +53,11 @@ struct CustomWebImage<Content: View>: View {
         self.handleImageTapGesture = handleImageTapGesture
         self.matchedGeometryEffectId = matchedGeometryEffectId
         self.post = post
+        self.blur = blur
         self.placeholderView = placeholderView
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
         self.width = width
@@ -65,10 +68,11 @@ struct CustomWebImage<Content: View>: View {
         self.handleImageTapGesture = handleImageTapGesture
         self.matchedGeometryEffectId = matchedGeometryEffectId
         self.post = post
+        self.blur = blur
         self.fallbackView = fallbackView
     }
     
-    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil,
+    init(_ urlString: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, aspectRatio: CGSize? = nil, circleClipped: Bool = false, handleImageTapGesture: Bool = true, centerCrop: Bool = false, matchedGeometryEffectId: String? = nil, post: Post? = nil, blur: Bool = false,
          @ViewBuilder placeholderView: @escaping () -> Content,
          @ViewBuilder fallbackView: @escaping () -> Content) {
         self.urlString = urlString
@@ -79,6 +83,7 @@ struct CustomWebImage<Content: View>: View {
         self.handleImageTapGesture = handleImageTapGesture
         self.matchedGeometryEffectId = matchedGeometryEffectId
         self.post = post
+        self.blur = blur
         self.centerCrop = centerCrop
         self.placeholderView = placeholderView
         self.fallbackView = fallbackView
@@ -134,6 +139,9 @@ struct CustomWebImage<Content: View>: View {
                     }
                     .applyIf(matchedGeometryEffectId != nil) {
                         $0.matchedGeometryEffect(id: matchedGeometryEffectId!, in: namespaceManager.animation)
+                    }
+                    .applyIf(blur) {
+                        $0.blur(radius: 20)
                     }
                     .id(matchedGeometryEffectId)
                 }

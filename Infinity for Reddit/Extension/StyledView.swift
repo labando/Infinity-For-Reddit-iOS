@@ -100,6 +100,10 @@ extension View {
         self.modifier(UsernameTextViewModifier())
     }
     
+    func usernameOnPost(post: Post) -> some View {
+        self.modifier(UsernameOnPostTextViewModifier(post: post))
+    }
+    
     func subreddit() -> some View {
         self.modifier(SubredditTextViewModifier())
     }
