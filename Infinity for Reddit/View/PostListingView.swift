@@ -78,7 +78,7 @@ struct PostListingView: View {
                     List {
                         ForEach(postListingViewModel.posts, id: \.id) { post in
                             PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing)
-                                .id(post.id)
+                                //.id(post.id)
                                 .listPlainItemNoInsets()
                                 .onAppear {
                                     if post.subredditOrUserIcon == nil {

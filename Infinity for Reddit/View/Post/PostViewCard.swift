@@ -178,6 +178,7 @@ struct PostViewCard: View {
                                     .frame(width: geo.size.width, height: CGFloat(geo.size.width) / (CGFloat(preview.images[0].source.width) / CGFloat(preview.images[0].source.height)))
                             }
                         )
+                        .id(url)
                         
                         switch postViewModel.post.postType {
                         case .video, .imgurVideo, .redgifs, .streamable:

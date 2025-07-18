@@ -96,12 +96,13 @@ struct CustomWebImage<Content: View>: View {
                     fallbackView()
                 }
             } else {
-                if handleImageTapGesture == true && matchedGeometryEffectId != nil && fullScreenMediaViewModel.matchedGeometryEffectId == matchedGeometryEffectId {
-                    // Image is now in full screen mode
-                    Color.clear
-                        .frame(width: width)
-                        .frame(height: height)
-                } else {
+//                if false {
+//                //if handleImageTapGesture == true && matchedGeometryEffectId != nil && fullScreenMediaViewModel.matchedGeometryEffectId == matchedGeometryEffectId {
+//                    // Image is now in full screen mode
+//                    Color.clear
+//                        .frame(width: width)
+//                        .frame(height: height)
+//                } else {
                     WebImage(url: URL(string: urlString!)) { image in
                         if let aspectRatio = aspectRatio {
                             image
@@ -137,14 +138,14 @@ struct CustomWebImage<Content: View>: View {
                     .applyIf(centerCrop == false) {
                         $0.scaledToFit()
                     }
-                    .applyIf(matchedGeometryEffectId != nil) {
-                        $0.matchedGeometryEffect(id: matchedGeometryEffectId!, in: namespaceManager.animation)
-                    }
+//                    .applyIf(matchedGeometryEffectId != nil) {
+//                        $0.matchedGeometryEffect(id: matchedGeometryEffectId!, in: namespaceManager.animation)
+//                    }
                     .applyIf(blur) {
                         $0.blur(radius: 20)
                     }
                     .id(matchedGeometryEffectId)
-                }
+                //}
             }
         }
         .applyIf(handleImageTapGesture == true) {
