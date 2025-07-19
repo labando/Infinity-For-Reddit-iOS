@@ -24,11 +24,14 @@ struct PostViewCard: View {
     let isSubredditPostListing: Bool
     
     let formatter = DateFormatter()
+    @State var width: CGFloat?
     
-    init(account: Account, post: Post, isSubredditPostListing: Bool) {
+    init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil) {
         self.isSubredditPostListing = isSubredditPostListing
         formatter.dateFormat = "y-MM-dd H:mm"
+        self.width = width
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
+        print("fuck \(width)")
     }
     
     var body: some View {
@@ -178,7 +181,7 @@ struct PostViewCard: View {
                                     .frame(width: geo.size.width, height: CGFloat(geo.size.width) / (CGFloat(preview.images[0].source.width) / CGFloat(preview.images[0].source.height)))
                             }
                         )
-                        .id(url)
+                        //.id(url)
                         
                         switch postViewModel.post.postType {
                         case .video, .imgurVideo, .redgifs, .streamable:

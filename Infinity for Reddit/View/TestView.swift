@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVKit
+import SDWebImageSwiftUI
 
 //struct TestView: View {
 //    @EnvironmentObject private var namespaceManager: NamespaceManager
@@ -159,33 +160,140 @@ class PlayerManager : ObservableObject {
     }
 }
 
+struct DummyListItem: Identifiable {
+    let id: Int // The Int itself serves as the unique identifier
+    // Add any other dummy properties you might need for your ItemView later
+    // var someText: String
+    // var imageUrl: URL? // If you plan to use WebImage with it
+}
+
 struct TestView: View {
-    @StateObject var playerManager = PlayerManager()
+    @State private var items: [DummyListItem] = (0..<5).map { DummyListItem(id: $0) }
     
     var body: some View {
-        List {
-            VStack(alignment: .center, spacing: 0) {
-//                AVPlayerControllerRepresented(player: playerManager.player)
-//                    .onAppear {
-//                        playerManager.play()
-//                    }
-//                InlineVideoView(url: URL(string: "https://media.w3.org/2010/05/sintel/trailer.mp4")!)
-//                    .frame(height: 300)
-                
-                
-                
-                Button("Clear All") {
-                    playerManager.playPause()
-                }
-                .font(.subheadline)
-                .foregroundColor(.blue)
-                
-                Text("fuck you ")
+        MultiColumnList(items: items, numberOfColumns: 1, viewForItem: { item, width in
+            AnyView(WebImage(url: URL(string: "https://cloudinary-marketing-res.cloudinary.com/images/w_1000,c_scale/v1679921049/Image_URL_header/Image_URL_header-png?_i=AA")) { image in
+                image.resizable() // Control layout like SwiftUI.AsyncImage, you must use this modifier or the view will use the image bitmap size
+            } placeholder: {
+                Rectangle().foregroundColor(.gray)
             }
+            // Supports options and context, like `.delayPlaceholder` to show placeholder only when error
+            .onSuccess { image, data, cacheType in
+                // Success
+                // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+            }
+            .indicator(.activity) // Activity Indicator
+            .transition(.fade(duration: 0.5)) // Fade Transition with duration
+            .scaledToFit()
+            .aspectRatio(CGSize(width: 1000, height: 523), contentMode: .fit)
+            .frame(maxWidth: .infinity)
+            //.frame(width:width, height: CGFloat(width) / (CGFloat(1000) / CGFloat(523)), alignment: .leading)
+            //                    .onAppear {
+            //                        print("fuck you \(width) \(CGFloat(width) / (CGFloat(1000) / CGFloat(523)))")
+            //                    }
             
-    //        VideoPlayerContainerView(url: URL(string: "https://media.w3.org/2010/05/sintel/trailer.mp4")!)
-    //            .frame(height: 400)
-        }
+            .background(Color.yellow))
+        })
+        
+//        WaterfallView(
+//            items: dummyItems,
+//            columns: 1,
+//            spacing: 8,
+//            itemView: { item in
+//                WebImage(url: URL(string: "https://cloudinary-marketing-res.cloudinary.com/images/w_1000,c_scale/v1679921049/Image_URL_header/Image_URL_header-png?_i=AA")) { image in
+//                    image.resizable() // Control layout like SwiftUI.AsyncImage, you must use this modifier or the view will use the image bitmap size
+//                } placeholder: {
+//                    Rectangle().foregroundColor(.gray)
+//                }
+//                // Supports options and context, like `.delayPlaceholder` to show placeholder only when error
+//                .onSuccess { image, data, cacheType in
+//                    // Success
+//                    // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+//                }
+//                .indicator(.activity) // Activity Indicator
+//                .transition(.fade(duration: 0.5)) // Fade Transition with duration
+//                .scaledToFit()
+//                .aspectRatio(CGSize(width: 1000, height: 523), contentMode: .fit)
+//                .frame(maxWidth: .infinity)
+//                //.frame(width:width, height: CGFloat(width) / (CGFloat(1000) / CGFloat(523)), alignment: .leading)
+//                //                    .onAppear {
+//                //                        print("fuck you \(width) \(CGFloat(width) / (CGFloat(1000) / CGFloat(523)))")
+//                //                    }
+//                
+//                .background(Color.yellow)
+//            },
+//            heightForWidth: { item, _ in item.height }
+//        )
+        
+//        MultiColumnList(
+//            items: dummyItems,
+//            numberOfColumns: 1,
+//            viewForItem: { item, width in
+//                AnyView(
+////                    CustomWebImage(
+////                        "https://cloudinary-marketing-res.cloudinary.com/images/w_1000,c_scale/v1679921049/Image_URL_header/Image_URL_header-png?_i=AA",
+////                        aspectRatio: CGSize(width: 1000, height: 523),
+////                        matchedGeometryEffectId: UUID().uuidString
+////                    )
+////                    SwiftUI.Image(systemName: "chevron.up")
+////                        //.frame(maxWidth: .infinity)
+////                        .frame(alignment: .leading)
+////                        .background(Color.red)
+//                    ZStack {
+//                        WebImage(url: URL(string: "https://cloudinary-marketing-res.cloudinary.com/images/w_1000,c_scale/v1679921049/Image_URL_header/Image_URL_header-png?_i=AA")) { image in
+//                                image.resizable() // Control layout like SwiftUI.AsyncImage, you must use this modifier or the view will use the image bitmap size
+//                            } placeholder: {
+//                                    Rectangle().foregroundColor(.gray)
+//                            }
+//                            // Supports options and context, like `.delayPlaceholder` to show placeholder only when error
+//                            .onSuccess { image, data, cacheType in
+//                                // Success
+//                                // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
+//                            }
+//                            .indicator(.activity) // Activity Indicator
+//                            .transition(.fade(duration: 0.5)) // Fade Transition with duration
+//                            .scaledToFit()
+//                            .frame(width:width, height: CGFloat(width) / (CGFloat(1000) / CGFloat(523)), alignment: .leading)
+//                            .onAppear {
+//                                print("fuck you \(width) \(CGFloat(width) / (CGFloat(1000) / CGFloat(523)))")
+//                            }
+//                        
+//                    }
+//                    
+//                        .background(Color.yellow)
+//                    
+////                    GeometryReader { geo in
+////                        CustomWebImage(
+////                            "https://cloudinary-marketing-res.cloudinary.com/images/w_1000,c_scale/v1679921049/Image_URL_header/Image_URL_header-png?_i=AA",
+////                            aspectRatio: CGSize(width: 1000, height: 523),
+////                            matchedGeometryEffectId: UUID().uuidString,
+////                            placeholderView: {
+////                                Spacer()
+////                                    .frame(width: geo.size.width, height: CGFloat(geo.size.width) / (CGFloat(1000) / CGFloat(523)))
+////                            }
+////                        )
+////                    }
+//                )
+//            },
+//            onItemAppear: { index, item in
+//                
+//            }
+//        )
+        
+//        List {
+//            CustomWebImage(
+//                "https://cloudinary-marketing-res.cloudinary.com/images/w_1000,c_scale/v1679921049/Image_URL_header/Image_URL_header-png?_i=AA",
+//                aspectRatio: CGSize(width: 1000, height: 523),
+//                matchedGeometryEffectId: UUID().uuidString
+//            )
+//            
+//            CustomWebImage(
+//                "https://cloudinary-marketing-res.cloudinary.com/images/w_1000,c_scale/v1679921049/Image_URL_header/Image_URL_header-png?_i=AA",
+//                aspectRatio: CGSize(width: 1000, height: 523),
+//                matchedGeometryEffectId: UUID().uuidString
+//            )
+//        }
+//        .background(Color.blue)
     }
         
 }

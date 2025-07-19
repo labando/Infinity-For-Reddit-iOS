@@ -11,7 +11,16 @@ import MarkdownUI
 import GRDB
 import SwiftUI
 
-enum PostListItem {
+enum PostListItem: Identifiable {
+    var id: String {
+        switch self {
+        case .post(let post):
+            return post.id
+        case .loading:
+            return UUID().uuidString
+        }
+    }
+    
     case post(Post)
     case loading
 }

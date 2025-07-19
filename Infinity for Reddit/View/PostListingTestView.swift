@@ -75,34 +75,35 @@ struct PostListingTestView: View {
                 }
             } else {
                 if isRootView {
-                    MultiColumnList(
-                        items: postListingViewModel.itemsWithLoadingIndicator,
-                        viewForItem: { item in
-                            switch item {
-                            case .post(let post):
-                                return AnyView(
-                                    PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing)
-                                               //.id(post.id)
-                                    .listPlainItemNoInsets()
-                                    .onAppear {
-                                        if post.subredditOrUserIcon == nil {
-                                            Task {
-                                                await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
-                                            }
-                                        }
-                                    }
-                                )
-                            case .loading:
-                                return AnyView(
-                                    ProgressIndicator()
-                                        .id("loadingIndicator")
-                                )
-                            }
-                        },
-                        onItemAppear: { index, item in
-                            postListingViewModel.loadPostsPagination(index: index)
-                        }
-                    )
+//                    MultiColumnList(
+//                        items: postListingViewModel.itemsWithLoadingIndicator,
+//                        numberOfColumns: 1,
+//                        viewForItem: { item, width in
+//                            switch item {
+//                            case .post(let post):
+//                                return AnyView(
+//                                    PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, width: width)
+//                                        .id(post.id)
+//                                        .listPlainItemNoInsets()
+//                                        .onAppear {
+//                                            if post.subredditOrUserIcon == nil {
+//                                                Task {
+//                                                    await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
+//                                                }
+//                                            }
+//                                        }
+//                                )
+//                            case .loading:
+//                                return AnyView(
+//                                    ProgressIndicator()
+//                                        .id("loadingIndicator")
+//                                )
+//                            }
+//                        },
+//                        onItemAppear: { index, item in
+//                            postListingViewModel.loadPostsPagination(index: index)
+//                        }
+//                    )
                 }
             }
         }

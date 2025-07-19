@@ -33,7 +33,7 @@ struct HomeView: View {
             TabView(selection: $selectedTab) {
                 Group {
                     CustomNavigationStack {
-                        PostListingTestView(
+                        PostListingView(
                             account: accountViewModel.account,
                             postListingMetadata: PostListingMetadata(
                                 postListingType: .frontPage,
