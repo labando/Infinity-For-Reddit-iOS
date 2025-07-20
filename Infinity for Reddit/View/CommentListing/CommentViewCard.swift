@@ -19,13 +19,11 @@ struct CommentViewCard: View {
     let formatter = DateFormatter()
     private let isInPostDetails: Bool
     let onToggleExpand: (() -> Void)?
-    let onCommentTapped: ((Comment) -> Void)?
     
-    init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil, onCommentTapped: ((Comment) -> Void)? = nil) {
+    init(account: Account, comment: Comment, isInPostDetails: Bool, onToggleExpand: (() -> Void)? = nil) {
         formatter.dateFormat = "y-MM-dd H:mm"
         self.isInPostDetails = isInPostDetails
         self.onToggleExpand = onToggleExpand
-        self.onCommentTapped = onCommentTapped
         _commentViewModel = StateObject(wrappedValue: CommentViewModel(account: account, comment: comment, commentRepository: CommentRepository()))
     }
     
@@ -176,8 +174,6 @@ struct CommentViewCard: View {
                 .padding(.bottom, 8)
             }
         }
-        .onTapGesture {
-            onCommentTapped?(commentViewModel.comment)
-        }
+        .contentShape(Rectangle())
     }
 }

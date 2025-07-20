@@ -43,16 +43,17 @@ struct CommentListingView: View {
             } else {
                 List {
                     ForEach(commentListingViewModel.comments, id: \.id) { comment in
-                        CommentViewCard(
-                            account: accountViewModel.account,
-                            comment: comment,
-                            isInPostDetails: false,
-                            onCommentTapped: { comment in
-                                navigationManager.path.append(
-                                    AppNavigation.postDetailsWithId(postId: String(comment.linkId.dropFirst(3)), commentId: comment.id)
-                                )
-                            }
-                        )
+                        TouchRipple(action: {
+                            navigationManager.path.append(
+                                AppNavigation.postDetailsWithId(postId: String(comment.linkId.dropFirst(3)), commentId: comment.id)
+                            )
+                        }) {
+                            CommentViewCard(
+                                account: accountViewModel.account,
+                                comment: comment,
+                                isInPostDetails: false
+                            )
+                        }
                         .listPlainItemNoInsets()
                         .id(comment.id)
                     }
