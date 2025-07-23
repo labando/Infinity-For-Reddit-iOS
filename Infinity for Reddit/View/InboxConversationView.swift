@@ -10,6 +10,8 @@ import SwiftUI
 struct InboxConversationView: View {
     @StateObject var inboxConversationViewModel: InboxConversationViewModel
     
+    @State private var scrollToBottomTrigger: Bool = false
+    
     init(inbox: Inbox) {
         _inboxConversationViewModel = StateObject(
             wrappedValue: InboxConversationViewModel(
@@ -20,16 +22,25 @@ struct InboxConversationView: View {
     }
     
     var body: some View {
-        List {
-            Text(inboxConversationViewModel.inbox.body)
+        UITableViewList(items: inboxConversationViewModel.conversations, viewForItem: { inbox in
+            AnyView(Text(inbox.body))
+        }, onItemAppear: { index, inbox in
             
-            if let replies = inboxConversationViewModel.inbox.replies?.data?.inboxes {
-                ForEach(replies, id: \.id) { reply in
-                    Text(reply.body)
-                }
-            }
-        }
-        .themedList()
+        },
+                        scrollFromBottom: true,
+                        shouldScrollToBottom: true,
+                        scrollToBottomTrigger: $scrollToBottomTrigger
+        )
+//        List {
+//            Text(inboxConversationViewModel.inbox.body)
+//            
+//            if let replies = inboxConversationViewModel.inbox.replies?.data?.inboxes {
+//                ForEach(replies, id: \.id) { reply in
+//                    Text(reply.body)
+//                }
+//            }
+//        }
+        //.themedList()
         .themedNavigationBar()
     }
 }

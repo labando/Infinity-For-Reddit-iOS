@@ -6,4 +6,5 @@
 //
 
 public protocol InboxConversationRepositoryProtocol {
+    //func sendMessage(commentListingType: CommentListingType, pathComponents: [String: String]?, queries: [String: String]?, params: [String: String]?) async throws -> CommentListing
 }

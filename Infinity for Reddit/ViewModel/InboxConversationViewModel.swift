@@ -10,6 +10,14 @@ import Foundation
 class InboxConversationViewModel: ObservableObject {
     @Published var inbox: Inbox
     
+    var conversations: [Inbox] {
+        if let replies = inbox.replies?.data?.inboxes {
+            return ([inbox] + replies).reversed()
+        }
+        
+        return [inbox]
+    }
+    
     private let inboxConversationRepository: InboxConversationRepositoryProtocol
     
     init(inbox: Inbox, inboxConversationRepository: InboxConversationRepositoryProtocol) {
