@@ -10,6 +10,7 @@ import Foundation
 class InboxConversationViewModel: ObservableObject {
     @Published var inbox: Inbox
     @Published var fullNameToReplyTo: String?
+    @Published var recepient: String?
     @Published var error: Error?
     @Published var listScrollTarget: String?
     
@@ -27,20 +28,30 @@ class InboxConversationViewModel: ObservableObject {
         self.inbox = inbox
         if inbox.author == AccountViewModel.shared.account.username {
             var fullNameTemp: String?
+            var recepientTemp: String?
             if let inboxes = inbox.replies.data.inboxes {
                 for i in (0..<inboxes.count).reversed() {
                     if inboxes[i].author != AccountViewModel.shared.account.username {
                         fullNameTemp = inboxes[i].name
                         fullNameToReplyTo = fullNameTemp
+                        recepientTemp = inboxes[i].author
+                        recepient = recepientTemp
                         break
+                    } else if inboxes[i].dest != AccountViewModel.shared.account.username {
+                        recepientTemp = inboxes[i].dest
+                        recepient = recepientTemp
                     }
                 }
             }
             if fullNameTemp == nil {
                 fullNameToReplyTo = inbox.name
             }
+            if recepientTemp == nil {
+                recepient = inbox.dest
+            }
         } else {
             fullNameToReplyTo = inbox.name
+            recepient = inbox.author
         }
         self.inboxConversationRepository = inboxConversationRepository
     }

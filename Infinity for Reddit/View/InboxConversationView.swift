@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct InboxConversationView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject var accountViewModel: AccountViewModel
     
     @StateObject var inboxConversationViewModel: InboxConversationViewModel
@@ -15,6 +17,7 @@ struct InboxConversationView: View {
     @State private var scrollToBottomTrigger: Bool = false
     @State private var messageText: String = ""
     @State private var sendMessageTask: Task<Void, Never>?
+    @State private var navigationBarMenuKey: UUID?
     @FocusState private var isInputActive: Bool
     
     init(inbox: Inbox) {
@@ -107,6 +110,29 @@ struct InboxConversationView: View {
             }
         }
         .themedNavigationBar()
+        .applyIf(inboxConversationViewModel.recepient != nil) {
+            $0.addTitleToInlineNavigationBar(inboxConversationViewModel.recepient!)
+        }
+        .toolbar {
+            NavigationBarMenu()
+        }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "View Profile") {
+                    guard let recepient = inboxConversationViewModel.recepient else {
+                        return
+                    }
+                    navigationManager.path.append(AppNavigation.userDetails(username: recepient))
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
     }
 }
 
