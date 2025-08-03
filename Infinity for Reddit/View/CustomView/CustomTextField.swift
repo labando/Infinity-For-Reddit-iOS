@@ -12,10 +12,12 @@ struct CustomTextField: View {
     
     @Binding var text: String
     var placeholder: String
+    private let singleLine: Bool
     
-    init(_ placeholder: String = "", text: Binding<String>) {
+    init(_ placeholder: String = "", text: Binding<String>, singleLine: Bool = false) {
         self.placeholder = placeholder
         _text = text
+        self.singleLine = singleLine
     }
     
     var body: some View {
@@ -23,7 +25,8 @@ struct CustomTextField: View {
             "",
             text: $text,
             prompt: Text(placeholder)
-                .foregroundStyle(Color(hex: customThemeViewModel.currentCustomTheme.secondaryTextColor))
+                .foregroundStyle(Color(hex: customThemeViewModel.currentCustomTheme.secondaryTextColor)),
+            axis: singleLine ? .horizontal : .vertical
         )
         .primaryText()
         .tint(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
