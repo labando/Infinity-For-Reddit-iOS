@@ -278,9 +278,6 @@
     "No inboxes" : {
 
     },
-    "No post filters found. Create a new one!" : {
-
-    },
     "No posts" : {
 
     },
@@ -438,6 +435,9 @@
 
     },
     "Spoiler" : {
+
+    },
+    "Start by creating a post filter" : {
 
     },
     "Subscribe" : {

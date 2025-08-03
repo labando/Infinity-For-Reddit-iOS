@@ -48,4 +48,8 @@ class PostFilterViewModel: ObservableObject {
     func deletePostFilter(id: Int) {
         postFilterRepository.deletePostFilter(id: id)
     }
+    
+    deinit {
+        listener?.cancel()
+    }
 }

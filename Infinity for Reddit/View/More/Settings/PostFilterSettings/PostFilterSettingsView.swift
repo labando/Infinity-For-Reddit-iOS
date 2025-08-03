@@ -32,43 +32,65 @@ struct PostFilterSettingsView: View {
     }
     
     var body: some View {
-        List {
-            InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")
-                .listPlainItemNoInsets()
-            
-            Divider()
-                .listPlainItemNoInsets()
-            
+        Group {
             if postFilterViewModel.postFilters.isEmpty {
-                Text("No post filters found. Create a new one!")
-                    .secondaryText()
-                    .listPlainItemNoInsets()
-            } else {
-                ForEach(postFilterViewModel.postFilters, id: \.id) { filter in
-                    TouchRipple(action: {
-                        navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter(postFilter: filter))
-                    }) {
-                        VStack {
-                            Text(filter.name)
-                                .primaryText()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .contentShape(Rectangle())
-                        .padding(16)
+                VStack(spacing: 0) {
+                    InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")
+                    
+                    Divider()
+                    
+                    VStack(alignment: .center, spacing: 8) {
+                        Spacer()
+                        
+                        SwiftUI.Image(systemName: "plus.circle")
+                            .primaryIcon()
+                        
+                        Text("Start by creating a post filter")
+                            .primaryIcon()
+                        
+                        Spacer()
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            postFilterViewModel.deletePostFilter(id: filter.id ?? -1)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                        .tint(.red)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter())
                     }
-                    .listPlainItemNoInsets()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")
+                        .listPlainItemNoInsets()
+                    
+                    Divider()
+                        .listPlainItemNoInsets()
+                    
+                    ForEach(postFilterViewModel.postFilters, id: \.id) { filter in
+                        TouchRipple(action: {
+                            navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter(postFilter: filter))
+                        }) {
+                            VStack {
+                                Text(filter.name)
+                                    .primaryText()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .contentShape(Rectangle())
+                            .padding(16)
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                postFilterViewModel.deletePostFilter(id: filter.id ?? -1)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            .tint(.red)
+                        }
+                        .listPlainItemNoInsets()
+                    }
+                }
+                .themedList()
             }
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Post Filter")
         .toolbar {
