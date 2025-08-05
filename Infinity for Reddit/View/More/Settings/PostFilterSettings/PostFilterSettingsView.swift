@@ -62,22 +62,14 @@ struct PostFilterSettingsView: View {
                     Divider()
                         .listPlainItemNoInsets()
                     
-                    ForEach(postFilterViewModel.postFilters, id: \.id) { filter in
-                        TouchRipple(action: {
-                            selectedPostFilter = filter
+                    ForEach(postFilterViewModel.postFilters, id: \.id) { postFilter in
+                        PostFilterItemView(postFilter: postFilter) {
+                            selectedPostFilter = postFilter
                             showPostFilterOptionSheet = true
-                        }) {
-                            VStack {
-                                Text(filter.name)
-                                    .primaryText()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            .contentShape(Rectangle())
-                            .padding(16)
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
-                                postFilterViewModel.deletePostFilter(id: filter.id ?? -1)
+                                postFilterViewModel.deletePostFilter(id: postFilter.id ?? -1)
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }
