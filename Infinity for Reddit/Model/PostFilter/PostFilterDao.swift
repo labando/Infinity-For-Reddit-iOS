@@ -86,10 +86,10 @@ struct PostFilterDao {
         try dbPool.read { db in
             let sql = """
                 SELECT * FROM post_filter 
-                WHERE post_filter.name IN 
-                    (SELECT post_filter_usage.name FROM post_filter_usage 
-                     WHERE (usage = ? AND name_of_usage = ? COLLATE NOCASE) 
-                     OR (usage = ? AND name_of_usage = '--'))
+                WHERE post_filter.id IN 
+                    (SELECT post_filter_usage.post_filter_id FROM post_filter_usage 
+                     WHERE (usage_type = ? AND name_of_usage = ? COLLATE NOCASE) 
+                     OR (usage_type = ? AND name_of_usage = '--'))
             """
             return try PostFilter.fetchAll(db, sql: sql, arguments: [usage, nameOfUsage, usage])
         }
@@ -101,7 +101,7 @@ struct PostFilterDao {
                 try dbPool.read { db in
                     try PostFilter.fetchAll(db, sql: "SELECT * FROM post_filter ORDER BY name")
                         .map { postFilter in
-                            let postFilterUsages = try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE name = ?", arguments: [postFilter.name])
+                            let postFilterUsages = try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE post_filter_id = ?", arguments: [postFilter.id])
                             return PostFilterWithUsage(postFilter: postFilter, postFilterUsages: postFilterUsages)
                         }
                 }

@@ -59,6 +59,8 @@ public class PostListingViewModel: ObservableObject {
     
     private var paginationTask: Task<Void, Never>?
     
+    private var cancellables = Set<AnyCancellable>()
+    
     // MARK: - Initializer
     init(postListingMetadata: PostListingMetadata, postListingRepository: PostListingRepositoryProtocol) {
         self.sortType = SortType(
@@ -69,6 +71,13 @@ public class PostListingViewModel: ObservableObject {
         self.postListingRepository = postListingRepository
         
         self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
+        
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .sink { [weak self] _ in
+                let newValue = UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey)
+                self?.setSensitiveContent(newValue)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Methods
@@ -260,6 +269,7 @@ public class PostListingViewModel: ObservableObject {
     
     func fetchPostFilter() {
         self.postFilter = postListingRepository.fetchPostFilter(postListingType: postListingMetadata.postListingType)
+        self.postFilter?.allowNSFW = sensitiveContent
     }
     
     func loadIcon(post: Post, displaySubredditIcon: Bool) async {
@@ -289,6 +299,7 @@ public class PostListingViewModel: ObservableObject {
     func setSensitiveContent(_ sensitiveContent: Bool) {
         if sensitiveContent != self.sensitiveContent {
             self.sensitiveContent = sensitiveContent
+            self.postFilter?.allowNSFW = sensitiveContent
             refreshPosts()
         }
     }

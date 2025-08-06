@@ -27,16 +27,18 @@ struct SearchView: View {
                         .foregroundColor(.gray)
                     
                     TextField("Search", text: $searchViewModel.query)
-                    .focused($isTextFieldFocused)
-                    .font(.system(size: 16))
-                    .foregroundColor(.primary)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                    .submitLabel(.search)
-                    .onSubmit {
-                        searchViewModel.saveSearchQuery()
-                        navigationManager.path.append(AppNavigation.search(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearchInThingType.all.rawValue))
-                    }
+                        .focused($isTextFieldFocused)
+                        .font(.system(size: 16))
+                        .foregroundColor(.primary)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .submitLabel(.search)
+                        .onSubmit {
+                            if !accountViewModel.account.isAnonymous() {
+                                searchViewModel.saveSearchQuery()
+                            }
+                            navigationManager.path.append(AppNavigation.search(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearchInThingType.all.rawValue))
+                        }
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)

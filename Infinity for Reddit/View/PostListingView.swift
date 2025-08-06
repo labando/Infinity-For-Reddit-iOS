@@ -18,19 +18,17 @@ struct PostListingView: View {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     @StateObject var postListingViewModel: PostListingViewModel
-    @State private var isRootView: Bool = true
     @State private var showNewPostMenu: Bool = false
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var upcomingSortTypeKind: SortType.Kind?
     @State private var navigationBarMenuKey: UUID?
     
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey, store: .contentSensitivityFilter) private var sensitiveContent: Bool = false
-    
     private let account: Account
     private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
     private let handleToolbarMenu: Bool
+    private var isRootView: Bool = true
     
     init(account: Account, postListingMetadata: PostListingMetadata, handleToolbarMenu: Bool = true) {
         self.account = account
@@ -156,9 +154,6 @@ struct PostListingView: View {
         .onDisappear {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
-        }
-        .onChange(of: sensitiveContent) { newValue, oldValue in
-            postListingViewModel.setSensitiveContent(newValue)
         }
         .sheet(isPresented: $showNewPostMenu) {
             NewPostSheet()
