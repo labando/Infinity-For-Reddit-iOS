@@ -31,14 +31,14 @@ struct CommentFilterUsageDao {
     
     func deleteCommentFilterUsage(commentFilterUsage: CommentFilterUsage) throws {
         try dbPool.write { db in
-            try db.execute(sql: "DELETE FROM comment_filter_usage WHERE name = ? AND usage = ? AND name_of_usage = ?", arguments: [commentFilterUsage.name, commentFilterUsage.usage, commentFilterUsage.nameOfUsage])
+            try db.execute(sql: "DELETE FROM comment_filter_usage WHERE comment_filter_id = ? AND usage_type = ? AND name_of_usage = ?", arguments: [commentFilterUsage.commentFilterId, commentFilterUsage.usageType.rawValue, commentFilterUsage.nameOfUsage])
         }
     }
     
-    func getAllCommentFilterUsageLiveData(name: String) -> AnyPublisher<[CommentFilterUsage], Error> {
+    func getAllCommentFilterUsageLiveData(commentFilterId: Int) -> AnyPublisher<[CommentFilterUsage], Error> {
         ValueObservation
             .tracking { db in
-                try CommentFilterUsage.fetchAll(db, sql: "SELECT * FROM comment_filter_usage WHERE name = ?", arguments: [name])
+                try CommentFilterUsage.fetchAll(db, sql: "SELECT * FROM comment_filter_usage WHERE comment_filter_id = ?", arguments: [commentFilterId])
             }
             .publisher(in: dbPool)
             .eraseToAnyPublisher()

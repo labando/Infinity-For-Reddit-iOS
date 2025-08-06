@@ -83,9 +83,6 @@
     "Comment" : {
 
     },
-    "Comment Filter" : {
-
-    },
     "Comment Toolbar Hidden by Default" : {
 
     },
@@ -447,6 +444,9 @@
 
     },
     "Start by applying your post filter somewhere" : {
+
+    },
+    "Start by creating a comment filter" : {
 
     },
     "Start by creating a post filter" : {

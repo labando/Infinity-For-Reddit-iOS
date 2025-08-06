@@ -123,6 +123,14 @@ struct CustomNavigationStack<Content: View>: View {
                     case .commentFilter:
                         CommentFilterSettingsView()
                             .environmentObject(navigationManager)
+                    case .createOrEditCommentFilter(let commentFilter):
+//                        CustomizeCommentFilterView(commentFilter)
+//                            .environmentObject(navigationManager)
+                        EmptyView()
+                    case .commentFilterUsageListing(let commentFilterId):
+//                        CommentFilterUsageListingView(commentFilterId: commentFilterId)
+//                            .environmentObject(navigationManager)
+                        EmptyView()
                     case .sortType:
                         EmptyView()
                     case .downloadLocation:

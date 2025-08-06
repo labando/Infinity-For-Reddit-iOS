@@ -37,13 +37,13 @@ struct CommentFilterDao {
     
     func deleteCommentFilter(commentFilter: CommentFilter) throws {
         try dbPool.write { db in
-            try db.execute(sql: "DELETE FROM comment_filter WHERE name = ?", arguments: [commentFilter.name])
+            try db.execute(sql: "DELETE FROM comment_filter WHERE id = ?", arguments: [commentFilter.id])
         }
     }
     
-    func deleteCommentFilter(name: String) throws {
+    func deleteCommentFilter(id: Int) throws {
         try dbPool.write { db in
-            try db.execute(sql: "DELETE FROM comment_filter WHERE name = ?", arguments: [name])
+            try db.execute(sql: "DELETE FROM comment_filter WHERE id = ?", arguments: [id])
         }
     }
     

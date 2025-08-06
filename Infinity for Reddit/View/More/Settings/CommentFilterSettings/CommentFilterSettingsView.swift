@@ -1,5 +1,5 @@
 //
-// PostFilterSettingsView.swift
+// CommentFilterSettingsView.swift
 // Infinity for Reddit
 //
 // Created by joeylr2042 on 2024-12-04
@@ -9,28 +9,28 @@ import SwiftUI
 import Swinject
 import GRDB
 
-struct PostFilterSettingsView: View {
+struct CommentFilterSettingsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
-    @StateObject var postFilterViewModel: PostFilterViewModel
-    @State private var selectedPostFilter: PostFilter?
+    @StateObject var commentFilterViewModel: CommentFilterViewModel
+    @State private var selectedCommentFilter: CommentFilter?
     @State private var navigationBarMenuKey: UUID?
     
-    @State private var showPostFilterOptionSheet: Bool = false
+    @State private var showCommentFilterOptionSheet: Bool = false
     
     init() {
-        _postFilterViewModel = StateObject(
-            wrappedValue: PostFilterViewModel(
-                postFilterRepository: PostFilterRepository()
+        _commentFilterViewModel = StateObject(
+            wrappedValue: .init(
+                commentFilterRepository: CommentFilterRepository()
             )
         )
     }
     
     var body: some View {
         Group {
-            if postFilterViewModel.postFilters.isEmpty {
+            if commentFilterViewModel.commentFilters.isEmpty {
                 VStack(spacing: 0) {
                     InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")
                     
@@ -42,7 +42,7 @@ struct PostFilterSettingsView: View {
                         SwiftUI.Image(systemName: "plus.circle")
                             .primaryIcon()
                         
-                        Text("Start by creating a post filter")
+                        Text("Start by creating a comment filter")
                             .primaryIcon()
                         
                         Spacer()
@@ -50,7 +50,7 @@ struct PostFilterSettingsView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter())
+                        navigationManager.path.append(SettingsViewNavigation.createOrEditCommentFilter())
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -62,14 +62,14 @@ struct PostFilterSettingsView: View {
                     Divider()
                         .listPlainItemNoInsets()
                     
-                    ForEach(postFilterViewModel.postFilters, id: \.id) { postFilter in
-                        PostFilterItemView(postFilter: postFilter) {
-                            selectedPostFilter = postFilter
-                            showPostFilterOptionSheet = true
+                    ForEach(commentFilterViewModel.commentFilters, id: \.id) { commentFilter in
+                        CommentFilterItemView(commentFilter: commentFilter) {
+                            selectedCommentFilter = commentFilter
+                            showCommentFilterOptionSheet = true
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
-                                postFilterViewModel.deletePostFilter(id: postFilter.id ?? -1)
+                                commentFilterViewModel.deleteCommentFilter(id: commentFilter.id ?? -1)
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }
@@ -82,25 +82,25 @@ struct PostFilterSettingsView: View {
             }
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Post Filter")
+        .addTitleToInlineNavigationBar("Comment Filter")
         .toolbar {
             Button("", systemImage: "plus") {
-                navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter())
+                navigationManager.path.append(SettingsViewNavigation.createOrEditCommentFilter())
             }
         }
-        .sheet(isPresented: $showPostFilterOptionSheet) {
+        .sheet(isPresented: $showCommentFilterOptionSheet) {
             PostOrCommentFilterOptionSheet(
                 onEditSelected: {
-                    if let postFilter = selectedPostFilter {
-                        navigationManager.path.append(SettingsViewNavigation.createOrEditPostFilter(postFilter: postFilter))
+                    if let commentFilter = selectedCommentFilter {
+                        navigationManager.path.append(SettingsViewNavigation.createOrEditCommentFilter(commentFilter: commentFilter))
                     }
                 }, onApplyToSelected: {
-                    if let postFilter = selectedPostFilter, let id = postFilter.id {
-                        navigationManager.path.append(SettingsViewNavigation.postFilterUsageListing(postFilterId: id))
+                    if let commentFilter = selectedCommentFilter, let id = commentFilter.id {
+                        navigationManager.path.append(SettingsViewNavigation.commentFilterUsageListing(commentFilterId: id))
                     }
                 }, onDeleteSelected: {
-                    if let postFilter = selectedPostFilter, let id = postFilter.id {
-                        postFilterViewModel.deletePostFilter(id: id)
+                    if let commentFilter = selectedCommentFilter, let id = commentFilter.id {
+                        commentFilterViewModel.deleteCommentFilter(id: id)
                     }
                 }
             )

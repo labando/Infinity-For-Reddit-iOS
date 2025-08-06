@@ -1,5 +1,5 @@
 //
-//  PostFilterOptionSheet.swift
+//  PostOrCommentFilterOptionSheet.swift
 //  Infinity for Reddit
 //
 //  Created by Docile Alligator on 2025-08-03.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PostFilterOptionSheet: View {
+struct PostOrCommentFilterOptionSheet: View {
     @Environment(\.dismiss) var dismiss
     
     var onEditSelected: () -> Void

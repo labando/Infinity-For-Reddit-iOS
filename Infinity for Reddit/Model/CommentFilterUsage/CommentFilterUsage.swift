@@ -7,22 +7,49 @@
 
 import GRDB
 
-struct CommentFilterUsage: Codable, FetchableRecord, PersistableRecord {
+struct CommentFilterUsage: Codable, FetchableRecord, PersistableRecord, Hashable {
     static let databaseTableName: String = "comment_filter_usage"
-    static let SUBREDDIT_TYPE = 1
+    
+    enum UsageType: Int, Codable {
+        case subreddit = 1
+        
+        var description: String {
+            switch self {
+            case .subreddit:
+                return "Subreddit"
+            }
+        }
+        
+        var textFieldPlaceholder: String {
+            switch self {
+            case .subreddit:
+                return "Subreddit Name (Without r/ prefix)"
+            }
+        }
+    }
 
-    var name: String
-    var usage: Int
+    var commentFilterId: Int
+    var usageType: UsageType
     var nameOfUsage: String
+    
+    var description: String {
+        switch self.usageType {
+        case .subreddit:
+            if nameOfUsage == PostFilterUsage.NO_USAGE {
+                return "All subreddits"
+            }
+            return "r/" + nameOfUsage
+        }
+    }
 
-    init(name: String, usage: Int, nameOfUsage: String) {
-        self.name = name
-        self.usage = usage
+    init(commentFilterId: Int, usageType: UsageType, nameOfUsage: String) {
+        self.commentFilterId = commentFilterId
+        self.usageType = usageType
         self.nameOfUsage = nameOfUsage
     }
 
     private enum CodingKeys: String, CodingKey, ColumnExpression {
-        case name, usage, nameOfUsage = "name_of_usage"
+        case commentFilterId = "comment_filter_id", usageType = "usage_type", nameOfUsage = "name_of_usage"
     }
 }
 

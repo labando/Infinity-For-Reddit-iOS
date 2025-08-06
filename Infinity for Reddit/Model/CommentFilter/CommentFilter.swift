@@ -7,9 +7,10 @@
 
 import GRDB
 
-struct CommentFilter: Codable, FetchableRecord, PersistableRecord {
+struct CommentFilter: Codable, FetchableRecord, PersistableRecord, Hashable {
     static let databaseTableName = "comment_filter"
 
+    var id: Int?
     var name: String = "New Filter"
 
     var displayMode: Int = 0
@@ -22,7 +23,7 @@ struct CommentFilter: Codable, FetchableRecord, PersistableRecord {
     init() { }
 
     private enum CodingKeys: String, CodingKey, ColumnExpression {
-        case name, displayMode = "display_mode", maxVote = "max_vote",
+        case id, name, displayMode = "display_mode", maxVote = "max_vote",
              minVote = "min_vote", excludeStrings = "exclude_strings",
              excludeUsers = "exclude_users"
     }
