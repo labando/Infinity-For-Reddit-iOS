@@ -52,4 +52,82 @@ public struct CommentFilter: Codable, FetchableRecord, PersistableRecord, Hashab
              minVote = "min_vote", excludeStrings = "exclude_strings",
              excludeUsers = "exclude_users"
     }
+    
+    static func mergeCommentFilter(_ commentFilterList: [CommentFilter]) -> CommentFilter {
+        guard commentFilterList.count > 1 else {
+            return commentFilterList.first!
+        }
+
+        var commentFilter = CommentFilter()
+        commentFilter.name = "Merged"
+
+        for c in commentFilterList {
+            // It seems odd but it works lol
+            commentFilter.displayMode = DisplayMode(rawValue: max(c.displayMode.rawValue, commentFilter.displayMode.rawValue)) ?? .collapseComment
+            commentFilter.maxVote = min(c.maxVote, commentFilter.maxVote)
+            commentFilter.minVote = max(c.minVote, commentFilter.minVote)
+
+            if let excludeStrings = c.excludeStrings, !excludeStrings.isEmpty {
+                commentFilter.excludeStrings = [
+                    commentFilter.excludeStrings ?? "",
+                    excludeStrings
+                ]
+                .filter { !$0.isEmpty }
+                .joined(separator: ",")
+            }
+
+            if let excludeUsers = c.excludeUsers, !excludeUsers.isEmpty {
+                commentFilter.excludeUsers = [
+                    commentFilter.excludeUsers ?? "",
+                    excludeUsers
+                ]
+                .filter { !$0.isEmpty }
+                .joined(separator: ",")
+            }
+        }
+
+        return commentFilter
+    }
+    
+    static func isCommentAllowed(_ comment: Comment, _ commentFilter: CommentFilter?) -> Bool {
+        guard let commentFilter = commentFilter else {
+            return true
+        }
+        
+        if commentFilter.maxVote != -1,
+           comment.likes + comment.score > commentFilter.maxVote {
+            return false
+        }
+        
+        if commentFilter.minVote != -1,
+           comment.likes + comment.score < commentFilter.minVote {
+            return false
+        }
+        
+        if let excludeStrings = commentFilter.excludeStrings,
+           !excludeStrings.isEmpty {
+            let titles = excludeStrings.split(separator: ",", omittingEmptySubsequences: false)
+            for t in titles {
+                let trimmed = t.trimmingCharacters(in: .whitespaces)
+                if !trimmed.isEmpty,
+                   comment.bodyHtml.lowercased().contains(trimmed.lowercased()) {
+                    return false
+                }
+            }
+        }
+        
+        if let excludeUsers = commentFilter.excludeUsers,
+           !excludeUsers.isEmpty {
+            let users = excludeUsers.split(separator: ",", omittingEmptySubsequences: false)
+            for u in users {
+                let trimmed = u.trimmingCharacters(in: .whitespaces)
+                if !trimmed.isEmpty,
+                   comment.author.caseInsensitiveCompare(trimmed) == .orderedSame {
+                    return false
+                }
+            }
+        }
+        
+        return true
+    }
 }

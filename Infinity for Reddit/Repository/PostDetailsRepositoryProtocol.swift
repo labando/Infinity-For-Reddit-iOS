@@ -12,5 +12,6 @@ public protocol PostDetailsRepositoryProtocol {
     func fetchComments(postId: String, queries: [String: String]) async throws -> PostDetailsRootClass
     func fetchCommentsSingleThread(postId: String, commentId: String, queries: [String: String]) async throws -> PostDetailsRootClass
     func fetchMoreCommentsForCommentMore(params: [String: String]) async throws -> MoreChildren
+    func fetchCommentFilter(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) -> CommentFilter
     func loadPostIcon(post: Post, isFromSubredditPostListing: Bool) async throws
 }

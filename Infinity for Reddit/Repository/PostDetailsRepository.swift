@@ -19,6 +19,7 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
     
     private let session: Session
     private let subredditDao: SubredditDao
+    private let commentFilterDao: CommentFilterDao
     
     public init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
@@ -29,6 +30,7 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         }
         self.session = resolvedSession
         self.subredditDao = SubredditDao(dbPool: resolvedDBPool)
+        self.commentFilterDao = CommentFilterDao(dbPool: resolvedDBPool)
     }
     
     public func fetchComments(
@@ -103,11 +105,20 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
             throw PostDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        let moreChildren = try MoreChildren(fromJson: json)
+        let moreChildren = MoreChildren(fromJson: json)
         moreChildren.makeCommentList()
         print(moreChildren.commentItems.count)
         
         return moreChildren
+    }
+    
+    public func fetchCommentFilter(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) -> CommentFilter {
+        do {
+            let commentFilters = try commentFilterDao.getValidCommentFilters(usageType: usageType, nameOfUsage: nameOfUsage)
+            return CommentFilter.mergeCommentFilter(commentFilters)
+        } catch {
+            return CommentFilter()
+        }
     }
     
     public func loadPostIcon(post: Post, isFromSubredditPostListing: Bool) async throws {
@@ -115,7 +126,7 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         
         guard post.subredditOrUserIconInPostDetails == nil else { return }
         
-        if "u/\(post.author)" == post.subredditNamePrefixed {
+        if "u/\(post.author ?? "")" == post.subredditNamePrefixed {
             // User's own subreddit
             try await loadUserIcon(post: post)
         } else {

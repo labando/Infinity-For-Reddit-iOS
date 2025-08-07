@@ -29,6 +29,7 @@ public class PostDetailsViewModel: ObservableObject {
     private var commentMore: CommentMore?
     private var after: String? = nil
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
+    private var commentFilter: CommentFilter?
     
     public let postDetailsRepository: PostDetailsRepositoryProtocol
     
@@ -60,7 +61,7 @@ public class PostDetailsViewModel: ObservableObject {
                     self.post = post
                 }
                 await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil)
-            case .postAndCommentId(let postId, let commentId):
+            case .postAndCommentId:
                 await fetchPostAndComments(isRefreshWithContinuation: refreshPostsContinuation != nil, shouldLoadPost: true)
             }
         } else {
@@ -112,7 +113,12 @@ public class PostDetailsViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
+            if commentFilter == nil {
+                fetchCommentFilter()
+            }
+            
             let processedComments = postProcessComments(postDetails.comments)
+            let commentsToBeAppendedToVisibleComments = pickVisibleComments(processedComments)
             
             try Task.checkCancellation()
             
@@ -125,10 +131,9 @@ public class PostDetailsViewModel: ObservableObject {
                     self.visibleComments.removeAll()
                     self.allComments.removeAll()
                 }
-                self.visibleComments.append(contentsOf: processedComments)
+                self.visibleComments.append(contentsOf: commentsToBeAppendedToVisibleComments)
                 self.allComments.append(contentsOf: processedComments)
                 
-                printDuplicateCommentIDs(in: visibleComments)
                 hasMoreComments = postDetails.commentListing.commentMore?.children.isEmpty == false
                 
                 self.isInitialLoading = false
@@ -164,6 +169,10 @@ public class PostDetailsViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
+            if commentFilter == nil {
+                fetchCommentFilter()
+            }
+            
             let processedComments = postProcessComments(moreChildren.commentItems)
             
             try Task.checkCancellation()
@@ -185,6 +194,42 @@ public class PostDetailsViewModel: ObservableObject {
             }
             print("Error fetching more comments for CommentMore: \(error)")
         }
+    }
+    
+    func pickVisibleComments(_ allCommentItems: [CommentItem]) -> [CommentItem] {
+        var result: [CommentItem] = []
+        var lastCollapsedDepth: Int? = nil
+        allCommentItems.forEach { commentItem in
+            switch commentItem {
+            case .comment(let comment):
+                if comment.isCollasped {
+                    lastCollapsedDepth = comment.depth
+                } else {
+                    if let depth = lastCollapsedDepth {
+                        if depth > comment.depth {
+                            // Child comment
+                            comment.isCollasped = true
+                        } else {
+                            lastCollapsedDepth = nil
+                            result.append(commentItem)
+                        }
+                    } else {
+                        result.append(commentItem)
+                    }
+                }
+            case .more:
+                if let depth = lastCollapsedDepth {
+                    if depth <= commentItem.depth {
+                        // Child CommentMore
+                        result.append(commentItem)
+                    }
+                } else {
+                    result.append(commentItem)
+                }
+            }
+        }
+        
+        return result
     }
     
     @MainActor
@@ -222,37 +267,30 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     func postProcessComments(_ comments: [CommentItem]) -> [CommentItem] {
-        return comments.map {
-            if case .comment(let comment) = $0 {
-                modifyCommentBody(comment)
-                comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
+        return comments.compactMap {
+            switch $0 {
+            case .comment(let comment):
+                let isCommentAllowed = CommentFilter.isCommentAllowed(comment, commentFilter)
+                if isCommentAllowed {
+                    print("Comment allowed")
+                    modifyCommentBody(comment)
+                    comment.bodyProcessedMarkdown = MarkdownContent(comment.body)
+                    return $0
+                } else if commentFilter?.displayMode == .collapseComment {
+                    print("Comment collapsed")
+                    comment.collapsed = true
+                    return $0
+                }
+                print("Comment not allowed")
+                return nil
+            default:
+                return $0
             }
-            return $0
         }
     }
     
     func modifyCommentBody(_ comment: Comment) {
         MarkdownUtils.parseRedditImagesBlock(comment)
-    }
-    
-    func printDuplicateCommentIDs(in comments: IdentifiedArrayOf<CommentItem>) {
-        var seen: Set<String> = []
-        var duplicates: Set<String> = []
-
-        for comment in comments {
-            if !seen.insert(comment.id).inserted {
-                duplicates.insert(comment.id)
-            }
-        }
-
-        if duplicates.isEmpty {
-            print("✅ No duplicate comment IDs found.")
-        } else {
-            print("❌ Duplicate comment IDs found:")
-            for id in duplicates {
-                print(" - \(id)")
-            }
-        }
     }
     
     public func collapseComments(comment: Comment) {
@@ -313,6 +351,10 @@ public class PostDetailsViewModel: ObservableObject {
         }
         
         comment.isCollasped = false
+    }
+    
+    func fetchCommentFilter() {
+        self.commentFilter = postDetailsRepository.fetchCommentFilter(usageType: .subreddit, nameOfUsage: post?.subreddit ?? "")
     }
     
     public func loadIcon(comment: Comment) {

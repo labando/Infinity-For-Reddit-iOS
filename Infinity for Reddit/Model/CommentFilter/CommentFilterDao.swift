@@ -78,7 +78,7 @@ struct CommentFilterDao {
         }
     }
     
-    func getValidCommentFilters(usage: Int, nameOfUsage: String) throws -> [CommentFilter] {
+    func getValidCommentFilters(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) throws -> [CommentFilter] {
         try dbPool.read { db in
             let sql = """
                 SELECT * FROM comment_filter WHERE (comment_filter.name IN 
@@ -87,7 +87,7 @@ struct CommentFilterDao {
                 OR (comment_filter.name NOT IN 
                     (SELECT comment_filter_usage.name FROM comment_filter_usage))
             """
-            return try CommentFilter.fetchAll(db, sql: sql, arguments: [usage, nameOfUsage])
+            return try CommentFilter.fetchAll(db, sql: sql, arguments: [usageType.rawValue, nameOfUsage])
         }
     }
     

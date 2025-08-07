@@ -75,10 +75,8 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     public func fetchPostFilter(postListingType: PostListingType) -> PostFilter {
         do {
             let postFilters = try postFilterDao.getValidPostFilters(usage: postListingType.postFilterUsageType.rawValue, nameOfUsage: postListingType.postFilterNameOfUsage)
-            // TODO get allow nsfw
             return PostFilter.mergePostFilter(postFilters)
         } catch {
-            // TODO get allow nsfw
             return PostFilter()
         }
     }
