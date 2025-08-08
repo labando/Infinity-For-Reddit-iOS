@@ -8,7 +8,7 @@
 import Foundation
 import SwiftyJSON
 
-class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
+class MediaMetadata : NSObject, ObservableObject, Identifiable {
     
     static let imageType = "Image"
     static let gifType = "AnimatedImage"
@@ -32,8 +32,6 @@ class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
     var dashUrl: String!
     var hlsUrl: String!
     var isGif: Bool!
-    
-    
     
     /**
      * Instantiate the instance using the passed json values to set the properties values
@@ -61,112 +59,6 @@ class MediaMetadata : NSObject, NSCoding, ObservableObject, Identifiable {
         hlsUrl = json["hlsUrl"].stringValue
         isGif = json["isGif"].boolValue
     }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if e != nil{
-            dictionary["e"] = e
-        }
-        if id != nil{
-            dictionary["id"] = id
-        }
-        if m != nil{
-            dictionary["m"] = m
-        }
-        if p != nil{
-            var dictionaryElements = [[String:Any]]()
-            for pElement in p {
-                dictionaryElements.append(pElement.toDictionary())
-            }
-            dictionary["p"] = dictionaryElements
-        }
-        if s != nil{
-            dictionary["s"] = s.toDictionary()
-        }
-        if status != nil{
-            dictionary["status"] = status
-        }
-        if x != nil {
-            dictionary["x"] = x
-        }
-        if y != nil {
-            dictionary["y"] = y
-        }
-        if dashUrl != nil {
-            dictionary["dashUrl"] = dashUrl
-        }
-        if hlsUrl != nil {
-            dictionary["hlsUrl"] = hlsUrl
-        }
-        if isGif != nil {
-            dictionary["isGif"] = isGif
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        e = aDecoder.decodeObject(forKey: "e") as? String
-        id = aDecoder.decodeObject(forKey: "id") as? String
-        m = aDecoder.decodeObject(forKey: "m") as? String
-        p = aDecoder.decodeObject(forKey: "p") as? [MediaMetadataPreview]
-        s = aDecoder.decodeObject(forKey: "s") as? MediaMetadataSource
-        status = aDecoder.decodeObject(forKey: "status") as? String
-        x = aDecoder.decodeObject(forKey: "x") as? Int
-        y = aDecoder.decodeObject(forKey: "y") as? Int
-        dashUrl = aDecoder.decodeObject(forKey: "dashUrl") as? String
-        hlsUrl = aDecoder.decodeObject(forKey: "hlsUrl") as? String
-        isGif = aDecoder.decodeObject(forKey: "isGif") as? Bool
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    func encode(with aCoder: NSCoder)
-    {
-        if e != nil{
-            aCoder.encode(e, forKey: "e")
-        }
-        if id != nil{
-            aCoder.encode(id, forKey: "id")
-        }
-        if m != nil{
-            aCoder.encode(m, forKey: "m")
-        }
-        if p != nil{
-            aCoder.encode(p, forKey: "p")
-        }
-        if s != nil{
-            aCoder.encode(s, forKey: "s")
-        }
-        if status != nil{
-            aCoder.encode(status, forKey: "status")
-        }
-        if x != nil{
-            aCoder.encode(x, forKey: "x")
-        }
-        if y != nil{
-            aCoder.encode(y, forKey: "y")
-        }
-        if dashUrl != nil{
-            aCoder.encode(dashUrl, forKey: "dashUrl")
-        }
-        if hlsUrl != nil{
-            aCoder.encode(hlsUrl, forKey: "hlsUrl")
-        }
-        if isGif != nil{
-            aCoder.encode(isGif, forKey: "isGif")
-        }
-    }
 }
 
 class MediaMetadataPreview : NSObject, NSCoding, ObservableObject, Identifiable {
@@ -177,6 +69,9 @@ class MediaMetadataPreview : NSObject, NSCoding, ObservableObject, Identifiable 
     var x : Int!
     //Height
     var y : Int!
+    var aspectRatio : CGSize {
+        return CGSize(width: x, height: y)
+    }
     
     
     /**

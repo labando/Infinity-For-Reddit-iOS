@@ -256,6 +256,9 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
             } else {
                 KFImage(URL(string: urlString!))
                     .resizable()
+                    .placeholder { progress in
+                        ProgressIndicator()
+                    }
                     .onSuccess { result in
                         print("Image loaded from cache: \(result.cacheType)")
                     }

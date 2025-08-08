@@ -39,10 +39,14 @@ struct GalleryFullScreenView: View {
             TabView(selection: $galleryScrollState.scrollId) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
                     if let media = mediaMetadata[item.mediaId], let preview = media.p.last {
-                        CustomWebImage(preview.u, handleImageTapGesture: false)
-                            .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                            .tag(index)
-                            .offset(y: currentDragOffset)
+                        CustomWebImage(
+                            preview.u,
+                            aspectRatio: preview.aspectRatio,
+                            handleImageTapGesture: false
+                        )
+                        .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                        .tag(index)
+                        .offset(y: currentDragOffset)
                     }
                 }
             }
