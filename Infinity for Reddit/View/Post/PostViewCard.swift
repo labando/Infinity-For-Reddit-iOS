@@ -174,11 +174,7 @@ struct PostViewCard: View {
                             aspectRatio: preview.images[0].source.aspectRatio,
                             matchedGeometryEffectId: UUID().uuidString,
                             post: postViewModel.post,
-                            blur: (postViewModel.post.over18 && blurSensitiveImages) || (postViewModel.post.spoiler && blurSpoilerImages),
-                            placeholderView: {
-                                Spacer()
-                                    .frame(width: geo.size.width, height: CGFloat(geo.size.width) / (CGFloat(preview.images[0].source.width) / CGFloat(preview.images[0].source.height)))
-                            }
+                            blur: (postViewModel.post.over18 && blurSensitiveImages) || (postViewModel.post.spoiler && blurSpoilerImages)
                         )
                         //.id(url)
                         
