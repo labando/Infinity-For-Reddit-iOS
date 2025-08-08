@@ -23,8 +23,12 @@ struct HomeView: View {
     @StateObject private var tab4NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
     @StateObject private var tab5NavigationBarMenuManager: NavigationBarMenuManager = NavigationBarMenuManager()
     
+    @StateObject private var homeViewModel = HomeViewModel()
+    
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
+    
+    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     @Namespace private var animation
     
@@ -77,6 +81,7 @@ struct HomeView: View {
                         Label("Inbox", systemImage: "envelope")
                     }
                     .tag(Tab.inbox)
+                    .badge(homeViewModel.hasNewMessages ? "!" : nil)
                     .environmentObject(tab3NavigationBarMenuManager)
                     
                     CustomNavigationStack {
@@ -113,6 +118,13 @@ struct HomeView: View {
                 print(docsDir)
             }
             .id(accountViewModel.account.username)
+            .onChange(of: selectedTab) { _, newTab in
+                print("Tab selection changed to: \(newTab)")
+                
+                if newTab == .inbox {
+                    homeViewModel.userViewedInbox()
+                }
+            }
             
             if let media = fullScreenMediaViewModel.media {
                 if case let .image(urlString, aspectRatio, post, matchedGeometryEffectId) = media {
@@ -133,6 +145,14 @@ struct HomeView: View {
                         .id(UUID())
                     }
                 }
+            }
+        }
+        .task {
+            await homeViewModel.refreshInbox()
+        }
+        .onReceive(timer) { _ in
+            Task {
+                await homeViewModel.refreshInbox()
             }
         }
         .onChange(of: colorScheme) {
