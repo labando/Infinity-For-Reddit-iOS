@@ -142,7 +142,7 @@ struct CommentViewCard: View {
                             SwiftUI.Image(systemName: "chevron.up")
                                 .commentIconTemplateRendering()
                                 .commentIcon()
-                                .rotationEffect(.degrees(commentViewModel.comment.isCollasped ? 0 : 180))
+                                .rotationEffect(.degrees(commentViewModel.comment.isCollasped ? 180 : 0))
                                 .animation(.easeInOut(duration: 0.25), value: commentViewModel.comment.isCollasped)
                         }
                         .padding(.trailing, 16)

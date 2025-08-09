@@ -59,11 +59,13 @@ struct SubscriptionsView: View {
         
         var body: some View {
             Group {
-                if subscriptionListingViewModel.isLoadingSubscriptions {
-                    ProgressIndicator()
-                } else if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
-                    Text("No subscribed subreddits")
-                        .primaryText()
+                if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
+                    if subscriptionListingViewModel.isLoadingSubscriptions {
+                        ProgressIndicator()
+                    } else {
+                        Text("No subscribed subreddits")
+                            .primaryText()
+                    }
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
@@ -86,11 +88,13 @@ struct SubscriptionsView: View {
         
         var body: some View {
             Group {
-                if subscriptionListingViewModel.isLoadingSubscriptions {
-                    ProgressIndicator()
-                } else if subscriptionListingViewModel.userSubscriptions.isEmpty {
-                    Text("No subscribed users")
-                        .primaryText()
+                if subscriptionListingViewModel.userSubscriptions.isEmpty {
+                    if subscriptionListingViewModel.isLoadingSubscriptions {
+                        ProgressIndicator()
+                    } else {
+                        Text("No subscribed users")
+                            .primaryText()
+                    }
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
@@ -113,11 +117,13 @@ struct SubscriptionsView: View {
         
         var body: some View {
             Group {
-                if subscriptionListingViewModel.isLoadingMyCustomFeeds {
-                    ProgressIndicator()
-                } else if subscriptionListingViewModel.myCustomFeeds.isEmpty {
-                    Text("No custom feeds")
-                        .primaryText()
+                if subscriptionListingViewModel.myCustomFeeds.isEmpty {
+                    if subscriptionListingViewModel.isLoadingMyCustomFeeds {
+                        ProgressIndicator()
+                    } else {
+                        Text("No custom feeds")
+                            .primaryText()
+                    }
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
