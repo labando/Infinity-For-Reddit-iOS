@@ -48,14 +48,13 @@ class SubredditDetailsViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            try await subredditDetailsRepository.subsribeSubreddit(subredditName: subredditName, action: action)
+            if !AccountViewModel.shared.account.isAnonymous() {
+                try await subredditDetailsRepository.subsribeSubreddit(subredditName: subredditName, action: action)
+            }
             
             try Task.checkCancellation()
             
             let subscribedSubredditDao = SubscribedSubredditDao(dbPool: dbPool)
-            guard !AccountViewModel.shared.account.isAnonymous() else {
-                return
-            }
             if action == "unsub" {
                 try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditName, accountName: AccountViewModel.shared.account.username)
                 //                print(try subscribedSubredditDao.getSubscribedSubreddit(subredditName: subredditName, accountName: AccountViewModel.shared.account.username) == nil)

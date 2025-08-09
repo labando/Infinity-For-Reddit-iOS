@@ -47,6 +47,8 @@ struct RedditGRDBDatabase {
                 t.column("created_utc", .double)
             }
             
+            try Account.ANONYMOUS_ACCOUNT.insert(db, onConflict: .ignore)
+            
             try db.create(table: PostFilter.databaseTableName, ifNotExists: true) { t in
                 t.autoIncrementedPrimaryKey("id")
                 t.column("name", .text)
