@@ -43,6 +43,29 @@ struct CustomizeCommentFilterView: View {
             
             FilledCardView {
                 VStack(spacing: 16) {
+                    Text("Filtered out comments will be shown as the following selected option.")
+                        .primaryText()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Picker("", selection: $customizeCommentFilterViewModel.displayMode) {
+                        Text("Remove")
+                            .primaryText()
+                            .tag(CommentFilter.DisplayMode.removeComment)
+                        
+                        Text("Fully collapse")
+                            .primaryText()
+                            .tag(CommentFilter.DisplayMode.collapseComment)
+                    }
+                    .pickerStyle(.segmented)
+                }
+                .padding(16)
+            }
+            .listPlainItemNoInsets()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            
+            FilledCardView {
+                VStack(spacing: 16) {
                     Text("Comments will be filtered out if they contain the following keywords.")
                         .primaryText()
                         .frame(maxWidth: .infinity, alignment: .leading)
