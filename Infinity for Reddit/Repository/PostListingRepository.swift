@@ -47,7 +47,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             apiRequest = RedditOAuthAPI.getFrontPagePosts(pathComponents: pathComponents!, queries: queries!)
         case .subreddit:
             apiRequest = RedditOAuthAPI.getSubredditPosts(pathComponents: pathComponents!, queries: queries!)
-        case .user(let username, let userWhere):
+        case .user:
             apiRequest = RedditOAuthAPI.getUserPosts(pathComponents: pathComponents!, queries: queries!)
         case .search:
             apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
@@ -100,7 +100,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         guard post.subredditOrUserIcon == nil else { return }
         
         if displaySubredditIcon {
-            if "u/\(post.author)" == post.subredditNamePrefixed {
+            if "u/\(post.author ?? "")" == post.subredditNamePrefixed {
                 // User's own subreddit
                 if subredditOrUserIcons[post.author] != nil {
                     await MainActor.run {

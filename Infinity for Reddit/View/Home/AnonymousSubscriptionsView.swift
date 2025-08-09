@@ -42,9 +42,6 @@ struct AnonymousSubscriptionsView: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .navigationTitle("Subscriptions")
-        .onDisappear {
-            anonymousSubscriptionListingViewModel.cancelAllCancellables()
-        }
     }
     
     struct AnonymousSubredditsView: View {

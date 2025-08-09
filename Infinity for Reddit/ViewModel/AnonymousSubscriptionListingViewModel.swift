@@ -117,8 +117,4 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     public func setSearchQuery(_ query: String) {
         searchQueryPublisher.send(query)
     }
-    
-    public func cancelAllCancellables() {
-        cancellables.forEach { $0.cancel() }
-    }
 }

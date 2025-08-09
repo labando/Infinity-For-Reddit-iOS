@@ -426,8 +426,4 @@ public class SubscriptionListingViewModel: ObservableObject {
             print("Error updating my custom feeds: \(error)")
         }
     }
-    
-    public func cancelAllCancellables() {
-        cancellables.forEach { $0.cancel() }
-    }
 }

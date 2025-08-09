@@ -11,6 +11,7 @@ import GRDB
 import Alamofire
 
 struct SubscriptionsView: View {
+    @EnvironmentObject private var accountViewModel: AccountViewModel
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
@@ -47,9 +48,6 @@ struct SubscriptionsView: View {
         .task {
             await subscriptionListingViewModel.loadSubscriptionsOnline()
             await subscriptionListingViewModel.loadMyCustomFeedsOnline()
-        }
-        .onDisappear {
-            subscriptionListingViewModel.cancelAllCancellables()
         }
     }
     
