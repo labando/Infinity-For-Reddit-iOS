@@ -67,8 +67,11 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
-                            SimpleWebImageTouchItemRow(text: subscription.name, iconUrl: subscription.iconUrl) {
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.favorite, action: {
                                 navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                            }) {
+                                subscription.favorite.toggle()
+                                subscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
                             }
                             .listPlainItemNoInsets()
                         }
@@ -96,8 +99,11 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
-                            SimpleWebImageTouchItemRow(text: subscription.name, iconUrl: subscription.iconUrl) {
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.favorite, action: {
                                 navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                            }) {
+                                subscription.favorite.toggle()
+                                subscriptionListingViewModel.toggleFavoriteUser(subscription)
                             }
                             .listPlainItemNoInsets()
                         }
@@ -125,8 +131,11 @@ struct SubscriptionsView: View {
                 } else {
                     List {
                         ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
-                            SimpleWebImageTouchItemRow(text: customFeed.displayName, iconUrl: customFeed.iconUrl) {
+                            SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                 navigationManager.path.append(AppNavigation.customFeed(myCustomFeed: customFeed))
+                            }) {
+                                customFeed.isFavorite.toggle()
+                                subscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
                             }
                             .listPlainItemNoInsets()
                         }

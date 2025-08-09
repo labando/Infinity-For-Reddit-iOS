@@ -32,7 +32,7 @@ public class SubscriptionListingViewModel: ObservableObject {
     private let userSubscriptionsPublisher: AnyPublisher<[SubscribedUserData], Error>
     private let myCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
-    public let subscriptionListingRepository: SubscriptionListingRepositoryProtocol
+    private let subscriptionListingRepository: SubscriptionListingRepositoryProtocol
     
     // MARK: - Initializer
     init(subscriptionListingRepository: SubscriptionListingRepositoryProtocol) {
@@ -424,6 +424,24 @@ public class SubscriptionListingViewModel: ObservableObject {
             }
         } catch {
             print("Error updating my custom feeds: \(error)")
+        }
+    }
+    
+    func toggleFavoriteSubreddit(_ subscribedSubreddit: SubscribedSubredditData) {
+        if !subscriptionListingRepository.toggleFavoriteSubreddit(subscribedSubreddit) {
+            // TODO handle error
+        }
+    }
+    
+    func toggleFavoriteUser(_ subscribedUser: SubscribedUserData) {
+        if !subscriptionListingRepository.toggleFavoriteUser(subscribedUser) {
+            // TODO handle error
+        }
+    }
+    
+    func toggleFavoriteCustomFeed(_ myCustomFeed: MyCustomFeed) {
+        if !subscriptionListingRepository.toggleFavoriteCustomFeed(myCustomFeed) {
+            // TODO handle error
         }
     }
 }

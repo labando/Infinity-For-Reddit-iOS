@@ -8,7 +8,10 @@
 import Combine
 import Alamofire
 
-public protocol SubscriptionListingRepositoryProtocol {
+protocol SubscriptionListingRepositoryProtocol {
     func fetchSubscriptions(queries: [String: String]) async throws -> SubscriptionListing
     func fetchMyCustomFeeds() async throws -> MyCustomFeedListing
+    func toggleFavoriteSubreddit(_ subscribedSubreddit: SubscribedSubredditData) -> Bool
+    func toggleFavoriteUser(_ subscribedUser: SubscribedUserData) -> Bool
+    func toggleFavoriteCustomFeed(_ customFeed: MyCustomFeed) -> Bool
 }
