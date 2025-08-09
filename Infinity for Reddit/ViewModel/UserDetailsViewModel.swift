@@ -62,17 +62,15 @@ class UserDetailsViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            try await userDetailsRepository.followUser(username: username, action: action)
+            if !AccountViewModel.shared.account.isAnonymous() {
+                try await userDetailsRepository.followUser(username: username, action: action)
+            }
             
             try Task.checkCancellation()
             
             let subscribedUserDao = SubscribedUserDao(dbPool: dbPool)
-            guard !AccountViewModel.shared.account.isAnonymous() else {
-                return
-            }
             if action == "unsub" {
                 try subscribedUserDao.deleteSubscribedUser(name: username, accountName: AccountViewModel.shared.account.username)
-//                print(try subscribedUserDao.getSubscribedUser(name: username, accountName: AccountViewModel.shared.account.username) == nil)
             } else {
                 if let userData = self.userData {
                     let subscribedUserData = SubscribedUserData(

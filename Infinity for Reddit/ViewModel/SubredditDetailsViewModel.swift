@@ -57,7 +57,6 @@ class SubredditDetailsViewModel: ObservableObject {
             let subscribedSubredditDao = SubscribedSubredditDao(dbPool: dbPool)
             if action == "unsub" {
                 try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditName, accountName: AccountViewModel.shared.account.username)
-                //                print(try subscribedSubredditDao.getSubscribedSubreddit(subredditName: subredditName, accountName: AccountViewModel.shared.account.username) == nil)
             } else {
                 if let subredditData = self.subredditData {
                     let subscribedSubredditData = SubscribedSubredditData(
