@@ -9,4 +9,5 @@ import Foundation
 
 public extension UserDefaults {
     static let contentSensitivityFilter = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.content_sensitivity_filter")!
+    static let interfaceCommentFilter = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.interface_comment")!
 }
