@@ -18,8 +18,6 @@ struct ContentSensitivityFilterSettingsView: View {
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForeverKey, store: .contentSensitivityFilter) private var disableSensitiveContentForever: Bool = false
     
-    @State var test: Bool = false
-    
     var body: some View {
         List {
             TogglePreference(isEnabled: $sensitiveContent, title: "Sensitive Content", icon: "figure.child.and.lock")
@@ -42,5 +40,6 @@ struct ContentSensitivityFilterSettingsView: View {
         }
         .themedList()
         .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Content Sensitivity Filter")
     }
 }

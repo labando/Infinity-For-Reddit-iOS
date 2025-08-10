@@ -38,9 +38,6 @@
     "All subreddits" : {
 
     },
-    "Always Show the Number of Child Comments" : {
-
-    },
     "AMOLED Dark" : {
 
     },
@@ -65,9 +62,6 @@
     "Click to Show Media in Gallery Layout" : {
 
     },
-    "Click to Show/Hide Comment Toolbar" : {
-
-    },
     "Collapse Account Section" : {
 
     },
@@ -87,9 +81,6 @@
 
     },
     "Comment" : {
-
-    },
-    "Comment Toolbar Hidden by Default" : {
 
     },
     "Comments submitted by the following users will be filtered out." : {
@@ -186,9 +177,6 @@
 
     },
     "Fully collapse" : {
-
-    },
-    "Fully Collapse Comment" : {
 
     },
     "Gallery" : {
@@ -440,13 +428,7 @@
     "Show Absolute Number of Votes" : {
 
     },
-    "Show Author Avatar" : {
-
-    },
     "Show Avatar on the Right" : {
-
-    },
-    "Show Comment Divider" : {
 
     },
     "Show Divider" : {
@@ -455,16 +437,7 @@
     "Show Elapsed Time in Posts and Comments" : {
 
     },
-    "Show Fewer Toolbar Options Starting From Level" : {
-
-    },
-    "Show Only One Comment Level Indicator" : {
-
-    },
     "Show Thumbnail on the Left" : {
-
-    },
-    "Show Top-level Comments First" : {
 
     },
     "Since:" : {
