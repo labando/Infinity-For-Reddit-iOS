@@ -26,9 +26,11 @@ public class InboxListingRepository: InboxListingRepositoryProtocol {
     
     public func fetchInboxListing(messageWhere: MessageWhere, pathComponents: [String : String], queries: [String : String]) async throws -> InboxListing {
         try Task.checkCancellation()
-        print("pathComponents: \(pathComponents)")
+        
+        var path = pathComponents
+        path["where"] = messageWhere.rawValue
         let response = try await self.session.request(
-            RedditOAuthAPI.getInbox(pathComponents: pathComponents, queries: queries)
+            RedditOAuthAPI.getInbox(pathComponents: path, queries: queries)
         )
         .validate()
         .serializingData()

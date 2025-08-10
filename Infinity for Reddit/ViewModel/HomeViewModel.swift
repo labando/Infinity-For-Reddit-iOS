@@ -53,7 +53,7 @@ class HomeViewModel: ObservableObject {
             do {
                 let inboxListingRepository = InboxListingRepository()
                 let messageWhere = MessageWhere.unread
-                let pathComponents: [String: String] = ["where": "\(messageWhere)"]
+                let pathComponents: [String: String] = [:]
                 let queries: [String: String] = ["limit": "50"]
                 let inboxListing = try await inboxListingRepository.fetchInboxListing(
                     messageWhere: messageWhere,
