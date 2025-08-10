@@ -93,6 +93,7 @@ struct HomeView: View {
                             Label("Inbox", systemImage: "envelope")
                         }
                         .tag(Tab.inbox)
+                        .badge(homeViewModel.hasNewMessages ? "!" : nil)
                         .environmentObject(tab3NavigationBarMenuManager)
                     }
                     
@@ -169,6 +170,7 @@ struct HomeView: View {
         }
         .environmentObject(NamespaceManager(animation))
         .task {
+//            try? await Task.sleep(nanoseconds: 3 * 1_000_000_000)
             await homeViewModel.refreshInbox()
         }
         .onReceive(timer) { _ in

@@ -29,15 +29,9 @@ class HomeViewModel: ObservableObject {
             
             if hasNewData {
                 print("Foreground Refresh: New data found! UI will be updated.")
-                
-                try await BackgroundTasksManager.shared.sendLocalNotification(
-                    title: "You've got new message! (foreground)",
-                    body: "Check your inbox for new messages."
-                )
             } else {
                 print("Foreground Refresh: No new data.")
             }
-            
         } catch {
             print("Foreground Refresh: Failed to check for data. Error: \(error)")
             self.hasNewMessages = false

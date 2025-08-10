@@ -48,10 +48,10 @@ struct Infinity: App {
                 .environmentObject(fullScreenMediaViewModel)
                 .environment(\.defaultMinListRowHeight, 0)
         }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .background  {
-                BackgroundTasksManager.shared.scheduleAppRefresh()
-            }
-        }
+//        .onChange(of: scenePhase) { _, newPhase in
+//            if newPhase == .background  {
+//                BackgroundTasksManager.shared.scheduleAppRefresh()
+//            }
+//        }
     }
 }

@@ -27,7 +27,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case getPostAndCommentsSingleThreadById(postId: String, commentId: String, queries: [String: String])
     case searchSubreddits(queries: [String: String])
     case searchUsers(queries: [String: String])
-    case getInbox(pathComponents: [String: String], queries: [String: String])
+    case getInbox(pathComponents: [String: String], queries: [String: String], headers: HTTPHeaders?)
     case saveThing(params: [String: String])
     case unsaveThing(params: [String: String])
     case getMoreCommentsForCommentMore(params: [String: String])
@@ -86,7 +86,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/subreddits/search.json"
         case .searchUsers:
             return "/search.json"
-        case .getInbox(let pathComponents, _):
+        case .getInbox(let pathComponents, _, _):
             return "/message/\(pathComponents["where"] ?? MessageWhere.inbox.rawValue).json"
         case .saveThing:
             return "/api/save"
@@ -146,7 +146,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         case .searchUsers(let queries):
             return ["raw_json": "1", "type": "user"].merging(queries, uniquingKeysWith: { _, new in new })
-        case .getInbox(_, let queries):
+        case .getInbox(_, let queries, _):
             return ["raw_json": "1", "limit": "100"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getMoreCommentsForCommentMore:
             return ["raw_json": "1", "api_type": "json"]
@@ -159,7 +159,9 @@ enum RedditOAuthAPI: URLRequestConvertible {
         switch self {
         case .getMyInfo(let headers):
             return headers
-        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed:
+        case .getInbox(_, _, let headers):
+            return headers
+        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed:
             return nil
         }
     }

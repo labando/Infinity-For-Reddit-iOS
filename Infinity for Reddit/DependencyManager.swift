@@ -27,6 +27,11 @@ struct DependencyManager {
             return Session(configuration: configuration, interceptor: RedditAccessTokenInterceptor())
         }.inObjectScope(.container) // Singleton
         
+        c.register(Session.self, name: "plain") { _ in
+            let configuration = URLSessionConfiguration.af.default
+            return Session(configuration: configuration)
+        }.inObjectScope(.container)
+        
         c.register(DatabasePool.self) { _ in
             do {
                 return try RedditGRDBDatabase.create()

@@ -7,12 +7,18 @@
 import Foundation
 import BackgroundTasks
 import UserNotifications
+import GRDB
+import Alamofire
 
 class BackgroundTasksManager {
+
     
     // MARK: - Properties
     let taskIdentifier = "com.docilealligator.infinityforreddit.bg.refresh.inbox"
     private let userDefaults: UserDefaults
+    private let dbPool: DatabasePool
+    
+    private var pullNotificationTimeKey: String { "PULL_NOTIFICATION_TIME" }
     
     // MARK: - Singleton
     static let shared = BackgroundTasksManager()
@@ -22,40 +28,32 @@ class BackgroundTasksManager {
             fatalError("Failed to resolve UserDefaults")
         }
         self.userDefaults = resolvedUserDefaults
+        guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
+            fatalError("Failed to resolve DatabasePool")
+        }
+        self.dbPool = resolvedDatabasePool
     }
     
-    // MARK: - Public Methods
     public func checkForNewData() async throws -> Bool {
         if AccountViewModel.shared.account.isAnonymous() {
             return false
         }
         
-//#if DEBUG
-//        print("DEBUG: force hasNewMessages = true (skip fetch & writes)")
-//        return true
-//#endif
-        
         let inboxListingRepository = InboxListingRepository()
         
-        let messageWhere = MessageWhere.unread
-        let pathComponents: [String: String] = [:]
-        let queries: [String: String] = ["limit": "50"]
-        
         let inboxListing = try await inboxListingRepository.fetchInboxListing(
-            messageWhere: messageWhere,
-            pathComponents: pathComponents,
-            queries: queries
+            messageWhere: .unread,
+            pathComponents: [:],
+            queries: ["limit": "50"]
         )
         try Task.checkCancellation()
         
-        let inboxes = inboxListing.inboxes ?? []
-        let createdUTCs: [TimeInterval] = inboxes.compactMap { inbox in
-            let raw = (inbox.createdUtc as Float?)
-            guard let raw else {
+        let createdUTCs: [TimeInterval] = (inboxListing.inboxes ?? []).compactMap {
+            guard let raw: Float = $0.createdUtc else {
                 return nil
             }
-            let timeInterval = TimeInterval(raw)
-            return timeInterval > 0 ? timeInterval : nil
+            let t = TimeInterval(raw)
+            return t > 0 ? t : nil
         }
         
         guard !createdUTCs.isEmpty else {
@@ -63,12 +61,10 @@ class BackgroundTasksManager {
         }
         
         let maxCreatedUTC = createdUTCs.max()!
-        
-        let key = "lastNotifiedUTC"
-        let lastNotifiedUTC = self.userDefaults.object(forKey: key) as? TimeInterval
+        let lastNotifiedUTC = self.userDefaults.object(forKey: "lastNotifiedUTC") as? TimeInterval
         
         if lastNotifiedUTC == nil {
-            self.userDefaults.set(maxCreatedUTC, forKey: key)
+            self.userDefaults.set(maxCreatedUTC, forKey: "lastNotifiedUTC")
             print("Background Check: seeded lastNotifiedUTC = \(maxCreatedUTC)")
             return false
         }
@@ -77,11 +73,9 @@ class BackgroundTasksManager {
             $0 > (lastNotifiedUTC ?? 0)
         }
         print("Background Check: maxCreatedUTC=\(maxCreatedUTC), lastNotifiedUTC=\(lastNotifiedUTC ?? 0), hasNewMessages=\(hasNewMessages)")
-
-
         
         if hasNewMessages {
-            self.userDefaults.set(maxCreatedUTC, forKey: key)
+            self.userDefaults.set(maxCreatedUTC, forKey: "lastNotifiedUTC")
             self.userDefaults.set(true, forKey: "hasNewMessages")
         }
         
@@ -93,8 +87,6 @@ class BackgroundTasksManager {
             let backgroundTask = Task {
                 await self.handleAppRefresh(task: task as! BGAppRefreshTask)
             }
-            
-            // Set the expiration handler. This is called if the task takes too long.
             task.expirationHandler = {
                 print("Background Task: Task is expiring, attempting to cancel.")
                 backgroundTask.cancel()
@@ -106,7 +98,6 @@ class BackgroundTasksManager {
     
     func scheduleAppRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
-        
         request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
         
         do {
@@ -122,44 +113,200 @@ class BackgroundTasksManager {
         }
     }
     
-    func sendLocalNotification(title: String, body: String) async throws {
-        let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
-        content.sound = .default
-        
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
-        
-        try await UNUserNotificationCenter.current().addRequest(request)
-        print("Local notification request added successfully via async wrapper.")
-    }
-    
-    // MARK: - Task Handling
     private func handleAppRefresh(task: BGAppRefreshTask) async {
         
         scheduleAppRefresh()
         
+        _ = await pullUnreadAndNotifyAllAccounts()
+        
+        task.setTaskCompleted(success: true)
+    }
+    
+    private func loadAllAccounts() async -> [Account] {
+        let accountDao = AccountDao(dbPool: dbPool)
         do {
-            print("Background Task (async): Starting task.")
-            if try await checkForNewData() {
-                print("Background Task (async): New data found, sending notification.")
-                try await sendLocalNotification(title: "You've got new message! (background)", body: "Check your inbox for new messages.")
-                task.setTaskCompleted(success: true)
-            } else {
-                print("Background Task (async): No new data found.")
-                task.setTaskCompleted(success: true)
-            }
-        } catch is CancellationError {
-            print("Background Task (async): Task was cancelled.")
-            task.setTaskCompleted(success: false)
+            return try accountDao.getAllAccounts()
+                .filter { ($0.accessToken?.isEmpty == false) }
         } catch {
-            print("Background Task (async): Task failed with error: \(error)")
-            task.setTaskCompleted(success: false)
+            print("Load accounts failed: \(error)")
+            return []
+        }
+    }
+    
+    @discardableResult
+    private func pullUnreadAndNotifyAllAccounts() async -> Bool {
+        let accounts: [Account] = await loadAllAccounts()
+        guard !accounts.isEmpty else {
+            return false
+        }
+        
+        let userNotificationCenter = UNUserNotificationCenter.current()
+        
+        let lastTime = self.userDefaults.double(forKey: pullNotificationTimeKey)
+        self.userDefaults.set(Date().timeIntervalSince1970, forKey: pullNotificationTimeKey)
+        
+        var anySent = false
+        
+        for (accIndex, account) in accounts.enumerated() {
+            guard let unreadListing = try? await fetchUnreadListingForAccount(account) else {
+                continue
+            }
+            
+            let messages = (unreadListing.inboxes ?? [])
+                .sorted { TimeInterval($0.createdUtc ?? 0) < TimeInterval($1.createdUtc ?? 0) }
+                .suffix(20)
+            
+            var countForAccount = 0
+            
+            for (msgIndex, inbox) in messages.enumerated() {
+                let created = TimeInterval(inbox.createdUtc ?? 0)
+                guard created > lastTime else { continue }
+                
+                anySent = true
+                countForAccount += 1
+                
+                let kind = (inbox.kind ?? "").lowercased()
+                let subject = (inbox.subject ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                let fallback = subject.isEmpty ? "New message" : subject
+                
+                var title: String
+                var subtitle: String
+                
+                print("kind: \(kind)")
+                switch kind {
+                case "t1":
+                    title = (inbox.author?.isEmpty == false) ? inbox.author! : "New comment"
+                    subtitle = subject.isEmpty ? "New activity" : subject.capitalizedFirst
+                    
+                case "t2":
+                    title = (inbox.linkTitle?.isEmpty == false) ? inbox.linkTitle! : fallback
+                    subtitle = "Account"
+                    
+                case "t3":
+                    title = (inbox.author?.isEmpty == false) ? inbox.author! : "New comment"
+                    subtitle = subject.isEmpty ? "New activity" : subject.capitalizedFirst
+                    
+                case "t4":
+                    title = (inbox.linkTitle?.isEmpty == false) ? inbox.linkTitle! : fallback
+                    subtitle = "Message"
+                    
+                case "t5":
+                    title = (inbox.linkTitle?.isEmpty == false) ? inbox.linkTitle! : fallback
+                    subtitle = "Subreddit"
+                    
+                default:
+                    title = (inbox.linkTitle?.isEmpty == false) ? inbox.linkTitle! : fallback
+                    subtitle = "Award"
+                }
+                
+                let content = UNMutableNotificationContent()
+                content.title = title
+                content.subtitle = subtitle
+                content.body = inbox.body ?? "You've got a new message"
+                content.sound = .default
+                content.threadIdentifier = "inbox.\(account.username.lowercased())"
+                
+                var info: [String: Any] = ["accountName": account.username]
+                if let fullname = inbox.name { info["messageFullname"] = fullname }
+                if let ctx = inbox.context { info["context"] = ctx }
+                content.userInfo = info
+                
+                let identifier = "msg.\(accIndex).\(msgIndex).\(UUID().uuidString)"
+                try? await userNotificationCenter.addRequest(UNNotificationRequest(identifier: identifier, content: content, trigger: nil))
+            }
+            
+            if countForAccount > 0 {
+                let summary = UNMutableNotificationContent()
+                summary.title = "New messages"
+                summary.subtitle = account.username
+                summary.body = "\(countForAccount) new message(s)"
+                summary.sound = .default
+                summary.threadIdentifier = "inbox.\(account.username.lowercased())"
+                
+                try? await userNotificationCenter.addRequest(
+                    UNNotificationRequest(
+                        identifier: "summary.\(account.username).\(UUID().uuidString)",
+                        content: summary,
+                        trigger: nil
+                    )
+                )
+            }
+        }
+        
+        return anySent
+    }
+    
+    private func fetchUnreadListingForAccount(_ account: Account) async throws -> InboxListing {
+        let inboxListingRepository = InboxListingRepository(sessionName: "plain")
+        do {
+            return try await inboxListingRepository.fetchInboxListing(
+                messageWhere: .unread,
+                pathComponents: [:],
+                queries: ["limit": "50"],
+                accessToken: account.accessToken
+            )
+        } catch {
+            guard let newAccessToken = try? await refreshAccessTokenIfPossible(account: account) else { throw error }
+            return try await inboxListingRepository.fetchInboxListing(
+                messageWhere: .unread,
+                pathComponents: [:],
+                queries: ["limit": "50"],
+                accessToken: newAccessToken
+            )
+        }
+    }
+    
+    private func refreshAccessTokenIfPossible(account: Account) async throws -> String {
+        guard let refreshToken = account.refreshToken, !refreshToken.isEmpty else {
+            throw NSError(domain: "BG", code: -2, userInfo: [NSLocalizedDescriptionKey: "Missing refresh token"])
+        }
+        let headers = APIUtils.getHttpBasicAuthHeader()
+        let params = ["grant_type": "refresh_token", "refresh_token": refreshToken]
+        
+        struct AccessTokenResponse: Decodable {
+            let accessToken: String
+            let refreshToken: String?
+            
+            enum CodingKeys: String, CodingKey {
+                case accessToken = "access_token"
+                case refreshToken = "refresh_token"
+            }
+        }
+        
+        let result = await AF.request(
+            "https://www.reddit.com/api/v1/access_token",
+            method: .post,
+            parameters: params,
+            encoding: URLEncoding.default,
+            headers: headers
+        ).validate().serializingDecodable(AccessTokenResponse.self).result
+        
+        switch result {
+        case .success(let tokenResponse):
+            let accountDao = AccountDao(dbPool: dbPool)
+            if let newRefreshToken = tokenResponse.refreshToken {
+                try? accountDao.updateAccessTokenAndRefreshToken(username: account.username, accessToken: tokenResponse.accessToken, refreshToken: newRefreshToken)
+            } else {
+                try? accountDao.updateAccessToken(username: account.username, accessToken: tokenResponse.accessToken)
+            }
+            if AccountViewModel.shared.account.username.caseInsensitiveCompare(account.username) == .orderedSame {
+                try? AccountViewModel.shared.updateTokens(accessToken: tokenResponse.accessToken, refreshToken: tokenResponse.refreshToken)
+            }
+            return tokenResponse.accessToken
+        case .failure(let refreshError):
+            throw refreshError
         }
     }
     
     // MARK: - Helper Methods
     private func shouldSendNotification(for listing: InboxListing) -> Bool {
         return !(listing.inboxes?.isEmpty ?? true)
+    }
+}
+
+private extension String {
+    var capitalizedFirst: String {
+        guard let first = first else { return self }
+        return first.uppercased() + dropFirst()
     }
 }
