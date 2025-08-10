@@ -30,15 +30,15 @@ class BackgroundTasksManager {
             return false
         }
         
-#if DEBUG
-        print("DEBUG: force hasNewMessages = true (skip fetch & writes)")
-        return true
-#endif
+//#if DEBUG
+//        print("DEBUG: force hasNewMessages = true (skip fetch & writes)")
+//        return true
+//#endif
         
         let inboxListingRepository = InboxListingRepository()
         
         let messageWhere = MessageWhere.unread
-        let pathComponents: [String: String] = ["where": "\(messageWhere)"]
+        let pathComponents: [String: String] = [:]
         let queries: [String: String] = ["limit": "50"]
         
         let inboxListing = try await inboxListingRepository.fetchInboxListing(
@@ -107,7 +107,7 @@ class BackgroundTasksManager {
     func scheduleAppRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
         
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 5 * 60)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
         
         do {
             try BGTaskScheduler.shared.submit(request)

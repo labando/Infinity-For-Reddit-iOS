@@ -30,7 +30,7 @@ struct HomeView: View {
     @State private var showProfile: Bool = false
     @State private var timerIsActive = true
     
-    let timer = Timer.publish(every: 5 * 60, on: .main, in: .common).autoconnect()
+    let timer = Timer.publish(every: 15 * 60, on: .main, in: .common).autoconnect()
     
     @Namespace private var animation
     
