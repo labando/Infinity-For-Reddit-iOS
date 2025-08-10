@@ -14,13 +14,6 @@ class ReadPostsRepository: ReadPostsRepositoryProtocol {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
-        do {
-            let readPostCount = try resolvedDBPool.read { db in
-                print(try ReadPost.fetchAll(db, sql: "SELECT * FROM read_posts") ?? [])
-            }
-        } catch {
-            print("fuck you")
-        }
         
         self.readPostDao = ReadPostDao(dbPool: resolvedDBPool)
     }
