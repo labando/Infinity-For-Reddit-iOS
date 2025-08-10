@@ -14,20 +14,24 @@ class SubscribedUserData: Codable, FetchableRecord, PersistableRecord {
     var name: String
     var iconUrl: String?
     var username: String
-    var favorite: Bool
+    var isFavorite: Bool
     
-    init(name: String, iconUrl: String?, username: String, favorite: Bool){
+    var identityInView: String {
+        return name + String(isFavorite)
+    }
+    
+    init(name: String, iconUrl: String?, username: String, isFavorite: Bool) {
         self.name = name
         self.iconUrl = iconUrl
         self.username = username
-        self.favorite = favorite
+        self.isFavorite = isFavorite
     }
     
     private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
         case name
         case iconUrl = "icon_url"
         case username
-        case favorite
+        case isFavorite = "is_favorite"
     }
     
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }

@@ -56,10 +56,10 @@ struct AnonymousSubscriptionsView: View {
                 } else {
                     List {
                         ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
-                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.favorite, action: {
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                 navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
                             }) {
-                                subscription.favorite.toggle()
+                                subscription.isFavorite.toggle()
                                 anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
                             }
                             .listPlainItemNoInsets()
@@ -84,10 +84,10 @@ struct AnonymousSubscriptionsView: View {
                 } else {
                     List {
                         ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
-                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.favorite, action: {
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                 navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
                             }) {
-                                subscription.favorite.toggle()
+                                subscription.isFavorite.toggle()
                                 anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
                             }
                             .listPlainItemNoInsets()

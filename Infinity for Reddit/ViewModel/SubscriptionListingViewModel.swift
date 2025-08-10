@@ -12,9 +12,12 @@ import GRDB
 public class SubscriptionListingViewModel: ObservableObject {
     // MARK: - Properties
     @Published var subredditSubscriptions: [SubscribedSubredditData] = []
+    @Published var favoriteSubredditSubscriptions: [SubscribedSubredditData] = []
     @Published var userSubscriptions: [SubscribedUserData] = []
+    @Published var favoriteUserSubscriptions: [SubscribedUserData] = []
     private var subscriptionsPrivate: [Subscription] = []
     @Published var myCustomFeeds: [MyCustomFeed] = []
+    @Published var favoriteMyCustomFeeds: [MyCustomFeed] = []
     
     @Published var isLoadingSubscriptions: Bool = false
     @Published var isLoadingMyCustomFeeds: Bool = false
@@ -31,6 +34,9 @@ public class SubscriptionListingViewModel: ObservableObject {
     private let subredditSubscriptionsPublisher: AnyPublisher<[SubscribedSubredditData], Error>
     private let userSubscriptionsPublisher: AnyPublisher<[SubscribedUserData], Error>
     private let myCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
+    private let favoriteSubredditSubscriptionsPublisher: AnyPublisher<[SubscribedSubredditData], Error>
+    private let favoriteUserSubscriptionsPublisher: AnyPublisher<[SubscribedUserData], Error>
+    private let favoriteMyCustomFeedSubscriptionsPublisher: AnyPublisher<[MyCustomFeed], Error>
     
     private let subscriptionListingRepository: SubscriptionListingRepositoryProtocol
     
@@ -55,6 +61,11 @@ public class SubscriptionListingViewModel: ObservableObject {
                 subscribedSubredditDao.getAllSubscribedSubredditsWithSearchQuery(accountName: AccountViewModel.shared.account.username, searchQuery: query)
             }
             .eraseToAnyPublisher()
+        favoriteSubredditSubscriptionsPublisher = searchQueryPublisher
+            .flatMap { query in
+                subscribedSubredditDao.getAllFavoriteSubscribedSubredditsWithSearchQuery(accountName: AccountViewModel.shared.account.username, searchQuery: query)
+            }
+            .eraseToAnyPublisher()
         
         let subscribedUserDao = SubscribedUserDao(dbPool: dbPool)
         userSubscriptionsPublisher = searchQueryPublisher
@@ -62,11 +73,21 @@ public class SubscriptionListingViewModel: ObservableObject {
                 subscribedUserDao.getAllSubscribedUsersWithSearchQuery(accountName: AccountViewModel.shared.account.username, searchQuery: query)
             }
             .eraseToAnyPublisher()
+        favoriteUserSubscriptionsPublisher = searchQueryPublisher
+            .flatMap { query in
+                subscribedUserDao.getAllFavoriteSubscribedUsersWithSearchQuery(accountName: AccountViewModel.shared.account.username, searchQuery: query)
+            }
+            .eraseToAnyPublisher()
         
         let multiredditDao = MyCustomFeedDao(dbPool: dbPool)
         myCustomFeedSubscriptionsPublisher = searchQueryPublisher
             .flatMap { query in
                 multiredditDao.getAllMyCustomFeedsWithSearchQuery(username: AccountViewModel.shared.account.username, searchQuery: query)
+            }
+            .eraseToAnyPublisher()
+        favoriteMyCustomFeedSubscriptionsPublisher = searchQueryPublisher
+            .flatMap { query in
+                multiredditDao.getAllFavoriteMyCustomFeedsWithSearchQuery(username: AccountViewModel.shared.account.username, searchQuery: query)
             }
             .eraseToAnyPublisher()
         
@@ -92,6 +113,22 @@ public class SubscriptionListingViewModel: ObservableObject {
             )
             .store(in: &cancellables)
         
+        favoriteSubredditSubscriptionsPublisher
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("Finished successfully.")
+                    case .failure(let error):
+                        print("Encountered an error: \(error)")
+                    }
+                },
+                receiveValue: { result in
+                    self.favoriteSubredditSubscriptions = result
+                }
+            )
+            .store(in: &cancellables)
+        
         userSubscriptionsPublisher
             .sink(
                 receiveCompletion: { completion in
@@ -108,6 +145,22 @@ public class SubscriptionListingViewModel: ObservableObject {
             )
             .store(in: &cancellables)
         
+        favoriteUserSubscriptionsPublisher
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("Finished successfully.")
+                    case .failure(let error):
+                        print("Encountered an error: \(error)")
+                    }
+                },
+                receiveValue: { result in
+                    self.favoriteUserSubscriptions = result
+                }
+            )
+            .store(in: &cancellables)
+        
         myCustomFeedSubscriptionsPublisher
             .sink(
                 receiveCompletion: { completion in
@@ -120,6 +173,22 @@ public class SubscriptionListingViewModel: ObservableObject {
                 },
                 receiveValue: { result in
                     self.myCustomFeeds = result
+                }
+            )
+            .store(in: &cancellables)
+        
+        favoriteMyCustomFeedSubscriptionsPublisher
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("Finished successfully.")
+                    case .failure(let error):
+                        print("Encountered an error: \(error)")
+                    }
+                },
+                receiveValue: { result in
+                    self.favoriteMyCustomFeeds = result
                 }
             )
             .store(in: &cancellables)
@@ -211,7 +280,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                 name: $0.displayName,
                 iconUrl: $0.iconImg == nil || $0.iconImg.isEmpty ? $0.communityIcon : $0.iconImg,
                 username: AccountViewModel.shared.account.username,
-                favorite: $0.userHasFavorited
+                isFavorite: $0.userHasFavorited
             )
         }
         
@@ -220,7 +289,7 @@ public class SubscriptionListingViewModel: ObservableObject {
                 name: $0.displayName,
                 iconUrl: $0.iconImg == nil || $0.iconImg.isEmpty ? $0.communityIcon : $0.iconImg,
                 username: AccountViewModel.shared.account.username,
-                favorite: $0.userHasFavorited
+                isFavorite: $0.userHasFavorited
             )
         }
         

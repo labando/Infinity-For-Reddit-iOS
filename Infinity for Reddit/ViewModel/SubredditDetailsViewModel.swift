@@ -64,7 +64,7 @@ class SubredditDetailsViewModel: ObservableObject {
                         name: subredditName,
                         iconUrl: subredditData.iconUrl,
                         username: AccountViewModel.shared.account.username,
-                        favorite: false
+                        isFavorite: false
                     )
                     try subscribedSubredditDao.insert(subscribedSubredditData: subscribedSubredditData)
                 }

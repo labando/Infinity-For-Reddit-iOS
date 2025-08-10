@@ -14,14 +14,18 @@ class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord {
     var name: String
     var iconUrl: String?
     var username: String
-    var favorite: Bool
+    var isFavorite: Bool
+    
+    var identityInView: String {
+        return fullName + String(isFavorite)
+    }
 
-    init(fullName: String, name: String, iconUrl: String? = nil, username: String, favorite: Bool) {
+    init(fullName: String, name: String, iconUrl: String? = nil, username: String, isFavorite: Bool) {
         self.fullName = fullName
         self.name = name
         self.iconUrl = iconUrl
         self.username = username
-        self.favorite = favorite
+        self.isFavorite = isFavorite
     }
     
     private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
@@ -29,7 +33,7 @@ class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord {
         case name
         case iconUrl = "icon_url"
         case username
-        case favorite
+        case isFavorite = "is_favorite"
     }
     
     public static let databaseSelection: [SQLSelectable] = CodingKeys.allCases.map { $0 }

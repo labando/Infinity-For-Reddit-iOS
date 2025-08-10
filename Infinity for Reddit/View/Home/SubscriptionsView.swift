@@ -66,11 +66,21 @@ struct SubscriptionsView: View {
                     }
                 } else {
                     List {
-                        ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.fullName) { subscription in
-                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.favorite, action: {
+                        ForEach(subscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                 navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
                             }) {
-                                subscription.favorite.toggle()
+                                subscription.isFavorite.toggle()
+                                subscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
+                            }
+                            .listPlainItemNoInsets()
+                        }
+                        
+                        ForEach(subscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
+                                navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                            }) {
+                                subscription.isFavorite.toggle()
                                 subscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
                             }
                             .listPlainItemNoInsets()
@@ -98,11 +108,21 @@ struct SubscriptionsView: View {
                     }
                 } else {
                     List {
-                        ForEach(subscriptionListingViewModel.userSubscriptions, id: \.name) { subscription in
-                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.favorite, action: {
+                        ForEach(subscriptionListingViewModel.favoriteUserSubscriptions, id: \.identityInView) { subscription in
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
                                 navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
                             }) {
-                                subscription.favorite.toggle()
+                                subscription.isFavorite.toggle()
+                                subscriptionListingViewModel.toggleFavoriteUser(subscription)
+                            }
+                            .listPlainItemNoInsets()
+                        }
+                        
+                        ForEach(subscriptionListingViewModel.userSubscriptions, id: \.identityInView) { subscription in
+                            SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
+                                navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                            }) {
+                                subscription.isFavorite.toggle()
                                 subscriptionListingViewModel.toggleFavoriteUser(subscription)
                             }
                             .listPlainItemNoInsets()
@@ -130,7 +150,17 @@ struct SubscriptionsView: View {
                     }
                 } else {
                     List {
-                        ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.path) { customFeed in
+                        ForEach(subscriptionListingViewModel.favoriteMyCustomFeeds, id: \.identityInView) { customFeed in
+                            SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
+                                navigationManager.path.append(AppNavigation.customFeed(myCustomFeed: customFeed))
+                            }) {
+                                customFeed.isFavorite.toggle()
+                                subscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
+                            }
+                            .listPlainItemNoInsets()
+                        }
+                        
+                        ForEach(subscriptionListingViewModel.myCustomFeeds, id: \.identityInView) { customFeed in
                             SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
                                 navigationManager.path.append(AppNavigation.customFeed(myCustomFeed: customFeed))
                             }) {

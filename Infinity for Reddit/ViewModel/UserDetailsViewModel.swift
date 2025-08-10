@@ -77,7 +77,7 @@ class UserDetailsViewModel: ObservableObject {
                         name: username,
                         iconUrl: userData.iconUrl,
                         username: AccountViewModel.shared.account.username,
-                        favorite: false
+                        isFavorite: false
                     )
                     try subscribedUserDao.insert(subscribedUserData: subscribedUserData)
                 }

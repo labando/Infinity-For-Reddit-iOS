@@ -115,7 +115,7 @@ struct RedditGRDBDatabase {
                 t.column("username", .text)
                     .notNull()
                     .references(Account.databaseTableName, onDelete: .cascade)
-                t.column("favorite", .boolean).notNull().defaults(to: false)
+                t.column("is_favorite", .boolean).notNull().defaults(to: false)
                 t.primaryKey(["full_name", "name"])
             }
             
@@ -125,7 +125,7 @@ struct RedditGRDBDatabase {
                 t.column("username", .text)
                     .notNull()
                     .references(Account.databaseTableName, onDelete: .cascade)
-                t.column("favorite", .boolean).notNull().defaults(to: false)
+                t.column("is_favorite", .boolean).notNull().defaults(to: false)
                 t.primaryKey(["name", "username"])
             }
             
