@@ -10,9 +10,57 @@ import Swinject
 import GRDB
 
 struct PostHistorySettingsView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadKey, store: .postHistory)
+    private var markPostsAsRead: Bool = false
+    
+    @AppStorage(PostHistoryUserDefaultsUtils.limitReadPostsKey, store: .postHistory)
+    private var limitReadPosts: Bool = true
+    
+    @AppStorage(PostHistoryUserDefaultsUtils.readPostsLimitKey, store: .postHistory)
+    private var readPostsLimit: Int = 500
+    
+    @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadAfterVotingKey, store: .postHistory)
+    private var markPostsAsReadAfterVoting: Bool = false
+    
+    @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadOnScrollKey, store: .postHistory)
+    private var markPostsAsReadOnScroll: Bool = false
+    
+    @AppStorage(PostHistoryUserDefaultsUtils.hideReadPostsKey, store: .postHistory)
+    private var hideReadPosts: Bool = false
     
     var body: some View {
-        Text("Post History")
+        List {
+            TogglePreference(isEnabled: $markPostsAsRead, title: "Mark Posts as Read")
+                .listPlainItemNoInsets()
+            
+            TogglePreference(isEnabled: $limitReadPosts, title: "Limit Read Posts")
+                .listPlainItemNoInsets()
+            
+            CustomTextField(
+                "Read Posts Limit",
+                text: Binding(
+                    get: { String(self.readPostsLimit) },
+                    set: { self.readPostsLimit = Int($0) ?? 500 }
+                ),
+                singleLine: true,
+                keyboardType: .numberPad
+            )
+            .padding(.leading, 60)
+            .padding(.trailing, 16)
+            .padding(.vertical, 8)
+            .listPlainItemNoInsets()
+
+            TogglePreference(isEnabled: $markPostsAsReadAfterVoting, title: "Mark Posts as Read After Voting")
+                .listPlainItemNoInsets()
+
+            TogglePreference(isEnabled: $markPostsAsReadOnScroll, title: "Mark Posts As Read on Scroll")
+                .listPlainItemNoInsets()
+
+            TogglePreference(isEnabled: $hideReadPosts, title: "Hide Read Posts")
+                .listPlainItemNoInsets()
+        }
+        .themedList()
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Post History")
     }
 }
