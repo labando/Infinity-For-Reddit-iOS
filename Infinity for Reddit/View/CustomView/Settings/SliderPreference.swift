@@ -14,8 +14,8 @@ struct SliderPreference: View {
     let maxValue: Float
     let step: Float = 1
     let title: String
-    let subtitle: String?
-    let icon: String? = nil
+    var subtitle: String? = nil
+    var icon: String? = nil
     
     var body: some View {
         HStack(spacing: 0) {

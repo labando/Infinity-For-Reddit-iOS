@@ -40,6 +40,8 @@ struct InterfaceCommentSettingsView: View {
     @AppStorage(InterfaceCommentUserDefaultsUtils.embeddedMediaTypeKey, store: .interfaceCommentFilter)
     private var embeddedMediaType: Int = 0
     
+    let embeddedMediaTypes = ["All", "Image and GIF", "Image and emote", "GIF and emote", "Image", "GIF", "Emote", "None"]
+    
     var body: some View {
         List {
             TogglePreference(isEnabled: $showTopLevelCommentsFirst, title: "Show Top-level Comments First")
@@ -80,14 +82,13 @@ struct InterfaceCommentSettingsView: View {
                 subtitle: "Level \(showFewerToolbarOptionsThreshold)"
             )
             .listPlainItemNoInsets()
-
-//            
-//            Picker("Embedded Media Type", selection: $embeddedMediaType) {
-//                ForEach(0..<commentInterfaceViewModel.embeddedMediaTypes.count, id: \.self) { index in
-//                    Text(commentInterfaceViewModel.embeddedMediaTypes[index]).tag(index)
-//                }
-//            }
-//            .padding(.leading, 44.5)
+            
+            PickerPreference(
+                selectedIndex: $embeddedMediaType,
+                items: embeddedMediaTypes,
+                title: "Embedded Media Type"
+            )
+            .listPlainItemNoInsets()
         }
         .themedList()
         .themedNavigationBar()
