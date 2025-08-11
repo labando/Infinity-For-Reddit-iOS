@@ -66,12 +66,21 @@ struct InterfaceCommentSettingsView: View {
             TogglePreference(isEnabled: $hideNVotes, title: "Hide the Number of Votes")
                 .listPlainItemNoInsets()
             
-//            Picker("Show Fewer Toolbar Options Starting From Level", selection: $showFewerToolbarOptionsThreshold) {
-//                ForEach(0..<commentInterfaceViewModel.toolBarOptionLevels.count, id: \.self) { index in
-//                    Text(commentInterfaceViewModel.toolBarOptionLevels[index]).tag(index)
-//                }
-//            }
-//            .padding(.leading, 44.5)
+            SliderPreference(
+                value: Binding(
+                    get: {
+                        Float(showFewerToolbarOptionsThreshold)
+                    },
+                    set: {
+                        showFewerToolbarOptionsThreshold = Int($0)
+                    }
+                ),
+                maxValue: 10,
+                title: "Show Fewer Toolbar Options Starting From",
+                subtitle: "Level \(showFewerToolbarOptionsThreshold)"
+            )
+            .listPlainItemNoInsets()
+
 //            
 //            Picker("Embedded Media Type", selection: $embeddedMediaType) {
 //                ForEach(0..<commentInterfaceViewModel.embeddedMediaTypes.count, id: \.self) { index in
