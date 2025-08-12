@@ -48,13 +48,8 @@ class BackgroundTasksManager {
         )
         try Task.checkCancellation()
         
-        let createdUTCs: [TimeInterval] = (inboxListing.inboxes ?? []).compactMap {
-            guard let raw: Float = $0.createdUtc else {
-                return nil
-            }
-            let t = TimeInterval(raw)
-            return t > 0 ? t : nil
-        }
+        let createdUTCs: [TimeInterval] = (inboxListing.inboxes ?? [])
+            .compactMap { $0.createdDate?.timeIntervalSince1970 }
         
         guard !createdUTCs.isEmpty else {
             return false
@@ -153,60 +148,32 @@ class BackgroundTasksManager {
             }
             
             let messages = (unreadListing.inboxes ?? [])
-                .sorted { TimeInterval($0.createdUtc ?? 0) < TimeInterval($1.createdUtc ?? 0) }
+                .sorted { ($0.createdDate ?? .distantPast) < ($1.createdDate ?? .distantPast)}
                 .suffix(20)
+                
             
             var countForAccount = 0
             
-            for (msgIndex, inbox) in messages.enumerated() {
-                let created = TimeInterval(inbox.createdUtc ?? 0)
+            for (msgIndex, inbox) in messages.enumerated().reversed() {
+                let created = inbox.createdDate?.timeIntervalSince1970 ?? 0
                 guard created > lastTime else { continue }
                 
                 anySent = true
                 countForAccount += 1
                 
-                let kind = (inbox.kind ?? "").lowercased()
-                let subject = (inbox.subject ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-                let fallback = subject.isEmpty ? "New message" : subject
+                let (title, subtitle) = NotificationFormatter.titleSubtitle(for: inbox)
                 
-                var title: String
-                var subtitle: String
-                
-                print("kind: \(kind)")
-                switch kind {
-                case "t1":
-                    title = (inbox.author?.isEmpty == false) ? inbox.author! : "New comment"
-                    subtitle = subject.isEmpty ? "New activity" : subject.capitalizedFirst
-                    
-                case "t2":
-                    title = (inbox.linkTitle?.isEmpty == false) ? inbox.linkTitle! : fallback
-                    subtitle = "Account"
-                    
-                case "t3":
-                    title = (inbox.author?.isEmpty == false) ? inbox.author! : "New comment"
-                    subtitle = subject.isEmpty ? "New activity" : subject.capitalizedFirst
-                    
-                case "t4":
-                    title = (inbox.linkTitle?.isEmpty == false) ? inbox.linkTitle! : fallback
-                    subtitle = "Message"
-                    
-                case "t5":
-                    title = (inbox.linkTitle?.isEmpty == false) ? inbox.linkTitle! : fallback
-                    subtitle = "Subreddit"
-                    
-                default:
-                    title = (inbox.linkTitle?.isEmpty == false) ? inbox.linkTitle! : fallback
-                    subtitle = "Award"
-                }
-                
-                let content = UNMutableNotificationContent()
+                let content  = UNMutableNotificationContent()
                 content.title = title
                 content.subtitle = subtitle
                 content.body = inbox.body ?? "You've got a new message"
                 content.sound = .default
                 content.threadIdentifier = "inbox.\(account.username.lowercased())"
                 
-                var info: [String: Any] = ["accountName": account.username]
+                var info: [String: Any] = [
+                    "accountName": account.username,
+                    "kind": inbox.messageKind.rawValue
+                ]
                 if let fullname = inbox.name { info["messageFullname"] = fullname }
                 if let ctx = inbox.context { info["context"] = ctx }
                 content.userInfo = info
@@ -215,7 +182,8 @@ class BackgroundTasksManager {
                 try? await userNotificationCenter.addRequest(UNNotificationRequest(identifier: identifier, content: content, trigger: nil))
             }
             
-            if countForAccount > 0 {
+            let showAccountSummary = false
+            if showAccountSummary && countForAccount > 0 {
                 let summary = UNMutableNotificationContent()
                 summary.title = "New messages"
                 summary.subtitle = account.username

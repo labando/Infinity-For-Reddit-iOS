@@ -78,3 +78,18 @@ public class Inbox : NSObject {
         wasComment = json["was_comment"].boolValue
     }
 }
+
+extension Inbox {
+    enum MessageKind: String {
+        case t1, t2, t3, t4, t5, t6, unknown
+    }
+    
+    var messageKind: MessageKind {
+        MessageKind(rawValue: (kind ?? "").lowercased()) ?? .unknown
+    }
+    
+    var createdDate: Date? {
+        guard let timestamp = createdUtc, timestamp > 0 else { return nil }
+        return Date(timeIntervalSince1970: TimeInterval(timestamp))
+    }
+}
