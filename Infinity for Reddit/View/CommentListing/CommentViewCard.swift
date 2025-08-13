@@ -188,7 +188,6 @@ struct CommentViewCard: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.bottom, 12)
-                        .frame(maxHeight: isToolbarHidden ? 0 : .infinity)
                     }
                 }
                 
