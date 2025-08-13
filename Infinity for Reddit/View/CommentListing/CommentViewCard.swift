@@ -19,6 +19,8 @@ struct CommentViewCard: View {
     private var fullyCollapseComment: Bool = false
     @AppStorage(InterfaceCommentUserDefaultsUtils.hideToolbarKey, store: .interfaceComment)
     private var hideToolbar: Bool = false
+    @AppStorage(InterfaceCommentUserDefaultsUtils.hideNVotesKey, store: .interfaceComment)
+    private var hideNVotes: Bool = false
     
     @StateObject var commentViewModel: CommentViewModel
     @State private var voteTask: Task<Void, Never>? = nil
@@ -129,8 +131,8 @@ struct CommentViewCard: View {
                             }
                             .buttonStyle(.borderless)
                             
-                            Text(String(commentViewModel.comment.score + commentViewModel.comment.likes))
-                                .frame(width: 50, alignment: .center)
+                            Text(String(hideNVotes ? "Hidden" : String(commentViewModel.comment.score + commentViewModel.comment.likes)))
+                                .frame(width: 72, alignment: .center)
                                 .commentInfo()
                             
                             Button(action: {
