@@ -10,34 +10,34 @@ import Swinject
 import GRDB
 
 struct InterfaceCommentSettingsView: View {
-    @AppStorage(InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirstKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirstKey, store: .interfaceComment)
     private var showTopLevelCommentsFirst: Bool = false
     
-    @AppStorage(InterfaceCommentUserDefaultsUtils.showCommentDividerKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.showCommentDividerKey, store: .interfaceComment)
     private var showCommentDivider: Bool = false
     
-    @AppStorage(InterfaceCommentUserDefaultsUtils.showOnlyOneCommentLevelIndicatorKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.showOnlyOneCommentLevelIndicatorKey, store: .interfaceComment)
     private var showOnlyOneCommentLevelIndicator: Bool = false
 
-    @AppStorage(InterfaceCommentUserDefaultsUtils.hideToolbarKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.hideToolbarKey, store: .interfaceComment)
     private var hideToolbar: Bool = false
 
-    @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceComment)
     private var fullyCollapseComment: Bool = false
 
-    @AppStorage(InterfaceCommentUserDefaultsUtils.showAuthorAvatarKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.showAuthorAvatarKey, store: .interfaceComment)
     private var showAuthorAvatar: Bool = false
 
-    @AppStorage(InterfaceCommentUserDefaultsUtils.alwaysShowNChildCommentsKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.alwaysShowNChildCommentsKey, store: .interfaceComment)
     private var alwaysShowNChildComments: Bool = false
 
-    @AppStorage(InterfaceCommentUserDefaultsUtils.hideNVotesKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.hideNVotesKey, store: .interfaceComment)
     private var hideNVotes: Bool = false
 
-    @AppStorage(InterfaceCommentUserDefaultsUtils.showFewerToolbarOptionsThresholdKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.showFewerToolbarOptionsThresholdKey, store: .interfaceComment)
     private var showFewerToolbarOptionsThreshold: Int = 0
 
-    @AppStorage(InterfaceCommentUserDefaultsUtils.embeddedMediaTypeKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.embeddedMediaTypeKey, store: .interfaceComment)
     private var embeddedMediaType: Int = 0
     
     let embeddedMediaTypes = ["All", "Image and GIF", "Image and emote", "GIF and emote", "Image", "GIF", "Emote", "None"]

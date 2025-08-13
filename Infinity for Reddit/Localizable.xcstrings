@@ -50,6 +50,9 @@
     "Cancel" : {
 
     },
+    "Change state" : {
+
+    },
     "Check Notifications Interval" : {
 
     },
@@ -171,9 +174,6 @@
 
     },
     "Font Size" : {
-
-    },
-    "fuck" : {
 
     },
     "Fully collapse" : {
@@ -393,9 +393,6 @@
 
     },
     "Restart the app to see the changes" : {
-
-    },
-    "Row %lld" : {
 
     },
     "Save" : {

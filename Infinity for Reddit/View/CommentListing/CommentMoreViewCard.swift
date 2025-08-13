@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CommentMoreViewCard: View {
-    @AppStorage(InterfaceCommentUserDefaultsUtils.showCommentDividerKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.showCommentDividerKey, store: .interfaceComment)
     private var showCommentDivider: Bool = false
     
     let commentMore: CommentMore

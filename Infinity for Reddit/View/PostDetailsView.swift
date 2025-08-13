@@ -21,7 +21,7 @@ struct PostDetailsView: View {
     @State private var showSortTypeSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     
-    @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceCommentFilter)
+    @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceComment)
     private var fullyCollapseComment: Bool = false
     
     private let account: Account

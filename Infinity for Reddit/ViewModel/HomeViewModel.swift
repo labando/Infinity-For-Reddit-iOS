@@ -21,14 +21,14 @@ class HomeViewModel: ObservableObject {
     }
     
     func refreshInbox() async {
-        print("Foreground Refresh: Pull & notify via unified pipeline.")
-        let anySent = await BackgroundTasksManager.shared.refreshAndNotifyAllAccounts()
-        let flag = anySent || userDefaults.bool(forKey: "hasNewMessages")
-        if hasNewMessages != flag {
-            hasNewMessages = flag
-        }
-        print(hasNewMessages ? "Foreground Refresh: New message found! UI will be updated."
-              : "Foreground Refresh: No new message.")
+//        print("Foreground Refresh: Pull & notify via unified pipeline.")
+//        let anySent = await BackgroundTasksManager.shared.refreshAndNotifyAllAccounts()
+//        let flag = anySent || userDefaults.bool(forKey: "hasNewMessages")
+//        if hasNewMessages != flag {
+//            hasNewMessages = flag
+//        }
+//        print(hasNewMessages ? "Foreground Refresh: New message found! UI will be updated."
+//              : "Foreground Refresh: No new message.")
     }
     
     func userViewedInbox() {

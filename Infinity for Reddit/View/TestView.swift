@@ -16,39 +16,30 @@ struct DummyListItem: Identifiable {
 }
 
 struct TestView: View {
-    @State private var items: [DummyListItem] = (0..<5).map { DummyListItem(id: $0) }
-    
-    var body: some View {
-//        MultiColumnList(items: items, numberOfColumns: 1, viewForItem: { item, width in
-//            AnyView(WebImage(url: URL(string: "https://cloudinary-marketing-res.cloudinary.com/images/w_1000,c_scale/v1679921049/Image_URL_header/Image_URL_header-png?_i=AA")) { image in
-//                image.resizable() // Control layout like SwiftUI.AsyncImage, you must use this modifier or the view will use the image bitmap size
-//            } placeholder: {
-//                Rectangle().foregroundColor(.gray)
-//            }
-//            // Supports options and context, like `.delayPlaceholder` to show placeholder only when error
-//            .onSuccess { image, data, cacheType in
-//                // Success
-//                // Note: Data exist only when queried from disk cache or network. Use `.queryMemoryData` if you really need data
-//            }
-//            .indicator(.activity) // Activity Indicator
-//            .transition(.fade(duration: 0.5)) // Fade Transition with duration
-//            .scaledToFit()
-//            .aspectRatio(CGSize(width: 1000, height: 523), contentMode: .fit)
-//            .frame(maxWidth: .infinity)
-//            //.frame(width:width, height: CGFloat(width) / (CGFloat(1000) / CGFloat(523)), alignment: .leading)
-//            //                    .onAppear {
-//            //                        print("fuck you \(width) \(CGFloat(width) / (CGFloat(1000) / CGFloat(523)))")
-//            //                    }
-//            
-//            .background(Color.yellow))
-//        })
+    @State var showView : Bool = false
         
-        NavigationSplitView {
-            List(0..<10) { item in
-                Text("Row \(item)")
+        var body: some View {
+            VStack {
+                
+                //Button to toggle the showView boolean
+                Button(action: {
+                    withAnimation{
+                             self.showView.toggle()
+                          }
+                }) {
+                    Text("Change state")
+                        .primaryText()
+                }
+                
+                //Show the red square if showView is true
+                if self.showView{
+                    Color.red
+                    .frame(width: 100, height: 100)
+                    .transition(.move(edge: .bottom))
+                }
+                
+                Spacer()
             }
-        } detail: {
-            Text("fuck")
+            .frame(maxHeight: .infinity)
         }
-    }
 }
