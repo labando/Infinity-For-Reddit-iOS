@@ -10,6 +10,9 @@ import SwiftUI
 struct CommentIndentationView: View {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
+    @AppStorage(InterfaceCommentUserDefaultsUtils.showOnlyOneCommentLevelIndicatorKey, store: .interfaceComment)
+    private var showOnlyOneCommentLevelIndicator: Bool = false
+    
     let depth: Int
     
     var depthColors: [Color] {
@@ -26,14 +29,21 @@ struct CommentIndentationView: View {
     
     var body: some View {
         if depth > 0 {
-            HStack(spacing: 8) {
-                ForEach(0..<depth, id:\.self) { depth in
-                    Rectangle()
-                        .fill(depthColors[depth % depthColors.count])
-                        .frame(width: 2)
+            if showOnlyOneCommentLevelIndicator {
+                Rectangle()
+                    .fill(depthColors[(depth - 1) % depthColors.count])
+                    .frame(width: 2)
+                    .padding(.leading, CGFloat(10 * depth))
+            } else {
+                HStack(spacing: 8) {
+                    ForEach(0..<depth, id:\.self) { depth in
+                        Rectangle()
+                            .fill(depthColors[depth % depthColors.count])
+                            .frame(width: 2)
+                    }
                 }
+                .padding(.leading, 10)
             }
-            .padding(.leading, 10)
         }
     }
 }
