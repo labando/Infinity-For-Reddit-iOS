@@ -56,7 +56,9 @@ public class InboxListingViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            let inboxListing = try await inboxListingRepository.fetchInboxListing(messageWhere: messageWhere, pathComponents: ["where": messageWhere.rawValue], queries: ["after": after ?? ""], accessToken: nil)
+            let inboxListing = try await inboxListingRepository.fetchInboxListing(messageWhere: messageWhere, pathComponents: ["where": messageWhere.rawValue], queries: ["after": after ?? ""],
+                interceptor: nil
+            )
             
             try Task.checkCancellation()
             

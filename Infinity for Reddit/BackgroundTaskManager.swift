@@ -88,19 +88,28 @@ class BackgroundTasksManager {
     
     @discardableResult
     private func pullUnreadAndNotifyAllAccounts() async -> Bool {
-        let accounts: [Account] = await loadAllAccounts()
+        let accounts = await loadAllAccounts()
         guard !accounts.isEmpty else {
             return false
         }
         
         let userNotificationCenter = UNUserNotificationCenter.current()
+        var anySent = false
         
         let lastTime = self.userDefaults.double(forKey: pullNotificationTimeKey)
         var maxDelivered = lastTime
-        var anySent = false
         
         for (accIndex, account) in accounts.enumerated() {
-            guard let unreadListing = try? await fetchUnreadListingForAccount(account) else {
+            let username = account.username
+            let provider = TokenCenter.shared
+//            let accessToken = account.accessToken ?? ""
+//            let refreshToken = account.refreshToken ?? ""
+            let perAccountAccessTokenInterceptor = RedditPerAccountAccessTokenInterceptor(
+                getToken: { await provider.currentAccessToken(for: username) },
+                refreshToken: { try await provider.forceRefresh(for: username) }
+            )
+            
+            guard let unreadListing = try? await fetchUnreadListingForAccount(account, interceptor: perAccountAccessTokenInterceptor) else {
                 continue
             }
             
@@ -145,23 +154,17 @@ class BackgroundTasksManager {
         return anySent
     }
     
-    private func fetchUnreadListingForAccount(_ account: Account) async throws -> InboxListing {
+    private func fetchUnreadListingForAccount(_ account: Account, interceptor: RequestInterceptor? = nil) async throws -> InboxListing {
         let inboxListingRepository = InboxListingRepository(sessionName: "plain")
         do {
             return try await inboxListingRepository.fetchInboxListing(
                 messageWhere: .unread,
                 pathComponents: [:],
                 queries: ["limit": "50"],
-                accessToken: account.accessToken
+                interceptor: interceptor
             )
         } catch {
-            guard let newAccessToken = try? await refreshAccessTokenIfPossible(account: account) else { throw error }
-            return try await inboxListingRepository.fetchInboxListing(
-                messageWhere: .unread,
-                pathComponents: [:],
-                queries: ["limit": "50"],
-                accessToken: newAccessToken
-            )
+            throw error
         }
     }
     
@@ -182,7 +185,8 @@ class BackgroundTasksManager {
             }
         }
         
-        let result = await AF.request(
+        let refreshSession = Session(configuration: .af.default)
+        let result = await refreshSession.request(
             "https://www.reddit.com/api/v1/access_token",
             method: .post,
             parameters: params,

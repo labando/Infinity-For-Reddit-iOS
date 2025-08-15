@@ -8,23 +8,37 @@ import Alamofire
 import Foundation
 
 final class RedditPerAccountAccessTokenInterceptor: RequestInterceptor {
-    private let getToken: @Sendable() -> String?
+    private let getToken: @Sendable() async -> String?
     private let refreshToken: @Sendable() async throws -> String
     
-    init(getToken: @escaping @Sendable() -> String?, refreshToken: @escaping @Sendable () async throws -> String) {
+    init(getToken: @escaping @Sendable() async -> String?, refreshToken: @escaping @Sendable () async throws -> String) {
         self.getToken = getToken
         self.refreshToken = refreshToken
     }
     
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
         var req = urlRequest
-        if req.url?.host?.contains("oauth.reddit.com") == true, req.headers["Authorization"] == nil, let accessToken = getToken(), !accessToken.isEmpty {
-            req.headers.add(name: "Authorization", value: "bearer \(accessToken)")
+        Task {
+            defer { completion(.success(req)) }
+            
+            guard req.url?.host == "oauth.reddit.com" else {
+                if req.headers[APIUtils.USER_AGENT_KEY] == nil {
+                    req.headers.add(name: APIUtils.USER_AGENT_KEY, value: APIUtils.USER_AGENT)
+                }
+                return
+            }
+            
+            if let accessToken = await getToken(), !accessToken.isEmpty {
+                req.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            } else {
+                req.headers.remove(name: "Authorization")
+            }
+            
+            if req.headers[APIUtils.USER_AGENT_KEY] == nil {
+                req.headers.add(name: APIUtils.USER_AGENT_KEY, value: APIUtils.USER_AGENT)
+            }
         }
-        if req.headers[APIUtils.USER_AGENT_KEY] == nil {
-            req.headers.add(name: APIUtils.USER_AGENT_KEY, value: APIUtils.USER_AGENT)
-        }
-        completion(.success(req))
+        print(req.url?.absoluteString ?? "Empty URL?")
     }
     
     func retry(_ request: Request, for session: Session, dueTo error: Error, completion: @escaping (RetryResult) -> Void) {
@@ -33,6 +47,12 @@ final class RedditPerAccountAccessTokenInterceptor: RequestInterceptor {
         }
         
         Task {
+            let headerToken = request.request?.value(forHTTPHeaderField: "Authorization") ?? ""
+            let current = await getToken() ?? ""
+            if !current.isEmpty, headerToken.contains(current) == false {
+                return completion(.retry) 
+            }
+            
             do {
                 _ = try await refreshToken()
                 completion(.retry)

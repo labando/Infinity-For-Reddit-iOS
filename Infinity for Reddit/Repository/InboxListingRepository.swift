@@ -27,34 +27,39 @@ public class InboxListingRepository: InboxListingRepositoryProtocol {
         self.session = resolvedSession
     }
     
-    public func fetchInboxListing(messageWhere: MessageWhere, pathComponents: [String : String], queries: [String : String], accessToken: String? = nil) async throws -> InboxListing {
+    public func fetchInboxListing(messageWhere: MessageWhere,
+                                  pathComponents: [String : String],
+                                  queries: [String : String],
+                                  interceptor: RequestInterceptor? = nil
+    ) async throws -> InboxListing {
         try Task.checkCancellation()
         
         var path = pathComponents
         path["where"] = messageWhere.rawValue
         
         var headers = HTTPHeaders()
+        headers.add(name: APIUtils.USER_AGENT_KEY, value: APIUtils.USER_AGENT)
         
-        if let token = accessToken, !token.isEmpty {
-            headers.add(name: APIUtils.USER_AGENT_KEY, value: APIUtils.USER_AGENT)
-            headers.add(name: "Authorization", value: "bearer \(token)")
-        } else if sessionName == "plain" {
-            throw InboxRepositoryError.AuthRequiredError("Access token is required for inbox/unread with plain session.")
+        if self.sessionName == "plain", interceptor == nil {
+            throw InboxRepositoryError.AuthRequiredError(
+                "Access token or interceptor is required for inbox/unread with plain session."
+            )
         }
         
         let response = try await self.session.request(
-            RedditOAuthAPI.getInbox(pathComponents: path, queries: queries, headers: headers)
+            RedditOAuthAPI.getInbox(pathComponents: path, queries: queries, headers: headers),
+            interceptor: interceptor
         )
         .validate()
         .serializingData()
         .response
         
         if let statusCode = response.response?.statusCode {
-            print("Status code: \(statusCode)")
+            print("Status code: \(statusCode) Session: \(self.sessionName)")
         }
         
         let data = response.data
-        
+        print(data)
         try Task.checkCancellation()
         
         let json = JSON(data)

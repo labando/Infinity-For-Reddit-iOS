@@ -1,0 +1,12 @@
+//
+// TokenProvider.swift
+// Infinity for Reddit
+//
+// Created by joeylr2042 on 2025-08-14
+
+import Foundation
+
+public protocol TokenProvider: Sendable {
+    func currentAccessToken(for username: String) async -> String?
+    func forceRefresh(for username: String) async throws -> String
+}
