@@ -215,14 +215,14 @@ public class PostListingViewModel: ObservableObject {
                     }
                     self.posts.append(contentsOf: realNewPosts)
                     hasMorePages = !(after == nil || after?.isEmpty == true)
-                    
-                    if isRefreshWithContinuation {
-                        finishPullToRefresh()
-                    }
                 }
             }
             
             await MainActor.run {
+                if isRefreshWithContinuation {
+                    finishPullToRefresh()
+                }
+                
                 isInitialLoading = false
                 isLoadingMore = false
                 

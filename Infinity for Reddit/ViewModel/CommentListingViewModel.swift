@@ -94,10 +94,10 @@ public class CommentListingViewModel: ObservableObject {
                     }
                     self.comments.append(contentsOf: processedComments)
                     self.hasMorePages = !(processedComments.isEmpty || after == nil || after?.isEmpty == true)
-                    
-                    if isRefreshWithContinuation {
-                        finishPullToRefresh()
-                    }
+                }
+                
+                if isRefreshWithContinuation {
+                    finishPullToRefresh()
                 }
                 
                 isInitialLoading = false
