@@ -39,7 +39,9 @@ struct MarkdownToolbar: View {
                             linkText = String(text[range])
                         }
                         
-                        isInsertingLink = true
+                        withAnimation {
+                            isInsertingLink = true
+                        }
                     }) {
                         SwiftUI.Image(systemName: "link")
                             .primaryIcon()
@@ -111,7 +113,7 @@ struct MarkdownToolbar: View {
                 GeometryReader { geo in
                     Color.clear
                         .onAppear { toolbarHeight = geo.size.height }
-                        .onChange(of: geo.size.height) { newValue in
+                        .onChange(of: geo.size.height) { oldValue, newValue in
                             toolbarHeight = newValue
                         }
                 }
@@ -125,7 +127,6 @@ struct MarkdownToolbar: View {
                     
                     CustomTextField("URL", text: $linkURL, singleLine: true)
                 }
-                .padding(16)
             } onConfirm: {
                 insertLink()
             }

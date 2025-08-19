@@ -11,6 +11,8 @@ struct CustomAlert<Content: View>: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     @Binding var isPresented: Bool
     
+    @State private var buttonHStackMaxHeight: CGFloat = 0
+    
     var title: String
     var subtitle: String?
     var content: Content?
@@ -38,12 +40,16 @@ struct CustomAlert<Content: View>: View {
                     .ignoresSafeArea()
                     .onTapGesture {
                         onDismiss?()
-                        isPresented = false
+                        withAnimation {
+                            isPresented = false
+                        }
                     }
                 
                 VStack(spacing: 0) {
                     Text(title)
                         .primaryText()
+                        .padding(.top, 16)
+                        .padding(.horizontal, 16)
                     
                     if let subtitle {
                         Spacer()
@@ -51,6 +57,7 @@ struct CustomAlert<Content: View>: View {
                         
                         Text(subtitle)
                             .secondaryText()
+                            .padding(.horizontal, 16)
                     }
                     
                     Spacer()
@@ -58,37 +65,71 @@ struct CustomAlert<Content: View>: View {
                     
                     if let content {
                         content
+                            .padding(.horizontal, 16)
                         
                         Spacer()
                             .frame(height: 16)
                     }
                     
+                    Divider()
+                    
                     HStack(spacing: 0) {
-                        Button {
+                        TouchRipple(action: {
                             onDismiss?()
-                            isPresented = false
-                        } label: {
+                            withAnimation {
+                                isPresented = false
+                            }
+                        }) {
                             Text("Cancel")
                                 .neutralTextButton()
+                                .frame(maxWidth: .infinity)
+                                .padding(16)
+                                .contentShape(Rectangle())
                         }
+                        .background(GeometryReader { geo in
+                            Color.clear.preference(key: MaxHeightKey.self, value: geo.size.height)
+                        })
                         
-                        Button {
+                        Divider()
+                        
+                        TouchRipple(action: {
                             onConfirm?()
-                            isPresented = false
-                        } label: {
+                            withAnimation {
+                                isPresented = false
+                            }
+                        }) {
                             Text("OK")
                                 .positiveTextButton()
+                                .frame(maxWidth: .infinity)
+                                .padding(16)
+                                .contentShape(Rectangle())
                         }
+                        .background(GeometryReader { geo in
+                            Color.clear.preference(key: MaxHeightKey.self, value: geo.size.height)
+                        })
                     }
+                    .frame(height: buttonHStackMaxHeight)
                 }
-                .padding(16)
+                .frame(maxWidth: 300)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color(hex: customThemeViewModel.currentCustomTheme.cardViewBackgroundColor))
                         .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: -1)
                         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 4)
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .onPreferenceChange(MaxHeightKey.self) { value in
+                    buttonHStackMaxHeight = value
+                }
             }
         }
+    }
+}
+
+struct MaxHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
