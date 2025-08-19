@@ -78,7 +78,17 @@ struct SubmitCommentView: View {
             MarkdownToolbar(
                 onBold: { applyMarkdown("**") },
                 onItalic: { applyMarkdown("_") },
-                onLink: { insertLink() }
+                onLink: { insertLink() },
+                onStrikeThrough: { applyMarkdown("~~") },
+                onSuperscript: { applyMarkdown("^") },
+                onHeader: {},
+                onOrderedList: {},
+                onUnorderedList: {},
+                onSpoiler: {},
+                onQuote: {},
+                onCodeBlock: {},
+                onUploadImage: {},
+                onGiphyGif: {}
             )
         }
         .themedNavigationBar()
