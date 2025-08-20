@@ -69,7 +69,7 @@ struct SubmitCommentView: View {
                         
                         ZStack(alignment: .topLeading) {
                             MarkdownTextField(text: $submitCommentViewModel.text, selectedRange: $selectedRange)
-                                .frame(minHeight: 120)
+                                .frame(minHeight: 300)
                             
                             if submitCommentViewModel.text.isEmpty {
                                 Text("Your interesting thoughts here")
