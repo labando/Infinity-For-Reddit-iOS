@@ -29,7 +29,7 @@ struct UserPicker: View {
                 }
             }
         } label: {
-            SimpleWebImageTouchItemRow(text: userPickerViewModel.selectedAccount.username, iconUrl: userPickerViewModel.selectedAccount.profileImageUrl ?? "")
+            SimpleWebImageTouchItemRow(text: userPickerViewModel.selectedAccount.username, iconUrl: userPickerViewModel.selectedAccount.profileImageUrl)
         }
     }
 }

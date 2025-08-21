@@ -22,12 +22,11 @@ struct SimpleWebImageTouchItemRow: View {
                         width: iconSize,
                         height: iconSize,
                         circleClipped: true,
-                        handleImageTapGesture: false
-//                        fallbackView: {
-//                            SwiftUI.Image(systemName: "person.crop.circle")
-//                                .resizable()
-//                                .frame(width: 30, height: 30)
-//                        }
+                        handleImageTapGesture: false,
+                        fallbackView: {
+                            SwiftUI.Image(systemName: "person.crop.circle")
+                                .primaryIcon()
+                        }
                     )
                 } else {
                     Spacer()

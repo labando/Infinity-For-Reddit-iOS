@@ -16,7 +16,8 @@ struct SubmitCommentView: View {
     init(parent: CommentParent) {
         _submitCommentViewModel = StateObject(
             wrappedValue: SubmitCommentViewModel(
-                commentParent: parent
+                commentParent: parent,
+                submitCommentRepository: SubmitCommentRepository()
             )
         )
     }
@@ -94,7 +95,21 @@ struct SubmitCommentView: View {
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Send Comment")
         .toolbar {
-            NavigationBarMenu()
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button {
+                    
+                } label: {
+                    SwiftUI.Image(systemName: "eye")
+                }
+                
+                Button {
+                    Task {
+                        await submitCommentViewModel.submitComment()
+                    }
+                } label: {
+                    SwiftUI.Image(systemName: "paperplane.fill")
+                }
+            }
         }
     }
 }
@@ -102,6 +117,24 @@ struct SubmitCommentView: View {
 enum CommentParent: Hashable {
     case post(parentPost: Post)
     case comment(parentComment: Comment)
+    
+    var parentFullname: String? {
+        switch self {
+        case .post(let parentPost):
+            return parentPost.name
+        case .comment(let parentComment):
+            return parentComment.name
+        }
+    }
+    
+    var childCommentDepth: Int {
+        switch self {
+        case .post:
+            return 0
+        case .comment(let parentComment):
+            return parentComment.depth + 1
+        }
+    }
     
     var title: String? {
         switch self {
