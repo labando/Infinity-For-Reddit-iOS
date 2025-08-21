@@ -49,6 +49,24 @@ struct CustomNavigationStack<Content: View>: View {
                     case .submitComment(let commentParent):
                         SubmitCommentView(parent: commentParent)
                             .environmentObject(navigationManager)
+                    case .submitTextPost:
+                        SubmitTextPostView()
+                            .environmentObject(navigationManager)
+                    case .submitLinkPost:
+                        SubmitLinkPostView()
+                            .environmentObject(navigationManager)
+                    case .submitVideoPost:
+                        SubmitVideoPostView()
+                            .environmentObject(navigationManager)
+                    case .submitImagePost:
+                        SubmitImagePostView()
+                            .environmentObject(navigationManager)
+                    case .submitGalleryPost:
+                        SubmitGalleryPostView()
+                            .environmentObject(navigationManager)
+                    case .submitPollPost:
+                        SubmitPollPostView()
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in
