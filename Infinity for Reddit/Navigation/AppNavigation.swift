@@ -21,4 +21,6 @@ enum AppNavigation: Hashable {
     case submitVideoPost
     case submitGalleryPost
     case submitPollPost
+    case chooseSubredditForNewPost
+    
 }

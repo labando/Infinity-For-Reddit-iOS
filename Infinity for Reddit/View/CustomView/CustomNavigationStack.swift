@@ -67,6 +67,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .submitPollPost:
                         SubmitPollPostView()
                             .environmentObject(navigationManager)
+                    case .chooseSubredditForNewPost:
+                        SubredditSelectionView()
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in
