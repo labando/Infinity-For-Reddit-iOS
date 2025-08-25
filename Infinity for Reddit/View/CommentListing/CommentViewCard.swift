@@ -152,7 +152,7 @@ struct CommentViewCard: View {
                             
                             Spacer()
                             
-                            if let onToggleExpand, commentViewModel.comment.replies?.comments?.count ?? -1 > 0 {
+                            if let onToggleExpand, commentViewModel.comment.replies?.comments.count ?? -1 > 0 {
                                 Button(action: {
                                     onToggleExpand()
                                 }) {

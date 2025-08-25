@@ -163,7 +163,12 @@ struct PostDetailsView: View {
             //print(colorScheme == .dark)
         }
         .onChange(of: commentSubmissionShareableViewModel.sentComment) {
-            print(commentSubmissionShareableViewModel.sentComment?.body ?? "No body")
+            if let sentComment = commentSubmissionShareableViewModel.sentComment {
+                if let sentCommentParent = self.sentCommentParent {
+                    postDetailsViewModel.insertSubmittedComment(sentComment, commentParent: sentCommentParent)
+                }
+                print(commentSubmissionShareableViewModel.sentComment?.body ?? "No body")
+            }
         }
         .task(id: postDetailsViewModel.loadPostAndCommentsTaskId) {
             await postDetailsViewModel.initialLoadPostAndComments()
