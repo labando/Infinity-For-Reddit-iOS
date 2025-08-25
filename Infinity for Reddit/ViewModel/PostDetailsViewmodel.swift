@@ -481,18 +481,20 @@ public class PostDetailsViewModel: ObservableObject {
             guard post.id == self.post?.id else { return }
             self.visibleComments.insert(.comment(comment), at: 0)
         case .comment(parentComment: let parentComment):
-            guard let index = self.visibleComments.firstIndex(where: { $0.id == parentComment.id }) else { return }
-            switch visibleComments[index] {
+            guard let visibleIndex = self.visibleComments.firstIndex(where: { $0.id == parentComment.id }) else { return }
+            guard let allIndex = self.allComments.firstIndex(where: { $0.id == parentComment.id }) else { return }
+            switch visibleComments[visibleIndex] {
             case .comment(let parentComment):
                 if let replies = parentComment.replies {
                     replies.comments.insert(comment, at: 0)
                 } else {
                     parentComment.replies = CommentListing(reply: comment)
                 }
+                self.allComments.insert(.comment(comment), at: allIndex + 1)
                 if parentComment.isCollasped {
                     expandComments(comment: parentComment)
                 } else {
-                    self.visibleComments.insert(.comment(comment), at: index + 1)
+                    self.visibleComments.insert(.comment(comment), at: visibleIndex + 1)
                 }
             default:
                 break
