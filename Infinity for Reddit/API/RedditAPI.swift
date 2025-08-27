@@ -68,7 +68,7 @@ enum RedditAPI: URLRequestConvertible {
             return "r/\(subredditName)/about.json"
         case .getPartialUserData:
             return "/api/user_data_by_account_ids.json"
-        case .getRules(subredditName: let subredditName):
+        case .getRules(let subredditName):
             return "/r/\(subredditName)/about/rules.json"
         }
     }

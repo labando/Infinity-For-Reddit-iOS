@@ -33,6 +33,7 @@ struct SubmitTextPostView: View {
                     navigationManager.path.append(AppNavigation.chooseSubredditForNewPost)
                 })
                 .environmentObject(subredditChooseViewModel)
+                .environmentObject(navigationManager)
                 
                 Toggle(isOn: $receiveReplyNotification) {
                     Text("Receive post reply notifications")

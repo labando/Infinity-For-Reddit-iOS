@@ -77,6 +77,10 @@ struct CustomNavigationStack<Content: View>: View {
                         SubredditSelectionView()
                             .environmentObject(navigationManager)
                             .environmentObject(subredditChooseViewModel)
+                    case .subredditRules:
+                        SubredditRulesView()
+                            .environmentObject(navigationManager)
+                            .environmentObject(subredditChooseViewModel)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

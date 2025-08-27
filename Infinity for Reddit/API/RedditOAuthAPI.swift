@@ -34,6 +34,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case sendCommentOrReplyToMessage(params: [String: String])
     case favoriteThing(params: [String: String])
     case favoriteCustomFeed(params: [String: String])
+    case getRules(subredditName: String)
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -41,7 +42,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules:
             return .get
         case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed:
             return .post
@@ -100,12 +101,14 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/api/favorite"
         case .favoriteCustomFeed:
             return "/api/multi/favorite"
+        case .getRules(let subredditName):
+            return "/r/\(subredditName)/about/rules.json"
         }
     }
     
     var parameters: [String: String]? {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules:
             return nil
         case .vote(let params), .subsrcribeToSubreddit(let params), .saveThing(let params), .unsaveThing(let params), .getMoreCommentsForCommentMore(let params), .sendCommentOrReplyToMessage(let params), .favoriteThing(let params), .favoriteCustomFeed(let params):
             return params
@@ -152,6 +155,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1", "api_type": "json"]
         case .favoriteCustomFeed:
             return ["raw_json": "1", "gilding_detail": "1"]
+        case .getRules:
+            return ["raw_json": "1"]
         }
     }
     
@@ -161,7 +166,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return headers
         case .getInbox(_, _, let headers):
             return headers
-        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed:
+        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .getRules:
             return nil
         }
     }

@@ -7,9 +7,9 @@
 import SwiftUI
 
 struct SubredditChooseView: View {
-    
     @EnvironmentObject var subredditChooseViewModel: SubredditChooseViewModel
     @EnvironmentObject var accountViewModel: AccountViewModel
+    @EnvironmentObject var navigationManager: NavigationManager
     
     @State private var showNoSubredditAlert = false
     
@@ -48,10 +48,11 @@ struct SubredditChooseView: View {
                         showNoSubredditAlert = true
                     } else {
                         Task {
-                            let isAnonymous: Bool = accountViewModel.account.isAnonymous()
+//                            let isAnonymous: Bool = accountViewModel.account.isAnonymous()
                             await subredditChooseViewModel.fetchRules(
-                                isAnonymous: isAnonymous
+                                isAnonymous: false
                             )
+                            navigationManager.path.append(AppNavigation.subredditRules)
                         }
                     }
                 }

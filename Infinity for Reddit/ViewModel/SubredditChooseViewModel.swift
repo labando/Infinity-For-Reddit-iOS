@@ -33,6 +33,8 @@ class SubredditChooseViewModel: ObservableObject {
             
             self.rules = fetched
             
+            print(rules)
+            
         } catch {
             self.rules = []
             print("Error fetching rules: \(error)")
