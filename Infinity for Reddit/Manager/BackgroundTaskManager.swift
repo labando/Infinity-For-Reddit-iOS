@@ -17,8 +17,6 @@ class BackgroundTasksManager {
     private let userDefaults: UserDefaults
     private let dbPool: DatabasePool
     
-    private var pullNotificationTimeKey: String { "PULL_NOTIFICATION_TIME" }
-    
     // MARK: - Singleton
     static let shared = BackgroundTasksManager()
     
@@ -96,7 +94,7 @@ class BackgroundTasksManager {
         let userNotificationCenter = UNUserNotificationCenter.current()
         var anySent = false
         
-        let lastTime = self.userDefaults.double(forKey: pullNotificationTimeKey)
+        let lastTime = self.userDefaults.double(forKey: UserDefaultsUtils.PULL_NOTIFICATION_TIME_KEY)
         var maxDelivered = lastTime
         
         for (accIndex, account) in accounts.enumerated() {
@@ -146,7 +144,7 @@ class BackgroundTasksManager {
         }
         
         if maxDelivered > lastTime {
-            userDefaults.set(maxDelivered, forKey: pullNotificationTimeKey)
+            userDefaults.set(maxDelivered, forKey: UserDefaultsUtils.PULL_NOTIFICATION_TIME_KEY)
         }
         return anySent
     }

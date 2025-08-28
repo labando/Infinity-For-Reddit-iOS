@@ -67,4 +67,8 @@ struct UserDefaultsUtils {
     static let LONG_PRESS_TO_HIDE_TOOLBAR_IN_COMPACT_LAYOUT = "long_press_to_hide_toolbar_in_compact_layout"
     static let POST_COMPACT_LAYOUT_TOOLBAR_HIDDEN_BY_DEFAULT = "post_compact_layout_toolbar_hidden_by_default"
     static let CLICK_TO_SHOW_MEDIA_IN_GALLERY_LAYOUT = "click_to_show_media_in_gallery_layout"
+    
+    // BackgrounTasks
+    static let PULL_NOTIFICATION_TIME_KEY = "pull_notification_time"
+    
 }

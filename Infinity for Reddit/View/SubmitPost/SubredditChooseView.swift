@@ -10,6 +10,7 @@ struct SubredditChooseView: View {
     @EnvironmentObject var subredditChooseViewModel: SubredditChooseViewModel
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
+    @StateObject var themeViewModel = CustomThemeViewModel()
     
     @State private var showNoSubredditAlert = false
     @State private var showRulesSheet = false
@@ -58,7 +59,7 @@ struct SubredditChooseView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.blue)
+                .tint(Color(hex: themeViewModel.currentCustomTheme.colorPrimary))
                 .controlSize(.regular)
             }
             .frame(maxWidth: .infinity)

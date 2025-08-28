@@ -50,7 +50,8 @@ struct SubmitTextPostView: View {
                     
                     if submitTextPostViewModel.title.isEmpty {
                         Text("Title")
-                            .primaryText()
+                            .secondaryText()
+                            .bold()
                     }
                 }
                 .padding(16)
