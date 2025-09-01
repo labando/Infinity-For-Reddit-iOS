@@ -135,17 +135,6 @@ struct MarkdownToolbar: View {
                         }
                     }
                 }
-                
-                if focusedField != nil {
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            focusedField = nil
-                        }) {
-                            Text("Done")
-                        }
-                    }
-                }
             }
             .background(
                 GeometryReader { geo in

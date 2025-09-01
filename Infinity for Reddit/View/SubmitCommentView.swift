@@ -138,14 +138,6 @@ struct SubmitCommentView: View {
                     SwiftUI.Image(systemName: "paperplane.fill")
                 }
             }
-            
-            ToolbarItemGroup(placement: .keyboard) {
-                Button {
-                    textViewCanFocus = false
-                } label: {
-                    Text("fuck")
-                }
-            }
         }
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitCommentViewModel.text)
