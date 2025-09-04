@@ -8,15 +8,18 @@
 import Foundation
 import Combine
 import GRDB
+import SwiftUI
 
 public class CustomThemeViewModel: ObservableObject {
     // The default theme is Indigo
-    @Published var currentCustomTheme: CustomTheme = CustomTheme.getIndigo()
-    @Published var isDarkTheme: Bool = false
+    //@Published private(set) var currentCustomTheme: CustomTheme = CustomTheme.getIndigo()
     @Published var allCustomThemes: [CustomTheme] = []
     @Published var currentLightCustomTheme: CustomTheme?
     @Published var currentDarkCustomTheme: CustomTheme?
     @Published var currentAmoledCustomTheme: CustomTheme?
+    @Published var appColorScheme: ColorScheme = .light
+    @Published var themeType: Int
+    @Published var amoledDark: Bool
     
     private let customThemeDao: CustomThemeDao
     private var cancellables = Set<AnyCancellable>()
@@ -25,6 +28,29 @@ public class CustomThemeViewModel: ObservableObject {
     let currentLightCustomThemePublisher: AnyPublisher<CustomTheme?, Error>
     let currentDarkCustomThemePublisher: AnyPublisher<CustomTheme?, Error>
     let currentAmoledCustomThemePublisher: AnyPublisher<CustomTheme?, Error>
+    
+    var currentCustomTheme: CustomTheme {
+        if themeType == CustomThemeUserDefaultsUtils.themeDeviceDefault {
+            if appColorScheme == .light {
+                return self.currentLightCustomTheme ?? CustomTheme.getIndigo()
+            } else {
+                if self.amoledDark {
+                    return self.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled()
+                }
+                return self.currentDarkCustomTheme ?? CustomTheme.getIndigoDark()
+            }
+        } else if themeType == CustomThemeUserDefaultsUtils.themeLight {
+            return self.currentLightCustomTheme ?? CustomTheme.getIndigo()
+        } else if themeType == CustomThemeUserDefaultsUtils.themeDark {
+            if self.amoledDark {
+                return self.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled()
+            }
+            return self.currentDarkCustomTheme ?? CustomTheme.getIndigoDark()
+        }
+        
+        // Really shouldn't happen
+        return CustomTheme.getIndigo()
+    }
     
     init() {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
@@ -37,6 +63,9 @@ public class CustomThemeViewModel: ObservableObject {
         self.currentLightCustomThemePublisher = customThemeDao.getLightCustomThemePublisher()
         self.currentDarkCustomThemePublisher = customThemeDao.getDarkCustomThemePublisher()
         self.currentAmoledCustomThemePublisher = customThemeDao.getAmoledCustomThemePublisher()
+        
+        self.themeType = CustomThemeUserDefaultsUtils.theme
+        self.amoledDark = CustomThemeUserDefaultsUtils.amoledDark
         
         allCustomThemesPublisher
             .receive(on: DispatchQueue.main)
@@ -69,5 +98,17 @@ public class CustomThemeViewModel: ObservableObject {
                 self?.currentAmoledCustomTheme = theme
             })
             .store(in: &cancellables)
+    }
+    
+    func setAppColorScheme(_ colorScheme: ColorScheme) {
+        self.appColorScheme = colorScheme
+    }
+    
+    func setThemeType(_ themeType: Int) {
+        self.themeType = themeType
+    }
+    
+    func setAmoledDark(_ amoledDark: Bool) {
+        self.amoledDark = amoledDark
     }
 }

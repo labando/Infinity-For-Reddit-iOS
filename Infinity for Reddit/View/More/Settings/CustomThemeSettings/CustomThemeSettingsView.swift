@@ -74,5 +74,21 @@ struct CustomThemeSettingsView: View {
         .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Theme")
+        .onChange(of: theme) { oldValue, newValue in
+            print("theme \(newValue)")
+        }
+        .onChange(of: amoledDark) { oldValue, newValue in
+            print("amoledDark \(newValue)")
+        }
+    }
+    
+    func changeTheme(theme: Int) {
+        if theme == CustomThemeUserDefaultsUtils.themeLight {
+            
+        } else if theme == CustomThemeUserDefaultsUtils.themeDark {
+            
+        } else {
+            
+        }
     }
 }
