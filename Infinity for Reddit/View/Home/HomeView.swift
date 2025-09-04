@@ -161,6 +161,8 @@ struct HomeView: View {
                 let docsDir = dirPaths[0]
                 
                 print(docsDir)
+                
+                customThemeViewModel.setAppColorScheme(colorScheme)
             }
             .id(accountViewModel.account.username)
             .onChange(of: selectedTab) { oldTab, newTab in
@@ -194,7 +196,7 @@ struct HomeView: View {
             }
         }
         .onChange(of: colorScheme) {
-            customThemeViewModel.isDarkTheme = colorScheme == .dark
+            customThemeViewModel.setAppColorScheme(colorScheme)
         }
         .onChange(of: accountViewModel.account) { oldValue, newValue in
             if newValue.isAnonymous(), case .inbox = selectedTab {

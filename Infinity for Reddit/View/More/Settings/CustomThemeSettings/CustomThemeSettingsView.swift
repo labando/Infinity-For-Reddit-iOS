@@ -11,90 +11,74 @@ import GRDB
 
 struct CustomThemeSettingsView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
-    @StateObject private var customThemeSettingsViewModel = CustomThemeSettingsViewModel()
-    @StateObject private var customThemeViewModel: CustomThemeViewModel
-    
-    init() {
-        _customThemeViewModel = StateObject(
-            wrappedValue: CustomThemeViewModel()
-        )
-    }
+    @AppStorage(CustomThemeUserDefaultsUtils.themeKey, store: .theme) private var theme: Int = CustomThemeUserDefaultsUtils.themeDeviceDefault
+    @AppStorage(CustomThemeUserDefaultsUtils.amoledDarkKey, store: .theme) private var amoledDark: Bool = false
     
     var body: some View {
         List {
-            Picker("Theme", systemImage: "paintbrush.fill", selection: $customThemeSettingsViewModel.theme) {
-                ForEach(0..<customThemeSettingsViewModel.themeOptions.count, id: \.self) { index in
-                    Text(customThemeSettingsViewModel.themeOptions[index]).tag(index)
-                }
-            }
-            .themedPicker()
-            .listPlainItem()
+            PickerPreference(
+                selectedIndex: $theme,
+                items: CustomThemeUserDefaultsUtils.themeOptions,
+                title: "Theme",
+                icon: "paintbrush.fill"
+            )
+            .listPlainItemNoInsets()
             
-            Toggle("AMOLED Dark", systemImage: "moon.fill", isOn: $customThemeSettingsViewModel.amoledDark)
-                .themedToggle()
-                .listPlainItem()
+            TogglePreference(
+                isEnabled: $amoledDark,
+                title: "AMOLED Dark",
+                icon: "moon.fill"
+            )
+            .listPlainItemNoInsets()
 
-            Section(header: Text("Customization")) {
-                themeListItem(
-                    themeType: "Light Theme",
-                    themeName: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
-                    icon: "upvoted")
-                .onTapGesture {
+            Section(header: Text("Customization").listSectionHeader()) {
+                PreferenceEntry(
+                    title: "Light Theme",
+                    subtitle: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
+                    icon: "sun.max"
+                ) {
                     navigationManager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo()))
                 }
+                .listPlainItemNoInsets()
                 
-                themeListItem(
-                    themeType: "Dark Theme",
-                    themeName: customThemeViewModel.currentDarkCustomTheme?.name ?? "Indigo Dark",
-                    icon: "upvoted")
-                .onTapGesture {
+                PreferenceEntry(
+                    title: "Dark Theme",
+                    subtitle: customThemeViewModel.currentDarkCustomTheme?.name ?? "Indigo Dark",
+                    icon: "moon"
+                ) {
                     navigationManager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentDarkCustomTheme ?? CustomTheme.getIndigoDark()))
                 }
+                .listPlainItemNoInsets()
                 
-                themeListItem(
-                    themeType: "Amoled Theme",
-                    themeName: customThemeViewModel.currentAmoledCustomTheme?.name ?? "Indigo Amoled",
-                    icon: "upvoted")
-                .onTapGesture {
+                PreferenceEntry(
+                    title: "Amoled Theme",
+                    subtitle: customThemeViewModel.currentAmoledCustomTheme?.name ?? "Indigo Amoled",
+                    icon: "moon"
+                ) {
                     navigationManager.path.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled()))
                 }
+                .listPlainItemNoInsets()
                 
-                HStack {
-                    SwiftUI.Image("upvote")
-                    
-                    Spacer()
-                        .frame(width: 16)
-                    
-                    Text("Manage Themes")
-                }
-                .onTapGesture {
+                PreferenceEntry(
+                    title: "Manage Themes",
+                    icon: "pencil"
+                ) {
                     navigationManager.path.append(CustomThemeSettingsViewNavigation.customThemeListing)
                 }
+                .listPlainItemNoInsets()
             }
             .listPlainItem()
         }
         .themedList()
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Theme", 1.0)
-    }
-    
-    func themeListItem(themeType: String, themeName: String, icon: String) -> some View {
-        HStack {
-            SwiftUI.Image(icon)
-            
-            Spacer()
-                .frame(width: 16)
-            
-            VStack(alignment: .leading) {
-                Text(themeType)
-                
-                Spacer()
-                    .frame(height: 8)
-                
-                Text(themeName)
-            }
+        .addTitleToInlineNavigationBar("Theme")
+        .onChange(of: theme) { oldValue, newValue in
+            customThemeViewModel.setThemeType(newValue)
+        }
+        .onChange(of: amoledDark) { oldValue, newValue in
+            customThemeViewModel.setAmoledDark(newValue)
         }
     }
 }

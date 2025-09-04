@@ -19,7 +19,6 @@ struct PostListingTestView: View {
     
     @StateObject var postListingViewModel: PostListingViewModel
     @State private var isRootView: Bool = true
-    @State private var showNewPostMenu: Bool = false
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var upcomingSortTypeKind: SortType.Kind?
@@ -135,11 +134,7 @@ struct PostListingTestView: View {
                 
                 NavigationBarMenuItem(title: "Sort") {
                     showSortTypeKindSheet = true
-                },
-                
-                NavigationBarMenuItem(title: "New Post") {
-                    showNewPostMenu = true
-                },
+                }
             ])
         }
         .onDisappear {
@@ -148,12 +143,6 @@ struct PostListingTestView: View {
         }
         .onChange(of: sensitiveContent) { oldValue, newValue in
             postListingViewModel.setSensitiveContent(newValue)
-        }
-        .sheet(isPresented: $showNewPostMenu) {
-            NewPostSheet()
-                .themedList()
-                .presentationDetents([.medium, .large])
-                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
         }
         .sheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
