@@ -16,6 +16,9 @@ struct CustomThemeSettingsView: View {
     @StateObject private var customThemeSettingsViewModel = CustomThemeSettingsViewModel()
     @StateObject private var customThemeViewModel: CustomThemeViewModel
     
+    @AppStorage(CustomThemeUserDefaultsUtils.themeKey, store: .theme) private var theme: Int = CustomThemeUserDefaultsUtils.themeDeviceDefault
+    @AppStorage(CustomThemeUserDefaultsUtils.amoledDarkKey, store: .theme) private var amoledDark: Bool = false
+    
     init() {
         _customThemeViewModel = StateObject(
             wrappedValue: CustomThemeViewModel()
@@ -25,15 +28,15 @@ struct CustomThemeSettingsView: View {
     var body: some View {
         List {
             PickerPreference(
-                selectedIndex: $customThemeSettingsViewModel.theme,
-                items: customThemeSettingsViewModel.themeOptions,
+                selectedIndex: $theme,
+                items: CustomThemeUserDefaultsUtils.themeOptions,
                 title: "Theme",
                 icon: "paintbrush.fill"
             )
             .listPlainItemNoInsets()
             
             TogglePreference(
-                isEnabled: $customThemeSettingsViewModel.amoledDark,
+                isEnabled: $amoledDark,
                 title: "AMOLED Dark",
                 icon: "moon.fill"
             )
