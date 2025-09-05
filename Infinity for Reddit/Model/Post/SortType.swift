@@ -67,6 +67,8 @@ struct SortType: Equatable {
                 return false
             }
         }
+        
+        var description: String { rawValue }
     }
 
     enum Time: String {

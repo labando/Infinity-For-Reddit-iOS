@@ -31,7 +31,7 @@ struct CustomThemeListingView: View {
         }
         .themedList()
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Custom Themes")
+        .addTitleToInlineNavigationBar("Manage Themes")
     }
     
     struct ThemeListItem: View {
