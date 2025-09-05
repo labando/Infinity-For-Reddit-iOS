@@ -5,7 +5,12 @@
 // Created by joeylr2042 on 2025-08-21
 
 import SwiftUI
-        
+
+enum PostField: Hashable {
+    case title
+    case body
+}
+
 struct SubmitTextPostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var subredditChooseViewModel: SubredditChooseViewModel
@@ -13,8 +18,8 @@ struct SubmitTextPostView: View {
     @StateObject private var submitTextPostViewModel: SubmitTextPostViewModel
     
     @FocusState private var markdownToolbarFocusedField: MarkdownFieldType?
+    @FocusState private var focusedField: PostField?
     
-    @State private var selectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var titleTextViewCanFocus: Bool = true
     @State private var contentTextViewCanFocus: Bool = true
     @State private var markdownToolbarHeight: CGFloat = 0
@@ -23,6 +28,8 @@ struct SubmitTextPostView: View {
     @State private var showFlairSheet: Bool = false
     @State private var isSpoiler: Bool = false
     @State private var isNSFW: Bool = false
+    @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
+    @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     
     init() {
         _submitTextPostViewModel = StateObject(
@@ -31,118 +38,139 @@ struct SubmitTextPostView: View {
     }
     
     var body: some View {
-        ZStack {
-            VStack {
-                UserPicker {
-                    submitTextPostViewModel.selectedAccount = $0
-                }
-                
-                SubredditChooseView(text: "Choose a subreddit", iconUrl: nil, action: {
-                    navigationManager.path.append(AppNavigation.chooseSubredditForNewPost)
-                })
-                .environmentObject(subredditChooseViewModel)
-                .environmentObject(navigationManager)
-                
-                Divider()
-                
-                HStack(spacing: 16) {
-                    if !subredditChooseViewModel.flairs.isEmpty {
-                        Button(action: {
-                            if submitTextPostViewModel.selectedFlair != nil {
-                                submitTextPostViewModel.selectedFlair = nil
-                            } else {
-                                showFlairSheet = true
+        VStack(spacing: 0) {
+            ZStack {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            UserPicker {
+                                submitTextPostViewModel.selectedAccount = $0
                             }
-                        }) {
-                            Text(submitTextPostViewModel.selectedFlair?.text ?? "Flair")
-                                .themedPillButton(
-                                    isSelected: submitTextPostViewModel.selectedFlair != nil,
-                                    selectedBackGround: themeViewModel.currentCustomTheme.flairBackgroundColor,
-                                    selectedForeGround: themeViewModel.currentCustomTheme.flairTextColor,
-                                    defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
-                                    defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
-                                    defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
-                                )
                             
+                            SubredditChooseView(text: "Choose a subreddit", iconUrl: nil, action: {
+                                navigationManager.path.append(AppNavigation.chooseSubredditForNewPost)
+                            })
+                            .environmentObject(subredditChooseViewModel)
+                            .environmentObject(navigationManager)
+                            
+                            Divider()
+                            
+                            HStack(spacing: 16) {
+                                if !subredditChooseViewModel.flairs.isEmpty {
+                                    Button(action: {
+                                        if submitTextPostViewModel.selectedFlair != nil {
+                                            submitTextPostViewModel.selectedFlair = nil
+                                        } else {
+                                            showFlairSheet = true
+                                        }
+                                    }) {
+                                        Text(submitTextPostViewModel.selectedFlair?.text ?? "Flair")
+                                            .themedPillButton(
+                                                isSelected: submitTextPostViewModel.selectedFlair != nil,
+                                                selectedBackGround: themeViewModel.currentCustomTheme.flairBackgroundColor,
+                                                selectedForeGround: themeViewModel.currentCustomTheme.flairTextColor,
+                                                defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
+                                                defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
+                                                defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
+                                            )
+                                        
+                                    }
+                                }
+                                
+                                Button(action: {
+                                    isSpoiler.toggle()
+                                }) {
+                                    Text("Spoiler")
+                                        .themedPillButton(
+                                            isSelected: isSpoiler,
+                                            selectedBackGround: themeViewModel.currentCustomTheme.spoilerBackgroundColor,
+                                            selectedForeGround: themeViewModel.currentCustomTheme.spoilerTextColor,
+                                            defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
+                                            defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
+                                            defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
+                                        )
+                                }
+                                
+                                if submitTextPostViewModel.subredditAllowsNSFW {
+                                    Button(action: {
+                                        isNSFW.toggle()
+                                    }) {
+                                        Text("Sensitive")
+                                            .themedPillButton(
+                                                isSelected: isNSFW,
+                                                selectedBackGround: themeViewModel.currentCustomTheme.nsfwBackgroundColor,
+                                                selectedForeGround: themeViewModel.currentCustomTheme.nsfwTextColor,
+                                                defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
+                                                defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
+                                                defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
+                                            )
+                                    }
+                                }
+                                
+                                Spacer()
+                            }
+                            .padding(16)
+                            
+                            Toggle(isOn: $receiveReplyNotification) {
+                                Text("Receive post reply notifications")
+                                    .secondaryText()
+                            }
+                            .padding(16)
+                            .themedToggle()
+                            
+                            Divider()
+                            
+                            ZStack(alignment: .topLeading) {
+                                MarkdownTextField(text: $submitTextPostViewModel.title, selectedRange: $titleSelectedRange, canFocus: $titleTextViewCanFocus)
+                                    .frame(maxHeight: 10)
+                                    .focused($focusedField, equals: .title)
+                                
+                                if submitTextPostViewModel.title.isEmpty {
+                                    Text("Title")
+                                        .secondaryText()
+                                        .bold()
+                                }
+                            }
+                            .padding(16)
+                            
+                            ZStack(alignment: .topLeading) {
+                                MarkdownTextField(text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                    .frame(minHeight: 300)
+                                    .focused($focusedField, equals: .body)
+                                
+                                if submitTextPostViewModel.content.isEmpty {
+                                    Text("Content")
+                                        .secondaryText()
+                                }
+                            }
+                            .padding(16)
                         }
                     }
                     
-                    Button(action: {
-                        isSpoiler.toggle()
-                    }) {
-                        Text("Spoiler")
-                            .themedPillButton(
-                                isSelected: isSpoiler,
-                                selectedBackGround: themeViewModel.currentCustomTheme.spoilerBackgroundColor,
-                                selectedForeGround: themeViewModel.currentCustomTheme.spoilerTextColor,
-                                defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
-                                defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
-                                defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
-                            )
-                    }
+                    Spacer().frame(height: markdownToolbarHeight)
                     
-                    if submitTextPostViewModel.subredditAllowsNSFW {
-                        Button(action: {
-                            isNSFW.toggle()
-                        }) {
-                            Text("Sensitive")
-                                .themedPillButton(
-                                    isSelected: isNSFW,
-                                    selectedBackGround: themeViewModel.currentCustomTheme.nsfwBackgroundColor,
-                                    selectedForeGround: themeViewModel.currentCustomTheme.nsfwTextColor,
-                                    defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
-                                    defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
-                                    defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
-                                )
-                        }
-                    }
-                    
-                    Spacer()
                 }
-                .padding(16)
                 
-                Toggle(isOn: $receiveReplyNotification) {
-                    Text("Receive post reply notifications")
-                        .secondaryText()
-                }
-                .padding(16)
-                .themedToggle()
-                
-                Divider()
-                
-                ZStack(alignment: .topLeading) {
-                    MarkdownTextField(text: $submitTextPostViewModel.title, selectedRange: $selectedRange, canFocus: $titleTextViewCanFocus)
-                        .frame(maxHeight: 10)
-                    
-                    if submitTextPostViewModel.title.isEmpty {
-                        Text("Title")
-                            .secondaryText()
-                            .bold()
-                    }
-                }
-                .padding(16)
-                
-                ZStack(alignment: .topLeading) {
-                    MarkdownTextField(text: $submitTextPostViewModel.content, selectedRange: $selectedRange, canFocus: $contentTextViewCanFocus)
-                        .frame(minHeight: 300)
-                    
-                    if submitTextPostViewModel.content.isEmpty {
-                        Text("Content")
-                            .secondaryText()
-                    }
-                }
-                .padding(16)
-                
-                Spacer()
+                MarkdownToolbar(
+                    text: focusedField == .title
+                    ? $submitTextPostViewModel.title
+                    : $submitTextPostViewModel.content,
+                    selectedRange: focusedField == .title
+                    ? $titleSelectedRange
+                    : $bodySelectedRange,
+                    toolbarHeight: $markdownToolbarHeight,
+                    focusedField: $markdownToolbarFocusedField
+                )
             }
             
-            MarkdownToolbar(
-                text: $submitTextPostViewModel.content,
-                selectedRange: $selectedRange,
-                toolbarHeight: $markdownToolbarHeight,
-                focusedField: $markdownToolbarFocusedField
-            )
+            KeyboardToolbar {
+                titleTextViewCanFocus = false
+                contentTextViewCanFocus = false
+                markdownToolbarFocusedField = nil
+                focusedField = nil
+            }
         }
+        .frame(maxHeight: .infinity)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Text Post")
         .toolbar {
