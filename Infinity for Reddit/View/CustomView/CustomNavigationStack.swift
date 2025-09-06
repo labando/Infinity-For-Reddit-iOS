@@ -94,6 +94,13 @@ struct CustomNavigationStack<Content: View>: View {
                             postFilter: postFilter
                         )
                         .environmentObject(navigationManager)
+                    case .searchSubreddits(let query, let searchInSubredditOrUserName, searchInMultiReddit: let searchInMultiReddit, searchInThingType: let searchInThingType):
+                        SearchResultsView(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType)
+                            .environmentObject(navigationManager)
+                    case .subredditSearch(let username):
+                            SubredditSearchView(username: username)
+                                .environmentObject(accountViewModel)
+                                .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

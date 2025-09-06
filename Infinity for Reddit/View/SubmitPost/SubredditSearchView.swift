@@ -10,11 +10,11 @@ struct SubredditSearchView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     
-    @StateObject private var searchViewModel: SearchViewModel
+    @StateObject private var subredditSearchViewModel: SubredditSearchViewModel
     @FocusState private var isTextFieldFocused: Bool
     
     init(username: String) {
-        _searchViewModel = StateObject(wrappedValue: SearchViewModel(username: username))
+        _subredditSearchViewModel = StateObject(wrappedValue: SubredditSearchViewModel(username: username))
     }
     
     var body: some View {
@@ -25,7 +25,7 @@ struct SubredditSearchView: View {
                     SwiftUI.Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
                     
-                    TextField("Search", text: $searchViewModel.query)
+                    TextField("Search", text: $subredditSearchViewModel.query)
                         .focused($isTextFieldFocused)
                         .font(.system(size: 16))
                         .foregroundColor(.primary)
@@ -34,9 +34,9 @@ struct SubredditSearchView: View {
                         .submitLabel(.search)
                         .onSubmit {
                             if !accountViewModel.account.isAnonymous() {
-                                searchViewModel.saveSearchQuery()
+                                subredditSearchViewModel.saveSearchQuery()
                             }
-                            navigationManager.path.append(AppNavigation.search(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearchInThingType.all.rawValue))
+                            navigationManager.path.append(AppNavigation.searchSubreddits(query: subredditSearchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearchInThingType.all.rawValue))
                         }
                 }
                 .padding(.vertical, 8)
@@ -47,13 +47,13 @@ struct SubredditSearchView: View {
                 .padding(.horizontal)
                 
                 // Recent Searches Header
-                if !searchViewModel.recentSearchQueries.isEmpty {
+                if !subredditSearchViewModel.recentSearchQueries.isEmpty {
                     HStack {
                         Text("Recent Searches")
                             .font(.headline)
                         Spacer()
                         Button("Clear All") {
-                            searchViewModel.clearAllRecentSearchQueries()
+                            subredditSearchViewModel.clearAllRecentSearchQueries()
                         }
                         .font(.subheadline)
                         .foregroundColor(.blue)
@@ -63,7 +63,7 @@ struct SubredditSearchView: View {
                 
                 // Recent search items
                 VStack(spacing: 12) {
-                    ForEach(searchViewModel.recentSearchQueries, id: \.time) { search in
+                    ForEach(subredditSearchViewModel.recentSearchQueries, id: \.time) { search in
                         TouchRipple(action: {
                             navigationManager.path.append(AppNavigation.search(query: search.searchQuery, searchInSubredditOrUserName: search.searchInSubredditOrUserName, searchInMultiReddit: search.multiRedditPath, searchInThingType: search.searchInThingType))
                         }) {

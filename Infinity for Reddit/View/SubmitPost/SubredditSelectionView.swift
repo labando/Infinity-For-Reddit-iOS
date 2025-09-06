@@ -44,6 +44,7 @@ struct SubredditSelectionView: View {
         @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
         @Environment(\.dismiss) private var dismiss
         @EnvironmentObject private var subredditChooseViewModel: SubredditChooseViewModel
+        @EnvironmentObject private var accountViewModel: AccountViewModel
         
         var body: some View {
             Group {
@@ -97,6 +98,9 @@ struct SubredditSelectionView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
+                        navigationManager.path.append(
+                            AppNavigation.subredditSearch(username: accountViewModel.account.username)
+                        )
                     } label: {
                         SwiftUI.Image(systemName: "magnifyingglass")
                     }

@@ -24,4 +24,6 @@ enum AppNavigation: Hashable {
     case chooseSubredditForNewPost
     case filterPosts(postListingMetadata: PostListingMetadata)
     case filteredPosts(postListingMetadata: PostListingMetadata, postFilter: PostFilter)
+    case searchSubreddits(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: Int)
+    case subredditSearch(username: String)
 }
