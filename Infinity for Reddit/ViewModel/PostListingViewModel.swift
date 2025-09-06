@@ -329,7 +329,9 @@ public class PostListingViewModel: ObservableObject {
         if sortTypeKind != self.sortType.type {
             self.sortType = self.sortType.with(type: sortTypeKind)
             loadPostsTaskId = UUID()
-            postListingMetadata.postListingType.saveSortType(sortType: SortType(type: sortTypeKind))
+            if UserDefaults.sortTypeSettings.bool(forKey: SortTypeSettingsUserDefaultsUtils.saveSortTypeKey) {
+                postListingMetadata.postListingType.saveSortType(sortType: SortType(type: sortTypeKind))
+            }
         }
     }
     
@@ -337,7 +339,9 @@ public class PostListingViewModel: ObservableObject {
         if sortType != self.sortType {
             self.sortType = sortType
             loadPostsTaskId = UUID()
-            postListingMetadata.postListingType.saveSortType(sortType: sortType)
+            if UserDefaults.sortTypeSettings.bool(forKey: SortTypeSettingsUserDefaultsUtils.saveSortTypeKey) {
+                postListingMetadata.postListingType.saveSortType(sortType: sortType)
+            }
         }
     }
     

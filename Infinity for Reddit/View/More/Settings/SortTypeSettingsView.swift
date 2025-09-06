@@ -12,7 +12,7 @@ import GRDB
 struct SortTypeSettingsView: View {
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
-    @AppStorage(SortTypeSettingsUserDefaultsUtils.saveSortTypeKey, store: .sortTypeSettings) private var saveSortType: Bool = false
+    @AppStorage(SortTypeSettingsUserDefaultsUtils.saveSortTypeKey, store: .sortTypeSettings) private var saveSortType: Bool = true
     @AppStorage(SortTypeSettingsUserDefaultsUtils.subredditDefaultSortTypeKey, store: .sortTypeSettings) private var subredditDefaultSortType: String = SortType.Kind.hot.rawValue
     @AppStorage(SortTypeSettingsUserDefaultsUtils.subredditDefaultSortTimeKey, store: .sortTypeSettings) private var subredditDefaultSortTime: String = SortType.Time.all.rawValue
     @AppStorage(SortTypeSettingsUserDefaultsUtils.userDefaultSortTypeKey, store: .sortTypeSettings) private var userDefaultSortType: String = SortType.Kind.new.rawValue
