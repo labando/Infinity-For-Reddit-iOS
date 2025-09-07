@@ -5,6 +5,8 @@
 //  Created by Docile Alligator on 2025-09-06.
 //
 
+import SwiftUI
+
 struct ZoomableScrollView<Content: View>: UIViewRepresentable {
     private var content: Content
     

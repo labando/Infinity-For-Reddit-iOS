@@ -40,7 +40,6 @@ struct ImageFullScreenView: View {
                 )
                 .offset(currentDragOffset)
             }
-            .background(Color.clear)
         }
         .gesture(
             DragGesture()
