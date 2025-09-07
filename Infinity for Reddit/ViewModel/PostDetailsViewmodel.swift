@@ -29,6 +29,7 @@ public class PostDetailsViewModel: ObservableObject {
     private var commentMore: CommentMore?
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
     private var commentFilter: CommentFilter?
+    private var hasUsedRecommendedSort: Bool = false
     
     //User defaults
     private var showTopLevelCommentsFirst: Bool
@@ -103,9 +104,10 @@ public class PostDetailsViewModel: ObservableObject {
             let postDetails: PostDetailsRootClass
             switch postDetailsInput {
             case .post(let post):
-                if SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortType {
+                if !hasUsedRecommendedSort && SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortType {
                     await MainActor.run {
                         self.sortTypeKind = SortType.Kind(rawValue: post.suggestedSort) ?? self.sortTypeKind
+                        self.hasUsedRecommendedSort = true
                     }
                 }
                 postDetails = try await postDetailsRepository.fetchComments(
@@ -119,11 +121,31 @@ public class PostDetailsViewModel: ObservableObject {
                         commentId: commentId,
                         queries: ["sort": sortTypeKind.rawValue, "context": String(singleThreadContext)]
                     )
+                    if !hasUsedRecommendedSort && SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortType {
+                        if let suggestedSort = SortType.Kind(rawValue: postDetails.postListing.posts[0].suggestedSort) {
+                            await MainActor.run {
+                                self.sortTypeKind =  suggestedSort
+                            }
+                            await fetchPostAndComments(isRefreshWithContinuation: isRefreshWithContinuation, shouldLoadPost: shouldLoadPost)
+                            return
+                        }
+                        self.hasUsedRecommendedSort = true
+                    }
                 } else {
                     postDetails = try await postDetailsRepository.fetchComments(
                         postId: postId,
                         queries: ["sort": sortTypeKind.rawValue]
                     )
+                    if !hasUsedRecommendedSort && SortTypeSettingsUserDefaultsUtils.respectSubredditRecommendedCommentSortType {
+                        if let suggestedSort = SortType.Kind(rawValue: postDetails.postListing.posts[0].suggestedSort) {
+                            await MainActor.run {
+                                self.sortTypeKind =  suggestedSort
+                            }
+                            await fetchPostAndComments(isRefreshWithContinuation: isRefreshWithContinuation, shouldLoadPost: shouldLoadPost)
+                            return
+                        }
+                        self.hasUsedRecommendedSort = true
+                    }
                 }
             }
             
