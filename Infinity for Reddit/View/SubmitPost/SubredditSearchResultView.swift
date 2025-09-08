@@ -17,33 +17,10 @@ struct SubredditSearchResultView: View {
     
     var body: some View {
         VStack {
-            SegmentedPicker(selectedValue: $selectedOption, values: ["Posts", "Subreddits", "Users"])
-                .padding(4)
-            
-            TabView(selection: $selectedOption) {
-                PostListingView(account: accountViewModel.account, postListingMetadata: PostListingMetadata(
-                    postListingType: PostListingType.search(
-                        query: searchResultsViewModel.query,
-                        searchInSubredditOrUserName: searchResultsViewModel.searchInSubredditOrUserName,
-                        searchInMultiReddit: searchResultsViewModel.searchInMultiReddit,
-                        searchInThingType: searchResultsViewModel.searchInThingType
-                    ),
-                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                    queries: ["q": searchResultsViewModel.query, "type": "link"],
-                    params: nil
-                ))
-                .tag(0)
-                
-                SubredditListingView(account: accountViewModel.account, query: searchResultsViewModel.query)
-                    .tag(1)
-                
-                UserListingView(account: accountViewModel.account, query: searchResultsViewModel.query)
-                    .tag(2)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            SubredditListingView(account: accountViewModel.account, query: searchResultsViewModel.query)
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar(searchResultsViewModel.query)
+        .addTitleToInlineNavigationBar("Subreddits")
         .id(accountViewModel.account.username)
         .toolbar {
             NavigationBarMenu()

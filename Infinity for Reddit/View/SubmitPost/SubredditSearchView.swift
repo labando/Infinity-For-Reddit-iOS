@@ -65,7 +65,7 @@ struct SubredditSearchView: View {
                 VStack(spacing: 12) {
                     ForEach(subredditSearchViewModel.recentSearchQueries, id: \.time) { search in
                         TouchRipple(action: {
-                            navigationManager.path.append(AppNavigation.search(query: search.searchQuery, searchInSubredditOrUserName: search.searchInSubredditOrUserName, searchInMultiReddit: search.multiRedditPath, searchInThingType: search.searchInThingType))
+                            navigationManager.path.append(AppNavigation.searchSubreddits(query: search.searchQuery, searchInSubredditOrUserName: search.searchInSubredditOrUserName, searchInMultiReddit: search.multiRedditPath, searchInThingType: search.searchInThingType))
                         }) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(search.searchQuery)
@@ -100,6 +100,12 @@ struct SubredditSearchView: View {
             .onTapGesture {
                 isTextFieldFocused = false
             }
+        }
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Search")
+        .id(accountViewModel.account.username)
+        .toolbar {
+            NavigationBarMenu()
         }
     }
 }

@@ -95,7 +95,7 @@ struct CustomNavigationStack<Content: View>: View {
                         )
                         .environmentObject(navigationManager)
                     case .searchSubreddits(let query, let searchInSubredditOrUserName, searchInMultiReddit: let searchInMultiReddit, searchInThingType: let searchInThingType):
-                        SearchResultsView(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType)
+                        SubredditSearchResultView(query: query, searchInSubredditOrUserName: searchInSubredditOrUserName, searchInMultiReddit: searchInMultiReddit, searchInThingType: searchInThingType)
                             .environmentObject(navigationManager)
                     case .subredditSearch(let username):
                             SubredditSearchView(username: username)
