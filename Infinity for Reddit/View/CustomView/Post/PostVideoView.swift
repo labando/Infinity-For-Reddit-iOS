@@ -14,6 +14,7 @@ struct PostVideoView: View {
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(VideoSettingsUserDefaultsUtils.videoAutoplayKey, store: .video) private var videoAutoplay: Int = 0
     @AppStorage(VideoSettingsUserDefaultsUtils.autoplaySensitiveVideoKey, store: .video) private var autoplaySensitiveVideo: Bool = true
+    @AppStorage(VideoSettingsUserDefaultsUtils.muteAutoplayingVideoKey, store: .video) private var muteAutoplayingVideo: Bool = true
     
     let post: Post
     let videoUrl: String
@@ -23,9 +24,9 @@ struct PostVideoView: View {
         if VideoSettingsUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected)
             && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
             if let preview = post.preview, preview.images.count > 0 {
-                InlineVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: preview.images[0].source.aspectRatio)
+                InlineVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: preview.images[0].source.aspectRatio, muteVideo: muteAutoplayingVideo)
             } else {
-                InlineVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: nil)
+                InlineVideoPlayer(videoURL: URL(string: videoUrl)!, aspectRatio: nil, muteVideo: muteAutoplayingVideo)
                     .frame(height: 400)
             }
         } else {

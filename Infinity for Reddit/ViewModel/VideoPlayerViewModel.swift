@@ -25,7 +25,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     @Published var duration: Double = 1
     @Published var isDragging = false
     
-    func loadAndPlay(url: URL) async {
+    func loadAndPlay(url: URL, muteVideo: Bool) async {
         guard !isLoaded, !isLoading else {
             return
         }
@@ -42,6 +42,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 isLoaded = true
                 isLoading = false
                 
+                player.isMuted = muteVideo
                 player.play()
                 
                 observeCurrentItem()

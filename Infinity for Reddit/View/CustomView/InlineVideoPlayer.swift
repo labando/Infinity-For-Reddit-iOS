@@ -14,17 +14,19 @@ struct InlineVideoPlayer: View {
     let videoURL: URL
     let player: AVPlayer
     private let aspectRatio: CGSize?
+    private let muteVideo: Bool
     
-    init(videoURL: URL, aspectRatio: CGSize?) {
+    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false) {
         self.videoURL = videoURL
         self.player = AVPlayer(url: videoURL)
         self.aspectRatio = aspectRatio
+        self.muteVideo = muteVideo
     }
 
     var body: some View {
         ZStack {
             if showPlayer {
-                InlineVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio)
+                InlineVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio, muteVideo: muteVideo)
             } else {
                 // For future video autoplay setting
 //                VStack {
@@ -74,11 +76,13 @@ private struct InlineVideoPlayerWithControls: View {
     
     private let url: URL
     private let aspectRatio: CGSize?
+    private let muteVideo: Bool
 
-    init(url: URL, aspectRatio: CGSize?) {
+    init(url: URL, aspectRatio: CGSize?, muteVideo: Bool = false) {
         _manager = StateObject(wrappedValue: VideoPlayerViewModel())
         self.url = url
         self.aspectRatio = aspectRatio
+        self.muteVideo = muteVideo
     }
 
     var body: some View {
@@ -144,7 +148,7 @@ private struct InlineVideoPlayerWithControls: View {
             manager.pause()
         }
         .task {
-            await manager.loadAndPlay(url: url)
+            await manager.loadAndPlay(url: url, muteVideo: muteVideo)
         }
         .appForegroundBackgroundListener(onAppEntersBackground: {
             manager.pause()
