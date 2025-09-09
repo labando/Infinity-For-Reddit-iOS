@@ -130,6 +130,19 @@ private struct InlineVideoPlayerWithControls: View {
                         .foregroundColor(.white)
                         .font(.caption)
                         .frame(width: 50, alignment: .leading)
+                    
+                    if manager.hasAudio {
+                        Button(action: {
+                            manager.toggleMute()
+                            manager.resetControlsTimer()
+                        }) {
+                            SwiftUI.Image(systemName: manager.isMuted ? "speaker.wave.2" : "speaker.slash")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(.white)
+                        }
+                        .buttonStyle(.borderless)
+                    }
                 }
                 .padding()
                 .background(Color.black)

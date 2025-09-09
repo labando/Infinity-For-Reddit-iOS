@@ -16,6 +16,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
 
     private var currentItemObserver: NSKeyValueObservation?
     private var statusObserver: NSKeyValueObservation?
+    private var audioTrackObserver: NSKeyValueObservation?
     private var timeObserverToken: Any?
     private var timeControlStatusObserver: NSKeyValueObservation?
     
@@ -24,6 +25,8 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     @Published var currentTime: Double = 0
     @Published var duration: Double = 1
     @Published var isDragging = false
+    @Published var hasAudio: Bool = false
+    @Published var isMuted: Bool = false
     
     func loadAndPlay(url: URL, muteVideo: Bool) async {
         guard !isLoaded, !isLoading else {
@@ -43,6 +46,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 isLoading = false
                 
                 player.isMuted = muteVideo
+                self.isMuted = muteVideo
                 player.play()
                 
                 observeCurrentItem()
@@ -91,6 +95,18 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                     }
                 }
             }
+            
+            self.audioTrackObserver = item.observe(\.tracks, options: [.new]) { [weak self] item, _ in
+                guard let self = self else { return }
+                var hasAudio = false
+                for playerItem in item.tracks {
+                    hasAudio = playerItem.assetTrack?.mediaType == .audio
+                    if hasAudio {
+                        break
+                    }
+                }
+                self.hasAudio = hasAudio
+            }
         }
     }
     
@@ -127,6 +143,15 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         player.pause()
     }
     
+    func toggleMute() {
+        if isMuted {
+            player.isMuted = false
+        } else {
+            player.isMuted = true
+        }
+        isMuted.toggle()
+    }
+    
     func seek(to time: Double) {
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
         player.seek(to: cmTime)
@@ -153,6 +178,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         NotificationCenter.default.removeObserver(self)
         currentItemObserver?.invalidate()
         statusObserver?.invalidate()
+        audioTrackObserver?.invalidate()
         timeControlStatusObserver?.invalidate()
         if let token = timeObserverToken {
             player.removeTimeObserver(token)
