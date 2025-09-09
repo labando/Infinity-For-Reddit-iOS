@@ -15,6 +15,7 @@ extension UserDefaults {
     static let sortTypeSettings = UserDefaults.standard
     static let theme = UserDefaults.standard
     static let video = UserDefaults.standard
+    static let notification = UserDefaults.standard
 }
 
 extension UserDefaults {

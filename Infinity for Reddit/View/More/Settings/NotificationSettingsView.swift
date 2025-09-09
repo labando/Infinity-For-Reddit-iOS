@@ -11,21 +11,45 @@ import Swinject
 import GRDB
 
 struct NotificationSettingsView: View {
-    @StateObject private var notificationSettingsViewModel = NotificationSettingsViewModel()
+    @AppStorage(NotificationUserDefaultsUtils.enableNotificationKey, store: .notification) private var enableNotification: Bool = true
+    @AppStorage(NotificationUserDefaultsUtils.notificationIntervalKey, store: .video) private var notificationInterval: Int = 60
+    
+    @State private var enableNotificationMirror: Bool
+    
+    private let notificationSettingsViewModel = NotificationSettingsViewModel()
+    
+    init() {
+        enableNotificationMirror = NotificationUserDefaultsUtils.enableNotification
+    }
     
     var body: some View {
-        Form {
-            Section {
-                Toggle("Enable Notifications", systemImage: "bell.fill", isOn: $notificationSettingsViewModel.enableNotifications)
-                
-                Picker("Check Notifications Interval", systemImage: "clock.fill", selection: $notificationSettingsViewModel.checkNotificationsInterval) {
-                    ForEach(0..<notificationSettingsViewModel.notificationsIntervals.count, id: \.self) { index in
-                        Text(notificationSettingsViewModel.notificationsIntervals[index]).tag(index)
-                    }
+        List {
+            TogglePreference(isEnabled: $enableNotification, title: "Enable Notification")
+                .listPlainItemNoInsets()
+            
+            if enableNotificationMirror {
+                BarebonePickerPreference(
+                    selected: $notificationInterval,
+                    items: NotificationUserDefaultsUtils.notificationIntervalOptions,
+                    title: "Check Notification Interval"
+                ) { interval in
+                    NotificationUserDefaultsUtils.notificationIntervalOptionsText[NotificationUserDefaultsUtils.notificationIntervalOptions.firstIndex(of: interval) ?? 2]
                 }
+                .listPlainItemNoInsets()
             }
         }
-        .navigationTitle("Notification")
+        .themedList()
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Notification")
+        .onChange(of: enableNotification) { _, newValue in
+            withAnimation {
+                enableNotificationMirror = newValue
+            }
+            notificationSettingsViewModel.enableNotification(enable: newValue)
+        }
+        .onChange(of: notificationInterval) { _, newValue in
+            notificationSettingsViewModel.updateNotificationInterval(interval: newValue)
+        }
     }
 }
 

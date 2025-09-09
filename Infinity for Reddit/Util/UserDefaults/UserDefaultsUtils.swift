@@ -6,11 +6,6 @@
 //
 
 struct UserDefaultsUtils {
-    
-    // NotificationInterfaceView
-    static let ENABLE_NOTIFICATION_KEY = "enable_notification"
-    static let NOTIFICATION_INTERVAL_KEY = "notificaiton_interval"
-    
     // SettingsInterfaceView
     static let HIDE_FAB_IN_POST_FEED = "hide_fab_in_post_feed"
     static let BOTTOM_APP_BAR_KEY = "bottom_app_bar"
