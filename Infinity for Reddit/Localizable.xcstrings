@@ -125,9 +125,6 @@
     "Download Location" : {
 
     },
-    "Embedded Media Type" : {
-
-    },
     "Enable Bottom Navigation" : {
 
     },
@@ -173,28 +170,10 @@
     "Hide Favorite Subreddits Section" : {
 
     },
-    "Hide Post Flair" : {
-
-    },
-    "Hide Post Type" : {
-
-    },
-    "Hide Subreddit and User Prefix" : {
-
-    },
     "Hide Subreddit Description" : {
 
     },
     "Hide Subscribed Subreddits Section" : {
-
-    },
-    "Hide the Number of Comments" : {
-
-    },
-    "Hide the Number of Votes" : {
-
-    },
-    "Hide Upvote Ratio" : {
 
     },
     "History" : {
@@ -384,9 +363,6 @@
 
     },
     "Sensitive" : {
-
-    },
-    "Separate Post And Comments in Landscape Mode" : {
 
     },
     "Show Absolute Number of Votes" : {
@@ -2208,9 +2184,6 @@
 
     },
     "Video Autoplay" : {
-
-    },
-    "Video autoplay will be disabled in the post detail page" : {
 
     },
     "Vote Buttons on the Right" : {

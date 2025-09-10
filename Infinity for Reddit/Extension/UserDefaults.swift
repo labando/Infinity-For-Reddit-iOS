@@ -17,6 +17,7 @@ extension UserDefaults {
     static let video = UserDefaults.standard
     static let notification = UserDefaults.standard
     static let interfacePost = UserDefaults.standard
+    static let interfacePostDetails = UserDefaults(suiteName: "com.docilealligator.infinityforreddit.interface_post_details")!
 }
 
 extension UserDefaults {
