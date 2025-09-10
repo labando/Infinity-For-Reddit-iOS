@@ -33,4 +33,8 @@ extension UserDefaults {
     func integer(forKey key: String, _ defaultValue: Int) -> Int {
         object(forKey: key) == nil ? defaultValue : integer(forKey: key)
     }
+    
+    func string(forKey key: String, _ defaultValue: String) -> String {
+        object(forKey: key) == nil ? defaultValue : string(forKey: key) ?? ""
+    }
 }

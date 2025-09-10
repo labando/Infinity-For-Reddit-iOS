@@ -14,8 +14,8 @@ class InterfaceTimeFormatUserDefaultsUtils {
     }
     
     static let timeFormatKey = "time_format"
-    static var timeFormat: Int {
-        return UserDefaults.interfacePost.integer(forKey: timeFormatKey)
+    static var timeFormat: String {
+        return UserDefaults.interfacePost.string(forKey: timeFormatKey, "MMM d, yyyy, HH:mm")
     }
     static let timeFormats = [
         "MMM d, yyyy, HH:mm",

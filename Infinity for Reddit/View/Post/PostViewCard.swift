@@ -29,15 +29,13 @@ struct PostViewCard: View {
     @AppStorage(InterfacePostUserDefaultsUtils.hideTextPostContentKey, store: .interfacePost) private var hideTextPostContent: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
     
-    let isSubredditPostListing: Bool
-    
-    let formatter = DateFormatter()
     @State var width: CGFloat?
     
+    let isSubredditPostListing: Bool
+    
     init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil) {
-        self.isSubredditPostListing = isSubredditPostListing
-        formatter.dateFormat = "y-MM-dd H:mm"
         self.width = width
+        self.isSubredditPostListing = isSubredditPostListing
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
     }
     
@@ -85,7 +83,7 @@ struct PostViewCard: View {
                 
                 Spacer()
                 
-                Text(formatter.string(from: Date(timeIntervalSince1970: TimeInterval(postViewModel.post.createdUtc))))
+                TimeText(timeUTCInSeconds: postViewModel.post.createdUtc)
                     .secondaryText()
             }
             .padding(.horizontal, 16)
