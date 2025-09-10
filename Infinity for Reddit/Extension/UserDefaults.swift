@@ -16,6 +16,7 @@ extension UserDefaults {
     static let theme = UserDefaults.standard
     static let video = UserDefaults.standard
     static let notification = UserDefaults.standard
+    static let interfacePost = UserDefaults.standard
 }
 
 extension UserDefaults {

@@ -59,9 +59,6 @@
     "Click here to browse all comments" : {
 
     },
-    "Click to Show Media in Gallery Layout" : {
-
-    },
     "Collapse Account Section" : {
 
     },
@@ -95,9 +92,6 @@
     "Comments will be filtered out if they contain the following keywords." : {
 
     },
-    "Compact Layout" : {
-
-    },
     "Content" : {
 
     },
@@ -114,12 +108,6 @@
 
     },
     "Data Saving Mode" : {
-
-    },
-    "Default Link Post Layout" : {
-
-    },
-    "Default Post Layout" : {
 
     },
     "Default Search Result Tab" : {
@@ -152,9 +140,6 @@
     "Filtered out comments will be shown as the following selected option." : {
 
     },
-    "Fixed Height in Card" : {
-
-    },
     "Follow" : {
 
     },
@@ -174,9 +159,6 @@
 
     },
     "Fully collapse" : {
-
-    },
-    "Gallery Layout" : {
 
     },
     "Gesture & Buttons" : {
@@ -206,16 +188,10 @@
     "Hide Subscribed Subreddits Section" : {
 
     },
-    "Hide Text Post Content" : {
-
-    },
     "Hide the Number of Comments" : {
 
     },
     "Hide the Number of Votes" : {
-
-    },
-    "Hide Toolbar by Default" : {
 
     },
     "Hide Upvote Ratio" : {
@@ -258,9 +234,6 @@
 
     },
     "Loading more comments" : {
-
-    },
-    "Long Press to Hide Toolbar" : {
 
     },
     "Manage Subscription" : {
@@ -422,13 +395,7 @@
     "Show Avatar on the Right" : {
 
     },
-    "Show Divider" : {
-
-    },
     "Show Elapsed Time in Posts and Comments" : {
-
-    },
-    "Show Thumbnail on the Left" : {
 
     },
     "Since:" : {
@@ -480,9 +447,6 @@
 
     },
     "The name should be unique." : {
-
-    },
-    "The Number of Columns in Post Feed" : {
 
     },
     "theme_item_archived_tint" : {
