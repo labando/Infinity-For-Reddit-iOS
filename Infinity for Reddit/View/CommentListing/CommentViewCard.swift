@@ -25,6 +25,8 @@ struct CommentViewCard: View {
     private var showAuthorAvatar: Bool = false
     @AppStorage(InterfaceCommentUserDefaultsUtils.showFewerToolbarOptionsThresholdKey, store: .interfaceComment)
     private var showFewerToolbarOptionsThreshold: Int = 5
+    @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface)
+    private var voteButtonsOnTheRight: Bool = false
     
     @StateObject var commentViewModel: CommentViewModel
     @State private var voteTask: Task<Void, Never>? = nil
@@ -48,7 +50,7 @@ struct CommentViewCard: View {
             CommentIndentationView(depth: commentViewModel.comment.depth)
             
             VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .center) {
+                HStack {
                     if isInPostDetails && showAuthorAvatar {
                         CustomWebImage(
                             commentViewModel.comment.authorIconUrl?.absoluteString,
@@ -120,35 +122,37 @@ struct CommentViewCard: View {
                     }
                     
                     if !isToolbarHidden {
-                        HStack(alignment: .center) {
-                            Button(action: {
-                                voteTask?.cancel()
-                                voteTask = Task {
-                                    await commentViewModel.voteComment(vote: 1)
+                        HStack {
+                            HStack {
+                                Button(action: {
+                                    voteTask?.cancel()
+                                    voteTask = Task {
+                                        await commentViewModel.voteComment(vote: 1)
+                                    }
+                                }) {
+                                    SwiftUI.Image(systemName: commentViewModel.comment.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
+                                        .commentIconTemplateRendering()
+                                        .commentUpvoteIcon(isUpvoted: commentViewModel.comment.likes == 1)
                                 }
-                            }) {
-                                SwiftUI.Image(systemName: commentViewModel.comment.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
-                                    .commentIconTemplateRendering()
-                                    .commentUpvoteIcon(isUpvoted: commentViewModel.comment.likes == 1)
-                            }
-                            .buttonStyle(.borderless)
+                                .buttonStyle(.borderless)
 
-                            VotesText(votes: commentViewModel.comment.score + commentViewModel.comment.likes, hideNVotes: hideNVotes)
-                                .frame(width: 72, alignment: .center)
-                                .commentInfo()
-                            
-                            Button(action: {
-                                voteTask?.cancel()
-                                voteTask = Task {
-                                    await commentViewModel.voteComment(vote: -1)
+                                VotesText(votes: commentViewModel.comment.score + commentViewModel.comment.likes, hideNVotes: hideNVotes)
+                                    .frame(width: 72, alignment: .center)
+                                    .commentInfo()
+                                
+                                Button(action: {
+                                    voteTask?.cancel()
+                                    voteTask = Task {
+                                        await commentViewModel.voteComment(vote: -1)
+                                    }
+                                }) {
+                                    SwiftUI.Image(systemName: commentViewModel.comment.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
+                                        .commentIconTemplateRendering()
+                                        .commentDownvoteIcon(isDownvoted: commentViewModel.comment.likes == -1)
                                 }
-                            }) {
-                                SwiftUI.Image(systemName: commentViewModel.comment.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
-                                    .commentIconTemplateRendering()
-                                    .commentDownvoteIcon(isDownvoted: commentViewModel.comment.likes == -1)
+                                .buttonStyle(.borderless)
                             }
-                            .padding(.trailing, 16)
-                            .buttonStyle(.borderless)
+                            .environment(\.layoutDirection, .leftToRight)
                             
                             Spacer()
                             
@@ -229,6 +233,7 @@ struct CommentViewCard: View {
                                 }
                             }
                         }
+                        .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
                         .padding(.horizontal, 16)
                         .padding(.bottom, 12)
                     }
