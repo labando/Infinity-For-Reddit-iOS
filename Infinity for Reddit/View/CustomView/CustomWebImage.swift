@@ -138,9 +138,7 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                         $0.scaledToFit()
                     }
                     .frame(width: width, height: height)
-                    .applyIf(centerCrop) {
-                        $0.clipped()
-                    }
+                    .clipped()
                     .applyIf(handleImageTapGesture) {
                         $0.mediaTapGesture(post: post, aspectRatio: imageAspectRatio, matchedGeometryEffectId: matchedGeometryEffectId)
                     }

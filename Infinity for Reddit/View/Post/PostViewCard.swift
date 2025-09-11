@@ -205,7 +205,7 @@ struct PostViewCard: View {
                         url,
                         height: limitMediaHeight ? 200 : nil,
                         aspectRatio: limitMediaHeight ? nil : preview.images[0].source.aspectRatio,
-                        centerCrop: true,
+                        centerCrop: limitMediaHeight,
                         matchedGeometryEffectId: UUID().uuidString,
                         post: postViewModel.post,
                         blur: (postViewModel.post.over18 && blurSensitiveImages) || (postViewModel.post.spoiler && blurSpoilerImages)
@@ -237,12 +237,6 @@ struct PostViewCard: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .applyIf(!limitMediaHeight) {
-                    $0.aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
-                }
-                .applyIf(limitMediaHeight) {
-                    $0.frame(height: 200)
-                }
             } else if postViewModel.post.postType.isMedia {
                 Spacer()
                     .frame(height: 8)
