@@ -174,7 +174,12 @@ struct PostViewCard: View {
                         await postViewModel.readPost()
                     }
                 }
-                .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
+                .applyIf(limitMediaHeight) {
+                    $0.frame(height: 200)
+                }
+                .applyIf(!limitMediaHeight) {
+                    $0.aspectRatio(preview.s.aspectRatio, contentMode: .fit)
+                }
             } else if !hideTextPostContent, case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
                 Spacer()
                     .frame(height: 6)

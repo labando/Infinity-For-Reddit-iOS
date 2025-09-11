@@ -36,6 +36,7 @@ struct GalleryCarousel: View {
                         CustomWebImage(
                             preview.u,
                             handleImageTapGesture: false,
+                            centerCrop: true,
                             blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages),
                             customOnTapGesture: {
                                 withAnimation {
