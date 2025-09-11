@@ -10,6 +10,8 @@ import Swinject
 import GRDB
 
 struct InterfaceSettingsView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+    
     @StateObject private var interfaceSettingsViewModel = InterfaceSettingsViewModel()
     
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
@@ -17,15 +19,21 @@ struct InterfaceSettingsView: View {
     
     var body: some View {
         List {
-            NavigationLink(destination: FontInterfaceView()) {
-                Label("Font", systemImage: "textformat.size")
-            } 
-            NavigationLink(destination: ImmersiveInterfaceView()) {
-                Text("Immersive Interface").padding(.leading, 44.5)
+            PreferenceEntry(
+                title: "Font",
+                icon: "textformat.size"
+            ) {
+                navigationManager.path.append(InterfaceSettingsViewNavigation.font)
             }
-            NavigationLink(destination: NavigationDrawerInterfaceView()) {
-                Text("Navigation Drawer").padding(.leading, 44.5)
+            .listPlainItemNoInsets()
+            
+            PreferenceEntry(
+                title: "Immersive Interface"
+            ) {
+                navigationManager.path.append(InterfaceSettingsViewNavigation.immersiveInterface)
             }
+            .listPlainItemNoInsets()
+            
             Toggle("Hide Subreddit Description", isOn: $interfaceSettingsViewModel.hideSubredditDescription).padding(.leading, 44.5)
             Toggle("Use Bottom Toolbar in Media Viewer", isOn: $interfaceSettingsViewModel.useBottomToolbarInMediaViewer).padding(.leading, 44.5)
             Picker("Default Search Result Tab", selection: $interfaceSettingsViewModel.defaultSearchResultTab){
@@ -34,18 +42,36 @@ struct InterfaceSettingsView: View {
                 }
             }
             .padding(.leading, 44.5)
-            NavigationLink(destination: InterfaceTimeFormatView()) {
-                Text("Time Format").padding(.leading, 44.5)
+            
+            PreferenceEntry(
+                title: "Time Format",
+                icon: "clock"
+            ) {
+                navigationManager.path.append(InterfaceSettingsViewNavigation.timeFormat)
             }
-            NavigationLink(destination: InterfacePostSettingsView()) {
-                Text("Post").padding(.leading, 44.5)
+            .listPlainItemNoInsets()
+            
+            PreferenceEntry(
+                title: "Post"
+            ) {
+                navigationManager.path.append(InterfaceSettingsViewNavigation.post)
             }
-            NavigationLink(destination: InterfacePostDetailsSettingsView()) {
-                Text("Post Details").padding(.leading, 44.5)
+            .listPlainItemNoInsets()
+            
+            PreferenceEntry(
+                title: "Post Details"
+            ) {
+                navigationManager.path.append(InterfaceSettingsViewNavigation.postDetails)
             }
-            NavigationLink(destination: InterfaceCommentSettingsView()) {
-                Text("Comment").padding(.leading, 44.5)
+            .listPlainItemNoInsets()
+            
+            PreferenceEntry(
+                title: "Comment",
+                icon: "text.bubble"
+            ) {
+                navigationManager.path.append(InterfaceSettingsViewNavigation.comment)
             }
+            .listPlainItemNoInsets()
             
             Section(header: Text("Post and Comment").listSectionHeader()) {
                 TogglePreference(isEnabled: $voteButtonsOnTheRight, title: "Vote Buttons on the Right")

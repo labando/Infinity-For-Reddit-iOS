@@ -80,9 +80,6 @@
     "Collapse Subscribed Subreddits Section" : {
 
     },
-    "Comment" : {
-
-    },
     "Comments submitted by the following users will be filtered out." : {
 
     },
@@ -270,9 +267,6 @@
 
     },
     "Post and Comment" : {
-
-    },
-    "Post Details" : {
 
     },
     "Posts from the following subreddits will be filtered out." : {
@@ -2152,9 +2146,6 @@
           }
         }
       }
-    },
-    "Time Format" : {
-
     },
     "Title" : {
 

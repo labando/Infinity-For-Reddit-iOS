@@ -221,6 +221,22 @@ struct CustomNavigationStack<Content: View>: View {
                             .environmentObject(navigationManager)
                     }
                 }
+                .navigationDestination(for: InterfaceSettingsViewNavigation.self) { destination in
+                    switch destination {
+                    case .font:
+                        FontInterfaceView()
+                    case .immersiveInterface:
+                        ImmersiveInterfaceView()
+                    case .timeFormat:
+                        InterfaceTimeFormatView()
+                    case .post:
+                        InterfacePostSettingsView()
+                    case .postDetails:
+                        InterfacePostDetailsSettingsView()
+                    case .comment:
+                        InterfaceCommentSettingsView()
+                    }
+                }
                 .environmentObject(navigationManager)
         }
         .themedNavigationBarBackButton()
