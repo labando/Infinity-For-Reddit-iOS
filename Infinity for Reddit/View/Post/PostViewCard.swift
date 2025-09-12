@@ -33,10 +33,12 @@ struct PostViewCard: View {
     @State var width: CGFloat?
     
     let isSubredditPostListing: Bool
+    let onPostTypeClicked: () -> Void
     
-    init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil) {
+    init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil, onPostTypeClicked: @escaping () -> Void) {
         self.width = width
         self.isSubredditPostListing = isSubredditPostListing
+        self.onPostTypeClicked = onPostTypeClicked
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
     }
     
@@ -99,6 +101,9 @@ struct PostViewCard: View {
             HFlow(alignment: .center) {
                 if !hidePostType {
                     PostTypeTag(post: postViewModel.post)
+                        .onTapGesture {
+                            onPostTypeClicked()
+                        }
                 }
                 
                 if postViewModel.post.spoiler {

@@ -95,16 +95,18 @@ struct PostListingView: View {
                 if isRootView {
                     List {
                         ForEach(postListingViewModel.posts, id: \.id) { post in
-                            PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing)
-                                //.id(post.id)
-                                .listPlainItemNoInsets()
-                                .onAppear {
-                                    if post.subredditOrUserIcon == nil {
-                                        Task {
-                                            await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
-                                        }
+                            PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, onPostTypeClicked: {
+                                onPostTypeClicked(post: post)
+                            })
+                            //.id(post.id)
+                            .listPlainItemNoInsets()
+                            .onAppear {
+                                if post.subredditOrUserIcon == nil {
+                                    Task {
+                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
                                     }
                                 }
+                            }
                         }
                         if postListingViewModel.hasMorePages {
                             ProgressIndicator()
@@ -121,16 +123,18 @@ struct PostListingView: View {
                     }
                 } else {
                     ForEach(postListingViewModel.posts, id: \.id) { post in
-                        PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing)
-                            .id(post.id)
-                            .listPlainItemNoInsets()
-                            .onAppear {
-                                if post.subredditOrUserIcon == nil {
-                                    Task {
-                                        await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
-                                    }
+                        PostViewCard(account: account, post: post, isSubredditPostListing: isSubredditPostListing, width: nil, onPostTypeClicked: {
+                            onPostTypeClicked(post: post)
+                        })
+                        .id(post.id)
+                        .listPlainItemNoInsets()
+                        .onAppear {
+                            if post.subredditOrUserIcon == nil {
+                                Task {
+                                    await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
                                 }
                             }
+                        }
                     }
                     if postListingViewModel.hasMorePages {
                         ProgressIndicator()
@@ -210,5 +214,16 @@ struct PostListingView: View {
             .presentationDetents([.medium, .large])
         }
         .environment(\.postListingVideoManager, postListingVideoManager)
+    }
+    
+    private func onPostTypeClicked(post: Post) {
+        if showFilterPostsOption {
+            navigationManager.path.append(
+                AppNavigation.filteredPosts(
+                    postListingMetadata: postListingMetadata,
+                    postFilter: PostFilter.constructPostFilter(postType: post.postType)
+                )
+            )
+        }
     }
 }

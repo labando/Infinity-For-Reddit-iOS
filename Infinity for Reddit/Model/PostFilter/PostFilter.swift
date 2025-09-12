@@ -359,4 +359,37 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
 
         return merged
     }
+    
+    private static func constructPostFilter() -> PostFilter {
+        var postFilter = PostFilter()
+        postFilter.containTextType = false
+        postFilter.containLinkType = false
+        postFilter.containImageType = false
+        postFilter.containGifType = false
+        postFilter.containVideoType = false
+        postFilter.containGalleryType = false
+        return postFilter
+    }
+    
+    static func constructPostFilter(postType: Post.PostType) -> PostFilter {
+        var postFilter = PostFilter.constructPostFilter()
+        switch postType {
+        case .text:
+            postFilter.containTextType = true
+        case .image, .imageWithUrlPreview:
+            postFilter.containImageType = true
+        case .gif:
+            postFilter.containGifType = true
+        case .video, .imgurVideo, .redgifs, .streamable:
+            postFilter.containVideoType = true
+        case .gallery:
+            postFilter.containGalleryType = true
+        case .link, .noPreviewLink:
+            postFilter.containLinkType = true
+        case .poll:
+            return PostFilter()
+        }
+        
+        return postFilter
+    }
 }
