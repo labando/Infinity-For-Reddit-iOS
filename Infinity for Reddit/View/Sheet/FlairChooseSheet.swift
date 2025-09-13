@@ -7,24 +7,28 @@
 import SwiftUI
 
 struct FlairChooseSheet: View {
-    @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var subredditChooseViewModel: SubredditChooseViewModel
-    @EnvironmentObject var submitTextPostViewModel: SubmitTextPostViewModel
     @Environment(\.dismiss) var dismiss
+    
+    let flairs: [Flair]                 
+    var onFlairSelected: (Flair) -> Void
     
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                if !subredditChooseViewModel.flairs.isEmpty {
-                    ForEach(subredditChooseViewModel.flairs, id: \.id) { flair in
+                if !flairs.isEmpty {
+                    ForEach(flairs, id: \.id) { flair in
                         SimpleTouchItemRow(
                             text: flair.text,
                             icon: nil
                         ){
-                            submitTextPostViewModel.selectedFlair = flair
+                            onFlairSelected(flair)
                             dismiss()
                         }
                     }
+                } else {
+                    Text("No flairs available")
+                        .secondaryText()
+                        .padding()
                 }
             }
             .padding(.top, 20)

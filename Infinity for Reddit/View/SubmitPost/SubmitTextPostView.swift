@@ -178,17 +178,14 @@ struct SubmitTextPostView: View {
             }
         }
         .sheet(isPresented: $showFlairSheet) {
-            FlairChooseSheet()
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
-                .environmentObject(subredditChooseViewModel)
-                .environmentObject(submitTextPostViewModel)
-            
-        }
-        .onChange(of: subredditChooseViewModel.selectedSubreddit?.name ?? "") { _, _ in
-            submitTextPostViewModel.selectedFlair = nil
-            isSpoiler = false
-            isNSFW = false
+            FlairChooseSheet(
+                   flairs: subredditChooseViewModel.flairs
+               ) { flair in
+                   submitTextPostViewModel.selectedFlair = flair
+               }
+               .presentationDetents([.medium, .large])
+               .presentationDragIndicator(.visible)
+               .environmentObject(submitTextPostViewModel)
         }
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitTextPostViewModel.content)
