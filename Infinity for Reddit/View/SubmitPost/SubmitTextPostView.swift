@@ -53,25 +53,26 @@ struct SubmitTextPostView: View {
                             Divider()
                             
                             HStack(spacing: 16) {
-                                if !subredditChooseViewModel.flairs.isEmpty {
-                                    Button(action: {
-                                        if submitTextPostViewModel.selectedFlair != nil {
-                                            submitTextPostViewModel.selectedFlair = nil
-                                        } else {
+                                Button(action: {
+                                    if submitTextPostViewModel.selectedFlair != nil {
+                                        submitTextPostViewModel.selectedFlair = nil
+                                    } else {
+                                        Task {
+                                            await subredditChooseViewModel.fetchFlairs()
                                             showFlairSheet = true
                                         }
-                                    }) {
-                                        Text(submitTextPostViewModel.selectedFlair?.text ?? "Flair")
-                                            .themedPillButton(
-                                                isSelected: submitTextPostViewModel.selectedFlair != nil,
-                                                selectedBackGround: themeViewModel.currentCustomTheme.flairBackgroundColor,
-                                                selectedForeGround: themeViewModel.currentCustomTheme.flairTextColor,
-                                                defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
-                                                defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
-                                                defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
-                                            )
-                                        
                                     }
+                                }) {
+                                    Text(submitTextPostViewModel.selectedFlair?.text ?? "Flair")
+                                        .themedPillButton(
+                                            isSelected: submitTextPostViewModel.selectedFlair != nil,
+                                            selectedBackGround: themeViewModel.currentCustomTheme.flairBackgroundColor,
+                                            selectedForeGround: themeViewModel.currentCustomTheme.flairTextColor,
+                                            defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
+                                            defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
+                                            defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
+                                        )
+                                    
                                 }
                                 
                                 Button(action: {
@@ -87,23 +88,21 @@ struct SubmitTextPostView: View {
                                             defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
                                         )
                                 }
-                                
-                                if submitTextPostViewModel.subredditAllowsNSFW {
-                                    Button(action: {
-                                        isNSFW.toggle()
-                                    }) {
-                                        Text("Sensitive")
-                                            .themedPillButton(
-                                                isSelected: isNSFW,
-                                                selectedBackGround: themeViewModel.currentCustomTheme.nsfwBackgroundColor,
-                                                selectedForeGround: themeViewModel.currentCustomTheme.nsfwTextColor,
-                                                defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
-                                                defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
-                                                defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
-                                            )
-                                    }
+
+                                Button(action: {
+                                    isNSFW.toggle()
+                                }) {
+                                    Text("Sensitive")
+                                        .themedPillButton(
+                                            isSelected: isNSFW,
+                                            selectedBackGround: themeViewModel.currentCustomTheme.nsfwBackgroundColor,
+                                            selectedForeGround: themeViewModel.currentCustomTheme.nsfwTextColor,
+                                            defaultBackGround: themeViewModel.currentCustomTheme.backgroundColor,
+                                            defaultForeGround: themeViewModel.currentCustomTheme.primaryTextColor,
+                                            defaultBorder: themeViewModel.currentCustomTheme.primaryTextColor
+                                        )
                                 }
-                                
+                        
                                 Spacer()
                             }
                             .padding(16)

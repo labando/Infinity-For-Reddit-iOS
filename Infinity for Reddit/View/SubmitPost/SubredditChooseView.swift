@@ -50,6 +50,7 @@ struct SubredditChooseView: View {
                         showNoSubredditAlert = true
                     } else {
                         Task {
+                            await subredditChooseViewModel.fetchRules(isAnonymous: false)
                             showRulesSheet = true
                         }
                     }

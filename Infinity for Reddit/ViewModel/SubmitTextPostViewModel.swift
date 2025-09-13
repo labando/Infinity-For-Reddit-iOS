@@ -12,7 +12,6 @@ class SubmitTextPostViewModel: ObservableObject {
     @Published var content: String = ""
     @Published var selectedAccount: Account
     @Published var selectedFlair: Flair?
-    @Published var subredditAllowsNSFW: Bool = false
     
     init() {
         self.selectedAccount = AccountViewModel.shared.account

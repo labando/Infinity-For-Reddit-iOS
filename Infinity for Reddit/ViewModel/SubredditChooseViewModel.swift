@@ -11,16 +11,8 @@ class SubredditChooseViewModel: ObservableObject {
     
     @Published var selectedSubreddit: SubscribedSubredditData? = nil {
         didSet {
-            
             rules = []
             flairs = []
-            
-            if let subreddit = selectedSubreddit, !subreddit.name.isEmpty {
-                Task {
-                    await fetchRules(isAnonymous: false)
-                    await fetchFlairs()
-                }
-            }
         }
     }
     @Published var error: Error?
