@@ -20,7 +20,7 @@ class SubmitLinkPostViewModel: ObservableObject {
         self.selectedAccount = AccountViewModel.shared.account
     }
     
-    func suggestTitle() {
+    func suggestTitle() async {
         var finalURL = url.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if !finalURL.lowercased().hasPrefix("http://") &&

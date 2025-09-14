@@ -27,11 +27,13 @@ struct SubmitTextPostView: View {
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
+    @State private var resetSelectedSubreddit: Bool
     
-    init() {
+    init(resetSelectedSubreddit: Bool = false) {
         _submitTextPostViewModel = StateObject(
             wrappedValue: SubmitTextPostViewModel()
         )
+        self.resetSelectedSubreddit = resetSelectedSubreddit
     }
     
     var body: some View {
@@ -47,7 +49,6 @@ struct SubmitTextPostView: View {
                             SubredditChooseView(text: "Choose a subreddit", iconUrl: nil, action: {
                                 navigationManager.path.append(AppNavigation.chooseSubredditForNewPost)
                             })
-                            .environmentObject(subredditChooseViewModel)
                             .environmentObject(navigationManager)
                             
                             Divider()
@@ -110,6 +111,9 @@ struct SubmitTextPostView: View {
                             Toggle(isOn: $receiveReplyNotification) {
                                 Text("Receive post reply notifications")
                                     .secondaryText()
+                                    .onTapGesture {
+                                        receiveReplyNotification.toggle()
+                                    }
                             }
                             .padding(16)
                             .themedToggle()
@@ -189,6 +193,12 @@ struct SubmitTextPostView: View {
         }
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitTextPostViewModel.content)
+        }
+        .onAppear {
+            if resetSelectedSubreddit {
+                subredditChooseViewModel.reset()
+            }
+            resetSelectedSubreddit = false
         }
     }
     

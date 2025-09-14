@@ -98,4 +98,9 @@ class SubredditChooseViewModel: ObservableObject {
         
         isLoadingFlairs = false
     }
+    
+    func reset() {
+        selectedSubreddit = nil
+        flairs = []
+    }
 }

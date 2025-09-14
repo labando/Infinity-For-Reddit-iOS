@@ -60,12 +60,12 @@ struct CustomNavigationStack<Content: View>: View {
                         SubmitCommentView(parent: commentParent)
                             .environmentObject(navigationManager)
                             .environmentObject(commentSubmissionShareableViewModel)
-                    case .submitTextPost:
-                        SubmitTextPostView()
+                    case .submitTextPost(let resetSelectedSubreddit):
+                        SubmitTextPostView(resetSelectedSubreddit: resetSelectedSubreddit)
                             .environmentObject(navigationManager)
                             .environmentObject(subredditChooseViewModel)
-                    case .submitLinkPost:
-                        SubmitLinkPostView()
+                    case .submitLinkPost(let resetSelectedSubreddit):
+                        SubmitLinkPostView(resetSelectedSubreddit: resetSelectedSubreddit)
                             .environmentObject(navigationManager)
                             .environmentObject(subredditChooseViewModel)
                     case .submitVideoPost:

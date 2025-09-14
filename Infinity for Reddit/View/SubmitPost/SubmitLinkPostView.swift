@@ -27,11 +27,13 @@ struct SubmitLinkPostView: View {
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
+    @State private var resetSelectedSubreddit: Bool
     
-    init() {
+    init(resetSelectedSubreddit: Bool = false) {
         _submitLinkPostViewModel = StateObject(
             wrappedValue: SubmitLinkPostViewModel()
         )
+        self.resetSelectedSubreddit = resetSelectedSubreddit
     }
     
     var body: some View {
@@ -47,7 +49,6 @@ struct SubmitLinkPostView: View {
                             SubredditChooseView(text: "Choose a subreddit", iconUrl: nil, action: {
                                 navigationManager.path.append(AppNavigation.chooseSubredditForNewPost)
                             })
-                            .environmentObject(subredditChooseViewModel)
                             .environmentObject(navigationManager)
                             
                             Divider()
@@ -110,22 +111,14 @@ struct SubmitLinkPostView: View {
                             Toggle(isOn: $receiveReplyNotification) {
                                 Text("Receive post reply notifications")
                                     .secondaryText()
+                                    .onTapGesture {
+                                        receiveReplyNotification.toggle()
+                                    }
                             }
                             .padding(16)
                             .themedToggle()
                             
                             Divider()
-                            
-//                            CustomTextField(
-//                                "Title",
-//                                text: $submitLinkPostViewModel.title,
-//                                singleLine: true,
-//                                keyboardType: .default,
-//                                showBorder: false,
-//                                fieldType: .title,
-//                                focusedField: $focusedField
-//                            )
-//                            .padding(16)
                             
                             HStack {
                                 CustomTextField(
@@ -195,7 +188,7 @@ struct SubmitLinkPostView: View {
         }
         .frame(maxHeight: .infinity)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Text Post")
+        .addTitleToInlineNavigationBar("Link Post")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
@@ -223,6 +216,12 @@ struct SubmitLinkPostView: View {
         }
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitLinkPostViewModel.content)
+        }
+        .onAppear {
+            if resetSelectedSubreddit {
+                subredditChooseViewModel.reset()
+            }
+            resetSelectedSubreddit = false
         }
     }
     
