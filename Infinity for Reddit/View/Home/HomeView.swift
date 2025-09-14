@@ -184,7 +184,7 @@ struct HomeView: View {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(currentUrl)
-                } else if case let .video(videoUrl, post) = media {
+                } else if case let .video(videoUrl, post, videoType) = media {
                     if let url = URL(string: videoUrl) {
                         VideoFullScreenView(url: url, videoFullScreenViewModel: videoFullScreenViewModel) {
                             fullScreenMediaViewModel.dismiss()

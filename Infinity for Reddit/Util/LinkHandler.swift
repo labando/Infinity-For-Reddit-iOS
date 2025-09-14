@@ -50,29 +50,26 @@ class LinkHandler {
         switch host {
         case "v.redd.it":
             openRedditVideo(finalURL)
-            return LinkDestination.fullScreenMedia
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.video(url: finalURL.absoluteString, videoType: .vReddIt))
             
         case "reddit-uploaded-media.s3-accelerate.amazonaws.com":
             openUploadedRedditImage(finalURL)
-            return LinkDestination.fullScreenMedia
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(url: finalURL.absoluteString))
             
         case _ where host.contains("reddit.com") || host.contains("redd.it") || host.contains("reddit.app"):
             return handleRedditPath(path, segments: segments, url: finalURL)
             
         case _ where host.contains("imgur.com"):
-            handleImgurURL(path: path, segments: segments, url: finalURL)
-            return LinkDestination.fullScreenMedia
+            return handleImgurURL(path: path, segments: segments, url: finalURL)
             
         case _ where host.contains("redgifs.com"):
-            handleRedgifsURL(path: path)
-            return LinkDestination.fullScreenMedia
+            return handleRedgifsURL(path: path, url: finalURL)
             
         case _ where host.contains("google.com"):
             return handleGoogleAmp(url: finalURL, path: path)
             
         case "streamable.com":
-            handleStreamable(path: path, segments: segments)
-            return LinkDestination.fullScreenMedia
+            return handleStreamable(path: path, segments: segments, url: finalURL)
             
         case "click.redditmail.com":
             if path.hasPrefix("/CL0/") {
@@ -106,7 +103,7 @@ class LinkHandler {
                   let realURLString = query.first(where: { $0.name == "url" })?.value,
                   let realURL = URL(string: realURLString) {
             openImage(realURL)
-            return LinkDestination.fullScreenMedia
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(url: realURL.absoluteString))
         } else if let subredditMatch = path.range(of: "/r/[\\w-]+", options: .regularExpression) {
             let subreddit = String(path[subredditMatch]).components(separatedBy: "/")[2]
             openSubreddit(subreddit)
@@ -120,30 +117,35 @@ class LinkHandler {
         }
     }
     
-    private func handleImgurURL(path: String, segments: [String], url: URL) {
+    private func handleImgurURL(path: String, segments: [String], url: URL) -> LinkDestination {
         if path.matches("/gallery/\\w+/?") {
             print("Open Imgur gallery: \(segments[1])")
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(url: url))
         } else if path.matches("/(album|a)/\\w+/?") {
             print("Open Imgur album: \(segments[1])")
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(url: url))
         } else if path.matches("/\\w+/?") {
             print("Open Imgur image: \(path.dropFirst())")
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurImage(url: url))
         } else if path.hasSuffix(".gifv") || path.hasSuffix(".mp4") {
             var videoURL = url.absoluteString
             if path.hasSuffix(".gifv") {
                 videoURL = videoURL.replacingOccurrences(of: ".gifv", with: ".mp4")
             }
-            openVideo(URL(string: videoURL)!)
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.video(url: url.absoluteString))
         } else {
-            openInSafari(url)
+            return LinkDestination.openInBrowser(url)
         }
     }
     
-    private func handleRedgifsURL(path: String) {
+    private func handleRedgifsURL(path: String, url: URL) -> LinkDestination {
         if path.matches("/watch/[\\w-]+$") {
             let id = path.components(separatedBy: "/").last!
             print("Open Redgifs video ID: \(id)")
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.video(url: url.absoluteString, videoType: .redgifs(id: id)))
         } else {
             print("Invalid Redgifs link")
+            return LinkDestination.openInBrowser(url)
         }
     }
     
@@ -159,12 +161,13 @@ class LinkHandler {
         return LinkDestination.openInBrowser(url)
     }
     
-    private func handleStreamable(path: String, segments: [String]) {
+    private func handleStreamable(path: String, segments: [String], url: URL) -> LinkDestination {
         if path.matches("/\\w+/?") {
             let shortCode = segments[0]
             print("Open Streamable video: \(shortCode)")
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.video(url: url.absoluteString, videoType: VideoType.streamable(shortCode: shortCode)))
         } else {
-            print("Invalid Streamable link")
+            return LinkDestination.openInBrowser(url)
         }
     }
     
@@ -210,7 +213,7 @@ class LinkHandler {
 
 enum LinkDestination {
     case navigation(any Hashable)
-    case fullScreenMedia
+    case fullScreenMedia(FullScreenMediaType)
     case openInBrowser(URL)
     case invalid
 }

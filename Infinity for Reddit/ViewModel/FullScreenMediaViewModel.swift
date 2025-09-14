@@ -8,10 +8,19 @@
 import Foundation
 
 enum FullScreenMediaType {
-    case image(url: String, aspectRatio: CGSize?, post: Post?, matchedGeometryEffectId: String?)
-    case gif(url: String, post: Post?)
-    case video(url: String, post: Post?)
+    case image(url: String, aspectRatio: CGSize? = nil, post: Post? = nil, matchedGeometryEffectId: String? = nil)
+    case gif(url: String, post: Post? = nil)
+    case video(url: String, post: Post? = nil, videoType: VideoType? = nil)
     case gallery(currentUrl: String, items: [GalleryItem], mediaMetadata: [String: MediaMetadata], galleryScrollState: GalleryScrollState)
+    case imgurGallery(url: URL)
+    case imgurAlbum(url: URL)
+    case imgurImage(url: URL)
+}
+
+enum VideoType {
+    case vReddIt
+    case redgifs(id: String)
+    case streamable(shortCode: String)
 }
 
 class GalleryScrollState: ObservableObject {
@@ -33,11 +42,17 @@ class FullScreenMediaViewModel: ObservableObject {
         switch media {
         case .image(_, _, _, let matchedGeometryEffectId):
             self.matchedGeometryEffectId = matchedGeometryEffectId
-        case .gif(_, _):
+        case .gif:
             break
-        case .video(_, _):
+        case .video:
             break
-        case .gallery(_, _, _, _):
+        case .gallery:
+            break
+        case .imgurGallery(url: let url):
+            break
+        case .imgurAlbum(url: let url):
+            break
+        case .imgurImage(url: let url):
             break
         }
         

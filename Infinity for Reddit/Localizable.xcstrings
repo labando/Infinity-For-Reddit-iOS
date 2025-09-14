@@ -233,6 +233,9 @@
     "No custom feeds" : {
 
     },
+    "No flairs available" : {
+
+    },
     "No inboxes" : {
 
     },
@@ -392,9 +395,6 @@
     "SubmitImagePostView" : {
 
     },
-    "SubmitLinkPostView" : {
-
-    },
     "SubmitPollPostView" : {
 
     },
@@ -411,6 +411,9 @@
 
     },
     "Subscriptions" : {
+
+    },
+    "Suggest Title" : {
 
     },
     "The name should be unique." : {

@@ -29,6 +29,7 @@ struct NoPreviewPostTypeIndicatorViewModifier: ViewModifier {
 
 struct MediaTapGestureHandlerViewModifer: ViewModifier {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    @EnvironmentObject var navigationManager: NavigationManager
     
     let post: Post?
     let aspectRatio: CGSize?
@@ -63,8 +64,7 @@ struct MediaTapGestureHandlerViewModifer: ViewModifier {
                                 fullScreenMediaViewModel.show(.video(url: videoUrl, post: post))
                             case .link:
                                 if let urlString = post?.url, let url = URL(string: urlString) {
-                                    //UIApplication.shared.open(url)
-                                    LinkHandler.shared.handle(url: url)
+                                    navigationManager.openLink(urlString)
                                 } else {
                                     print("Invalid or empty URL")
                                 }
