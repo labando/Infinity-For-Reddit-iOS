@@ -139,11 +139,14 @@ struct SubmitLinkPostView: View {
                                 )
                                 
                                 Button("Suggest Title") {
-                                    print("Suggest Title tapped")
+                                    Task {
+                                        await submitLinkPostViewModel.suggestTitle()
+                                    }
                                 }
                                 .buttonStyle(.borderedProminent)
                                 .tint(Color(hex: themeViewModel.currentCustomTheme.colorPrimary))
                                 .controlSize(.regular)
+                                .contentShape(Rectangle())
                             }
                             .padding(16)
                             
