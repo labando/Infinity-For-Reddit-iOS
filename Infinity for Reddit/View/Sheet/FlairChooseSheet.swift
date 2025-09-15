@@ -17,12 +17,19 @@ struct FlairChooseSheet: View {
             VStack(spacing: 0) {
                 if !flairs.isEmpty {
                     ForEach(flairs, id: \.id) { flair in
-                        SimpleTouchItemRow(
-                            text: flair.text,
-                            icon: nil
-                        ){
+                        TouchRipple(action: {
                             onFlairSelected(flair)
                             dismiss()
+                        }) {
+                            HStack {
+                                FlairRowView(
+                                    flairRichtext: flair.richtext ?? [],
+                                    flairText: flair.text
+                                )
+                                Spacer()
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
                         }
                     }
                 } else {

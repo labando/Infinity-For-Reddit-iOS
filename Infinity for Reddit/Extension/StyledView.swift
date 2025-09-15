@@ -283,4 +283,8 @@ extension View {
     func authorFlairText() -> some View {
         self.modifier(AuthorFlairTextViewModifier())
     }
+    
+    func flairRowText() -> some View {
+        self.modifier(FlairRowTextViewModifier())
+    }
 }

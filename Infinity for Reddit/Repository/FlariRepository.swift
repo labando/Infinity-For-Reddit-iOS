@@ -29,9 +29,9 @@ class FlairRepository: FlairRepositoryProtocol {
         let flairs = try await self.session.request(
             RedditOAuthAPI.getFlairs(subredditName: subreddit)
         )
-            .validate()
-            .serializingDecodable([Flair].self)
-            .value
+        .validate()
+        .serializingDecodable([Flair].self)
+        .value
         
         try Task.checkCancellation()
         

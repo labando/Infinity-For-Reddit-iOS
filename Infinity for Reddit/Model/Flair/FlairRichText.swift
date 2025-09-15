@@ -8,7 +8,7 @@
 import Foundation
 import SwiftyJSON
 
-public class FlairRichtext : NSObject, NSCoding {
+public class FlairRichtext : NSObject, NSCoding, Codable {
     
     //Type e.g. "text", "emoji"
     var e : String!

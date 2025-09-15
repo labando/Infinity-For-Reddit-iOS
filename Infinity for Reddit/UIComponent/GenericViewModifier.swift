@@ -241,3 +241,13 @@ struct AuthorFlairTextViewModifier: ViewModifier {
             .font(.system(size: 12))
     }
 }
+
+struct FlairRowTextViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
+            .font(.system(size: 16, weight: .medium))
+    }
+}
