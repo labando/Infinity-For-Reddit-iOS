@@ -40,7 +40,7 @@ class LinkHandler {
         }
         
         guard let host = finalURL.host else {
-            print("❌ Missing host in URL: \(finalURL)")
+            print("Missing host in URL: \(finalURL)")
             return LinkDestination.invalid
         }
         
@@ -49,12 +49,10 @@ class LinkHandler {
         
         switch host {
         case "v.redd.it":
-            openRedditVideo(finalURL)
             return LinkDestination.fullScreenMedia(FullScreenMediaType.video(url: finalURL.absoluteString, videoType: .vReddIt))
             
         case "reddit-uploaded-media.s3-accelerate.amazonaws.com":
-            openUploadedRedditImage(finalURL)
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(url: finalURL.absoluteString))
+            return openUploadedRedditImage(finalURL)
             
         case _ where host.contains("reddit.com") || host.contains("redd.it") || host.contains("reddit.app"):
             return handleRedditPath(path, segments: segments, url: finalURL)
@@ -101,24 +99,19 @@ class LinkHandler {
             let postId = segments[index + 1]
             if segments.count > index + 2 {
                 let commentId = segments.last!
-                openPostWithComment(postId, commentId: commentId)
                 return LinkDestination.navigation(AppNavigation.postDetails(postDetailsInput: PostDetailsInput.postAndCommentId(postId: postId, commentId: commentId), isFromSubredditPostListing: false))
             } else {
-                openPost(postId)
                 return LinkDestination.navigation(AppNavigation.postDetails(postDetailsInput: PostDetailsInput.postAndCommentId(postId: postId), isFromSubredditPostListing: false))
             }
         } else if path == "/media", let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
                   let realURLString = query.first(where: { $0.name == "url" })?.value,
                   let realURL = URL(string: realURLString) {
-            openImage(realURL)
             return LinkDestination.fullScreenMedia(FullScreenMediaType.image(url: realURL.absoluteString))
         } else if let subredditMatch = path.range(of: "/r/[\\w-]+", options: .regularExpression) {
             let subreddit = String(path[subredditMatch]).components(separatedBy: "/")[2]
-            openSubreddit(subreddit)
             return LinkDestination.navigation(AppNavigation.subredditDetails(subredditName: subreddit))
         } else if let userMatch = path.range(of: "/(u|user)/[\\w-]+", options: .regularExpression) {
             let username = String(path[userMatch]).components(separatedBy: "/").last!
-            openUser(username)
             return LinkDestination.navigation(AppNavigation.userDetails(username: username))
         } else {
             return LinkDestination.openInBrowser(url)
@@ -179,39 +172,13 @@ class LinkHandler {
         }
     }
     
-    private func openImage(_ url: URL) {
-        print("Open image: \(url.absoluteString)")
-    }
-    
-    private func openVideo(_ url: URL) {
-        print("Open video: \(url.absoluteString)")
-    }
-    
-    private func openUploadedRedditImage(_ url: URL) {
+    private func openUploadedRedditImage(_ url: URL) -> LinkDestination {
         let unescaped = url.absoluteString.replacingOccurrences(of: "%2F", with: "/")
         if let id = unescaped.components(separatedBy: "/").last {
             print("Uploaded image ID: \(id)")
+            return LinkDestination.fullScreenMedia(.image(url: unescaped))
         }
-    }
-    
-    private func openRedditVideo(_ url: URL) {
-        print("Open v.redd.it video: \(url.absoluteString)")
-    }
-    
-    private func openPost(_ id: String) {
-        print("Navigate to post: \(id)")
-    }
-    
-    private func openPostWithComment(_ postId: String, commentId: String) {
-        print("Navigate to post: \(postId) with comment: \(commentId)")
-    }
-    
-    private func openSubreddit(_ name: String) {
-        print("Navigate to subreddit: \(name)")
-    }
-    
-    private func openUser(_ name: String) {
-        print("Navigate to user: \(name)")
+        return LinkDestination.openInBrowser(url)
     }
     
     private func openInSafari(_ url: URL) {
