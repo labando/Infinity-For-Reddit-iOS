@@ -108,15 +108,20 @@ struct SubmitTextPostView: View {
                             }
                             .padding(16)
                             
-                            Toggle(isOn: $receiveReplyNotification) {
-                                Text("Receive post reply notifications")
-                                    .secondaryText()
-                                    .onTapGesture {
-                                        receiveReplyNotification.toggle()
-                                    }
+                            TouchRipple(action: {
+                                receiveReplyNotification.toggle()
+                            }) {
+                                HStack {
+                                    RowText("Receive post reply notifications")
+                                        .secondaryText()
+                                    
+                                    Toggle(isOn: $receiveReplyNotification) {}
+                                        .labelsHidden()
+                                        .themedToggle()
+                                        .excludeFromTouchRipple()
+                                }
+                                .padding(16)
                             }
-                            .padding(16)
-                            .themedToggle()
                             
                             Divider()
                             
