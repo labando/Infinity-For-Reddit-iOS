@@ -16,6 +16,7 @@ struct UserListingView: View {
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
+    private let iconSize: CGFloat = 28
     
     init(account: Account, query: String) {
         self.account = account
@@ -39,15 +40,13 @@ struct UserListingView: View {
                     ForEach(userListingViewModel.users, id: \.id) { user in
                         HStack {
                             CustomWebImage(
-                                user.iconImg == nil || user.iconImg.isEmpty ? "" : user.subreddit?.iconImg,
-                                width: 40,
-                                height: 40,
+                                user.iconUrl,
+                                width: iconSize,
+                                height: iconSize,
                                 circleClipped: true,
                                 handleImageTapGesture: false,
                                 fallbackView: {
-                                    SwiftUI.Image(systemName: "person.crop.circle")
-                                        .resizable()
-                                        .frame(width: 40, height: 40)
+                                    InitialLetterAvatarImageFallbackView(name: user.name, size: iconSize)
                                 }
                             )
                             

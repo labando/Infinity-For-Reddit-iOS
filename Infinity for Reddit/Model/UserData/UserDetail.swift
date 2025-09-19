@@ -9,65 +9,19 @@ import Foundation
 import SwiftyJSON
 import GRDB
 
-class UserDetailRootClass : NSObject, NSCoding{
-    
+class UserDetailRootClass : NSObject {
     var data : User!
     var kind : String!
     
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
-    init(fromJson json: JSON!){
-        if json.isEmpty{
+    init(fromJson json: JSON!) {
+        if json.isEmpty {
             return
         }
         let dataJson = json["data"]
-        if !dataJson.isEmpty{
+        if !dataJson.isEmpty {
             data = User(fromJson: dataJson)
         }
         kind = json["kind"].stringValue
-    }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if data != nil{
-            dictionary["data"] = data.toDictionary()
-        }
-        if kind != nil{
-            dictionary["kind"] = kind
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        data = aDecoder.decodeObject(forKey: "data") as? User
-        kind = aDecoder.decodeObject(forKey: "kind") as? String
-        
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    func encode(with aCoder: NSCoder)
-    {
-        if data != nil{
-            aCoder.encode(data, forKey: "data")
-        }
-        if kind != nil{
-            aCoder.encode(kind, forKey: "kind")
-        }
-        
     }
     
     public func toUserData() -> UserData {

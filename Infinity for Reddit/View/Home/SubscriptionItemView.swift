@@ -27,12 +27,10 @@ struct SubscriptionItemView: View {
                         width: iconSize,
                         height: iconSize,
                         circleClipped: true,
-                        handleImageTapGesture: false
-//                        fallbackView: {
-//                            SwiftUI.Image(systemName: "person.crop.circle")
-//                                .resizable()
-//                                .frame(width: 30, height: 30)
-//                        }
+                        handleImageTapGesture: false,
+                        fallbackView: {
+                            InitialLetterAvatarImageFallbackView(name: text, size: iconSize)
+                        }
                     )
                 } else {
                     Spacer()

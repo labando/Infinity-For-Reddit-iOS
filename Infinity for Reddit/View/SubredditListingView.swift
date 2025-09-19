@@ -16,6 +16,7 @@ struct SubredditListingView: View {
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
+    private let iconSize: CGFloat = 28
     var onSelect: ((Subreddit) -> Void)?
     
     init(account: Account, query: String, onSelect: ((Subreddit) -> Void)? = nil) {
@@ -42,21 +43,14 @@ struct SubredditListingView: View {
                         HStack {
                             CustomWebImage(
                                 subreddit.iconUrl,
-                                width: 40,
-                                height: 40,
+                                width: iconSize,
+                                height: iconSize,
                                 circleClipped: true,
                                 handleImageTapGesture: false,
                                 fallbackView: {
-                                    SwiftUI.Image(systemName: "person.crop.circle")
-                                        .resizable()
-                                        .frame(width: 40, height: 40)
+                                    InitialLetterAvatarImageFallbackView(name: subreddit.displayName, size: iconSize)
                                 }
                             )
-                            .onAppear {
-                                print(subreddit.displayName)
-                                print(subreddit.iconImg)
-                                print(subreddit.communityIcon)
-                            }
                             
                             Spacer()
                                 .frame(width: 24)

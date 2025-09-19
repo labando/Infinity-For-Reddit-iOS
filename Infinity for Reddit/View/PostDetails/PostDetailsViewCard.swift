@@ -33,6 +33,8 @@ struct PostDetailsViewCard: View {
     let isFromSubredditPostListing: Bool
     let onSendComment: () -> Void
     
+    private let iconSize: CGFloat = 24
+    
     init(account: Account, post: Post, isFromSubredditPostListing: Bool, onSendComment: @escaping () -> Void) {
         self.isFromSubredditPostListing = isFromSubredditPostListing
         self.onSendComment = onSendComment
@@ -47,17 +49,15 @@ struct PostDetailsViewCard: View {
             HStack {
                 CustomWebImage(
                     postViewModel.post.subredditOrUserIconInPostDetails,
-                    width: 24,
-                    height: 24,
+                    width: iconSize,
+                    height: iconSize,
                     circleClipped: true,
                     handleImageTapGesture: false,
                     fallbackView: {
-                        SwiftUI.Image(systemName: "person.crop.circle")
-                            .resizable()
-                            .frame(width: 24, height: 24)
+                        InitialLetterAvatarImageFallbackView(name: postViewModel.post.subreddit, size: iconSize)
                     }
                 )
-                .frame(width: 24, height: 24)
+                .frame(width: iconSize, height: iconSize)
                 .onTapGesture {
                     goToSubredditDetails()
                 }

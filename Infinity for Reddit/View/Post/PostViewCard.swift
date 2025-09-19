@@ -36,6 +36,8 @@ struct PostViewCard: View {
     let onPostTypeClicked: () -> Void
     let onSensitiveClicked: () -> Void
     
+    private let iconSize: CGFloat = 24
+    
     init(account: Account, post: Post, isSubredditPostListing: Bool, width: CGFloat? = nil, onPostTypeClicked: @escaping () -> Void, onSensitiveClicked: @escaping () -> Void) {
         self.width = width
         self.isSubredditPostListing = isSubredditPostListing
@@ -52,17 +54,15 @@ struct PostViewCard: View {
             HStack {
                 CustomWebImage(
                     postViewModel.post.subredditOrUserIcon,
-                    width: 24,
-                    height: 24,
+                    width: iconSize,
+                    height: iconSize,
                     circleClipped: true,
                     handleImageTapGesture: false,
                     fallbackView: {
-                        SwiftUI.Image(systemName: "person.crop.circle")
-                            .resizable()
-                            .frame(width: 24, height: 24)
+                        InitialLetterAvatarImageFallbackView(name: isSubredditPostListing ? postViewModel.post.author : postViewModel.post.subreddit, size: iconSize)
                     }
                 )
-                .frame(width: 24, height: 24)
+                .frame(width: iconSize, height: iconSize)
                 .onTapGesture {
                     if (!isSubredditPostListing) {
                         navigationManager.path.append(AppNavigation.subredditDetails(subredditName: postViewModel.post.subreddit))

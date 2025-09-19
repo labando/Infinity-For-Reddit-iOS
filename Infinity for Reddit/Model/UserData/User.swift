@@ -36,6 +36,10 @@ public class User : NSObject, NSCoding {
     var totalKarma : Int!
     var verified : Bool!
     
+    var iconUrl: String {
+        return iconImg.isEmpty ? subreddit?.iconImg ?? "" : iconImg
+    }
+    
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */

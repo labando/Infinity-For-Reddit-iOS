@@ -18,6 +18,8 @@ struct UserDetailsView: View {
     @State private var isCurrentUserProfile: Bool = true
     @State private var subscribeTask: Task<Void, Never>?
     
+    private let userIconSize: CGFloat = 80
+    
     init(username: String) {
         _userDetailsViewModel = StateObject(
             wrappedValue: UserDetailsViewModel(
@@ -35,10 +37,13 @@ struct UserDetailsView: View {
                     HStack(spacing: 0) {
                         CustomWebImage(
                             userData.iconUrl,
-                            width: 80,
-                            height: 80,
+                            width: userIconSize,
+                            height: userIconSize,
                             circleClipped: true,
-                            handleImageTapGesture: false
+                            handleImageTapGesture: false,
+                            fallbackView: {
+                                InitialLetterAvatarImageFallbackView(name: userData.name, size: userIconSize)
+                            }
                         )
                         .padding(.vertical, 20)
                         

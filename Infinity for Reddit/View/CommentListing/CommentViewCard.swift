@@ -34,6 +34,7 @@ struct CommentViewCard: View {
     @State private var isToolbarHidden: Bool
 
     private let isInPostDetails: Bool
+    private let userIconSize: CGFloat = 24
     let onToggleExpand: (() -> Void)?
     let onReply: (() -> Void)?
     
@@ -54,17 +55,15 @@ struct CommentViewCard: View {
                     if isInPostDetails && showAuthorAvatar {
                         CustomWebImage(
                             commentViewModel.comment.authorIconUrl?.absoluteString,
-                            width: 24,
-                            height: 24,
+                            width: userIconSize,
+                            height: userIconSize,
                             circleClipped: true,
                             handleImageTapGesture: false,
                             fallbackView: {
-                                SwiftUI.Image(systemName: "person.crop.circle")
-                                    .resizable()
-                                    .frame(width: 24, height: 24)
+                                InitialLetterAvatarImageFallbackView(name: commentViewModel.comment.author, size: userIconSize)
                             }
                         )
-                        .frame(width: 24, height: 24)
+                        .frame(width: userIconSize, height: userIconSize)
                         .onTapGesture {
                             navigationManager.path.append(AppNavigation.userDetails(username: commentViewModel.comment.author))
                         }

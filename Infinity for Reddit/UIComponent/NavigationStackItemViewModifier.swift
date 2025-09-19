@@ -1,5 +1,5 @@
 //
-//  NavigationDestination.swift
+//  NavigationStackItemViewModifier.swift
 //  Infinity for Reddit
 //
 //  Created by Docile Alligator on 2025-05-29.
@@ -12,6 +12,8 @@ struct NavigationStackItemViewModifier: ViewModifier {
     
     @State private var showProfile: Bool = false
     
+    private let userIconSize: CGFloat = 30
+    
     func body(content: Content) -> some View {
         content
             .toolbar {
@@ -21,15 +23,20 @@ struct NavigationStackItemViewModifier: ViewModifier {
                     }) {
                         CustomWebImage(
                             accountViewModel.account.profileImageUrl,
-                            width: 30,
-                            height: 30,
+                            width: userIconSize,
+                            height: userIconSize,
                             circleClipped: true,
                             handleImageTapGesture: false,
                             fallbackView: {
-                                SwiftUI.Image(systemName: "person.crop.circle")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                    .navigationBarImage()
+                                if accountViewModel.account.isAnonymous() {
+                                    SwiftUI.Image(systemName: "person.crop.circle.badge.questionmark.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: userIconSize, height: userIconSize)
+                                        .navigationBarImage()
+                                } else {
+                                    InitialLetterAvatarImageFallbackView(name: accountViewModel.account.username, size: userIconSize)
+                                }
                             }
                         )
                     }

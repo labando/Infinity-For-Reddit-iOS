@@ -25,6 +25,8 @@ struct SubredditDetailsView: View {
     
     @StateObject var subredditDetailsViewModel : SubredditDetailsViewModel
     
+    private let subredditIconSize: CGFloat = 80
+    
     init(subredditName: String) {
         _subredditDetailsViewModel = StateObject(
             wrappedValue: SubredditDetailsViewModel(
@@ -92,10 +94,13 @@ struct SubredditDetailsView: View {
                             HStack(spacing: 0) {
                                 CustomWebImage(
                                     subredditData.iconUrl,
-                                    width: 80,
-                                    height: 80,
+                                    width: subredditIconSize,
+                                    height: subredditIconSize,
                                     circleClipped: true,
-                                    handleImageTapGesture: false
+                                    handleImageTapGesture: false,
+                                    fallbackView: {
+                                        InitialLetterAvatarImageFallbackView(name: subredditData.name, size: subredditIconSize)
+                                    }
                                 )
                                 
                                 VStack(alignment: .leading, spacing: 8) {

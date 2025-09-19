@@ -16,6 +16,8 @@ struct AccountSheet: View {
     
     @StateObject var accountListingViewModel: AccountListingViewModel
     
+    private let profileImageSize: CGFloat = 96
+    
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
@@ -40,14 +42,20 @@ struct AccountSheet: View {
                     
                     CustomWebImage(
                         accountViewModel.account.profileImageUrl,
-                        width: 96,
-                        height: 96,
+                        width: profileImageSize,
+                        height: profileImageSize,
                         circleClipped: true,
                         handleImageTapGesture: false,
                         fallbackView: {
-                            SwiftUI.Image(systemName: "person.crop.circle")
-                                .resizable()
-                                .frame(width: 96, height: 96)
+                            if accountViewModel.account.isAnonymous() {
+                                SwiftUI.Image(systemName: "person.crop.circle.badge.questionmark.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: profileImageSize, height: profileImageSize)
+                                    .primaryIcon()
+                            } else {
+                                InitialLetterAvatarImageFallbackView(name: accountViewModel.account.username, size: profileImageSize)
+                            }
                         }
                     )
                 }
