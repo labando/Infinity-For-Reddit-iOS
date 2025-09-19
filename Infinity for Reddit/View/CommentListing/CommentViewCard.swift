@@ -78,8 +78,7 @@ struct CommentViewCard: View {
                             }
                     } else {
                         VStack(alignment: .leading, spacing: 0) {
-                            Text("u/\(commentViewModel.comment.author)")
-                                .username()
+                            CommentAuthorView(comment: commentViewModel.comment)
                             
                             AuthorFlairView(flairRichtext: commentViewModel.comment.authorFlairRichtext, flairText: commentViewModel.comment.authorFlairText)
                         }

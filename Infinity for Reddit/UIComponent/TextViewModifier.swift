@@ -68,7 +68,6 @@ struct UsernameTextViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fixedSize(horizontal: false, vertical: true)
-            //.font()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.username))
     }
 }

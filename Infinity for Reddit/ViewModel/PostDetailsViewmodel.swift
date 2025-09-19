@@ -88,8 +88,10 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    public func fetchPostAndComments(isRefreshWithContinuation: Bool = false, shouldLoadPost: Bool = false) async {
-        guard !isInitialLoading, !isLoadingMore else { return }
+    public func fetchPostAndComments(isRefreshWithContinuation: Bool = false, shouldLoadPost: Bool = false, forceLoad: Bool = false) async {
+        if !forceLoad {
+            guard !isInitialLoading, !isLoadingMore else { return }
+        }
         
         let isInitailLoadCopy = isInitialLoad
         
@@ -132,8 +134,9 @@ public class PostDetailsViewModel: ObservableObject {
                         if !postDetails.postListing.posts.isEmpty, let suggestedSort = SortType.Kind(rawValue: postDetails.postListing.posts[0].suggestedSort) {
                             await MainActor.run {
                                 self.sortTypeKind =  suggestedSort
+                                self.hasUsedRecommendedSort = true
                             }
-                            await fetchPostAndComments(isRefreshWithContinuation: isRefreshWithContinuation, shouldLoadPost: shouldLoadPost)
+                            await fetchPostAndComments(isRefreshWithContinuation: isRefreshWithContinuation, shouldLoadPost: shouldLoadPost, forceLoad: true)
                             return
                         }
                         self.hasUsedRecommendedSort = true
@@ -147,8 +150,9 @@ public class PostDetailsViewModel: ObservableObject {
                         if !postDetails.postListing.posts.isEmpty, let suggestedSort = SortType.Kind(rawValue: postDetails.postListing.posts[0].suggestedSort) {
                             await MainActor.run {
                                 self.sortTypeKind =  suggestedSort
+                                self.hasUsedRecommendedSort = true
                             }
-                            await fetchPostAndComments(isRefreshWithContinuation: isRefreshWithContinuation, shouldLoadPost: shouldLoadPost)
+                            await fetchPostAndComments(isRefreshWithContinuation: isRefreshWithContinuation, shouldLoadPost: shouldLoadPost, forceLoad: true)
                             return
                         }
                         self.hasUsedRecommendedSort = true
