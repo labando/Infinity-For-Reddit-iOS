@@ -41,7 +41,7 @@ struct SubredditListingView: View {
                     ForEach(subredditListingViewModel.subreddits, id: \.id) { subreddit in
                         HStack {
                             CustomWebImage(
-                                subreddit.iconImg,
+                                subreddit.iconUrl,
                                 width: 40,
                                 height: 40,
                                 circleClipped: true,
@@ -52,6 +52,11 @@ struct SubredditListingView: View {
                                         .frame(width: 40, height: 40)
                                 }
                             )
+                            .onAppear {
+                                print(subreddit.displayName)
+                                print(subreddit.iconImg)
+                                print(subreddit.communityIcon)
+                            }
                             
                             Spacer()
                                 .frame(width: 24)

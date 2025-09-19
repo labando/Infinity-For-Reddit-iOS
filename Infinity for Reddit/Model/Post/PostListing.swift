@@ -368,7 +368,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         permalink = json["permalink"].stringValue
         pinned = json["pinned"].boolValue
         let previewJson = json["preview"]
-        if !previewJson.isEmpty{
+        if !previewJson.isEmpty {
             preview = Preview(fromJson: previewJson)
         }
         pwls = json["pwls"].intValue
@@ -1034,8 +1034,8 @@ class Preview : NSObject, NSCoding{
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!){
-        if json.isEmpty{
+    init(fromJson json: JSON!) {
+        if json.isEmpty {
             return
         }
         enabled = json["enabled"].boolValue
