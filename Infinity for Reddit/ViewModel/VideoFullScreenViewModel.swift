@@ -30,7 +30,7 @@ class VideoFullScreenViewModel: ObservableObject {
             var finalURL: URL? = url
             switch videoType {
             case .vReddIt:
-                break
+                finalURL = try await loadVReddItVideo(url)
             case .redgifs(id: let id):
                 finalURL = try await loadRedgifsVideo(id)
             case .streamable(shortCode: let shortCode):
@@ -80,14 +80,11 @@ class VideoFullScreenViewModel: ObservableObject {
     }
     
     private func loadStreamableVideo(_ shortCode: String) async throws -> URL? {
-        let streamable = try await VideoFetcher.shared.fetchStreamableVideo(shortCode: shortCode)
-        if let mp4 = streamable.mp4 {
-            return URL(string: mp4.url)
-        } else if let mp4Mobile = streamable.mp4mobile {
-            return URL(string: mp4Mobile.url)
-        }
-        
-        return nil
+        return try await VideoFetcher.shared.fetchStreamableVideo(shortCode: shortCode)
+    }
+    
+    private func loadVReddItVideo(_ url: URL) async throws -> URL? {
+        return try await VideoFetcher.shared.fetchVReddItVideo(url: url)
     }
     
     func play() {

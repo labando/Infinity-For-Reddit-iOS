@@ -17,13 +17,13 @@ class PostListingRootClass: NSObject, NSCoding{
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!) {
-        if json.isEmpty{
-            return
+    init(fromJson json: JSON!) throws {
+        if json.isEmpty {
+            throw JSONError.invalidData
         }
         let dataJson = json["data"]
-        if !dataJson.isEmpty{
-            data = PostListing(fromJson: dataJson)
+        if !dataJson.isEmpty {
+            data = try PostListing(fromJson: dataJson)
         }
         kind = json["kind"].stringValue
     }
@@ -78,15 +78,20 @@ public class PostListing : NSObject, NSCoding{
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!) {
-        if json.isEmpty{
-            return
+    init(fromJson json: JSON!) throws {
+        if json.isEmpty {
+            throw JSONError.invalidData
         }
         let childrenArray = json["children"].arrayValue
         for childJSON in childrenArray {
             let dataJson = childJSON["data"]
-            if !dataJson.isEmpty{
-                posts.append(Post(fromJson: dataJson))
+            if !dataJson.isEmpty {
+                do {
+                    posts.append(try Post(fromJson: dataJson))
+                } catch {
+                    // Ignore the error
+                    print(error.localizedDescription)
+                }
             }
         }
         after = json["after"].stringValue
@@ -235,7 +240,18 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     @Published var isRead: Bool = false
     
     enum PostType: Equatable {
-        case text, image, imageWithUrlPreview(urlPreview: String), gif, video(videoUrl: String, downloadUrl: String), gallery, link, noPreviewLink, poll, imgurVideo(url: String), redgifs(redgifsId: String), streamable(shortCode: String)
+        case text
+        case image
+        case imageWithUrlPreview(urlPreview: String)
+        case gif
+        case video(videoUrl: String, downloadUrl: String)
+        case gallery
+        case link
+        case noPreviewLink
+        case poll
+        case imgurVideo(url: String)
+        case redgifs(redgifsId: String)
+        case streamable(shortCode: String)
         
         var isMedia: Bool {
             switch self {
@@ -269,9 +285,9 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!){
+    init(fromJson json: JSON!) throws {
         if json.isEmpty {
-            return
+            throw JSONError.invalidData
         }
         approvedAtUtc = json["approved_at_utc"].stringValue
         approvedBy = json["approved_by"].stringValue
@@ -289,7 +305,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
         created = json["created"].int64Value
         createdUtc = json["created_utc"].int64Value
         if let crosspostParentListArray = json["crosspost_parent_list"].array, !crosspostParentListArray.isEmpty {
-            crosspostParent = Post(fromJson: crosspostParentListArray[0])
+            crosspostParent = try Post(fromJson: crosspostParentListArray[0])
         }
         distinguished = json["distinguished"].stringValue
         domain = json["domain"].stringValue

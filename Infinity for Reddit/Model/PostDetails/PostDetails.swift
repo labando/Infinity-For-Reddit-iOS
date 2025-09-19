@@ -17,20 +17,22 @@ public class PostDetailsRootClass: NSObject, NSCoding, Validatable {
     /**
      * Instantiate the instance using the passed json values to set the properties values
      */
-    init(fromJson json: JSON!) throws {
+    init(fromJson json: JSON!, parseComments: Bool = true) throws {
         try Self.validate(json: json)
         
-        if json.isEmpty{
-            return
+        if json.isEmpty {
+            throw JSONError.invalidData
         }
         
         let postListingJson = json[0]
         if !postListingJson.isEmpty {
-            postListing = PostListingRootClass(fromJson: postListingJson).data
+            postListing = try PostListingRootClass(fromJson: postListingJson).data
         }
-        let commentListingJson = json[1]
-        if !commentListingJson.isEmpty {
-            commentListing = try CommentListingRootClass(fromJson: commentListingJson).data
+        if parseComments {
+            let commentListingJson = json[1]
+            if !commentListingJson.isEmpty {
+                commentListing = try CommentListingRootClass(fromJson: commentListingJson).data
+            }
         }
     }
     

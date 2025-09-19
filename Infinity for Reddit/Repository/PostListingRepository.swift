@@ -71,7 +71,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        return PostListingRootClass(fromJson: json).data
+        return try PostListingRootClass(fromJson: json).data
     }
     
     public func getAnonymousSubscriptionsConcatenated() -> String {
