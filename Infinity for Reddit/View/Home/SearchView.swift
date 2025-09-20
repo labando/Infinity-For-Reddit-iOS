@@ -12,7 +12,7 @@ struct SearchView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     
     @StateObject private var searchViewModel: SearchViewModel
-    @FocusState private var isTextFieldFocused: Bool
+    @FocusState var focusedField: FieldType?
     
     private let onSearchCustomAction: ((String) -> Void)?
     
@@ -28,23 +28,22 @@ struct SearchView: View {
                 SwiftUI.Image(systemName: "magnifyingglass")
                     .foregroundColor(.gray)
                 
-                TextField("Search", text: $searchViewModel.query)
-                    .focused($isTextFieldFocused)
-                    .font(.system(size: 16))
-                    .foregroundColor(.primary)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                    .submitLabel(.search)
-                    .onSubmit {
-                        if !accountViewModel.account.isAnonymous() {
-                            searchViewModel.saveSearchQuery()
-                        }
-                        if let onSearch = onSearchCustomAction {
-                            onSearch(searchViewModel.query)
-                        } else {
-                            navigationManager.path.append(AppNavigation.searchResults(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearchInThingType.all))
-                        }
+                CustomTextField("Search",
+                                text: $searchViewModel.query,
+                                singleLine: true,
+                                fieldType: .search,
+                                focusedField: $focusedField)
+                .submitLabel(.search)
+                .onSubmit {
+                    if !accountViewModel.account.isAnonymous() {
+                        searchViewModel.saveSearchQuery()
                     }
+                    if let onSearch = onSearchCustomAction {
+                        onSearch(searchViewModel.query)
+                    } else {
+                        navigationManager.path.append(AppNavigation.searchResults(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearchInThingType.all))
+                    }
+                }
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
@@ -117,11 +116,12 @@ struct SearchView: View {
             }
             .themedList()
         }
-        .onTapGesture {
-            isTextFieldFocused = false
-        }
         .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Search")
+    }
+    
+    enum FieldType: Hashable {
+        case search
     }
 }
