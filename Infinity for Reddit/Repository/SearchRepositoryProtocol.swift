@@ -6,7 +6,13 @@
 //
 
 public protocol SearchRepositoryProtocol {
-    func saveSearchQuery(username: String, query: String, searchInSubredditOrUserName: String?, multiRedditPath: String?, searchInThingType: SearchInThingType, time: Int64)
+    func saveSearchQuery(username: String,
+                         query: String,
+                         searchInSubredditOrUserName: String?,
+                         multiRedditPath: String?,
+                         customFeedDisplayName: String?,
+                         searchInThingType: SearchInThingType,
+                         time: Int64)
     func clearAllRecentSearchQueries(username: String)
     func deleteRecentSearchQueries(recentSearchQuery: RecentSearchQuery)
 }

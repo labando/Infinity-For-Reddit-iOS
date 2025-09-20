@@ -25,7 +25,7 @@ struct CustomFeedDetailsView: View {
         PostListingView(
             account: accountViewModel.account,
             postListingMetadata: PostListingMetadata(
-                postListingType: .multireddit(path: customFeedDetailsViewModel.myCustomFeed.path),
+                postListingType: .customFeed(path: customFeedDetailsViewModel.myCustomFeed.path),
                 pathComponents: ["multipath": customFeedDetailsViewModel.myCustomFeed.path],
                 headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                 queries: nil,

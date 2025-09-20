@@ -16,7 +16,14 @@ class SearchRepository: SearchRepositoryProtocol {
         self.operationQueue = operationQueue
     }
     
-    func saveSearchQuery(username: String, query: String, searchInSubredditOrUserName: String?, multiRedditPath: String?, searchInThingType: SearchInThingType, time: Int64) {
+    func saveSearchQuery(username: String,
+                         query: String,
+                         searchInSubredditOrUserName: String?,
+                         multiRedditPath: String?,
+                         customFeedDisplayName: String?,
+                         searchInThingType: SearchInThingType,
+                         time: Int64
+    ) {
         operationQueue.addOperation {
             do {
                 try self.recentSearchQueryDao.insert(
@@ -26,6 +33,7 @@ class SearchRepository: SearchRepositoryProtocol {
                             searchQuery: query,
                             searchInSubredditOrUserName: searchInSubredditOrUserName,
                             multiRedditPath: multiRedditPath,
+                            multiRedditDisplayName: customFeedDisplayName,
                             searchInThingType: searchInThingType,
                             time: time
                         )

@@ -30,6 +30,14 @@ class SearchViewModel: ObservableObject {
         }
     }
     
+    var searchInCustomFeedDisplayName: String {
+        if let searchInThing = searchInThing {
+            return searchInThing.displayName
+        } else {
+            return ""
+        }
+    }
+    
     var searchInThingType: SearchInThingType {
         if let searchInThing = searchInThing {
             return searchInThing.searchInThingType
@@ -88,6 +96,7 @@ class SearchViewModel: ObservableObject {
             query: query,
             searchInSubredditOrUserName: searchInSubredditOrUserName,
             multiRedditPath: searchInCustomFeed,
+            customFeedDisplayName: searchInCustomFeedDisplayName,
             searchInThingType: searchInThingType,
             time: Int64(Date().timeIntervalSince1970)
         )

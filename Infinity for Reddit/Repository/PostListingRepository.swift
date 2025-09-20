@@ -49,10 +49,31 @@ public class PostListingRepository: PostListingRepositoryProtocol {
             apiRequest = RedditOAuthAPI.getSubredditPosts(pathComponents: pathComponents!, queries: queries!)
         case .user:
             apiRequest = RedditOAuthAPI.getUserPosts(pathComponents: pathComponents!, queries: queries!)
-        case .search:
-            apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
-        case .multireddit:
-            apiRequest = RedditOAuthAPI.getMultiredditPosts(pathComponents: pathComponents!, queries: queries!)
+        case .search(_, let searchInSubredditOrUserName, let searchInMultiReddit, let searchInThingType):
+            switch searchInThingType {
+            case .all:
+                apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
+            case .subreddit:
+                if let name = searchInSubredditOrUserName {
+                    apiRequest = RedditOAuthAPI.getSearchPostsInSpecificThing(pathComponents: ["name" : "r/\(name)"], queries: queries!)
+                } else {
+                    apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
+                }
+            case .user:
+                if let name = searchInSubredditOrUserName {
+                    apiRequest = RedditOAuthAPI.getSearchPostsInSpecificThing(pathComponents: ["name" : "r/u_\(name)"], queries: queries!)
+                } else {
+                    apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
+                }
+            case .customFeed:
+                if let path = searchInMultiReddit {
+                    apiRequest = RedditOAuthAPI.getSearchPostsInSpecificThing(pathComponents: ["name" : path], queries: queries!)
+                } else {
+                    apiRequest = RedditOAuthAPI.getSearchPosts(queries: queries!)
+                }
+            }
+        case .customFeed:
+            apiRequest = RedditOAuthAPI.getCustomFeedPosts(pathComponents: pathComponents!, queries: queries!)
         case .anonymousFrontPage:
             apiRequest = RedditOAuthAPI.getSubredditConcatPosts(pathComponents: pathComponents!, queries: queries!)
         }

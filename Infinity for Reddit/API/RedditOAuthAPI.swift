@@ -16,7 +16,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case getSubredditPosts(pathComponents: [String: String], queries: [String: String])
     case getUserPosts(pathComponents: [String: String], queries: [String: String])
     case getSearchPosts(queries: [String: String])
-    case getMultiredditPosts(pathComponents: [String: String], queries: [String: String])
+    case getSearchPostsInSpecificThing(pathComponents: [String: String], queries: [String: String])
+    case getCustomFeedPosts(pathComponents: [String: String], queries: [String: String])
     case getSubredditConcatPosts(pathComponents: [String: String], queries: [String: String])
     case vote(params: [String: String])
     case getSubscribedThings(queries: [String: String])
@@ -43,7 +44,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs:
             return .get
         case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed:
             return .post
@@ -67,8 +68,10 @@ enum RedditOAuthAPI: URLRequestConvertible {
         case .getUserPosts(let pathComponents, _):
             return "/user/\(pathComponents["username"] ?? "")/\(pathComponents["where"] ?? "submitted").json"
         case .getSearchPosts:
-            return "search.json"
-        case .getMultiredditPosts(let pathComponents, _):
+            return "/search.json"
+        case .getSearchPostsInSpecificThing(let pathComponents, _):
+            return "\(pathComponents["name"] ?? "")/search.json"
+        case .getCustomFeedPosts(let pathComponents, _):
             return "\(pathComponents["multipath"] ?? "").json"
         case .getSubredditConcatPosts(let pathComponents, _):
             return "/r/\(pathComponents["subreddit"] ?? "popular")/\(pathComponents["sortType"] ?? "hot").json"
@@ -111,7 +114,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var parameters: [String: String]? {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs:
             return nil
         case .vote(let params), .subsrcribeToSubreddit(let params), .saveThing(let params), .unsaveThing(let params), .getMoreCommentsForCommentMore(let params), .sendCommentOrReplyToMessage(let params), .favoriteThing(let params), .favoriteCustomFeed(let params):
             return params
@@ -131,15 +134,17 @@ enum RedditOAuthAPI: URLRequestConvertible {
         case .vote, .getMyCustomFeeds, .saveThing, .unsaveThing, .subsrcribeToSubreddit, .sendCommentOrReplyToMessage, .favoriteThing:
             return nil
         case .getSubredditPosts(_, let queries):
-            return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
+            return ["raw_json": "1", "always_show_media": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getUserPosts(_, let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getSearchPosts(let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
-        case .getMultiredditPosts(_, let queries):
-            return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
+        case .getSearchPostsInSpecificThing(_, let queries):
+            return ["raw_json": "1", "restrict_sr": "on", "sr_detail": "true", "always_show_media": "1"].merging(queries, uniquingKeysWith: { _, new in new })
+        case .getCustomFeedPosts(_, let queries):
+            return ["raw_json": "1", "always_show_media": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getSubredditConcatPosts(_, let queries):
-            return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
+            return ["raw_json": "1", "always_show_media": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getSubscribedThings(let queries):
             return ["raw_json": "1"].merging(queries, uniquingKeysWith: { _, new in new })
         case .getUserComments(_, let queries):
@@ -171,7 +176,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return headers
         case .getInbox(_, _, let headers):
             return headers
-        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getMultiredditPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .getRules, .getFlairs:
+        case .getFrontPagePosts, .getUserData, .getSubredditData, .vote, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .subsrcribeToSubreddit, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .getRules, .getFlairs:
             return nil
         }
     }

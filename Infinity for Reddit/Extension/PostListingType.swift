@@ -18,7 +18,7 @@ extension PostListingType: SortTypeKindSource {
             return [.new, .hot, .top, .controversial]
         case .search:
             return [.relevance, .hot, .top, .new, .comments]
-        case .multireddit:
+        case .customFeed:
             return [.hot, .new, .rising, .top, .controversial]
         case .anonymousFrontPage:
             return [.hot, .new, .rising, .top, .controversial]
@@ -68,7 +68,7 @@ extension PostListingType {
             return .user
         case .search:
             return .search
-        case .multireddit:
+        case .customFeed:
             return .customFeed
         case .anonymousFrontPage:
             return .home
@@ -87,7 +87,7 @@ extension PostListingType {
             return username
         case .search:
             return PostFilterUsage.NO_USAGE
-        case .multireddit(let path):
+        case .customFeed(let path):
             return path
         case .anonymousFrontPage:
             return PostFilterUsage.NO_USAGE
@@ -106,7 +106,7 @@ extension PostListingType {
             return SortTypeUserDetailsUtils.getUserPost(username: username)
         case .search:
             return SortTypeUserDetailsUtils.searchPost
-        case .multireddit(let path):
+        case .customFeed(let path):
             return SortTypeUserDetailsUtils.getCustomFeedPost(path: path)
         case .anonymousFrontPage:
             return SortTypeUserDetailsUtils.getSubredditPost(subredditName: Account.ANONYMOUS_ACCOUNT.username)
@@ -135,7 +135,7 @@ extension PostListingType {
             if let time = sortType.time {
                 UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.searchPostSortTimeKey)
             }
-        case .multireddit(let path):
+        case .customFeed(let path):
             UserDefaults.sortType?.set(sortType.type.rawValue, forKey: SortTypeUserDetailsUtils.customFeedPostSortTypeBaseKey + path)
             if let time = sortType.time {
                 UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.customFeedPostSortTimeBaseKey + path)

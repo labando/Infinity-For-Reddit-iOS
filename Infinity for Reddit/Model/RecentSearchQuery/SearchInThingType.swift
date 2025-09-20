@@ -34,7 +34,7 @@ enum SearchInThing {
             return subscribedSubredditData.name
         case .user(let subscribedUserData):
             return subscribedUserData.name
-        case .customFeed(let myCustomFeed):
+        case .customFeed:
             return ""
         }
     }
