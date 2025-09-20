@@ -42,7 +42,14 @@ struct SearchView: View {
                     if let onSearch = onSearchCustomAction {
                         onSearch(searchViewModel.query)
                     } else {
-                        navigationManager.path.append(AppNavigation.searchResults(query: searchViewModel.query, searchInSubredditOrUserName: "", searchInMultiReddit: "", searchInThingType: SearchInThingType.all))
+                        navigationManager.path.append(
+                            AppNavigation.searchResults(
+                                query: searchViewModel.query,
+                                searchInSubredditOrUserName: searchViewModel.searchInSubredditOrUserName,
+                                searchInMultiReddit: searchViewModel.searchInCustomFeed,
+                                searchInThingType: searchViewModel.searchInThingType
+                            )
+                        )
                     }
                 }
             }
@@ -83,7 +90,6 @@ struct SearchView: View {
                     .font(.subheadline)
                     .foregroundColor(.blue)
                 }
-                
                 .padding(.horizontal, 16)
             }
             
@@ -111,11 +117,8 @@ struct SearchView: View {
                             case .user:
                                 Text("u/\(search.searchInSubredditOrUserName ?? "")")
                                     .username()
-                            case .multireddit:
+                            case .customFeed:
                                 Text(search.multiRedditDisplayName ?? "")
-                                    .secondaryText()
-                            default:
-                                Text("All subreddits")
                                     .secondaryText()
                             }
                         }

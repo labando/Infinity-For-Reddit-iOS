@@ -14,6 +14,30 @@ class SearchViewModel: ObservableObject {
     @Published var searchInThing: SearchInThing?
     @Published var recentSearchQueries: [RecentSearchQuery] = []
     
+    var searchInSubredditOrUserName: String {
+        if let searchInThing = searchInThing {
+            return searchInThing.searchInSubredditOrUserName
+        } else {
+            return ""
+        }
+    }
+    
+    var searchInCustomFeed: String {
+        if let searchInThing = searchInThing {
+            return searchInThing.searchInCustomFeed
+        } else {
+            return ""
+        }
+    }
+    
+    var searchInThingType: SearchInThingType {
+        if let searchInThing = searchInThing {
+            return searchInThing.searchInThingType
+        } else {
+            return .all
+        }
+    }
+    
     private let dbPool: DatabasePool
     private let searchRepository: SearchRepository
     
@@ -59,7 +83,14 @@ class SearchViewModel: ObservableObject {
     }
     
     func saveSearchQuery() {
-        searchRepository.saveSearchQuery(username: username, query: query, searchInSubredditOrUserName: nil, multiRedditPath: nil, searchInThingType: SearchInThingType.all, time: Int64(Date().timeIntervalSince1970))
+        searchRepository.saveSearchQuery(
+            username: username,
+            query: query,
+            searchInSubredditOrUserName: searchInSubredditOrUserName,
+            multiRedditPath: searchInCustomFeed,
+            searchInThingType: searchInThingType,
+            time: Int64(Date().timeIntervalSince1970)
+        )
     }
     
     func clearAllRecentSearchQueries() {
