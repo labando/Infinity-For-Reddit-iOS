@@ -22,9 +22,6 @@ enum AppNavigation: Hashable {
     case submitVideoPost
     case submitGalleryPost
     case submitPollPost
-    case selectSubredditForPostSubmission
     case filterPosts(postListingMetadata: PostListingMetadata)
     case filteredPosts(postListingMetadata: PostListingMetadata, postFilter: PostFilter)
-    case searchSubreddit
-    case searchSubredditsResults(query: String)
 }

@@ -18,10 +18,13 @@ struct AnonymousSubscriptionsView: View {
 
     @State private var selectedOption = 0
     
-    init() {
+    private let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
+    
+    init(customOnTapForSearchInThing: ((SearchInThing) -> Void)? = nil) {
         _anonymousSubscriptionListingViewModel = StateObject(
             wrappedValue: AnonymousSubscriptionListingViewModel(anonymousSubscriptionListingRepository: AnonymousSubscriptionListingRepository())
         )
+        self.customOnTapForSearchInThing = customOnTapForSearchInThing
     }
 
     var body: some View {
@@ -30,10 +33,10 @@ struct AnonymousSubscriptionsView: View {
                 .padding(4)
             
             TabView(selection: $selectedOption) {
-                AnonymousSubredditsView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                AnonymousSubredditsView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
                     .tag(0)
                 
-                AnonymousUsersView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                AnonymousUsersView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
                     .tag(1)
                 
                 AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
@@ -43,11 +46,21 @@ struct AnonymousSubscriptionsView: View {
         }
         .rootViewBackground()
         .navigationTitle("Subscriptions")
+//        .navigationDestination(for: SearchSubredditNavigation.self) { destination in
+//            switch destination {
+//            case .searchSubreddit:
+//                SearchSubredditsView { subscribedSubredditData in
+//                    
+//                }
+//            }
+//        }
     }
     
     struct AnonymousSubredditsView: View {
         @EnvironmentObject var navigationManager: NavigationManager
         @ObservedObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
+        
+        let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
         
         var body: some View {
             Group {
@@ -60,7 +73,11 @@ struct AnonymousSubscriptionsView: View {
                             Section(header: Text("Favorite").listSectionHeader()) {
                                 ForEach(anonymousSubscriptionListingViewModel.favoriteSubredditSubscriptions, id: \.identityInView) { subscription in
                                     SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                        navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                                        if let customOnTapForSearchInThing = customOnTapForSearchInThing {
+                                            customOnTapForSearchInThing(SearchInThing.subreddit(subscription))
+                                        } else {
+                                            navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                                        }
                                     }) {
                                         subscription.isFavorite.toggle()
                                         anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
@@ -74,7 +91,11 @@ struct AnonymousSubscriptionsView: View {
                         Section(header: Text("All").listSectionHeader()) {
                             ForEach(anonymousSubscriptionListingViewModel.subredditSubscriptions, id: \.identityInView) { subscription in
                                 SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                    navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                                    if let customOnTapForSearchInThing = customOnTapForSearchInThing {
+                                        customOnTapForSearchInThing(SearchInThing.subreddit(subscription))
+                                    } else {
+                                        navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subscription.name))
+                                    }
                                 }) {
                                     subscription.isFavorite.toggle()
                                     anonymousSubscriptionListingViewModel.toggleFavoriteSubreddit(subscription)
@@ -95,6 +116,8 @@ struct AnonymousSubscriptionsView: View {
         @EnvironmentObject var navigationManager: NavigationManager
         @ObservedObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
         
+        let customOnTapForSearchInThing: ((SearchInThing) -> Void)?
+        
         var body: some View {
             Group {
                 if anonymousSubscriptionListingViewModel.userSubscriptions.isEmpty {
@@ -106,7 +129,11 @@ struct AnonymousSubscriptionsView: View {
                             Section(header: Text("Favorite").listSectionHeader()) {
                                 ForEach(anonymousSubscriptionListingViewModel.favoriteUserSubscriptions, id: \.identityInView) { subscription in
                                     SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                        navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                                        if let customOnTapForSearchInThing = customOnTapForSearchInThing {
+                                            customOnTapForSearchInThing(SearchInThing.user(subscription))
+                                        } else {
+                                            navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                                        }
                                     }) {
                                         subscription.isFavorite.toggle()
                                         anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
@@ -120,7 +147,11 @@ struct AnonymousSubscriptionsView: View {
                         Section(header: Text("All").listSectionHeader()) {
                             ForEach(anonymousSubscriptionListingViewModel.userSubscriptions, id: \.identityInView) { subscription in
                                 SubscriptionItemView(text: subscription.name, iconUrl: subscription.iconUrl, isFavorite: subscription.isFavorite, action: {
-                                    navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                                    if let customOnTapForSearchInThing = customOnTapForSearchInThing {
+                                        customOnTapForSearchInThing(SearchInThing.user(subscription))
+                                    } else {
+                                        navigationManager.path.append(AppNavigation.userDetails(username: subscription.name))
+                                    }
                                 }) {
                                     subscription.isFavorite.toggle()
                                     anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)

@@ -11,6 +11,7 @@ import GRDB
 
 class SearchViewModel: ObservableObject {
     @Published var query: String = ""
+    @Published var searchInThing: SearchInThing?
     @Published var recentSearchQueries: [RecentSearchQuery] = []
     
     private let dbPool: DatabasePool

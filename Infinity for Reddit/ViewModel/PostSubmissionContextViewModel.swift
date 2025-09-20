@@ -95,9 +95,4 @@ class PostSubmissionContextViewModel: ObservableObject {
         
         isLoadingFlairs = false
     }
-    
-    func reset() {
-        selectedSubreddit = nil
-        flairs = []
-    }
 }

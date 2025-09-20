@@ -8,20 +8,21 @@ import SwiftUI
 
 struct SubredditSearchResultView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
-    @EnvironmentObject var postSubmissionContextViewModel: PostSubmissionContextViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     
     @Environment(\.dismiss) var dismiss
     
     private let query: String
+    private let onSubscribedSubredditSelected: (SubscribedSubredditData) -> Void
     
-    init(query: String) {
+    init(query: String, onSubscribedSubredditSelected: @escaping (SubscribedSubredditData) -> Void) {
         self.query = query
+        self.onSubscribedSubredditSelected = onSubscribedSubredditSelected
     }
     
     var body: some View {
         SubredditListingView(account: accountViewModel.account, query: query) { subreddit in
-            postSubmissionContextViewModel.selectedSubreddit = SubscribedSubredditData.fromSubreddit(subreddit, username: accountViewModel.account.username)
+            onSubscribedSubredditSelected(SubscribedSubredditData.fromSubreddit(subreddit, username: accountViewModel.account.username))
             dismiss()
         }
         .themedNavigationBar()

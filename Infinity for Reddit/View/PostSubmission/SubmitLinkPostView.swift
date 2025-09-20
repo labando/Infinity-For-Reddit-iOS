@@ -9,8 +9,9 @@ import MarkdownUI
 
 struct SubmitLinkPostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
-    @EnvironmentObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     @EnvironmentObject private var themeViewModel: CustomThemeViewModel
+    
+    @StateObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     @StateObject private var submitLinkPostViewModel: SubmitLinkPostViewModel
     
     @FocusState private var markdownToolbarFocusedField: MarkdownFieldType?
@@ -24,9 +25,11 @@ struct SubmitLinkPostView: View {
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
-    @State private var resetSelectedSubreddit: Bool = true
     
     init() {
+        _postSubmissionContextViewModel = StateObject(
+            wrappedValue: PostSubmissionContextViewModel(ruleRepository: RuleRepository(), flairRepository: FlairRepository())
+        )
         _submitLinkPostViewModel = StateObject(
             wrappedValue: SubmitLinkPostViewModel()
         )
@@ -43,7 +46,7 @@ struct SubmitLinkPostView: View {
                             }
                             
                             PostSubmissionSubredditChooserView(text: "Choose a subreddit", iconUrl: nil, action: {
-                                navigationManager.path.append(AppNavigation.selectSubredditForPostSubmission)
+                                navigationManager.path.append(SelectSubredditNavigation.selectSubreddit)
                             })
                             .environmentObject(navigationManager)
                             
@@ -182,12 +185,6 @@ struct SubmitLinkPostView: View {
         }
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitLinkPostViewModel.content)
-        }
-        .onAppear {
-            if resetSelectedSubreddit {
-                postSubmissionContextViewModel.reset()
-            }
-            resetSelectedSubreddit = false
         }
     }
     

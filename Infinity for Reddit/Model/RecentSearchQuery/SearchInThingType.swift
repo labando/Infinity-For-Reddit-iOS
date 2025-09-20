@@ -11,3 +11,9 @@ public enum SearchInThingType: Int, Codable, CaseIterable, Hashable {
     case user = 2
     case multireddit = 3
 }
+
+enum SearchInThing {
+    case subreddit(SubscribedSubredditData)
+    case user(SubscribedUserData)
+    case customFeed(MyCustomFeed)
+}

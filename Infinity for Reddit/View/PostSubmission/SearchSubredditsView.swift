@@ -10,13 +10,23 @@ struct SearchSubredditsView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     
+    let onSubscribedSubredditSelected: (SubscribedSubredditData) -> Void
+    
     var body: some View {
         SearchView { query in
             navigationManager.path.removeLast()
-            navigationManager.path.append(AppNavigation.searchSubredditsResults(query: query))
+            navigationManager.path.append(SubredditSearchResultNavigation.subredditSearchResult(query: query))
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Search")
+        .addTitleToInlineNavigationBar("Search Subreddits")
         .id(accountViewModel.account.username)
+        .navigationDestination(for: SubredditSearchResultNavigation.self) { destination in
+            switch destination {
+                case .subredditSearchResult(let query):
+                SubredditSearchResultView(query: query) { subscribedSubreddit in
+                    onSubscribedSubredditSelected(subscribedSubreddit)
+                }
+            }
+        }
     }
 }

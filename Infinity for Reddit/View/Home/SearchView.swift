@@ -22,7 +22,7 @@ struct SearchView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 0) {
             // Search bar
             HStack(spacing: 8) {
                 SwiftUI.Image(systemName: "magnifyingglass")
@@ -46,12 +46,25 @@ struct SearchView: View {
                     }
                 }
             }
-            .padding(.vertical, 8)
             .padding(.horizontal, 12)
             .background(Color(.systemGray5))
             .cornerRadius(10)
-            .padding(.top, 12)
-            .padding(.horizontal)
+            .padding(16)
+            
+            TouchRipple(action: {
+                navigationManager.path.append(ThingSelectionNavigation.selectThing)
+            }) {
+                HStack(spacing: 0) {
+                    Text("Search in")
+                        .colorAccentText()
+                    
+//                    RowText(postSubmissionContextViewModel.selectedSubreddit?.name ?? text)
+//                        .primaryText()
+                }
+                .frame(maxWidth: .infinity)
+                .padding(16)
+                .contentShape(Rectangle())
+            }
             
             // Recent Searches Header
             if !searchViewModel.recentSearchQueries.isEmpty {
@@ -65,7 +78,8 @@ struct SearchView: View {
                     .font(.subheadline)
                     .foregroundColor(.blue)
                 }
-                .padding(.horizontal)
+                
+                .padding(.horizontal, 16)
             }
             
             // Recent search items
@@ -120,6 +134,14 @@ struct SearchView: View {
         .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Search")
+        .navigationDestination(for: ThingSelectionNavigation.self) { destination in
+            switch destination {
+            case .selectThing:
+                SelectSearchInThingView { searchInThing in
+                    searchViewModel.searchInThing = searchInThing
+                }
+            }
+        }
     }
     
     enum FieldType: Hashable {

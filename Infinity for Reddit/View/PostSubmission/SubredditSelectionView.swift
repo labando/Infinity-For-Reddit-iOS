@@ -12,23 +12,25 @@ import Alamofire
 
 struct SubredditSelectionView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
-    @EnvironmentObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     
     @Environment(\.dismiss) private var dismiss
     
     @StateObject var subscriptionListingViewModel: SubscriptionListingViewModel
     
-    init() {
+    let onSubscribedSubredditSelected: (SubscribedSubredditData) -> Void
+    
+    init(onSubscribedSubredditSelected: @escaping (SubscribedSubredditData) -> Void) {
         _subscriptionListingViewModel = StateObject(
             wrappedValue: SubscriptionListingViewModel(
                 subscriptionListingRepository: SubscriptionListingRepository()
             )
         )
+        self.onSubscribedSubredditSelected = onSubscribedSubredditSelected
     }
 
     var body: some View {
         SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
-            postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+            onSubscribedSubredditSelected(subscribedSubredditData)
             dismiss()
         }
         .themedNavigationBar()
@@ -41,10 +43,15 @@ struct SubredditSelectionView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     navigationManager.path.removeLast()
-                    navigationManager.path.append(AppNavigation.searchSubreddit)
+                    navigationManager.path.append(SearchSubredditNavigation.searchSubreddit)
                 } label: {
                     SwiftUI.Image(systemName: "magnifyingglass")
                 }
+            }
+        }
+        .navigationDestination(for: SearchSubredditNavigation.self) { destination in
+            SearchSubredditsView { subscribedSubredditData in
+                onSubscribedSubredditSelected(subscribedSubredditData)
             }
         }
     }

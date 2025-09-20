@@ -9,8 +9,9 @@ import MarkdownUI
 
 struct SubmitTextPostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
-    @EnvironmentObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     @EnvironmentObject private var themeViewModel: CustomThemeViewModel
+    
+    @StateObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     @StateObject private var submitTextPostViewModel: SubmitTextPostViewModel
     
     @FocusState private var markdownToolbarFocusedField: MarkdownFieldType?
@@ -27,9 +28,11 @@ struct SubmitTextPostView: View {
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
-    @State private var resetSelectedSubreddit: Bool = true
     
     init() {
+        _postSubmissionContextViewModel = StateObject(
+            wrappedValue: PostSubmissionContextViewModel(ruleRepository: RuleRepository(), flairRepository: FlairRepository())
+        )
         _submitTextPostViewModel = StateObject(
             wrappedValue: SubmitTextPostViewModel()
         )
@@ -46,7 +49,7 @@ struct SubmitTextPostView: View {
                             }
                             
                             PostSubmissionSubredditChooserView(text: "Choose a subreddit", iconUrl: nil, action: {
-                                navigationManager.path.append(AppNavigation.selectSubredditForPostSubmission)
+                                navigationManager.path.append(SelectSubredditNavigation.selectSubreddit)
                             })
                             
                             Divider()
@@ -161,11 +164,13 @@ struct SubmitTextPostView: View {
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitTextPostViewModel.content)
         }
-        .onAppear {
-            if resetSelectedSubreddit {
-                postSubmissionContextViewModel.reset()
+        .navigationDestination(for: SelectSubredditNavigation.self) { destination in
+            switch destination {
+            case .selectSubreddit:
+                SubredditSelectionView { subscribedSubreddit in
+                    postSubmissionContextViewModel.selectedSubreddit = subscribedSubreddit
+                }
             }
-            resetSelectedSubreddit = false
         }
     }
     
