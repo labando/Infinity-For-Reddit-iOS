@@ -348,12 +348,11 @@ public class Comment : NSObject, Validatable, Identifiable, ObservableObject {
         permalink = json["permalink"].stringValue
         quarantine = json["quarantine"].boolValue
         removalReason = json["removal_reason"].stringValue
-        if (json["replies"].string == nil) {
-            // It has replies
+        if let repliesData = json["replies"].dictionary?["data"], !repliesData.isEmpty {
             do {
-                replies = try CommentListing(fromJson: json["replies"]["data"])
+                replies = try CommentListing(fromJson: repliesData)
             } catch {
-                // Ignore
+                print("Failed to parse replies: \(error)")
             }
         }
         reportReasons = json["report_reasons"].stringValue
