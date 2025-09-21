@@ -1,12 +1,12 @@
 //
-// SubredditSearchResultView.swift
+// SubredditSearchResultSheet.swift
 // Infinity for Reddit
 //
 // Created by joeylr2042 on 2025-09-06
         
 import SwiftUI
 
-struct SubredditSearchResultView: View {
+struct SubredditSearchResultSheet: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     

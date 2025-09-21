@@ -8,7 +8,6 @@ import SwiftUI
 import MarkdownUI
 
 struct SubmitLinkPostView: View {
-    @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var themeViewModel: CustomThemeViewModel
     
     @StateObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
@@ -45,10 +44,9 @@ struct SubmitLinkPostView: View {
                                 submitLinkPostViewModel.selectedAccount = $0
                             }
                             
-                            PostSubmissionSubredditChooserView(text: "Choose a subreddit", iconUrl: nil, action: {
-                                navigationManager.path.append(SelectSubredditNavigation.selectSubreddit)
-                            })
-                            .environmentObject(navigationManager)
+                            PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
+                                postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                            }
                             
                             Divider()
                             

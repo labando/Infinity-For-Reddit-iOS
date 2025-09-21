@@ -10,28 +10,25 @@ struct PostSubmissionSubredditChooserView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     
-    @StateObject var postSubmissionContextViewModel: PostSubmissionContextViewModel
+    @ObservedObject var postSubmissionContextViewModel: PostSubmissionContextViewModel
     
     @State private var showNoSubredditAlert = false
     @State private var showRulesSheet = false
-    
-    var text: String
-    var iconUrl: String?
-    var action: () -> Void
+    @State private var showSubredditSelectionSheet = false
+
+    var onSubredditSelected: (SubscribedSubredditData) -> Void
     
     private let iconSize: CGFloat = 24
     
-    init(text: String, iconUrl: String?, action: @escaping () -> Void) {
-        self.text = text
-        self.iconUrl = iconUrl
-        self.action = action
-        _postSubmissionContextViewModel = StateObject(
-            wrappedValue: PostSubmissionContextViewModel(ruleRepository: RuleRepository(), flairRepository: FlairRepository())
-        )
+    init(postSubmissionContextViewModel: PostSubmissionContextViewModel, onSubredditSelected: @escaping (SubscribedSubredditData) -> Void) {
+        self.postSubmissionContextViewModel = postSubmissionContextViewModel
+        self.onSubredditSelected = onSubredditSelected
     }
     
     var body: some View {
-        TouchRipple(action: action) {
+        TouchRipple(action: {
+            showSubredditSelectionSheet = true
+        }) {
             HStack(spacing: 0) {
                 if let icon = postSubmissionContextViewModel.selectedSubreddit?.iconUrl {
                     CustomWebImage(
@@ -49,7 +46,7 @@ struct PostSubmissionSubredditChooserView: View {
                 Spacer()
                     .frame(width: 24)
                 
-                RowText(postSubmissionContextViewModel.selectedSubreddit?.name ?? text)
+                RowText(postSubmissionContextViewModel.selectedSubreddit?.name ?? "Choose a subreddit")
                     .primaryText()
                 
                 Spacer()
@@ -80,6 +77,13 @@ struct PostSubmissionSubredditChooserView: View {
         .sheet(isPresented: $showRulesSheet) {
             SubredditRulesView()
                 .environmentObject(postSubmissionContextViewModel)
+        }
+        .sheet(isPresented: $showSubredditSelectionSheet) {
+            NavigationStack {
+                SubredditSelectionSheet { subscribedSubreddit in
+                    onSubredditSelected(subscribedSubreddit)
+                }
+            }
         }
     }
 }

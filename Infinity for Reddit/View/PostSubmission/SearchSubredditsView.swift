@@ -1,34 +1,42 @@
 //
-// SubredditSearchView.swift
+// SearchSubredditsSheet.swift
 // Infinity for Reddit
 //
 // Created by joeylr2042 on 2025-08-27
         
 import SwiftUI
 
-struct SearchSubredditsView: View {
+struct SearchSubredditsSheet: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var showSubredditSearchResultSheet: Bool = false
+    @State private var queryItem: Item?
     
     let onSubscribedSubredditSelected: (SubscribedSubredditData) -> Void
     
     var body: some View {
         SearchView { query in
-            navigationManager.path.removeLast()
-            DispatchQueue.main.async {
-                navigationManager.path.append(SubredditSearchResultNavigation.subredditSearchResult(query: query))
-            }
+            queryItem = Item(query: query)
+            showSubredditSearchResultSheet = true
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Search Subreddits")
         .id(accountViewModel.account.username)
-        .navigationDestination(for: SubredditSearchResultNavigation.self) { destination in
-            switch destination {
-                case .subredditSearchResult(let query):
-                SubredditSearchResultView(query: query) { subscribedSubreddit in
+        .sheet(item: $queryItem) { queryItem in
+            NavigationStack {
+                SubredditSearchResultSheet(query: queryItem.query) { subscribedSubreddit in
                     onSubscribedSubredditSelected(subscribedSubreddit)
+                    dismiss()
                 }
             }
         }
+    }
+    
+    private struct Item: Identifiable {
+        let id = UUID()
+        let query: String
     }
 }

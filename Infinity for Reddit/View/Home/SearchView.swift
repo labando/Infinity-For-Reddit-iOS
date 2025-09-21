@@ -170,6 +170,7 @@ struct SearchView: View {
                 searchViewModel.searchInThing = searchInThing
                 showSubredditAndUserSearchResultView = false
             }
+            .id(searchThingQuery)
         }
     }
     

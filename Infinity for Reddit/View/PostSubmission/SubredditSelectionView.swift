@@ -1,6 +1,6 @@
 
 //
-// SubredditSelectionView.swift
+// SubredditSelectionSheet.swift
 // Infinity for Reddit
 //
 // Created by joeylr2042 on 2025-08-21
@@ -10,12 +10,14 @@ import Swinject
 import GRDB
 import Alamofire
 
-struct SubredditSelectionView: View {
+struct SubredditSelectionSheet: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
     @Environment(\.dismiss) private var dismiss
     
     @StateObject var subscriptionListingViewModel: SubscriptionListingViewModel
+    
+    @State private var showSearchSubredditsSheet: Bool = false
     
     let onSubscribedSubredditSelected: (SubscribedSubredditData) -> Void
     
@@ -42,22 +44,18 @@ struct SubredditSelectionView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    navigationManager.path.removeLast()
-                    DispatchQueue.main.async {
-                        navigationManager.path.append(SearchSubredditNavigation.searchSubreddit)
-                    }
+                    showSearchSubredditsSheet = true
                 } label: {
                     SwiftUI.Image(systemName: "magnifyingglass")
                 }
             }
         }
-        .navigationDestination(for: SearchSubredditNavigation.self) { destination in
-            switch destination {
-            case .searchSubreddit:
-                SearchSubredditsView { subscribedSubredditData in
+        .sheet(isPresented: $showSearchSubredditsSheet) {
+            NavigationStack {
+                SearchSubredditsSheet { subscribedSubredditData in
                     onSubscribedSubredditSelected(subscribedSubredditData)
+                    dismiss()
                 }
-                .environmentObject(navigationManager)
             }
         }
     }
