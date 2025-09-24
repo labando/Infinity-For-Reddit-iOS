@@ -12,13 +12,13 @@ struct ImageFullScreenView: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     @EnvironmentObject var namespaceManager: NamespaceManager
     
-    let url: URL?
+    let urlString: String
     let aspectRatio: CGSize?
     let matchedGeometryEffectId: String?
     let onDismiss: () -> Void
     
-    init(url: URL?, aspectRatio: CGSize? = nil, matchedGeometryEffectId: String? = nil, onDismiss: @escaping () -> Void) {
-        self.url = url
+    init(urlString: String, aspectRatio: CGSize? = nil, matchedGeometryEffectId: String? = nil, onDismiss: @escaping () -> Void) {
+        self.urlString = urlString
         self.aspectRatio = aspectRatio
         self.matchedGeometryEffectId = matchedGeometryEffectId
         self.onDismiss = onDismiss
@@ -27,7 +27,7 @@ struct ImageFullScreenView: View {
     var body: some View {
         ZStack {
             CustomWebImage(
-                url?.absoluteString ?? "",
+                urlString,
                 aspectRatio: aspectRatio,
                 handleImageTapGesture: false,
                 matchedGeometryEffectId: matchedGeometryEffectId
@@ -46,13 +46,15 @@ struct ImageFullScreenView: View {
             VStack {
                 Spacer()
                 
-                ImageFullScreenToolbar(onDownload: {
-                    print("download")
-                }, onSetAsWallpaper: {
-                    print("wallpaper")
-                }, onShare: {
-                    print("share")
-                })
+                ImageFullScreenToolbar(
+                    downloadMediaType: DownloadMediaType.image(downloadUrlString: urlString, fileName: "test.jpg"),
+                    onSetAsWallpaper: {
+                        print("wallpaper")
+                    },
+                    onShare: {
+                        print("share")
+                    }
+                )
             }
         }
     }

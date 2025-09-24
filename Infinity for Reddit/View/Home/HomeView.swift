@@ -172,7 +172,7 @@ struct HomeView: View {
             
             if let media = fullScreenMediaViewModel.media {
                 if case let .image(urlString, aspectRatio, post, matchedGeometryEffectId) = media {
-                    ImageFullScreenView(url: URL(string: urlString), aspectRatio: aspectRatio, matchedGeometryEffectId: matchedGeometryEffectId) {
+                    ImageFullScreenView(urlString: urlString, aspectRatio: aspectRatio, matchedGeometryEffectId: matchedGeometryEffectId) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(urlString)
@@ -190,7 +190,7 @@ struct HomeView: View {
                         .id(url)
                     }
                 } else if case let .gif(urlString, post) = media {
-                    ImageFullScreenView(url: URL(string: urlString)) {
+                    ImageFullScreenView(urlString: urlString) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(urlString)

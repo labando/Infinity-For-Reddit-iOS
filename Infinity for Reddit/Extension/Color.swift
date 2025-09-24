@@ -44,7 +44,7 @@ extension Color {
         }
     }
     
-    init(hex: String, default defaultColor: Color = .clear) {
+    init(hex: String, opacity: Double = 1.0, default defaultColor: Color = .clear) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
         
@@ -61,7 +61,7 @@ extension Color {
             r = Double((rgb & 0xFF0000) >> 16) / 255
             g = Double((rgb & 0x00FF00) >> 8) / 255
             b = Double(rgb & 0x0000FF) / 255
-            a = 1.0
+            a = opacity
         } else if length == 8 {
             r = Double((rgb & 0xFF000000) >> 24) / 255
             g = Double((rgb & 0x00FF0000) >> 16) / 255

@@ -28,7 +28,7 @@ class MediaDownloader {
         self.session = resolvedSession
     }
     
-    func download(downloadMediaType: DownloadMediaType, onProgress: @escaping (Double) -> Void) async throws {
+    func download(downloadMediaType: DownloadMediaType, onProgress: @escaping (Double) async -> Void) async throws {
         let destination: DownloadRequest.Destination = { _, _ in
             let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(downloadMediaType.fileName)
             return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
@@ -43,7 +43,7 @@ class MediaDownloader {
         Task {
             for await progress in request.downloadProgress() {
                 print("Progress: \(progress.fractionCompleted)")
-                onProgress(progress.fractionCompleted)
+                await onProgress(progress.fractionCompleted)
             }
         }
         
