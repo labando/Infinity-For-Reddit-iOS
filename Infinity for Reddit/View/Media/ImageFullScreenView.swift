@@ -53,14 +53,10 @@ struct ImageFullScreenView: View {
             ImageFullScreenToolbar(
                 downloadMediaType: DownloadMediaType.image(downloadUrlString: urlString, fileName: "test.jpg"),
                 isVisible: $isToolbarVisible,
-                onSetAsWallpaper: {
-                    print("wallpaper")
-                },
-                onShare: {
-                    print("share")
-                },
                 onClose: {
-                    onDismiss()
+                    withAnimation {
+                        onDismiss()
+                    }
                 }
             )
             .zIndex(1)

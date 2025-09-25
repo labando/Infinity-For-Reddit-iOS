@@ -12,25 +12,18 @@ struct ImageFullScreenToolbar: View {
     
     @Binding var isVisible: Bool
     
-    //let onDownload: () -> Void
-    let onSetAsWallpaper: () -> Void
-    let onShare: () -> Void
     let onClose: () -> Void
     
     private let buttonSize: CGFloat = 24
     
     init(downloadMediaType: DownloadMediaType,
          isVisible: Binding<Bool>,
-         onSetAsWallpaper: @escaping () -> Void,
-         onShare: @escaping () -> Void,
          onClose: @escaping () -> Void
     ) {
         _fullScreenMediaToolbarViewModel = StateObject(
             wrappedValue: FullScreenMediaToolbarViewModel(downloadMediaType: downloadMediaType)
         )
         self._isVisible = isVisible
-        self.onSetAsWallpaper = onSetAsWallpaper
-        self.onShare = onShare
         self.onClose = onClose
     }
     
@@ -69,19 +62,6 @@ struct ImageFullScreenToolbar: View {
                             .padding(.horizontal, 8)
                             .padding(.top, 6)
                             .padding(.bottom, 10)
-                            .foregroundColor(Color.white)
-                            .background(
-                                Circle()
-                                    .fill(Color(hex: "#08cf75"))
-                            )
-                    }
-                    
-                    Button {
-                        onSetAsWallpaper()
-                    } label: {
-                        SwiftUI.Image(systemName: "photo.on.rectangle")
-                            .font(.system(size: buttonSize - 4))
-                            .padding(12)
                             .foregroundColor(Color.white)
                             .background(
                                 Circle()
