@@ -38,11 +38,11 @@ struct ImageFullScreenView: View {
                 outOfBoundsColor: .black,
                 onDragEnded: { transform in
                     if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
-                        onDismiss()
                         return true
                     }
                     return false
-                }
+                },
+                onDismiss: onDismiss
             )
             .onTapGesture {
                 withAnimation {
