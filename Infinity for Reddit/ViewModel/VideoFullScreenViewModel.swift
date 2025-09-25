@@ -12,7 +12,17 @@ class VideoFullScreenViewModel: ObservableObject {
     @Published var player: AVPlayer = .init()
     @Published private var isLoading: Bool = false
     @Published private var isLoaded: Bool = false
+    @Published var currentTime: Double = 0
+    @Published var duration: Double = 1
+    @Published var isSeekingProgress: Bool = false
+    @Published var hasAudio: Bool = false
+    @Published var isMuted: Bool = false
     @Published private var error: Error?
+    
+    private var currentItemObserver: NSKeyValueObservation?
+    private var timeObserverToken: Any?
+    private var statusObserver: NSKeyValueObservation?
+    private var audioTrackObserver: NSKeyValueObservation?
     
     func loadAndPlay(url: URL, videoType: VideoType) async {
         guard !isLoaded, !isLoading else {
@@ -47,6 +57,9 @@ class VideoFullScreenViewModel: ObservableObject {
                     isLoading = false
                     
                     player.play()
+                    
+                    observeCurrentItem()
+                    observeTime()
                     
                     NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
                                                            object: player.currentItem,
@@ -101,6 +114,45 @@ class VideoFullScreenViewModel: ObservableObject {
         
         isLoaded = false
         isLoading = false
+    }
+    
+    private func observeTime() {
+        timeObserverToken = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.5, preferredTimescale: 600), queue: .main) { [weak self] time in
+            guard let self = self else { return }
+            self.currentTime = time.seconds
+        }
+    }
+    
+    private func observeCurrentItem() {
+        currentItemObserver = player.observe(\.currentItem, options: [.new, .initial]) { [weak self] player, _ in
+            guard let self = self, let item = player.currentItem else { return }
+            
+            // When we get a new item, observe its status
+            self.statusObserver = item.observe(\.status, options: [.new]) { [weak self] item, _ in
+                guard let self = self else { return }
+                
+                if item.status == .readyToPlay {
+                    let durationSec = item.duration.seconds
+                    if durationSec.isFinite {
+                        DispatchQueue.main.async {
+                            self.duration = durationSec
+                        }
+                    }
+                }
+            }
+            
+            self.audioTrackObserver = item.observe(\.tracks, options: [.new]) { [weak self] item, _ in
+                guard let self = self else { return }
+                var hasAudio = false
+                for playerItem in item.tracks {
+                    hasAudio = playerItem.assetTrack?.mediaType == .audio
+                    if hasAudio {
+                        break
+                    }
+                }
+                self.hasAudio = hasAudio
+            }
+        }
     }
     
     deinit {

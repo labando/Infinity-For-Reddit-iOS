@@ -18,6 +18,8 @@ struct VideoFullScreenView: View {
     @State private var currentDragOffset = 0.0
     @State private var hasStartedDragging: Bool = false
     @State private var isAnimatingBack: Bool = false
+    @State private var isShowingController: Bool = false
+    @State private var isPlaying: Bool = true
     
     let url: URL
     let videoType: VideoType
@@ -38,15 +40,56 @@ struct VideoFullScreenView: View {
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
             
-            VideoPlayer(player: videoFullScreenViewModel.player)
-                .frame(height: 400)
+            PlayerView(player: videoFullScreenViewModel.player)
                 .offset(y: currentDragOffset)
+                .onTapGesture {
+                    withAnimation {
+                        isShowingController.toggle()
+                    }
+                }
+            
+            if isShowingController {
+                VideoController(
+                    isPlaying: $isPlaying,
+                    duration: $videoFullScreenViewModel.duration,
+                    currentTime: $videoFullScreenViewModel.currentTime,
+                    isSeekingProgress: $videoFullScreenViewModel.isSeekingProgress
+                )
+                .onTapGesture {
+                    withAnimation {
+                        isShowingController.toggle()
+                    }
+                }
+                .zIndex(1)
+            }
         }
         .appForegroundBackgroundListener(onAppEntersForeground: {
-            videoFullScreenViewModel.play()
+            //videoFullScreenViewModel.play()
+            isPlaying = true
         }, onAppEntersBackground: {
-            videoFullScreenViewModel.pause()
+            //videoFullScreenViewModel.pause()
+            isPlaying = false
         })
+        .onChange(of: isPlaying) { _, newValue in
+            if newValue {
+                videoFullScreenViewModel.play()
+            } else {
+                videoFullScreenViewModel.pause()
+            }
+        }
+        .onChange(of: videoFullScreenViewModel.currentTime) { _, newValue in
+            if videoFullScreenViewModel.isSeekingProgress {
+                self.videoFullScreenViewModel.player.seek(to: CMTime(seconds: videoFullScreenViewModel.currentTime, preferredTimescale: 600))
+            }
+        }
+        .onChange(of: videoFullScreenViewModel.isSeekingProgress) { _, newValue in
+            if newValue && isPlaying {
+                videoFullScreenViewModel.pause()
+            } else if !newValue && isPlaying {
+                videoFullScreenViewModel.play()
+            }
+            //self.isPlaying = !newValue
+        }
         .task {
             await videoFullScreenViewModel.loadAndPlay(url: url, videoType: videoType)
         }
@@ -92,5 +135,38 @@ struct VideoFullScreenView: View {
         let maxOffset: CGFloat = 300
         let offset = min(abs(currentDragOffset), maxOffset)
         return Double(1 - (offset / maxOffset))
+    }
+}
+
+struct VideoController: View {
+    @Binding var isPlaying: Bool
+    @Binding var duration: Double
+    @Binding var currentTime: Double
+    @Binding var isSeekingProgress: Bool
+    
+    var body: some View {
+        ZStack {
+            Button {
+                isPlaying.toggle()
+            } label: {
+                SwiftUI.Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 36))
+                    .foregroundStyle(.white)
+            }
+            
+            VStack {
+                Spacer()
+                
+                HStack {
+                    Slider(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
+                        isSeekingProgress = isEditing
+                    })
+                    .padding(.horizontal, 32)
+                }
+            }
+            .padding(.bottom, 48)
+        }
+        .frame(maxWidth: .infinity)
+        .background(Color.gray.opacity(0.2))
     }
 }
