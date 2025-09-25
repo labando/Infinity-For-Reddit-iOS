@@ -12,6 +12,8 @@ struct ImageFullScreenView: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     @EnvironmentObject var namespaceManager: NamespaceManager
     
+    @State private var isToolbarVisible: Bool = true
+    
     let urlString: String
     let aspectRatio: CGSize?
     let matchedGeometryEffectId: String?
@@ -42,9 +44,15 @@ struct ImageFullScreenView: View {
                     return false
                 }
             )
+            .onTapGesture {
+                withAnimation {
+                    isToolbarVisible.toggle()
+                }
+            }
             
             ImageFullScreenToolbar(
                 downloadMediaType: DownloadMediaType.image(downloadUrlString: urlString, fileName: "test.jpg"),
+                isVisible: $isToolbarVisible,
                 onSetAsWallpaper: {
                     print("wallpaper")
                 },
@@ -55,6 +63,7 @@ struct ImageFullScreenView: View {
                     onDismiss()
                 }
             )
+            .zIndex(1)
         }
     }
 }
