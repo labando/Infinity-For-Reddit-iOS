@@ -177,6 +177,10 @@ struct MediaGestureViewModifier: ViewModifier {
     }
     
     private func opacityForBackground(maxYDistance: CGFloat) -> Double {
+        if transform.scaleX > minZoomScale || transform.scaleY > minZoomScale {
+            return 1
+        }
+        
         let yDistance = min(abs(transform.ty), maxYDistance)
         return Double(1 - (yDistance / maxYDistance))
     }
