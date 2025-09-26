@@ -77,9 +77,14 @@ struct VideoFullScreenView: View {
                 videoFullScreenViewModel.pause()
             }
         }
-        .onChange(of: videoFullScreenViewModel.currentTime) { _, newValue in
+        .onReceive(videoFullScreenViewModel.$currentTime
+            .removeDuplicates()
+            .throttle(for: .milliseconds(500), scheduler: RunLoop.main, latest: true)
+        ) { newValue in
             if videoFullScreenViewModel.isSeekingProgress {
-                self.videoFullScreenViewModel.player.seek(to: CMTime(seconds: videoFullScreenViewModel.currentTime, preferredTimescale: 600))
+                videoFullScreenViewModel.player.seek(
+                    to: CMTime(seconds: newValue, preferredTimescale: 600)
+                )
             }
         }
         .onChange(of: videoFullScreenViewModel.isSeekingProgress) { _, newValue in
@@ -88,7 +93,6 @@ struct VideoFullScreenView: View {
             } else if !newValue && isPlaying {
                 videoFullScreenViewModel.play()
             }
-            //self.isPlaying = !newValue
         }
         .task {
             await videoFullScreenViewModel.loadAndPlay(url: url, videoType: videoType)
@@ -158,15 +162,32 @@ struct VideoController: View {
                 Spacer()
                 
                 HStack {
+                    Text(formatTime(currentTime))
+                        .foregroundColor(.white)
+                        .font(.caption)
+                        .frame(width: 50, alignment: .trailing)
+                    
                     Slider(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
                         isSeekingProgress = isEditing
                     })
                     .padding(.horizontal, 32)
+                    
+                    Text(formatTime(duration))
+                        .foregroundColor(.white)
+                        .font(.caption)
+                        .frame(width: 50, alignment: .leading)
                 }
             }
             .padding(.bottom, 48)
         }
         .frame(maxWidth: .infinity)
         .background(Color.gray.opacity(0.2))
+    }
+    
+    private func formatTime(_ seconds: Double) -> String {
+        guard !seconds.isNaN else { return "00:00" }
+        let mins = Int(seconds) / 60
+        let secs = Int(seconds) % 60
+        return String(format: "%02d:%02d", mins, secs)
     }
 }
