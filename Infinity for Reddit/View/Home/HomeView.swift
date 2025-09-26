@@ -189,6 +189,7 @@ struct HomeView: View {
                             videoFullScreenViewModel.resetState()
                         }
                         .id(url)
+                        .zIndex(1)
                     }
                 } else if case let .gif(urlString, post) = media {
                     ImageFullScreenView(urlString: urlString) {

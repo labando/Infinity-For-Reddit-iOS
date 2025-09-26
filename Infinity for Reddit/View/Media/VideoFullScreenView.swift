@@ -53,7 +53,14 @@ struct VideoFullScreenView: View {
                     isPlaying: $isPlaying,
                     duration: $videoFullScreenViewModel.duration,
                     currentTime: $videoFullScreenViewModel.currentTime,
-                    isSeekingProgress: $videoFullScreenViewModel.isSeekingProgress
+                    isSeekingProgress: $videoFullScreenViewModel.isSeekingProgress,
+                    hasAudio: $videoFullScreenViewModel.hasAudio,
+                    isMuted: $videoFullScreenViewModel.isMuted,
+                    onDismiss: {
+                        withAnimation {
+                            onDismiss()
+                        }
+                    }
                 )
                 .onTapGesture {
                     withAnimation {
@@ -94,6 +101,9 @@ struct VideoFullScreenView: View {
                 videoFullScreenViewModel.play()
             }
         }
+        .onChange(of: videoFullScreenViewModel.isMuted) { _, newValue in
+            videoFullScreenViewModel.player.isMuted = newValue
+        }
         .task {
             await videoFullScreenViewModel.loadAndPlay(url: url, videoType: videoType)
         }
@@ -115,6 +125,7 @@ struct VideoFullScreenView: View {
                 .onEnded { value in
                     if hasStartedDragging && abs(value.translation.height) > 100 {
                         withAnimation(.linear(duration: 0.25)) {
+                            isShowingController = false
                             if value.translation.height < 0 {
                                 // Dragged up
                                 currentDragOffset = -UIScreen.main.bounds.height
@@ -147,9 +158,42 @@ struct VideoController: View {
     @Binding var duration: Double
     @Binding var currentTime: Double
     @Binding var isSeekingProgress: Bool
+    @Binding var hasAudio: Bool
+    @Binding var isMuted: Bool
+    
+    let onDismiss: () -> Void
     
     var body: some View {
         ZStack {
+            VStack {
+                HStack {
+                    Button {
+                        onDismiss()
+                    } label: {
+                        SwiftUI.Image(systemName: "xmark")
+                            .font(.system(size: 24))
+                            .foregroundColor(Color.white)
+                    }
+                    
+                    Spacer()
+                    
+                    if hasAudio {
+                        Button {
+                            isMuted.toggle()
+                        } label: {
+                            SwiftUI.Image(systemName: isMuted ? "speaker.slash" : "speaker.wave.2")
+                                .font(.system(size: 24))
+                                .foregroundStyle(.white)
+                        }
+                    }
+                }
+                .padding(16)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                
+                Spacer()
+            }
+            .padding(.top, 48)
+            
             Button {
                 isPlaying.toggle()
             } label: {
@@ -170,7 +214,7 @@ struct VideoController: View {
                     Slider(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
                         isSeekingProgress = isEditing
                     })
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal, 16)
                     
                     Text(formatTime(duration))
                         .foregroundColor(.white)
