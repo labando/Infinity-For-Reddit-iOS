@@ -80,7 +80,7 @@ struct SubmitImagePostView: View {
                                 if let previewImage = submitImagePostViewModel.capturedImage {
                                     VStack {
                                         Button(action: {
-                                            submitImagePostViewModel.capturedImage = nil
+                                            submitImagePostViewModel.clearCapturedImage()
                                         }) {
                                             Text("Select again")
                                                 .subreddit()
@@ -153,8 +153,7 @@ struct SubmitImagePostView: View {
         .fullScreenCover(isPresented: $showCamera) {
             MCamera()
                 .onImageCaptured { capturedImage, controller in
-                    submitImagePostViewModel.capturedImage = capturedImage
-                    print("Captured Image: \(capturedImage.description)")
+                    submitImagePostViewModel.setCapturedImage(capturedImage)
                     controller.closeMCamera()
                 }
                 .setCloseMCameraAction {
@@ -176,8 +175,7 @@ struct SubmitImagePostView: View {
                 if let selectedItem = newSelectedItem,
                    let imageData = try? await selectedItem.loadTransferable(type: Data.self),
                    let pickedImage = UIImage(data: imageData) {
-                    submitImagePostViewModel.capturedImage = pickedImage
-                    print("Picked Image: \(pickedImage.description)")
+                    submitImagePostViewModel.setCapturedImage(pickedImage)
                 }
             }
         }

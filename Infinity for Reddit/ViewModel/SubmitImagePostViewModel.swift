@@ -17,5 +17,15 @@ class SubmitImagePostViewModel: ObservableObject {
     init() {
         self.selectedAccount = AccountViewModel.shared.account
     }
+    
+    func setCapturedImage(_ image: UIImage) {
+        capturedImage = image
+        print("Updated captured image: \(image.description)")
+    }
+    
+    func clearCapturedImage() {
+        capturedImage = nil
+        print("Cleared captured image")
+    }
 }
 
