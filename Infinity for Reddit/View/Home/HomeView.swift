@@ -183,14 +183,12 @@ struct HomeView: View {
                     }
                     .id(currentUrl)
                 } else if case let .video(videoUrl, post, videoType) = media {
-                    if let url = URL(string: videoUrl) {
-                        VideoFullScreenView(url: url, videoType: videoType, videoFullScreenViewModel: videoFullScreenViewModel) {
-                            fullScreenMediaViewModel.dismiss()
-                            videoFullScreenViewModel.resetState()
-                        }
-                        .id(url)
-                        .zIndex(1)
+                    VideoFullScreenView(urlString: videoUrl, post: post, videoType: videoType, videoFullScreenViewModel: videoFullScreenViewModel) {
+                        fullScreenMediaViewModel.dismiss()
+                        videoFullScreenViewModel.resetState()
                     }
+                    .id(videoUrl)
+                    .zIndex(1)
                 } else if case let .gif(urlString, post) = media {
                     ImageFullScreenView(urlString: urlString) {
                         fullScreenMediaViewModel.dismiss()

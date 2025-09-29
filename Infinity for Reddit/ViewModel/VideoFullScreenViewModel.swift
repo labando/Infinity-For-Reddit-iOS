@@ -17,18 +17,30 @@ class VideoFullScreenViewModel: ObservableObject {
     @Published var isSeekingProgress: Bool = false
     @Published var hasAudio: Bool = false
     @Published var isMuted: Bool = false
+    @Published var downloadProgress: Double = 0
     @Published private var error: Error?
     
     private var currentItemObserver: NSKeyValueObservation?
     private var timeObserverToken: Any?
     private var statusObserver: NSKeyValueObservation?
     private var audioTrackObserver: NSKeyValueObservation?
+    private var downloadTask: Task<Void, Never>?
     
-    func loadAndPlay(url: URL, videoType: VideoType) async {
+    enum VideoPlayerError: Error {
+        case invalidURL
+    }
+    
+    func loadAndPlay(urlString: String, videoType: VideoType) async {
         guard !isLoaded, !isLoading else {
             if player.currentItem != nil {
                 player.play()
             }
+            return
+        }
+        
+        guard let url = URL(string: urlString) else {
+            self.error = VideoPlayerError.invalidURL
+            print("invalid url")
             return
         }
         
@@ -152,6 +164,43 @@ class VideoFullScreenViewModel: ObservableObject {
                 }
                 self.hasAudio = hasAudio
             }
+        }
+    }
+    
+    func downloadMedia(urlString: String, post: Post?) {
+        guard downloadTask == nil else {
+            return
+        }
+        
+        downloadTask = Task {
+            await self.downloadMediaAsync(urlString: urlString, post: post)
+        }
+    }
+    
+    private func downloadMediaAsync(urlString: String, post: Post?) async {
+        do {
+            let downloadMediaType: DownloadMediaType
+            if let post = post, case .video(_, let downloadUrl) = post.postType {
+                downloadMediaType = .video(downloadUrlString: downloadUrl, fileName: "test.mp4")
+            } else {
+                downloadMediaType = .video(downloadUrlString: urlString, fileName: "test.mp4")
+            }
+            
+            try await MediaDownloader.shared.download(
+                downloadMediaType: downloadMediaType,
+                onProgress: { progress in
+                    await MainActor.run {
+                        self.downloadProgress = progress
+                    }
+                })
+        } catch {
+            await MainActor.run {
+                self.error = error
+            }
+        }
+        await MainActor.run {
+            self.downloadProgress = 0
+            self.downloadTask = nil
         }
     }
     

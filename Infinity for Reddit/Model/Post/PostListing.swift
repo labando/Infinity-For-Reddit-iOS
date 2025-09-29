@@ -146,7 +146,7 @@ public class PostListing : NSObject, NSCoding{
     }
 }
 
-public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
+public class Post : NSObject, ObservableObject, Identifiable {
     var approvedAtUtc : String!
     var approvedBy : String!
     var archived : Bool!
@@ -281,10 +281,7 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
             }
         }
     }
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
+
     init(fromJson json: JSON!) throws {
         if json.isEmpty {
             throw JSONError.invalidData
@@ -485,555 +482,13 @@ public class Post : NSObject, NSCoding, ObservableObject, Identifiable {
     public func isAuthorDeleted() -> Bool {
         return author != nil && author! == "[deleted]"
     }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if approvedAtUtc != nil{
-            dictionary["approved_at_utc"] = approvedAtUtc
-        }
-        if approvedBy != nil{
-            dictionary["approved_by"] = approvedBy
-        }
-        if archived != nil{
-            dictionary["archived"] = archived
-        }
-        if author != nil{
-            dictionary["author"] = author
-        }
-        if authorFlairRichtext != nil{
-            dictionary["author_flair_richtext"] = authorFlairRichtext
-        }
-        if authorFlairText != nil{
-            dictionary["author_flair_text"] = authorFlairText
-        }
-        if authorFlairType != nil{
-            dictionary["author_flair_type"] = authorFlairType
-        }
-        if authorFullname != nil{
-            dictionary["author_fullname"] = authorFullname
-        }
-        if authorIsBlocked != nil{
-            dictionary["author_is_blocked"] = authorIsBlocked
-        }
-        if canModPost != nil{
-            dictionary["can_mod_post"] = canModPost
-        }
-        if created != nil{
-            dictionary["created"] = created
-        }
-        if createdUtc != nil{
-            dictionary["created_utc"] = createdUtc
-        }
-        if crosspostParent != nil {
-            dictionary["crosspost_parent_list"] = crosspostParent
-        }
-        if distinguished != nil{
-            dictionary["distinguished"] = distinguished
-        }
-        if domain != nil{
-            dictionary["domain"] = domain
-        }
-        if downs != nil{
-            dictionary["downs"] = downs
-        }
-        if edited != nil{
-            dictionary["edited"] = edited
-        }
-        if galleryData != nil{
-            dictionary["gallery_data"] = galleryData
-        }
-        if hidden != nil{
-            dictionary["hidden"] = hidden
-        }
-        if id != nil{
-            dictionary["id"] = id
-        }
-        if isCrosspostable != nil{
-            dictionary["is_crosspostable"] = isCrosspostable
-        }
-        if isOriginalContent != nil{
-            dictionary["is_original_content"] = isOriginalContent
-        }
-        if isRedditMediaDomain != nil{
-            dictionary["is_reddit_media_domain"] = isRedditMediaDomain
-        }
-        if isSelf != nil{
-            dictionary["is_self"] = isSelf
-        }
-        if isVideo != nil{
-            dictionary["is_video"] = isVideo
-        }
-        if likes != nil {
-            dictionary["likes"] = likes
-        }
-        if linkFlairRichtext != nil{
-            dictionary["link_flair_richtext"] = linkFlairRichtext
-        }
-        if linkFlairText != nil{
-            dictionary["link_flair_text"] = linkFlairText
-        }
-        if linkFlairType != nil{
-            dictionary["link_flair_type"] = linkFlairType
-        }
-        if locked != nil{
-            dictionary["locked"] = locked
-        }
-        if media != nil{
-            dictionary["media"] = media
-        }
-        if mediaMetadata != nil{
-            dictionary["media_metadata"] = mediaMetadata
-        }
-        if mediaOnly != nil{
-            dictionary["media_only"] = mediaOnly
-        }
-        if modNote != nil{
-            dictionary["mod_note"] = modNote
-        }
-        if modReasonBy != nil{
-            dictionary["mod_reason_by"] = modReasonBy
-        }
-        if modReasonTitle != nil{
-            dictionary["mod_reason_title"] = modReasonTitle
-        }
-        if modReports != nil{
-            dictionary["mod_reports"] = modReports
-        }
-        if name != nil{
-            dictionary["name"] = name
-        }
-        if numComments != nil{
-            dictionary["num_comments"] = numComments
-        }
-        if numCrossposts != nil{
-            dictionary["num_crossposts"] = numCrossposts
-        }
-        if numReports != nil{
-            dictionary["num_reports"] = numReports
-        }
-        if over18 != nil{
-            dictionary["over_18"] = over18
-        }
-        if permalink != nil{
-            dictionary["permalink"] = permalink
-        }
-        if pinned != nil{
-            dictionary["pinned"] = pinned
-        }
-        if preview != nil{
-            dictionary["preview"] = preview.toDictionary()
-        }
-        if pwls != nil{
-            dictionary["pwls"] = pwls
-        }
-        if quarantine != nil{
-            dictionary["quarantine"] = quarantine
-        }
-        if removalReason != nil{
-            dictionary["removal_reason"] = removalReason
-        }
-        if removedBy != nil{
-            dictionary["removed_by"] = removedBy
-        }
-        if removedByCategory != nil{
-            dictionary["removed_by_category"] = removedByCategory
-        }
-        if reportReasons != nil{
-            dictionary["report_reasons"] = reportReasons
-        }
-        if saved != nil{
-            dictionary["saved"] = saved
-        }
-        if score != nil{
-            dictionary["score"] = score
-        }
-        if selftext != nil{
-            dictionary["selftext"] = selftext
-        }
-        if selftextHtml != nil{
-            dictionary["selftext_html"] = selftextHtml
-        }
-        if sendReplies != nil{
-            dictionary["send_replies"] = sendReplies
-        }
-        if spoiler != nil{
-            dictionary["spoiler"] = spoiler
-        }
-        if stickied != nil{
-            dictionary["stickied"] = stickied
-        }
-        if subreddit != nil{
-            dictionary["subreddit"] = subreddit
-        }
-        if subredditId != nil{
-            dictionary["subreddit_id"] = subredditId
-        }
-        if subredditNamePrefixed != nil{
-            dictionary["subreddit_name_prefixed"] = subredditNamePrefixed
-        }
-        if subredditSubscribers != nil{
-            dictionary["subreddit_subscribers"] = subredditSubscribers
-        }
-        if subredditType != nil{
-            dictionary["subreddit_type"] = subredditType
-        }
-        if suggestedSort != nil{
-            dictionary["suggested_sort"] = suggestedSort
-        }
-        if thumbnail != nil{
-            dictionary["thumbnail"] = thumbnail
-        }
-        if thumbnailHeight != nil{
-            dictionary["thumbnail_height"] = thumbnailHeight
-        }
-        if thumbnailWidth != nil{
-            dictionary["thumbnail_width"] = thumbnailWidth
-        }
-        if title != nil{
-            dictionary["title"] = title
-        }
-        if ups != nil{
-            dictionary["ups"] = ups
-        }
-        if upvoteRatio != nil{
-            dictionary["upvote_ratio"] = upvoteRatio
-        }
-        if url != nil{
-            dictionary["url"] = url
-        }
-        if userReports != nil{
-            dictionary["user_reports"] = userReports
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required public init(coder aDecoder: NSCoder)
-    {
-        approvedAtUtc = aDecoder.decodeObject(forKey: "approved_at_utc") as? String
-        approvedBy = aDecoder.decodeObject(forKey: "approved_by") as? String
-        archived = aDecoder.decodeObject(forKey: "archived") as? Bool
-        author = aDecoder.decodeObject(forKey: "author") as? String
-        authorFlairRichtext = aDecoder.decodeObject(forKey: "author_flair_richtext") as? [FlairRichtext]
-        authorFlairText = aDecoder.decodeObject(forKey: "author_flair_text") as? String
-        authorFlairType = aDecoder.decodeObject(forKey: "author_flair_type") as? String
-        authorFullname = aDecoder.decodeObject(forKey: "author_fullname") as? String
-        authorIsBlocked = aDecoder.decodeObject(forKey: "author_is_blocked") as? Bool
-        canModPost = aDecoder.decodeObject(forKey: "can_mod_post") as? Bool
-        created = aDecoder.decodeObject(forKey: "created") as? Int64
-        createdUtc = aDecoder.decodeObject(forKey: "created_utc") as? Int64
-        crosspostParent = aDecoder.decodeObject(forKey: "crosspost_parent_list") as? Post
-        distinguished = aDecoder.decodeObject(forKey: "distinguished") as? String
-        domain = aDecoder.decodeObject(forKey: "domain") as? String
-        downs = aDecoder.decodeObject(forKey: "downs") as? Int
-        edited = aDecoder.decodeObject(forKey: "edited") as? Bool
-        galleryData = aDecoder.decodeObject(forKey: "gallery_data") as? GalleryData
-        hidden = aDecoder.decodeObject(forKey: "hidden") as? Bool
-        id = aDecoder.decodeObject(forKey: "id") as? String
-        isCrosspostable = aDecoder.decodeObject(forKey: "is_crosspostable") as? Bool
-        isOriginalContent = aDecoder.decodeObject(forKey: "is_original_content") as? Bool
-        isSelf = aDecoder.decodeObject(forKey: "is_self") as? Bool
-        isVideo = aDecoder.decodeObject(forKey: "is_video") as? Bool
-        likes = aDecoder.decodeObject(forKey: "likes") as? Int
-        linkFlairRichtext = aDecoder.decodeObject(forKey: "link_flair_richtext") as? [FlairRichtext]
-        linkFlairText = aDecoder.decodeObject(forKey: "link_flair_text") as? String
-        linkFlairType = aDecoder.decodeObject(forKey: "link_flair_type") as? String
-        locked = aDecoder.decodeObject(forKey: "locked") as? Bool
-        media = aDecoder.decodeObject(forKey: "media") as? PostMedia
-        mediaMetadata = aDecoder.decodeObject(forKey: "media_metadata") as? [String: MediaMetadata]
-        mediaOnly = aDecoder.decodeObject(forKey: "media_only") as? Bool
-        modNote = aDecoder.decodeObject(forKey: "mod_note") as? String
-        modReasonBy = aDecoder.decodeObject(forKey: "mod_reason_by") as? String
-        modReasonTitle = aDecoder.decodeObject(forKey: "mod_reason_title") as? String
-        modReports = aDecoder.decodeObject(forKey: "mod_reports") as? [[Any]]
-        name = aDecoder.decodeObject(forKey: "name") as? String
-        numComments = aDecoder.decodeObject(forKey: "num_comments") as? Int
-        numCrossposts = aDecoder.decodeObject(forKey: "num_crossposts") as? Int
-        numReports = aDecoder.decodeObject(forKey: "num_reports") as? Int
-        over18 = aDecoder.decodeObject(forKey: "over_18") as? Bool
-        permalink = aDecoder.decodeObject(forKey: "permalink") as? String
-        pinned = aDecoder.decodeObject(forKey: "pinned") as? Bool
-        preview = aDecoder.decodeObject(forKey: "preview") as? Preview
-        pwls = aDecoder.decodeObject(forKey: "pwls") as? Int
-        quarantine = aDecoder.decodeObject(forKey: "quarantine") as? Bool
-        removalReason = aDecoder.decodeObject(forKey: "removal_reason") as? String
-        removedBy = aDecoder.decodeObject(forKey: "removed_by") as? String
-        removedByCategory = aDecoder.decodeObject(forKey: "removed_by_category") as? String
-        reportReasons = aDecoder.decodeObject(forKey: "report_reasons") as? String
-        saved = aDecoder.decodeObject(forKey: "saved") as? Bool
-        score = aDecoder.decodeObject(forKey: "score") as? Int
-        selftext = aDecoder.decodeObject(forKey: "selftext") as? String
-        selftextHtml = aDecoder.decodeObject(forKey: "selftext_html") as? String
-        sendReplies = aDecoder.decodeObject(forKey: "send_replies") as? Bool
-        spoiler = aDecoder.decodeObject(forKey: "spoiler") as? Bool
-        stickied = aDecoder.decodeObject(forKey: "stickied") as? Bool
-        subreddit = aDecoder.decodeObject(forKey: "subreddit") as? String
-        subredditId = aDecoder.decodeObject(forKey: "subreddit_id") as? String
-        subredditNamePrefixed = aDecoder.decodeObject(forKey: "subreddit_name_prefixed") as? String
-        subredditSubscribers = aDecoder.decodeObject(forKey: "subreddit_subscribers") as? Int
-        subredditType = aDecoder.decodeObject(forKey: "subreddit_type") as? String
-        suggestedSort = aDecoder.decodeObject(forKey: "suggested_sort") as? String
-        thumbnail = aDecoder.decodeObject(forKey: "thumbnail") as? String
-        thumbnailHeight = aDecoder.decodeObject(forKey: "thumbnail_height") as? Int
-        thumbnailWidth = aDecoder.decodeObject(forKey: "thumbnail_width") as? Int
-        title = aDecoder.decodeObject(forKey: "title") as? String
-        ups = aDecoder.decodeObject(forKey: "ups") as? Int
-        upvoteRatio = aDecoder.decodeObject(forKey: "upvote_ratio") as? Float
-        url = aDecoder.decodeObject(forKey: "url") as? String
-        userReports = aDecoder.decodeObject(forKey: "user_reports") as? [[String]]
-        
-        postType = aDecoder.decodeObject(forKey: "post_type") as? PostType ?? .text
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    public func encode(with aCoder: NSCoder)
-    {
-        if approvedAtUtc != nil{
-            aCoder.encode(approvedAtUtc, forKey: "approved_at_utc")
-        }
-        if approvedBy != nil{
-            aCoder.encode(approvedBy, forKey: "approved_by")
-        }
-        if archived != nil{
-            aCoder.encode(archived, forKey: "archived")
-        }
-        if author != nil{
-            aCoder.encode(author, forKey: "author")
-        }
-        if authorFlairRichtext != nil{
-            aCoder.encode(authorFlairRichtext, forKey: "author_flair_richtext")
-        }
-        if authorFlairText != nil{
-            aCoder.encode(authorFlairText, forKey: "author_flair_text")
-        }
-        if authorFlairType != nil{
-            aCoder.encode(authorFlairType, forKey: "author_flair_type")
-        }
-        if authorFullname != nil{
-            aCoder.encode(authorFullname, forKey: "author_fullname")
-        }
-        if authorIsBlocked != nil{
-            aCoder.encode(authorIsBlocked, forKey: "author_is_blocked")
-        }
-        if canModPost != nil{
-            aCoder.encode(canModPost, forKey: "can_mod_post")
-        }
-        if created != nil{
-            aCoder.encode(created, forKey: "created")
-        }
-        if createdUtc != nil{
-            aCoder.encode(createdUtc, forKey: "created_utc")
-        }
-        if crosspostParent != nil {
-            aCoder.encode(crosspostParent, forKey: "crosspost_parent_list")
-        }
-        if distinguished != nil{
-            aCoder.encode(distinguished, forKey: "distinguished")
-        }
-        if domain != nil{
-            aCoder.encode(domain, forKey: "domain")
-        }
-        if downs != nil{
-            aCoder.encode(downs, forKey: "downs")
-        }
-        if edited != nil{
-            aCoder.encode(edited, forKey: "edited")
-        }
-        if galleryData != nil{
-            aCoder.encode(galleryData, forKey: "gallery_data")
-        }
-        if hidden != nil{
-            aCoder.encode(hidden, forKey: "hidden")
-        }
-        if id != nil{
-            aCoder.encode(id, forKey: "id")
-        }
-        if isCrosspostable != nil{
-            aCoder.encode(isCrosspostable, forKey: "is_crosspostable")
-        }
-        if isOriginalContent != nil{
-            aCoder.encode(isOriginalContent, forKey: "is_original_content")
-        }
-        if isRedditMediaDomain != nil{
-            aCoder.encode(isRedditMediaDomain, forKey: "is_reddit_media_domain")
-        }
-        if isSelf != nil{
-            aCoder.encode(isSelf, forKey: "is_self")
-        }
-        if isVideo != nil{
-            aCoder.encode(isVideo, forKey: "is_video")
-        }
-        if likes != nil {
-            aCoder.encode(likes, forKey: "likes")
-        }
-        if linkFlairRichtext != nil{
-            aCoder.encode(linkFlairRichtext, forKey: "link_flair_richtext")
-        }
-        if linkFlairText != nil{
-            aCoder.encode(linkFlairText, forKey: "link_flair_text")
-        }
-        if linkFlairType != nil{
-            aCoder.encode(linkFlairType, forKey: "link_flair_type")
-        }
-        if locked != nil{
-            aCoder.encode(locked, forKey: "locked")
-        }
-        if media != nil{
-            aCoder.encode(media, forKey: "media")
-        }
-        if mediaMetadata != nil{
-            aCoder.encode(mediaMetadata, forKey: "media_metadata")
-        }
-        if mediaOnly != nil{
-            aCoder.encode(mediaOnly, forKey: "media_only")
-        }
-        if modNote != nil{
-            aCoder.encode(modNote, forKey: "mod_note")
-        }
-        if modReasonBy != nil{
-            aCoder.encode(modReasonBy, forKey: "mod_reason_by")
-        }
-        if modReasonTitle != nil{
-            aCoder.encode(modReasonTitle, forKey: "mod_reason_title")
-        }
-        if modReports != nil{
-            aCoder.encode(modReports, forKey: "mod_reports")
-        }
-        if name != nil{
-            aCoder.encode(name, forKey: "name")
-        }
-        if numComments != nil{
-            aCoder.encode(numComments, forKey: "num_comments")
-        }
-        if numCrossposts != nil{
-            aCoder.encode(numCrossposts, forKey: "num_crossposts")
-        }
-        if numReports != nil{
-            aCoder.encode(numReports, forKey: "num_reports")
-        }
-        if over18 != nil{
-            aCoder.encode(over18, forKey: "over_18")
-        }
-        if permalink != nil{
-            aCoder.encode(permalink, forKey: "permalink")
-        }
-        if pinned != nil{
-            aCoder.encode(pinned, forKey: "pinned")
-        }
-        if preview != nil{
-            aCoder.encode(preview, forKey: "preview")
-        }
-        if pwls != nil{
-            aCoder.encode(pwls, forKey: "pwls")
-        }
-        if quarantine != nil{
-            aCoder.encode(quarantine, forKey: "quarantine")
-        }
-        if removalReason != nil{
-            aCoder.encode(removalReason, forKey: "removal_reason")
-        }
-        if removedBy != nil{
-            aCoder.encode(removedBy, forKey: "removed_by")
-        }
-        if removedByCategory != nil{
-            aCoder.encode(removedByCategory, forKey: "removed_by_category")
-        }
-        if reportReasons != nil{
-            aCoder.encode(reportReasons, forKey: "report_reasons")
-        }
-        if saved != nil{
-            aCoder.encode(saved, forKey: "saved")
-        }
-        if score != nil{
-            aCoder.encode(score, forKey: "score")
-        }
-        if selftext != nil{
-            aCoder.encode(selftext, forKey: "selftext")
-        }
-        if selftextHtml != nil{
-            aCoder.encode(selftextHtml, forKey: "selftext_html")
-        }
-        if sendReplies != nil{
-            aCoder.encode(sendReplies, forKey: "send_replies")
-        }
-        if spoiler != nil{
-            aCoder.encode(spoiler, forKey: "spoiler")
-        }
-        if stickied != nil{
-            aCoder.encode(stickied, forKey: "stickied")
-        }
-        if subreddit != nil{
-            aCoder.encode(subreddit, forKey: "subreddit")
-        }
-        if subredditId != nil{
-            aCoder.encode(subredditId, forKey: "subreddit_id")
-        }
-        if subredditNamePrefixed != nil{
-            aCoder.encode(subredditNamePrefixed, forKey: "subreddit_name_prefixed")
-        }
-        if subredditSubscribers != nil{
-            aCoder.encode(subredditSubscribers, forKey: "subreddit_subscribers")
-        }
-        if subredditType != nil{
-            aCoder.encode(subredditType, forKey: "subreddit_type")
-        }
-        if suggestedSort != nil{
-            aCoder.encode(suggestedSort, forKey: "suggested_sort")
-        }
-        if thumbnail != nil{
-            aCoder.encode(thumbnail, forKey: "thumbnail")
-        }
-        if thumbnailHeight != nil{
-            aCoder.encode(thumbnailHeight, forKey: "thumbnail_height")
-        }
-        if thumbnailWidth != nil{
-            aCoder.encode(thumbnailWidth, forKey: "thumbnail_width")
-        }
-        if title != nil{
-            aCoder.encode(title, forKey: "title")
-        }
-        if ups != nil{
-            aCoder.encode(ups, forKey: "ups")
-        }
-        if upvoteRatio != nil{
-            aCoder.encode(upvoteRatio, forKey: "upvote_ratio")
-        }
-        if url != nil{
-            aCoder.encode(url, forKey: "url")
-        }
-        if userReports != nil{
-            aCoder.encode(userReports, forKey: "user_reports")
-        }
-        
-        if postType != nil {
-            aCoder.encode(postType, forKey: "post_type")
-        }
-    }
-    
-//    static func == (lhs: Post, rhs: Post) -> Bool {
-//        return lhs.id == rhs.id
-//    }
 }
 
-class Preview : NSObject, NSCoding{
+class Preview : NSObject {
     
     var enabled : Bool!
     var images : [Image]!
-    
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
+
     init(fromJson json: JSON!) {
         if json.isEmpty {
             return
@@ -1046,64 +501,15 @@ class Preview : NSObject, NSCoding{
             images.append(value)
         }
     }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if enabled != nil{
-            dictionary["enabled"] = enabled
-        }
-        if images != nil{
-            var dictionaryElements = [[String:Any]]()
-            for imagesElement in images {
-                dictionaryElements.append(imagesElement.toDictionary())
-            }
-            dictionary["images"] = dictionaryElements
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        enabled = aDecoder.decodeObject(forKey: "enabled") as? Bool
-        images = aDecoder.decodeObject(forKey: "images") as? [Image]
-        
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    func encode(with aCoder: NSCoder)
-    {
-        if enabled != nil{
-            aCoder.encode(enabled, forKey: "enabled")
-        }
-        if images != nil{
-            aCoder.encode(images, forKey: "images")
-        }
-        
-    }
-    
 }
 
-class Image : NSObject, NSCoding{
+class Image : NSObject {
     
     var resolutions : [Resolution]! = [Resolution]()
     var source : Resolution!
     var gifVariant: Image!
     var mp4Variant: Image!
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
+
     init(fromJson json: JSON!) {
         if json.isEmpty {
             return
@@ -1128,54 +534,9 @@ class Image : NSObject, NSCoding{
             }
         }
     }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if resolutions != nil{
-            var dictionaryElements = [[String:Any]]()
-            for resolutionsElement in resolutions {
-                dictionaryElements.append(resolutionsElement.toDictionary())
-            }
-            dictionary["resolutions"] = dictionaryElements
-        }
-        if source != nil{
-            dictionary["source"] = source.toDictionary()
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        resolutions = aDecoder.decodeObject(forKey: "resolutions") as? [Resolution]
-        source = aDecoder.decodeObject(forKey: "source") as? Resolution
-        
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    func encode(with aCoder: NSCoder)
-    {
-        if resolutions != nil{
-            aCoder.encode(resolutions, forKey: "resolutions")
-        }
-        if source != nil{
-            aCoder.encode(source, forKey: "source")
-        }
-    }
-    
 }
 
-class Resolution : NSObject, NSCoding{
+class Resolution : NSObject {
     
     var height : Int!
     var url : String!
@@ -1183,81 +544,24 @@ class Resolution : NSObject, NSCoding{
     var aspectRatio : CGSize {
         return CGSize(width: width, height: height)
     }
-    
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
-    init(fromJson json: JSON!){
-        if json.isEmpty{
+
+    init(fromJson json: JSON!) {
+        if json.isEmpty {
             return
         }
         height = json["height"].intValue
         url = json["url"].stringValue
         width = json["width"].intValue
     }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if height != nil{
-            dictionary["height"] = height
-        }
-        if url != nil{
-            dictionary["url"] = url
-        }
-        if width != nil{
-            dictionary["width"] = width
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        height = aDecoder.decodeObject(forKey: "height") as? Int
-        url = aDecoder.decodeObject(forKey: "url") as? String
-        width = aDecoder.decodeObject(forKey: "width") as? Int
-        
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    func encode(with aCoder: NSCoder)
-    {
-        if height != nil{
-            aCoder.encode(height, forKey: "height")
-        }
-        if url != nil{
-            aCoder.encode(url, forKey: "url")
-        }
-        if width != nil{
-            aCoder.encode(width, forKey: "width")
-        }
-        
-    }
-    
 }
 
 
-class PostMedia : NSObject, NSCoding{
+class PostMedia : NSObject {
     
     var redditVideo : RedditVideo!
-    
-    
-    /**
-     * Instantiate the instance using the passed json values to set the properties values
-     */
-    init(fromJson json: JSON!){
-        if json.isEmpty{
+
+    init(fromJson json: JSON!) {
+        if json.isEmpty {
             return
         }
         let redditVideoJson = json["reddit_video"]
@@ -1265,41 +569,6 @@ class PostMedia : NSObject, NSCoding{
             redditVideo = RedditVideo(fromJson: redditVideoJson)
         }
     }
-    
-    /**
-     * Returns all the available property values in the form of [String:Any] object where the key is the approperiate json key and the value is the value of the corresponding property
-     */
-    func toDictionary() -> [String:Any]
-    {
-        var dictionary = [String:Any]()
-        if redditVideo != nil{
-            dictionary["reddit_video"] = redditVideo.toDictionary()
-        }
-        return dictionary
-    }
-    
-    /**
-     * NSCoding required initializer.
-     * Fills the data from the passed decoder
-     */
-    @objc required init(coder aDecoder: NSCoder)
-    {
-        redditVideo = aDecoder.decodeObject(forKey: "reddit_video") as? RedditVideo
-        
-    }
-    
-    /**
-     * NSCoding required method.
-     * Encodes mode properties into the decoder
-     */
-    func encode(with aCoder: NSCoder)
-    {
-        if redditVideo != nil{
-            aCoder.encode(redditVideo, forKey: "reddit_video")
-        }
-        
-    }
-    
 }
 
 class RedditVideo : NSObject, NSCoding{

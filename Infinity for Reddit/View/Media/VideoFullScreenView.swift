@@ -25,12 +25,14 @@ struct VideoFullScreenView: View {
     @State private var isPlaying: Bool = true
     @State private var playbackSpeed: Double = 1
     
-    let url: URL
+    let urlString: String
+    let post: Post?
     let videoType: VideoType
     let onDismiss: () -> Void
     
-    init(url: URL, videoType: VideoType, videoFullScreenViewModel: VideoFullScreenViewModel, onDismiss: @escaping () -> Void) {
-        self.url = url
+    init(urlString: String, post: Post?, videoType: VideoType, videoFullScreenViewModel: VideoFullScreenViewModel, onDismiss: @escaping () -> Void) {
+        self.urlString = urlString
+        self.post = post
         self.videoType = videoType
         self.videoFullScreenViewModel = videoFullScreenViewModel
         self.onDismiss = onDismiss
@@ -72,6 +74,9 @@ struct VideoFullScreenView: View {
                         videoFullScreenViewModel.player.seek(
                             to: CMTime(seconds: min(videoFullScreenViewModel.duration, newTime), preferredTimescale: 600)
                         )
+                    },
+                    onDownload: {
+                        videoFullScreenViewModel.downloadMedia(urlString: urlString, post: post)
                     },
                     onDismiss: {
                         withAnimation {
@@ -125,7 +130,7 @@ struct VideoFullScreenView: View {
             videoFullScreenViewModel.player.rate = Float(newValue)
         }
         .task {
-            await videoFullScreenViewModel.loadAndPlay(url: url, videoType: videoType)
+            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType)
         }
         .gesture(
             DragGesture()
@@ -184,6 +189,7 @@ struct VideoController: View {
     
     let onFastForward: () -> Void
     let onRewind: () -> Void
+    let onDownload: () -> Void
     let onDismiss: () -> Void
     
     var body: some View {
@@ -278,6 +284,16 @@ struct VideoController: View {
             
             VStack {
                 Spacer()
+                
+                HStack {
+                    Button {
+                        onDownload()
+                    } label: {
+                        SwiftUI.Image(systemName: "square.and.arrow.down")
+                            .font(.system(size: 24))
+                            .foregroundStyle(.white)
+                    }
+                }
                 
                 HStack {
                     Text(formatTime(currentTime))
