@@ -63,6 +63,7 @@ struct VideoFullScreenView: View {
                     hasAudio: $videoFullScreenViewModel.hasAudio,
                     isMuted: $videoFullScreenViewModel.isMuted,
                     playbackSpeed: $playbackSpeed,
+                    title: post?.title,
                     onFastForward: {
                         let newTime = videoFullScreenViewModel.currentTime + 5
                         videoFullScreenViewModel.player.seek(
@@ -186,6 +187,7 @@ struct VideoController: View {
     @Binding var hasAudio: Bool
     @Binding var isMuted: Bool
     @Binding var playbackSpeed: Double
+    let title: String?
     
     let onFastForward: () -> Void
     let onRewind: () -> Void
@@ -195,7 +197,7 @@ struct VideoController: View {
     var body: some View {
         ZStack {
             VStack {
-                HStack {
+                HStack(spacing: 12) {
                     Button {
                         onDismiss()
                     } label: {
@@ -223,30 +225,40 @@ struct VideoController: View {
                         }
                     }
                     
+                    Button {
+                        onDownload()
+                    } label: {
+                        SwiftUI.Image(systemName: "arrow.down.square")
+                            .font(.system(size: 24))
+                            .foregroundStyle(.white)
+                    }
+                    
                     Menu {
-                        ForEach(Array(VideoUserDefaultsUtils.playbackSpeeds.indices), id: \.self) { index in
-                            Button {
-                                playbackSpeed = VideoUserDefaultsUtils.playbackSpeeds[index]
-                            } label: {
-                                HStack {
-                                    Text(VideoUserDefaultsUtils.playbackSpeedsText[index])
-                                        .primaryText()
-                                    
-                                    Spacer()
-                                    
-                                    if playbackSpeed == VideoUserDefaultsUtils.playbackSpeeds[index] {
-                                        SwiftUI.Image(systemName: "checkmark")
+                        Menu {
+                            ForEach(Array(VideoUserDefaultsUtils.playbackSpeeds.indices), id: \.self) { index in
+                                Button {
+                                    playbackSpeed = VideoUserDefaultsUtils.playbackSpeeds[index]
+                                } label: {
+                                    HStack {
+                                        Text(VideoUserDefaultsUtils.playbackSpeedsText[index])
+                                            .primaryText()
+                                        
+                                        Spacer()
+                                        
+                                        if playbackSpeed == VideoUserDefaultsUtils.playbackSpeeds[index] {
+                                            SwiftUI.Image(systemName: "checkmark")
+                                        }
                                     }
                                 }
                             }
+                        } label: {
+                            Text("Speed")
+                                .primaryText()
                         }
                     } label: {
-                        Button {
-                        } label: {
-                            SwiftUI.Image(systemName: "gauge.with.dots.needle.67percent")
-                                .font(.system(size: 24))
-                                .foregroundStyle(.white)
-                        }
+                        SwiftUI.Image(systemName: "ellipsis.circle")
+                            .font(.system(size: 24))
+                            .foregroundStyle(.white)
                     }
                 }
                 .padding(16)
@@ -285,21 +297,15 @@ struct VideoController: View {
             VStack {
                 Spacer()
                 
-                HStack {
-                    Button {
-                        onDownload()
-                    } label: {
-                        SwiftUI.Image(systemName: "square.and.arrow.down")
-                            .font(.system(size: 24))
-                            .foregroundStyle(.white)
-                    }
+                if let title {
+                    RowText(title)
+                        .foregroundStyle(.white)
+                        .padding(16)
                 }
                 
                 HStack {
                     Text(formatTime(currentTime))
-                        .foregroundColor(.white)
-                        .font(.caption)
-                        .frame(width: 50, alignment: .trailing)
+                        .foregroundStyle(.white)
                     
                     Slider(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
                         isSeekingProgress = isEditing
@@ -307,10 +313,9 @@ struct VideoController: View {
                     .padding(.horizontal, 16)
                     
                     Text(formatTime(duration))
-                        .foregroundColor(.white)
-                        .font(.caption)
-                        .frame(width: 50, alignment: .leading)
+                        .foregroundStyle(.white)
                 }
+                .padding(.horizontal, 16)
             }
             .padding(.bottom, 48)
         }
