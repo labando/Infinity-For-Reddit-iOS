@@ -244,7 +244,8 @@ public class Post : NSObject, ObservableObject, Identifiable {
         case image
         case imageWithUrlPreview(urlPreview: String)
         case gif
-        case video(videoUrl: String, downloadUrl: String)
+        case redditVideo(videoUrlString: String, downloadUrlString: String)
+        case video(videoUrlString: String, downloadUrlString: String)
         case gallery
         case link
         case noPreviewLink
@@ -255,7 +256,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         
         var isMedia: Bool {
             switch self {
-            case .image, .imageWithUrlPreview(urlPreview: _), .gif, .video(videoUrl: _, downloadUrl: _), .gallery, .imgurVideo(url: _), .redgifs(redgifsId: _), .streamable(shortCode: _):
+            case .image, .imageWithUrlPreview, .gif, .redditVideo, .video, .gallery, .imgurVideo, .redgifs, .streamable:
                 return true
             default:
                 return false
@@ -270,7 +271,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
                 return "Image"
             case .gif:
                 return "Gif"
-            case .video, .imgurVideo, .redgifs, .streamable:
+            case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
                 return "Video"
             case .gallery:
                 return "Gallery"
@@ -437,7 +438,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
                     return PostType.imageWithUrlPreview(urlPreview: url)
                 } else {
                     if isVideo {
-                        return PostType.video(videoUrl: media?.redditVideo?.hlsUrl ?? "", downloadUrl: media?.redditVideo?.fallbackUrl ?? "")
+                        return PostType.redditVideo(videoUrlString: media?.redditVideo?.hlsUrl ?? "", downloadUrlString: media?.redditVideo?.fallbackUrl ?? "")
                     } else {
                         if host.contains("redgifs.com") {
                             return PostType.redgifs(redgifsId: url.components(separatedBy: "/").last?.lowercased() ?? "")
@@ -450,7 +451,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
             }
         } else {
             if isVideo {
-                return PostType.video(videoUrl: media?.redditVideo?.hlsUrl ?? "", downloadUrl: media?.redditVideo?.fallbackUrl ?? "")
+                return PostType.redditVideo(videoUrlString: media?.redditVideo?.hlsUrl ?? "", downloadUrlString: media?.redditVideo?.fallbackUrl ?? "")
             } else {
                 if path.hasSuffix(".jpg") || path.hasSuffix(".png") || path.hasSuffix(".jpeg") {
                     return PostType.image
@@ -462,7 +463,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
                     }
                     return PostType.imgurVideo(url: url)
                 } else if path.hasSuffix(".mp4") {
-                    return PostType.video(videoUrl: url, downloadUrl: url)
+                    return PostType.video(videoUrlString: url, downloadUrlString: url)
                 } else {
                     if url.contains(permalink) {
                         return PostType.text

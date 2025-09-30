@@ -380,7 +380,7 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
             postFilter.containImageType = true
         case .gif:
             postFilter.containGifType = true
-        case .video, .imgurVideo, .redgifs, .streamable:
+        case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
             postFilter.containVideoType = true
         case .gallery:
             postFilter.containGalleryType = true

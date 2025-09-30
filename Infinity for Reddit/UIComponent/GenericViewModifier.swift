@@ -60,8 +60,10 @@ struct MediaTapGestureHandlerViewModifer: ViewModifier {
                                         fullScreenMediaViewModel.show(.gif(url: post?.url ?? "", post: post))
                                     }
                                 }
-                            case .video(let videoUrl, let downloadUrl):
-                                fullScreenMediaViewModel.show(.video(url: videoUrl, post: post))
+                            case .redditVideo(let videoUrlString, let downloadUrlString):
+                                fullScreenMediaViewModel.show(.video(url: videoUrlString, post: post))
+                            case .video(let videoUrlString, let downloadUrlString):
+                                fullScreenMediaViewModel.show(.video(url: videoUrlString, post: post))
                             case .link:
                                 if let urlString = post?.url, let url = URL(string: urlString) {
                                     navigationManager.openLink(urlString)

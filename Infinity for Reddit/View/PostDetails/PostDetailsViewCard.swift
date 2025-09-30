@@ -195,11 +195,20 @@ struct PostDetailsViewCard: View {
                 // May not have a preview!!!!!!
                 GalleryCarousel(post: postViewModel.post)
                     .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
-            } else if case .video(let videoUrl, _) = postViewModel.post.postType {
+            } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrl: videoUrl) {
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrlString) {
+                    Task {
+                        await postViewModel.readPost()
+                    }
+                }
+            } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
+                Spacer()
+                    .frame(height: 10)
+                
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrlString) {
                     Task {
                         await postViewModel.readPost()
                     }
@@ -219,7 +228,7 @@ struct PostDetailsViewCard: View {
                         )
                         
                         switch postViewModel.post.postType {
-                        case .video, .imgurVideo, .redgifs, .streamable:
+                        case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
                             SwiftUI.Image(systemName: "play.circle")
                                 .resizable()
                                 .mediaIndicator()
@@ -245,7 +254,7 @@ struct PostDetailsViewCard: View {
                 // No preview media
                 ZStack {
                     switch postViewModel.post.postType {
-                    case .video, .imgurVideo, .redgifs, .streamable:
+                    case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
                         SwiftUI.Image(systemName: "video")
                             .noPreviewPostTypeIndicator()
                     case .gallery:

@@ -197,11 +197,20 @@ struct PostViewCard: View {
                 Text(selftextTruncated)
                     .postContent()
                     .padding(.horizontal, 16)
-            } else if case .video(let videoUrl, _) = postViewModel.post.postType {
+            } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrl: videoUrl, inPostListing: true) {
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrlString, inPostListing: true) {
+                    Task {
+                        await postViewModel.readPost()
+                    }
+                }
+            } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
+                Spacer()
+                    .frame(height: 10)
+                
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrlString, inPostListing: true) {
                     Task {
                         await postViewModel.readPost()
                     }
@@ -230,7 +239,7 @@ struct PostViewCard: View {
                     )
                     
                     switch postViewModel.post.postType {
-                    case .video, .imgurVideo, .redgifs, .streamable:
+                    case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
                         SwiftUI.Image(systemName: "play.circle")
                             .resizable()
                             .mediaIndicator()
@@ -254,7 +263,7 @@ struct PostViewCard: View {
                 // No preview media
                 ZStack {
                     switch postViewModel.post.postType {
-                    case .video, .imgurVideo, .redgifs, .streamable:
+                    case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
                         SwiftUI.Image(systemName: "video")
                             .noPreviewPostTypeIndicator()
                     case .gallery:

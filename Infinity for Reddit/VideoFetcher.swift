@@ -109,8 +109,10 @@ class VideoFetcher {
                     print("Post id: \(postId)")
                     if let post = try await fetchPost(postId: postId) {
                         switch post.postType {
-                        case .video(let videoUrl, let downloadUrl):
-                            return URL(string: videoUrl)
+                        case .redditVideo(let videoUrlString, _):
+                            return URL(string: videoUrlString)
+                        case .video(let videoUrlString, _):
+                            return URL(string: videoUrlString)
                         case .redgifs(let redgifsId):
                             return try await fetchRedgifsVideo(id: redgifsId)
                         case .streamable(let shortCode):

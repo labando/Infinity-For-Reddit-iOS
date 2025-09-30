@@ -91,14 +91,14 @@ class MediaDownloader {
     }
     
     private func downloadRedditVideo(post: Post, fileName: String) async throws {
-        guard case .video(_, let downloadUrl) = post.postType, let downloadURL = URL(string: downloadUrl) else {
+        guard case .redditVideo(_, let downloadUrlString) = post.postType, let downloadURL = URL(string: downloadUrlString) else {
             throw MediaDownloaderError.invalidRedditVideo
         }
 
         let videoTrackDownloadedFileURL = try await downloadFile(downloadURL: downloadURL, fileName: "video_track.mp4", onProgress: { _ in })
         var audioTrackDownloadedFileURL: URL?
-        if let lastSlashIndex = downloadUrl.lastIndex(of: "/") {
-            let audioUrlPrefix = String(downloadUrl[..<lastSlashIndex])
+        if let lastSlashIndex = downloadUrlString.lastIndex(of: "/") {
+            let audioUrlPrefix = String(downloadUrlString[..<lastSlashIndex])
             for suffix in possibleRedditVideoAudioTrackURLSuffices {
                 if let audioUrl = URL(string: audioUrlPrefix + suffix) {
                     print(audioUrl)
@@ -111,8 +111,7 @@ class MediaDownloader {
                 }
             }
         }
-        
-        print(audioTrackDownloadedFileURL?.absoluteString ?? "No audio track")
+
         if let audioTrackDownloadedFileURL {
             let exportedMuxedVideoURL = try await muxVideoAndAudio(downloadedVideoURL: videoTrackDownloadedFileURL, downloadedAudioURL: audioTrackDownloadedFileURL, fileName: fileName)
             try await saveVideoToPhotosLibrary(exportedMuxedVideoURL)
