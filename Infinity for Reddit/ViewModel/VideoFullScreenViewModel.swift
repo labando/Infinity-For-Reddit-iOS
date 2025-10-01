@@ -22,6 +22,7 @@ class VideoFullScreenViewModel: ObservableObject {
     @Published var isShowingController: Bool = false
     @Published private var error: Error?
     
+    private var loadedURL: URL?
     private var currentItemObserver: NSKeyValueObservation?
     private var timeObserverToken: Any?
     private var statusObserver: NSKeyValueObservation?
@@ -64,6 +65,7 @@ class VideoFullScreenViewModel: ObservableObject {
                 break
             }
             if let url = finalURL {
+                loadedURL = finalURL
                 let item = try await loadPlayerItem(from: url)
                 player.replaceCurrentItem(with: item)
                 
@@ -127,6 +129,7 @@ class VideoFullScreenViewModel: ObservableObject {
         NotificationCenter.default.removeObserver(self)
         self.player.replaceCurrentItem(with: nil)
         
+        loadedURL = nil
         isLoaded = false
         isLoading = false
     }

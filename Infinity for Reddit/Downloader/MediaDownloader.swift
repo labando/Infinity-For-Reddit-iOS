@@ -56,15 +56,17 @@ class MediaDownloader {
             break
         case .video:
             try await saveVideoToPhotosLibrary(downloadedFileURL)
-        case .gallery:
-            // TODO
-            break
+        case .vReddIt:
+            try await saveVideoToPhotosLibrary(downloadedFileURL)
         case .redgifs:
             try await saveVideoToPhotosLibrary(downloadedFileURL)
         case .streamable:
             try await saveVideoToPhotosLibrary(downloadedFileURL)
         case .imgurVideo:
             try await saveVideoToPhotosLibrary(downloadedFileURL)
+        case .gallery:
+            // TODO
+            break
         }
     }
     
@@ -225,10 +227,11 @@ enum DownloadMediaType {
     case gif(downloadUrlString: String, fileName: String)
     case redditVideo(post: Post)
     case video(downloadUrlString: String, fileName: String)
-    case gallery(galleryItems: [GalleryItem], fileName: String)
+    case vReddIt(urlString: String, downloadUrlString: String?)
     case redgifs(redgifsId: String, downloadUrlString: String?)
     case streamable(shortCode: String, downloadUrlString: String?)
     case imgurVideo(downloadUrlString: String, fileName: String)
+    case gallery(galleryItems: [GalleryItem], fileName: String)
     
     var fileName: String {
         switch self {
@@ -240,13 +243,16 @@ enum DownloadMediaType {
             return "\(post.fileNameWithoutExtension).mp4"
         case .video(_, let fileName):
             return fileName
-        case .gallery(_, let fileName):
-            return fileName
+        case .vReddIt(urlString: let urlString, downloadUrlString: let downloadUrlString):
+            // Should not get file name here
+            return "vReddIt-\(Utils.randomString()).mp4"
         case .redgifs(let redgifsId, _):
             return "Redgifs-\(redgifsId).mp4"
         case .streamable(let shortCode, _):
             return "Streamable-\(shortCode).mp4"
         case .imgurVideo(_, let fileName):
+            return fileName
+        case .gallery(_, let fileName):
             return fileName
         }
     }
@@ -262,8 +268,13 @@ enum DownloadMediaType {
             return nil
         case .video(let downloadUrlString, _):
             return URL(string: downloadUrlString)
-        case .gallery(_, let fileName):
-            // Handle gallery media download
+        case .vReddIt(let urlString, let downloadUrlString):
+            if let downloadUrlString {
+                return URL(string: downloadUrlString)
+            }
+            if let url = URL(string: urlString) {
+                return try? await VideoFetcher.shared.fetchVReddItVideo(url: url)
+            }
             return nil
         case .redgifs(let redgifsId, let downloadUrlString):
             if let downloadUrlString {
@@ -278,6 +289,9 @@ enum DownloadMediaType {
         case .imgurVideo(let downloadUrlString, _):
             // TODO need to check if this is the real download url
             return URL(string: downloadUrlString)
+        case .gallery(_, let fileName):
+            // Handle gallery media download
+            return nil
         }
     }
 }

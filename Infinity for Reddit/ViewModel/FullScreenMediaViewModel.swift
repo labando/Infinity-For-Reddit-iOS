@@ -16,7 +16,7 @@ enum FullScreenMediaType {
     case imgurAlbum(url: URL)
     case imgurImage(url: URL)
     
-//    var downloadMediaType: DownloadMediaType {
+//    func getDownloadMediaType(fullScreenMediaType: FullScreenMediaType, loadedVideoURL: URL?) throws -> DownloadMediaType {
 //        switch self {
 //        case .image(let urlString, _, let post, _):
 //            if let post {
@@ -38,17 +38,54 @@ enum FullScreenMediaType {
 //                }
 //                return DownloadMediaType.gif(downloadUrlString: urlString, fileName: "\(Utils.randomString()).gif")
 //            }
-//        case .video(url: let urlString, post: let post, videoType: let videoType):
-//
-//        case .gallery(let currentUrlString, let post, _, _, _):
+//        case .video(let urlString, let post, let videoType):
+//            switch videoType {
+//            case .reddit:
+//                if let post {
+//                    return DownloadMediaType.redditVideo(post: post)
+//                } else {
+//                    // Really should not happen
+//                    return DownloadMediaType.video(downloadUrlString: urlString, fileName: "\(Utils.randomString()).mp4")
+//                }
+//            case .direct:
+//                return DownloadMediaType.video(downloadUrlString: urlString, fileName: "\(post?.fileNameWithoutExtension ?? Utils.randomString()).mp4")
+//            case .vReddIt:
+//                return DownloadMediaType.vReddIt(urlString: urlString, downloadUrlString: loadedVideoURL?.absoluteString ?? nil)
+//            case .redgifs(id: let id):
+//                return DownloadMediaType.redgifs(redgifsId: id, downloadUrlString: loadedVideoURL?.absoluteString ?? nil)
+//            case .streamable(shortCode: let shortCode):
+//                return DownloadMediaType.streamable(shortCode: shortCode, downloadUrlString: loadedVideoURL?.absoluteString ?? nil)
+//            }
+//        case .gallery(let currentUrlString, let post, let galleryItems, let galleryScrollState):
 //            if let post {
-//                return DownloadMediaType.gif(downloadUrlString: currentUrlString, fileName: "\(post.fileNameWithoutExtension).jpg")
+//                switch galleryItems[galleryScrollState.scrollId].mediaType {
+//                case .image:
+//                    return DownloadMediaType.image(downloadUrlString: currentUrlString, fileName: "\(post.fileNameWithoutExtension).jpg")
+//                case .gif:
+//                    return DownloadMediaType.gif(downloadUrlString: currentUrlString, fileName: "\(post.fileNameWithoutExtension).gif")
+//                case .video:
+//                    return DownloadMediaType.video(downloadUrlString: currentUrlString, fileName: "\(post.fileNameWithoutExtension).mp4")
+//                }
 //            } else {
 //                let url = URL(string: currentUrlString)
 //                if let url = url {
-//                    return DownloadMediaType.gif(downloadUrlString: currentUrlString, fileName: url.lastPathComponent)
+//                    switch galleryItems[galleryScrollState.scrollId].mediaType {
+//                    case .image:
+//                        return DownloadMediaType.image(downloadUrlString: currentUrlString, fileName: url.lastPathComponent)
+//                    case .gif:
+//                        return DownloadMediaType.gif(downloadUrlString: currentUrlString, fileName: url.lastPathComponent)
+//                    case .video:
+//                        return DownloadMediaType.video(downloadUrlString: currentUrlString, fileName: url.lastPathComponent)
+//                    }
 //                }
-//                return DownloadMediaType.gif(downloadUrlString: currentUrlString, fileName: "\(Utils.randomString()).jpg")
+//                switch galleryItems[galleryScrollState.scrollId].mediaType {
+//                case .image:
+//                    return DownloadMediaType.image(downloadUrlString: currentUrlString, fileName: "\(Utils.randomString()).jpg")
+//                case .gif:
+//                    return DownloadMediaType.gif(downloadUrlString: currentUrlString, fileName: "\(Utils.randomString()).gif")
+//                case .video:
+//                    return DownloadMediaType.video(downloadUrlString: currentUrlString, fileName: "\(Utils.randomString()).mp4")
+//                }
 //            }
 //        case .imgurGallery(let url):
 //            <#code#>
@@ -58,6 +95,10 @@ enum FullScreenMediaType {
 //            <#code#>
 //        }
 //    }
+}
+
+enum DownloadMediaTypeError: Error {
+    case getDownloadMediaTypeFailed
 }
 
 enum VideoType {
