@@ -50,11 +50,11 @@ enum FullScreenMediaType {
 //            case .direct:
 //                return DownloadMediaType.video(downloadUrlString: urlString, fileName: "\(post?.fileNameWithoutExtension ?? Utils.randomString()).mp4")
 //            case .vReddIt:
-//                return DownloadMediaType.vReddIt(urlString: urlString, downloadUrlString: loadedVideoURL?.absoluteString ?? nil)
+//                return DownloadMediaType.vReddIt(urlString: urlString, downloadUrlString: loadedVideoURL?.absoluteString)
 //            case .redgifs(id: let id):
-//                return DownloadMediaType.redgifs(redgifsId: id, downloadUrlString: loadedVideoURL?.absoluteString ?? nil)
+//                return DownloadMediaType.redgifs(redgifsId: id, downloadUrlString: loadedVideoURL?.absoluteString)
 //            case .streamable(shortCode: let shortCode):
-//                return DownloadMediaType.streamable(shortCode: shortCode, downloadUrlString: loadedVideoURL?.absoluteString ?? nil)
+//                return DownloadMediaType.streamable(shortCode: shortCode, downloadUrlString: loadedVideoURL?.absoluteString)
 //            }
 //        case .gallery(let currentUrlString, let post, let galleryItems, let galleryScrollState):
 //            if let post {

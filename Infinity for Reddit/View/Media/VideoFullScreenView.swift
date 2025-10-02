@@ -82,6 +82,7 @@ struct VideoFullScreenView: View {
                     onResetControllerTimer: videoFullScreenViewModel.resetControllerTimer,
                     onRemoveControllerTimer: videoFullScreenViewModel.removeControllerTimer,
                     onDismiss: {
+                        videoFullScreenViewModel.resetState()
                         withAnimation {
                             onDismiss()
                         }
@@ -136,7 +137,7 @@ struct VideoFullScreenView: View {
         .task {
             await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType)
         }
-        .gesture(
+        .simultaneousGesture(
             DragGesture()
                 .updating($dragOffset) { value, state, _ in
                     // Only allow vertical drag to trigger dismiss
@@ -153,6 +154,7 @@ struct VideoFullScreenView: View {
                 }
                 .onEnded { value in
                     if hasStartedDragging && abs(value.translation.height) > 100 {
+                        videoFullScreenViewModel.resetState()
                         withAnimation(.linear(duration: 0.25)) {
                             videoFullScreenViewModel.removeControllerTimer()
                             videoFullScreenViewModel.isShowingController = false

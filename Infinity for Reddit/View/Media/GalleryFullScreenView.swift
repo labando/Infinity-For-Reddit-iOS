@@ -11,6 +11,8 @@ struct GalleryFullScreenView: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     @EnvironmentObject private var namespaceManager: NamespaceManager
     
+    @StateObject private var tabViewDismissalViewModel: TabViewDismissalViewModel
+    
     @ObservedObject private var galleryScrollState: GalleryScrollState
     @GestureState private var dragOffset: CGSize = .zero
     @State private var currentDragOffset = 0.0
@@ -23,6 +25,7 @@ struct GalleryFullScreenView: View {
     init(items: [GalleryItem], galleryScrollState: GalleryScrollState, onDismiss: @escaping () -> Void) {
         self.items = items
         self.galleryScrollState = galleryScrollState
+        self._tabViewDismissalViewModel = StateObject(wrappedValue: .init())
         self.onDismiss = onDismiss
     }
     
@@ -36,55 +39,70 @@ struct GalleryFullScreenView: View {
             
             TabView(selection: $galleryScrollState.scrollId) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    ZoomableScrollView {
-                        CustomWebImage(
-                            item.urlString,
-                            handleImageTapGesture: false
+                    if item.mediaType != .video {
+                        ZoomableScrollView {
+                            CustomWebImage(
+                                item.urlString,
+                                handleImageTapGesture: false
+                            )
+                            .offset(y: currentDragOffset)
+                        }
+                        .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                        .tag(index)
+                        .simultaneousGesture(
+                            DragGesture()
+                                .updating($dragOffset) { value, state, _ in
+                                    // Only allow vertical drag to trigger dismiss
+                                    if !hasStartedDragging && abs(value.translation.height) > abs(value.translation.width) {
+                                        hasStartedDragging = true
+                                    }
+                                    if hasStartedDragging {
+                                        state = value.translation
+                                    }
+                                }
+                                .onChanged { value in
+                                    // Adjust the scale based on the drag distance
+                                    currentDragOffset = value.translation.height
+                                }
+                                .onEnded { value in
+                                    if hasStartedDragging && abs(value.translation.height) > 100 {
+                                        withAnimation(.linear(duration: 0.25)) {
+                                            if value.translation.height < 0 {
+                                                // Dragged up
+                                                currentDragOffset = -UIScreen.main.bounds.height
+                                            } else {
+                                                // Dragged down
+                                                currentDragOffset = UIScreen.main.bounds.height
+                                            }
+                                        } completion: {
+                                            tabViewDismissalViewModel.isDismissed = true
+                                            onDismiss()
+                                        }
+                                    } else {
+                                        withAnimation {
+                                            currentDragOffset = 0.0
+                                        }
+                                    }
+                                    hasStartedDragging = false
+                                }
                         )
-                        .offset(y: currentDragOffset)
+                    } else {
+                        TabVideoView(
+                            urlString: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+                            post: nil,
+                            videoType: .direct,
+                            isSelected: galleryScrollState.scrollId == index,
+                            tabViewDismissalViewModel: tabViewDismissalViewModel
+                        ) {
+                            tabViewDismissalViewModel.isDismissed = true
+                            onDismiss()
+                        }
+                        .tag(index)
                     }
-                    .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                    .tag(index)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .gesture(
-            DragGesture()
-                .updating($dragOffset) { value, state, _ in
-                    // Only allow vertical drag to trigger dismiss
-                    if !hasStartedDragging && abs(value.translation.height) > abs(value.translation.width) {
-                        hasStartedDragging = true
-                    }
-                    if hasStartedDragging {
-                        state = value.translation
-                    }
-                }
-                .onChanged { value in
-                    // Adjust the scale based on the drag distance
-                    currentDragOffset = value.translation.height
-                }
-                .onEnded { value in
-                    if hasStartedDragging && abs(value.translation.height) > 100 {
-                        withAnimation(.linear(duration: 0.25)) {
-                            if value.translation.height < 0 {
-                                // Dragged up
-                                currentDragOffset = -UIScreen.main.bounds.height
-                            } else {
-                                // Dragged down
-                                currentDragOffset = UIScreen.main.bounds.height
-                            }
-                        } completion: {
-                            onDismiss()
-                        }
-                    } else {
-                        withAnimation {
-                            currentDragOffset = 0.0
-                        }
-                    }
-                    hasStartedDragging = false
-                }
-        )
     }
     
     private func opacityForBackground() -> Double {
