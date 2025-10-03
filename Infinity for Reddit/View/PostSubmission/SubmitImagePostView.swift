@@ -16,6 +16,8 @@ struct SubmitImagePostView: View {
     @FocusState private var markdownToolbarFocusedField: MarkdownFieldType?
     @FocusState private var focusedField: FieldType?
     
+    @Environment(\.dismiss) var dismiss
+    
     @State private var contentTextViewCanFocus: Bool = true
     @State private var markdownToolbarHeight: CGFloat = 0
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
@@ -148,24 +150,36 @@ struct SubmitImagePostView: View {
             photoLibrary: .shared()
         )
         .fullScreenCover(isPresented: $showCamera) {
-            MCamera()
-                .onImageCaptured { capturedImage, controller in
-                    submitImagePostViewModel.setCapturedImage(capturedImage)
-                    controller.closeMCamera()
+            if Utils.checkCameraAvailability() {
+                MCamera()
+                    .onImageCaptured { capturedImage, controller in
+                        submitImagePostViewModel.setCapturedImage(capturedImage)
+                        controller.closeMCamera()
+                    }
+                    .setCloseMCameraAction {
+                        showCamera = false
+                    }
+                    .setCameraOutputType(.photo)
+                    .setAudioAvailability(false)
+                    .setCameraScreen { cameraManager, id, closeMCameraAction in
+                        DefaultCameraScreen(
+                            cameraManager: cameraManager,
+                            namespace: id,
+                            closeMCameraAction: closeMCameraAction
+                        ).cameraOutputSwitchAllowed(false)
+                    }
+                    .startSession()
+            } else {
+                VStack {
+                    Text("Camera not available")
+                        .padding(.bottom, 60)
+                    
+                    Button("Close") {
+                        showCamera = false
+                    }
+                    .filledButton()
                 }
-                .setCloseMCameraAction {
-                    showCamera = false
-                }
-                .setCameraOutputType(.photo)
-                .setAudioAvailability(false)
-                .setCameraScreen { cameraManager, id, closeMCameraAction in
-                    DefaultCameraScreen(
-                        cameraManager: cameraManager,
-                        namespace: id,
-                        closeMCameraAction: closeMCameraAction
-                    ).cameraOutputSwitchAllowed(false)
-                }
-                .startSession()
+            }
         }
         .onChange(of: selectedPhotoItem) { _, newSelectedItem in
             Task {
@@ -192,7 +206,7 @@ private struct SelectImageToolbar: View {
     let onPhotoPickerTap: () -> Void
     
     let buttonSize: CGFloat = 24
-
+    
     var body: some View {
         HStack(spacing: 32) {
             Button {
@@ -204,7 +218,7 @@ private struct SelectImageToolbar: View {
                     .padding(16)
                     .background(Circle().fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent)))
             }
-
+            
             Button {
                 onPhotoPickerTap()
             } label: {
