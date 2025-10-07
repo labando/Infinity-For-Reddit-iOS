@@ -210,60 +210,91 @@ struct GalleryImageToolbar: View {
             Spacer()
             
             if isVisible {
-                HStack {
-                    Button {
-                        fullScreenMediaToolbarViewModel.downloadMedia()
-                    } label: {
-                        SwiftUI.Image(systemName: "square.and.arrow.down")
-                            .font(.system(size: buttonSize))
-                            .padding(.horizontal, 10)
-                            .padding(.top, 12)
-                            .padding(.bottom, 14)
-                            .foregroundColor(Color.white)
-                            .background(
-                                Circle()
-                                    .fill(Color(hex: "#2E2E2E"))
-                            )
-                    }
-                    
-                    Button {
-                        fullScreenMediaToolbarViewModel.shareImage()
-                    } label: {
-                        SwiftUI.Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: buttonSize))
-                            .padding(.horizontal, 10)
-                            .padding(.top, 12)
-                            .padding(.bottom, 14)
-                            .foregroundColor(Color.white)
-                            .background(
-                                Circle()
-                                    .fill(Color(hex: "#2E2E2E"))
-                            )
-                    }
-                    
-                    Menu {
-                        Button("Download all media") {
-                            fullScreenMediaToolbarViewModel.downloadAllGalleryMedia(items: items, post: post)
+                VStack {
+                    HStack {
+                        Button {
+                            fullScreenMediaToolbarViewModel.downloadMedia()
+                        } label: {
+                            SwiftUI.Image(systemName: "square.and.arrow.down")
+                                .font(.system(size: buttonSize))
+                                .padding(.horizontal, 10)
+                                .padding(.top, 12)
+                                .padding(.bottom, 14)
+                                .foregroundColor(Color.white)
+                                .background(
+                                    Circle()
+                                        .fill(Color(hex: "#2E2E2E"))
+                                )
                         }
-                    } label: {
-                        SwiftUI.Image(systemName: "ellipsis.circle")
-                            .font(.system(size: buttonSize))
-                            .padding(10)
-                            .foregroundColor(Color.white)
-                            .background(
-                                Circle()
-                                    .fill(Color(hex: "#2E2E2E"))
-                            )
+                        
+                        Button {
+                            fullScreenMediaToolbarViewModel.shareImage()
+                        } label: {
+                            SwiftUI.Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: buttonSize))
+                                .padding(.horizontal, 10)
+                                .padding(.top, 12)
+                                .padding(.bottom, 14)
+                                .foregroundColor(Color.white)
+                                .background(
+                                    Circle()
+                                        .fill(Color(hex: "#2E2E2E"))
+                                )
+                        }
+                        
+                        Menu {
+                            Button("Download all media") {
+                                fullScreenMediaToolbarViewModel.downloadAllGalleryMedia(items: items, post: post)
+                            }
+                        } label: {
+                            SwiftUI.Image(systemName: "ellipsis.circle")
+                                .font(.system(size: buttonSize))
+                                .padding(10)
+                                .foregroundColor(Color.white)
+                                .background(
+                                    Circle()
+                                        .fill(Color(hex: "#2E2E2E"))
+                                )
+                        }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                    )
+                    .contentShape(Capsule())
+                    
+                    VStack {
+                        Text("Downloading...")
+                            .foregroundStyle(.white)
+                        
+                        ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                    )
+                    .opacity(fullScreenMediaToolbarViewModel.downloadProgress == 0 ? 0 : 1)
+                    
+                    VStack {
+                        Text("Downloading All Media...")
+                            .foregroundStyle(.white)
+                        
+                        ProgressView(value: fullScreenMediaToolbarViewModel.downloadGalleryAllMediaProgress)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                    )
+                    .opacity(fullScreenMediaToolbarViewModel.downloadGalleryAllMediaProgress == 0 ? 0 : 1)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(Color(hex: "#6B6B6B", opacity: 0.5))
-                )
-                .padding(.bottom, 64)
-                .contentShape(Capsule())
+                .padding(.horizontal, 32)
+                .padding(.bottom, 32)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }

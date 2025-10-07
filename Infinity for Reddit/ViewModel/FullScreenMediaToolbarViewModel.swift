@@ -70,7 +70,7 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
                 
                 for await _ in group {
                     await MainActor.run { [weak self] in
-                        self?.downloadGalleryAllMediaProgress = (self?.downloadGalleryAllMediaProgress ?? 0) + 1 / Double(items.count)
+                        self?.downloadGalleryAllMediaProgress = min(1, (self?.downloadGalleryAllMediaProgress ?? 0) + 1 / Double(items.count))
                     }
                 }
                 
