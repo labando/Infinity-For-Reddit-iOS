@@ -270,6 +270,7 @@ struct GalleryImageToolbar: View {
                             .foregroundStyle(.white)
                         
                         ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
+                            .tint(.white)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -284,6 +285,7 @@ struct GalleryImageToolbar: View {
                             .foregroundStyle(.white)
                         
                         ProgressView(value: fullScreenMediaToolbarViewModel.downloadGalleryAllMediaProgress)
+                            .tint(.white)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
