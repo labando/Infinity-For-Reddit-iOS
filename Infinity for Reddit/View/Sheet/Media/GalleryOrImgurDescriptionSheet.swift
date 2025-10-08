@@ -9,8 +9,6 @@ import SwiftUI
 import MarkdownUI
 
 struct GalleryOrImgurDescriptionSheet: View {
-    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
-    
     let title: String?
     let description: String
     let link: String?
@@ -24,24 +22,34 @@ struct GalleryOrImgurDescriptionSheet: View {
                 }
                 
                 if !description.isEmpty {
-                    Markdown(description)
-                        .markdownTheme(Theme().link {
-                            ForegroundColor(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
-                        }.text {
-                            ForegroundColor(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor))
-                        })
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .markdownLinkHandler { url in
-                            UIApplication.shared.open(url)
-                        }
+                    DescriptionOrLinkMarkdown(content: description)
                 }
                 
                 if let link, !link.isEmpty {
-                    RowText(link)
+                    DescriptionOrLinkMarkdown(content: link)
                 }
             }
             .padding(16)
         }
         .rootViewBackground()
+    }
+}
+
+private struct DescriptionOrLinkMarkdown: View {
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    
+    let content: String
+    
+    var body: some View {
+        Markdown(content)
+            .markdownTheme(Theme().link {
+                ForegroundColor(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+            }.text {
+                ForegroundColor(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor))
+            })
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .markdownLinkHandler { url in
+                UIApplication.shared.open(url)
+            }
     }
 }
