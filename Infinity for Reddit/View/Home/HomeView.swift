@@ -195,6 +195,8 @@ struct HomeView: View {
                     }
                     .id(urlString)
                     .zIndex(1)
+                } else if case let .imgurAlbum(imgurId, post) = media {
+                    
                 }
             }
         }

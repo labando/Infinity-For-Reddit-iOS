@@ -12,9 +12,9 @@ enum FullScreenMediaType {
     case gif(urlString: String, post: Post? = nil)
     case video(urlString: String, post: Post? = nil, videoType: VideoType = .reddit)
     case gallery(currentUrlString: String, post: Post? = nil, items: [GalleryItem], galleryScrollState: GalleryScrollState)
-    case imgurGallery(url: URL)
-    case imgurAlbum(url: URL)
-    case imgurImage(url: URL)
+    case imgurGallery(imgurId: String, post: Post? = nil)
+    case imgurAlbum(imgurId: String, post: Post? = nil)
+    case imgurImage(imgurId: String, post: Post? = nil)
     
 //    func getDownloadMediaType(fullScreenMediaType: FullScreenMediaType, loadedVideoURL: URL?) throws -> DownloadMediaType {
 //        switch self {
@@ -134,11 +134,11 @@ class FullScreenMediaViewModel: ObservableObject {
             break
         case .gallery:
             break
-        case .imgurGallery(url: let url):
+        case .imgurGallery:
             break
-        case .imgurAlbum(url: let url):
+        case .imgurAlbum:
             break
-        case .imgurImage(url: let url):
+        case .imgurImage:
             break
         }
         

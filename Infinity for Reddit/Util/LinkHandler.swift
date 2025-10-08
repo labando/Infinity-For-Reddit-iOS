@@ -47,6 +47,14 @@ class LinkHandler {
         let path = finalURL.path
         let segments = path.split(separator: "/").map(String.init)
         
+        if path.hasSuffix(".mp4") {
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.video(urlString: finalURL.absoluteString, videoType: .direct))
+        } else if path.hasSuffix(".jpg") || path.hasSuffix(".JPG") || path.hasSuffix(".jpeg") || path.hasSuffix(".png") {
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString))
+        } else if path.hasSuffix(".gif") {
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.gif(urlString: finalURL.absoluteString))
+        }
+        
         switch host {
         case "v.redd.it":
             return LinkDestination.fullScreenMedia(FullScreenMediaType.video(urlString: finalURL.absoluteString, videoType: .vReddIt))
@@ -78,14 +86,6 @@ class LinkHandler {
             }
             
         default:
-            if path.hasSuffix(".mp4") {
-                return LinkDestination.fullScreenMedia(FullScreenMediaType.video(urlString: finalURL.absoluteString, videoType: .direct))
-            } else if path.hasSuffix(".jpg") || path.hasSuffix(".JPG") || path.hasSuffix(".jpeg") || path.hasSuffix(".png") {
-                return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString))
-            } else if path.hasSuffix(".gif") {
-                return LinkDestination.fullScreenMedia(FullScreenMediaType.gif(urlString: finalURL.absoluteString))
-            }
-            
             return LinkDestination.openInBrowser(finalURL)
         }
         
@@ -121,13 +121,14 @@ class LinkHandler {
     private func handleImgurURL(path: String, segments: [String], url: URL) -> LinkDestination {
         if path.matches("/gallery/\\w+/?") {
             print("Open Imgur gallery: \(segments[1])")
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(url: url))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(imgurId: segments[1].components(separatedBy: "-").last ?? segments[1]))
         } else if path.matches("/(album|a)/\\w+/?") {
             print("Open Imgur album: \(segments[1])")
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(url: url))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurGallery(imgurId: segments[1].components(separatedBy: "-").last ?? segments[1]))
         } else if path.matches("/\\w+/?") {
             print("Open Imgur image: \(path.dropFirst())")
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurImage(url: url))
+            let potentialId = path.dropFirst()
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.imgurImage(imgurId: String(potentialId.components(separatedBy: "-").last ?? String(potentialId))))
         } else if path.hasSuffix(".gifv") || path.hasSuffix(".mp4") {
             var videoURL = url.absoluteString
             if path.hasSuffix(".gifv") {

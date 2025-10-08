@@ -12,11 +12,13 @@ import Kingfisher
 class FullScreenMediaToolbarViewModel: ObservableObject {
     @Published var downloadProgress: Double = 0
     @Published var downloadGalleryAllMediaProgress: Double = 0
+    @Published var downloadImgurAllMediaProgress: Double = 0
     @Published var error: Error?
     
     private let downloadMediaType: DownloadMediaType
     private var downloadTask: Task<Void, Never>?
     private var downloadGalleryAllMediaTask: Task<Void, Never>?
+    private var downloadImgurAllMediaTask: Task<Void, Never>?
     private var shareTask: Task<Void, Never>?
     
     enum FullScreenMediaToolbarError: Error {
@@ -64,7 +66,7 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
             await withTaskGroup(of: Void.self) { group in
                 for item in items {
                     group.addTask { [weak self] in
-                        await self?.downloadGalleryItemMediaAsync(downloadMediaType: item.toDownloadMediaType(post: post))
+                        await self?.downloadGalleryOrImgurItemMediaAsync(downloadMediaType: item.toDownloadMediaType(post: post))
                     }
                 }
                 
@@ -82,7 +84,34 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
         }
     }
     
-    private func downloadGalleryItemMediaAsync(downloadMediaType: DownloadMediaType) async {
+    func downloadAllImgurMedia(imgurMedia: ImgurMedia, post: Post?) {
+        guard downloadImgurAllMediaTask == nil else {
+            return
+        }
+        
+        downloadImgurAllMediaTask = Task {
+            await withTaskGroup(of: Void.self) { group in
+                for item in imgurMedia.images {
+                    group.addTask { [weak self] in
+                        await self?.downloadGalleryOrImgurItemMediaAsync(downloadMediaType: item.toDownloadMediaType(post: post))
+                    }
+                }
+                
+                for await _ in group {
+                    await MainActor.run { [weak self] in
+                        self?.downloadImgurAllMediaProgress = min(1, (self?.downloadImgurAllMediaProgress ?? 0) + 1 / Double(imgurMedia.images.count))
+                    }
+                }
+                
+                await MainActor.run {
+                    self.downloadImgurAllMediaProgress = 0
+                    self.downloadImgurAllMediaTask = nil
+                }
+            }
+        }
+    }
+    
+    private func downloadGalleryOrImgurItemMediaAsync(downloadMediaType: DownloadMediaType) async {
         do {
             try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, _ in })
         } catch {

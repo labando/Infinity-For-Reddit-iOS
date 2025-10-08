@@ -47,6 +47,11 @@ struct DependencyManager {
             return Session(configuration: configuration)
         }.inObjectScope(.container)
         
+        c.register(Session.self, name: "imgur") { _ in
+            let configuration = URLSessionConfiguration.af.default
+            return Session(configuration: configuration)
+        }.inObjectScope(.container)
+        
         c.register(DatabasePool.self) { _ in
             do {
                 return try RedditGRDBDatabase.create()

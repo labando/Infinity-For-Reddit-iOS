@@ -16,4 +16,12 @@ class Utils {
     static func checkCameraAvailability() -> Bool {
         return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .unspecified) != nil
     }
+    
+    static func getFileExtension(from urlString: String) -> String? {
+        guard let url = URL(string: urlString) else {
+            return nil
+        }
+        let ext = url.pathExtension
+        return ext.isEmpty ? nil : ext
+    }
 }

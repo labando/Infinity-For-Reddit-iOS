@@ -1,32 +1,33 @@
 //
-//  GalleryFullScreenView.swift
+//  ImgurFullScreenView.swift
 //  Infinity for Reddit
 //
-//  Created by Docile Alligator on 2025-05-05.
+//  Created by Docile Alligator on 2025-10-07.
 //
 
 import SwiftUI
 
-struct GalleryFullScreenView: View {
+struct ImgurFullScreenView: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     @EnvironmentObject private var namespaceManager: NamespaceManager
     
+    @StateObject private var imgurFullScreenViewModel: ImgurFullScreenViewModel
     @StateObject private var tabViewDismissalViewModel: TabViewDismissalViewModel
-    
-    @ObservedObject private var galleryScrollState: GalleryScrollState
+
     @GestureState private var dragOffset: CGSize = .zero
     @State private var currentDragOffset = 0.0
     @State private var hasStartedDragging: Bool = false
     @State private var isAnimatingBack: Bool = false
+    @State private var selectedTab: Int = 0
     
     let post: Post?
-    var items: [GalleryItem]
     let onDismiss: () -> Void
     
-    init(post: Post?, items: [GalleryItem], galleryScrollState: GalleryScrollState, onDismiss: @escaping () -> Void) {
+    init(imgurMediaType: ImgurMediaType, post: Post?, onDismiss: @escaping () -> Void) {
         self.post = post
-        self.items = items
-        self.galleryScrollState = galleryScrollState
+        self._imgurFullScreenViewModel = StateObject(
+            wrappedValue: ImgurFullScreenViewModel(imgurMediaType: imgurMediaType)
+        )
         self._tabViewDismissalViewModel = StateObject(wrappedValue: .init())
         self.onDismiss = onDismiss
     }
@@ -38,36 +39,37 @@ struct GalleryFullScreenView: View {
                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
                 .edgesIgnoringSafeArea(.all)
                 .ignoresSafeArea()
-            
-            TabView(selection: $galleryScrollState.scrollId) {
-                ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    if item.mediaType != .video {
-                        GalleryImageView(
-                            urlString: item.urlString,
-                            items: items,
-                            post: post
-                        ) {
-                            tabViewDismissalViewModel.isDismissed = true
-                            onDismiss()
+            if let imgurMedia = imgurFullScreenViewModel.imgurMedia, let images = imgurMedia.images {
+                TabView(selection: $selectedTab) {
+                    ForEach(Array(images.enumerated()), id: \.offset) { index, item in
+                        if item.mediaType != .video {
+                            ImgurImageView(
+                                imgurMediaItem: item,
+                                imgurMedia: imgurMedia,
+                                post: post
+                            ) {
+                                tabViewDismissalViewModel.isDismissed = true
+                                onDismiss()
+                            }
+                            .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
+                            .tag(index)
+                        } else {
+                            TabVideoView(
+                                urlString: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+                                post: nil,
+                                videoType: .direct,
+                                isSelected: selectedTab == index,
+                                tabViewDismissalViewModel: tabViewDismissalViewModel
+                            ) {
+                                tabViewDismissalViewModel.isDismissed = true
+                                onDismiss()
+                            }
+                            .tag(index)
                         }
-                        .containerRelativeFrame(.horizontal, count: 1, span: 1, spacing: 0, alignment: .center)
-                        .tag(index)
-                    } else {
-                        TabVideoView(
-                            urlString: item.urlString,
-                            post: nil,
-                            videoType: .direct,
-                            isSelected: galleryScrollState.scrollId == index,
-                            tabViewDismissalViewModel: tabViewDismissalViewModel
-                        ) {
-                            tabViewDismissalViewModel.isDismissed = true
-                            onDismiss()
-                        }
-                        .tag(index)
                     }
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
         }
     }
     
@@ -78,7 +80,7 @@ struct GalleryFullScreenView: View {
     }
 }
 
-struct GalleryImageView: View {
+struct ImgurImageView: View {
     @State private var currentImageZoom: CGFloat = 1.0
     @State private var currentDragOffset = 0.0
     @GestureState private var dragOffset: CGSize = .zero
@@ -86,8 +88,8 @@ struct GalleryImageView: View {
     @State private var isAnimatingBack: Bool = false
     @State private var isToolbarVisible: Bool = true
     
-    let urlString: String
-    let items: [GalleryItem]
+    let imgurMediaItem: ImgurMediaItem
+    let imgurMedia: ImgurMedia
     let post: Post?
     let onDismiss: () -> Void
     
@@ -96,7 +98,7 @@ struct GalleryImageView: View {
             ZoomableScrollView(
                 content: {
                     CustomWebImage(
-                        urlString,
+                        imgurMediaItem.link,
                         handleImageTapGesture: false
                     )
                     .offset(y: currentDragOffset)
@@ -147,10 +149,10 @@ struct GalleryImageView: View {
                     }
             )
             
-            GalleryImageToolbar(
-                downloadMediaType: .image(downloadUrlString: urlString, fileName: "test.jpg"),
+            ImgurImageToolbar(
+                downloadMediaType: .image(downloadUrlString: imgurMediaItem.link, fileName: "test.jpg"),
                 isVisible: $isToolbarVisible,
-                items: items,
+                imgurMedia: imgurMedia,
                 post: post,
                 onDismiss: onDismiss
             )
@@ -158,12 +160,12 @@ struct GalleryImageView: View {
     }
 }
 
-struct GalleryImageToolbar: View {
+struct ImgurImageToolbar: View {
     @StateObject private var fullScreenMediaToolbarViewModel: FullScreenMediaToolbarViewModel
     
     @Binding var isVisible: Bool
     
-    let items: [GalleryItem]
+    let imgurMedia: ImgurMedia
     let post: Post?
     let onDismiss: () -> Void
     
@@ -171,7 +173,7 @@ struct GalleryImageToolbar: View {
     
     init(downloadMediaType: DownloadMediaType,
          isVisible: Binding<Bool>,
-         items: [GalleryItem],
+         imgurMedia: ImgurMedia,
          post: Post?,
          onDismiss: @escaping () -> Void
     ) {
@@ -179,7 +181,7 @@ struct GalleryImageToolbar: View {
             wrappedValue: FullScreenMediaToolbarViewModel(downloadMediaType: downloadMediaType)
         )
         self._isVisible = isVisible
-        self.items = items
+        self.imgurMedia = imgurMedia
         self.post = post
         self.onDismiss = onDismiss
     }
@@ -244,7 +246,7 @@ struct GalleryImageToolbar: View {
                         
                         Menu {
                             Button("Download all media") {
-                                fullScreenMediaToolbarViewModel.downloadAllGalleryMedia(items: items, post: post)
+                                fullScreenMediaToolbarViewModel.downloadAllImgurMedia(imgurMedia: imgurMedia, post: post)
                             }
                         } label: {
                             SwiftUI.Image(systemName: "ellipsis.circle")

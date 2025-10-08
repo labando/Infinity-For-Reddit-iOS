@@ -9,11 +9,11 @@ extension GalleryItem {
     func toDownloadMediaType(post: Post?) -> DownloadMediaType {
         switch mediaType {
         case .image:
-            return .image(downloadUrlString: urlString, fileName: "\(post == nil ? "Gallery-" : post!.fileNameWithoutExtension + "-")\(mediaId ?? Utils.randomString()).jpg")
+            return .image(downloadUrlString: urlString, fileName: "\(post == nil ? "Gallery-" : post!.fileNameWithoutExtension + "-")\(mediaId ?? Utils.randomString()).\(Utils.getFileExtension(from: urlString) ?? "jpg")")
         case .gif:
-            return .gif(downloadUrlString: urlString, fileName: "\(post == nil ? "Gallery-" : post!.fileNameWithoutExtension + "-")\(mediaId ?? Utils.randomString()).gif")
+            return .gif(downloadUrlString: urlString, fileName: "\(post == nil ? "Gallery-" : post!.fileNameWithoutExtension + "-")\(mediaId ?? Utils.randomString()).\(Utils.getFileExtension(from: urlString) ?? "gif")")
         case .video:
-            return .video(downloadUrlString: urlString, fileName: "\(post == nil ? "Gallery-" : post!.fileNameWithoutExtension + "-")\(mediaId ?? Utils.randomString()).mp4")
+            return .video(downloadUrlString: urlString, fileName: "\(post == nil ? "Gallery-" : post!.fileNameWithoutExtension + "-")\(mediaId ?? Utils.randomString()).\(Utils.getFileExtension(from: urlString) ?? "mp4")")
         }
     }
 }
