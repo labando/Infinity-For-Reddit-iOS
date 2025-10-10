@@ -13,6 +13,8 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
     @Published var downloadProgress: Double = 0
     @Published var downloadGalleryAllMediaProgress: Double = 0
     @Published var downloadImgurAllMediaProgress: Double = 0
+    @Published var showFinishedDownloadAllMediaMessage: Bool = false
+    @Published var showFinishedDownloadMessage: Bool = false
     @Published var error: Error?
     
     private let downloadMediaType: DownloadMediaType
@@ -43,7 +45,7 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
         do {
             try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, progress in
                 await MainActor.run {
-                    self.downloadProgress = progress ?? 0
+                    self.downloadProgress = progress
                 }
             })
         } catch {
@@ -51,8 +53,20 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
                 self.error = error
             }
         }
+        
         await MainActor.run {
             self.downloadProgress = 0
+            self.showFinishedDownloadMessage = true
+        }
+        
+        do {
+            try await Task.sleep(for: .seconds(1))
+        } catch {
+            // Ignore
+        }
+        
+        await MainActor.run {
+            self.showFinishedDownloadMessage = false
             self.downloadTask = nil
         }
     }
@@ -78,6 +92,17 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
                 
                 await MainActor.run {
                     self.downloadGalleryAllMediaProgress = 0
+                    self.showFinishedDownloadAllMediaMessage = true
+                }
+                
+                do {
+                    try await Task.sleep(for: .seconds(1))
+                } catch {
+                    // Ignore
+                }
+                
+                await MainActor.run {
+                    self.showFinishedDownloadAllMediaMessage = false
                     self.downloadGalleryAllMediaTask = nil
                 }
             }
@@ -105,6 +130,17 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
                 
                 await MainActor.run {
                     self.downloadImgurAllMediaProgress = 0
+                    self.showFinishedDownloadAllMediaMessage = true
+                }
+                
+                do {
+                    try await Task.sleep(for: .seconds(1))
+                } catch {
+                    // Ignore
+                }
+                
+                await MainActor.run {
+                    self.showFinishedDownloadAllMediaMessage = false
                     self.downloadImgurAllMediaTask = nil
                 }
             }

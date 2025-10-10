@@ -308,35 +308,69 @@ struct ImgurImageToolbar: View {
                     )
                     .contentShape(Capsule())
                     
-                    VStack {
-                        Text("Downloading...")
-                            .foregroundStyle(.white)
+                    ZStack {
+                        VStack {
+                            Text("Downloading...")
+                                .foregroundStyle(.white)
+                            
+                            ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
+                                .tint(.white)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.downloadProgress == 0 ? 0 : 1)
                         
-                        ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
-                            .tint(.white)
+                        HStack {
+                            SwiftUI.Image(systemName: "checkmark.seal")
+                                .foregroundStyle(.white)
+                            
+                            Text("Image downloaded")
+                                .foregroundStyle(.white)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.showFinishedDownloadMessage ? 1 : 0)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
-                    )
-                    .opacity(fullScreenMediaToolbarViewModel.downloadProgress == 0 ? 0 : 1)
-                    
-                    VStack {
-                        Text("Downloading All Media...")
-                            .foregroundStyle(.white)
+
+                    ZStack {
+                        VStack {
+                            Text("Downloading all media...")
+                                .foregroundStyle(.white)
+                            
+                            ProgressView(value: fullScreenMediaToolbarViewModel.downloadImgurAllMediaProgress)
+                                .tint(.white)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.downloadImgurAllMediaProgress == 0 ? 0 : 1)
                         
-                        ProgressView(value: fullScreenMediaToolbarViewModel.downloadImgurAllMediaProgress)
-                            .tint(.white)
+                        HStack {
+                            SwiftUI.Image(systemName: "checkmark.seal")
+                                .foregroundStyle(.white)
+                            
+                            Text("All media downloaded")
+                                .foregroundStyle(.white)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.showFinishedDownloadAllMediaMessage ? 1 : 0)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
-                    )
-                    .opacity(fullScreenMediaToolbarViewModel.downloadImgurAllMediaProgress == 0 ? 0 : 1)
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 32)

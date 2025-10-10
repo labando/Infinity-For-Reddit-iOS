@@ -35,6 +35,9 @@
     "All" : {
 
     },
+    "All media downloaded" : {
+
+    },
     "All subreddits" : {
 
     },
@@ -134,6 +137,9 @@
     "Download Location" : {
 
     },
+    "Downloading all media..." : {
+
+    },
     "Downloading All Media..." : {
 
     },
@@ -195,6 +201,9 @@
 
     },
     "Ignore Navigation Bar in Immersive Interface" : {
+
+    },
+    "Image downloaded" : {
 
     },
     "Immersive Interface" : {
