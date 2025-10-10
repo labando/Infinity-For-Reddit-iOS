@@ -123,8 +123,8 @@ struct CommentViewCard: View {
                     }
                     
                     if !isToolbarHidden {
-                        HStack {
-                            HStack {
+                        HStack(spacing: 0) {
+                            HStack(spacing: 0) {
                                 Button(action: {
                                     voteTask?.cancel()
                                     voteTask = Task {
@@ -136,10 +136,13 @@ struct CommentViewCard: View {
                                         .commentUpvoteIcon(isUpvoted: commentViewModel.comment.likes == 1)
                                 }
                                 .buttonStyle(.borderless)
+                                .padding(8)
+                                .contentShape(Rectangle())
 
                                 VotesText(votes: commentViewModel.comment.score + commentViewModel.comment.likes, hideNVotes: hideNVotes)
                                     .frame(width: 72, alignment: .center)
                                     .commentInfo()
+                                    .onTapGesture {}
                                 
                                 Button(action: {
                                     voteTask?.cancel()
@@ -152,6 +155,8 @@ struct CommentViewCard: View {
                                         .commentDownvoteIcon(isDownvoted: commentViewModel.comment.likes == -1)
                                 }
                                 .buttonStyle(.borderless)
+                                .padding(8)
+                                .contentShape(Rectangle())
                             }
                             .environment(\.layoutDirection, .leftToRight)
                             
@@ -168,8 +173,9 @@ struct CommentViewCard: View {
                                             .rotationEffect(.degrees(commentViewModel.comment.isCollasped ? 180 : 0))
                                             .animation(.easeInOut(duration: 0.25), value: commentViewModel.comment.isCollasped)
                                     }
-                                    .padding(.trailing, 16)
                                     .buttonStyle(.borderless)
+                                    .padding(8)
+                                    .contentShape(Rectangle())
                                 }
                                 
                                 Button(action: {
@@ -182,16 +188,18 @@ struct CommentViewCard: View {
                                         .commentIconTemplateRendering()
                                         .commentIcon()
                                 }
-                                .padding(.trailing, 16)
                                 .buttonStyle(.borderless)
+                                .padding(8)
+                                .contentShape(Rectangle())
                                 
                                 ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
                                     SwiftUI.Image(systemName: "square.and.arrow.up")
                                         .commentIconTemplateRendering()
                                         .commentIcon()
                                 }
-                                .padding(.trailing, 16)
                                 .buttonStyle(.borderless)
+                                .padding(8)
+                                .contentShape(Rectangle())
                                 
                                 if isInPostDetails {
                                     Button(action: {
@@ -202,6 +210,8 @@ struct CommentViewCard: View {
                                             .commentIcon()
                                     }
                                     .buttonStyle(.borderless)
+                                    .padding(8)
+                                    .contentShape(Rectangle())
                                 }
                             } else {
                                 Menu {
@@ -235,8 +245,7 @@ struct CommentViewCard: View {
                             }
                         }
                         .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 12)
+                        .padding(.horizontal, 8)
                     }
                 }
                 
