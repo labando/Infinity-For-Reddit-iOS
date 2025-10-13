@@ -19,8 +19,6 @@ struct PostViewCard: View {
     @State var voteTask: Task<Void, Never>?
     @State var saveTask: Task<Void, Never>?
     
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostTypeKey, store: .interfacePost) private var hidePostType: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostFlairKey, store: .interfacePost) private var hidePostFlair: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hideSubredditAndUserPrefixKey, store: .interfacePost) private var hideSubredditAndUserPrefix: Bool = false
@@ -222,68 +220,15 @@ struct PostViewCard: View {
                         await postViewModel.readPost()
                     }
                 }
-            } else if let preview = postViewModel.post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
+            } else if postViewModel.post.postType.isMedia {
                 Spacer()
                     .frame(height: 10)
                 
-                ZStack(alignment: .topLeading) {
-                    CustomWebImage(
-                        url,
-                        height: limitMediaHeight ? 200 : nil,
-                        aspectRatio: limitMediaHeight ? nil : preview.images[0].source.aspectRatio,
-                        centerCrop: limitMediaHeight,
-                        matchedGeometryEffectId: UUID().uuidString,
-                        post: postViewModel.post,
-                        blur: (postViewModel.post.over18 && blurSensitiveImages) || (postViewModel.post.spoiler && blurSpoilerImages)
-                    )
-                    .simultaneousGesture(
-                        TapGesture()
-                            .onEnded {
-                                Task {
-                                    await postViewModel.readPost()
-                                }
-                            }
-                    )
-                    
-                    switch postViewModel.post.postType {
-                    case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
-                        SwiftUI.Image(systemName: "play.circle")
-                            .resizable()
-                            .mediaIndicator()
-                            .padding(12)
-                            .frame(width: 64, height: 64)
-                    case .link:
-                        SwiftUI.Image(systemName: "link.circle")
-                            .resizable()
-                            .mediaIndicator()
-                            .padding(12)
-                            .frame(width: 64, height: 64)
-                    default:
-                        EmptyView()
+                PostPreviewView(post: postViewModel.post, inPostListing: true) {
+                    Task {
+                        await postViewModel.readPost()
                     }
                 }
-                .frame(maxWidth: .infinity)
-            } else if postViewModel.post.postType.isMedia {
-                Spacer()
-                    .frame(height: 8)
-                
-                // No preview media
-                ZStack {
-                    switch postViewModel.post.postType {
-                    case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
-                        SwiftUI.Image(systemName: "video")
-                            .noPreviewPostTypeIndicator()
-                    case .gallery:
-                        SwiftUI.Image(systemName: "square.stack")
-                            .noPreviewPostTypeIndicator()
-                    default:
-                        // Image and some weird post types
-                        SwiftUI.Image(systemName: "photo")
-                            .noPreviewPostTypeIndicator()
-                    }
-                }
-                .noPreviewPostTypeIndicatorBackground()
-                .mediaTapGesture(post: postViewModel.post, aspectRatio: nil, matchedGeometryEffectId: nil)
             }
             
             HStack(spacing: 0) {
