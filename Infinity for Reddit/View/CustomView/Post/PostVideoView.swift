@@ -20,7 +20,7 @@ struct PostVideoView: View {
     let post: Post
     let videoUrl: String
     var inPostListing: Bool = false
-    let onReadPost: () -> Void
+    var onReadPost: (() -> Void)? = nil
     
     var body: some View {
         if VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected)
@@ -43,12 +43,14 @@ struct PostVideoView: View {
                         post: post,
                         blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages)
                     )
-                    .simultaneousGesture(
-                        TapGesture()
-                            .onEnded {
-                                onReadPost()
-                            }
-                    )
+                    .applyIf(inPostListing) {
+                        $0.simultaneousGesture(
+                            TapGesture()
+                                .onEnded {
+                                    onReadPost?()
+                                }
+                        )
+                    }
                     
                     SwiftUI.Image(systemName: "play.circle")
                         .resizable()

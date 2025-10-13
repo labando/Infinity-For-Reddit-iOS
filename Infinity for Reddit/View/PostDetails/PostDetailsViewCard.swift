@@ -204,75 +204,17 @@ struct PostDetailsViewCard: View {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrl: videoUrlString) {
-                    Task {
-                        await postViewModel.readPost()
-                    }
-                }
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrlString)
             } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrl: videoUrlString) {
-                    Task {
-                        await postViewModel.readPost()
-                    }
-                }
-            } else if postViewModel.post.postType != .text, let preview = postViewModel.post.preview, preview.images.count > 0, let url = preview.images[0].source.url {
-                Spacer()
-                    .frame(height: 10)
-                
-                GeometryReader { geo in
-                    ZStack(alignment: .topLeading) {
-                        CustomWebImage(
-                            url,
-                            aspectRatio: preview.images[0].source.aspectRatio,
-                            matchedGeometryEffectId: UUID().uuidString,
-                            post: postViewModel.post,
-                            blur: (postViewModel.post.over18 && blurSensitiveImages) || (postViewModel.post.spoiler && blurSpoilerImages)
-                        )
-                        
-                        switch postViewModel.post.postType {
-                        case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
-                            SwiftUI.Image(systemName: "play.circle")
-                                .resizable()
-                                .mediaIndicator()
-                                .padding(12)
-                                .frame(width: 64, height: 64)
-                        case .link:
-                            SwiftUI.Image(systemName: "link.circle")
-                                .resizable()
-                                .mediaIndicator()
-                                .padding(12)
-                                .frame(width: 64, height: 64)
-                        default:
-                            EmptyView()
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .aspectRatio(preview.images[0].source.aspectRatio, contentMode: .fit)
+                PostVideoView(post: postViewModel.post, videoUrl: videoUrlString)
             } else if postViewModel.post.postType.isMedia {
                 Spacer()
                     .frame(height: 10)
                 
-                // No preview media
-                ZStack {
-                    switch postViewModel.post.postType {
-                    case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
-                        SwiftUI.Image(systemName: "video")
-                            .noPreviewPostTypeIndicator()
-                    case .gallery:
-                        SwiftUI.Image(systemName: "square.stack")
-                            .noPreviewPostTypeIndicator()
-                    default:
-                        // Image and some weird post types
-                        SwiftUI.Image(systemName: "photo")
-                            .noPreviewPostTypeIndicator()
-                    }
-                }
-                .noPreviewPostTypeIndicatorBackground()
-                .mediaTapGesture(post: postViewModel.post, aspectRatio: nil, matchedGeometryEffectId: nil)
+                PostPreviewView(post: postViewModel.post)
             }
             
             if let selftext = postViewModel.post.selftextProcessedMarkdown {

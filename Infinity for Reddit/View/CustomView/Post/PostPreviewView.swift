@@ -10,7 +10,7 @@ import SwiftUI
 struct PostPreviewView: View {
     let post: Post
     var inPostListing: Bool = false
-    let onReadPost: () -> Void
+    var onReadPost: (() -> Void)? = nil
     
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
@@ -28,12 +28,14 @@ struct PostPreviewView: View {
                     post: post,
                     blur: (post.over18 && blurSensitiveImages) || (post.spoiler && blurSpoilerImages)
                 )
-                .simultaneousGesture(
-                    TapGesture()
-                        .onEnded {
-                            onReadPost()
-                        }
-                )
+                .applyIf(inPostListing) {
+                    $0.simultaneousGesture(
+                        TapGesture()
+                            .onEnded {
+                                onReadPost?()
+                            }
+                    )
+                }
                 
                 switch post.postType {
                 case .redditVideo, .video, .imgurVideo, .redgifs, .streamable:
