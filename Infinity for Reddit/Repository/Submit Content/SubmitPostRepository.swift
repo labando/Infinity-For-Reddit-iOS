@@ -121,4 +121,50 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
     }
+    
+    func submitGifPost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        content: String,
+        gifUrlString: String,
+        posterUrlString: String,
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool,
+        isRichTextJSON: Bool
+    ) async throws {
+        var params = [
+            "api_type": "json",
+            "sr": subredditName,
+            "title": title,
+            "kind": "image",
+            "url": gifUrlString,
+            "video_poster_url": posterUrlString,
+            "spoiler": String(isSpoiler),
+            "nsfw": String(isSensitive),
+            "sendreplies": String(receivePostReplyNotifications)
+        ]
+        if !content.isEmpty {
+            params["text"] = content
+        }
+        if let flair {
+            params["flair_text"] = flair.text
+            params["flair_id"] = flair.id
+        }
+        
+        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let data = try await self.session.request(RedditOAuthAPI.submitTextPost(params: params), interceptor: interceptor)
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw SubmitPostRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        try json.throwIfRedditError(defaultErrorMessage: "Failed to submit post.")
+    }
 }

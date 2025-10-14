@@ -33,4 +33,18 @@ protocol SubmitPostRepositoryProtocol {
         receivePostReplyNotifications: Bool,
         isRichTextJSON: Bool
     ) async throws
+    
+    func submitGifPost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        content: String,
+        gifUrlString: String,
+        posterUrlString: String,
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool,
+        isRichTextJSON: Bool
+    ) async throws
 }

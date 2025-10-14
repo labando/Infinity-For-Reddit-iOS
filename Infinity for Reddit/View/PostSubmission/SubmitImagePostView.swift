@@ -84,7 +84,7 @@ struct SubmitImagePostView: View {
                             }
                             .padding(16)
                             
-                            if let previewImage = submitImagePostViewModel.capturedImage {
+                            if let previewImage = submitImagePostViewModel.image {
                                 VStack(spacing: 16) {
                                     Button(action: {
                                         submitImagePostViewModel.clearCapturedImage()
@@ -167,7 +167,7 @@ struct SubmitImagePostView: View {
             if Utils.checkCameraAvailability() {
                 MCamera()
                     .onImageCaptured { capturedImage, controller in
-                        submitImagePostViewModel.setCapturedImage(capturedImage)
+                        submitImagePostViewModel.setImage(image: capturedImage)
                         controller.closeMCamera()
                     }
                     .setCloseMCameraAction {
@@ -199,8 +199,9 @@ struct SubmitImagePostView: View {
             Task {
                 if let selectedItem = newSelectedItem,
                    let imageData = try? await selectedItem.loadTransferable(type: Data.self),
-                   let pickedImage = UIImage(data: imageData) {
-                    submitImagePostViewModel.setCapturedImage(pickedImage)
+                   let image = UIImage(data: imageData) {
+                    print(isGIF(imageData: imageData))
+                    submitImagePostViewModel.setImage(image: image, imageData: imageData, isGIF: isGIF(imageData: imageData))
                 } else {
                     // Error handling
                 }
@@ -230,6 +231,14 @@ struct SubmitImagePostView: View {
     
     private enum FieldType: Hashable {
         case title
+    }
+    
+    private func isGIF(imageData: Data) -> Bool {
+        guard imageData.count >= 4 else {
+            return false
+        }
+        let signature = String(bytes: imageData.prefix(4), encoding: .ascii)
+        return signature == "GIF8"
     }
 }
 

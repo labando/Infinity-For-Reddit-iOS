@@ -80,6 +80,51 @@ class MediaUploadRepository: MediaUploadRepositoryProtocol {
         throw MediaUploadRepositoryError.failedToExtractURL
     }
     
+    func uploadGIF(account: Account, gifData: Data) async throws -> String {
+        let params = [
+            "filepath": "post_gif.gif",
+            "mimetype": "image/gif"
+        ]
+        
+        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let metadataResponseData = try await self.session.request(RedditOAuthAPI.uploadMediaMetadata(params: params), interceptor: interceptor)
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        let json = JSON(metadataResponseData)
+        if let error = json.error {
+            throw APIError.jsonDecodingError(error.localizedDescription)
+        }
+        
+        let dataDictionary = try self.getDataDictionary(from: json)
+        
+        let uploadImageResponseData = try await self.session.upload(
+            multipartFormData: { formData in
+                for (key, value) in dataDictionary {
+                    formData.append(value, withName: key)
+                }
+                
+                formData.append(
+                    gifData,
+                    withName: "file",
+                    fileName: "post_gif.gif",
+                    mimeType: "image/gif"
+                )
+            },
+            with: MediaUploadAPI.uploadMedia
+        )
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        if let gifUrlString = getImageURLString(uploadImageResponseData, getImageKey: false) {
+            return gifUrlString
+        }
+        
+        throw MediaUploadRepositoryError.failedToExtractURL
+    }
+    
     private func getDataDictionary(from json: JSON) throws -> [String: Data] {
         let nameValuePairs = json["args"]["fields"].arrayValue
         
