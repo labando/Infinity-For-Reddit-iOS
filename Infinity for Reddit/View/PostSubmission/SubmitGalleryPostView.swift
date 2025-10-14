@@ -93,7 +93,7 @@ struct SubmitGalleryPostView: View {
                                 .padding(.horizontal, 16)
                             } else {
                                 GallerySelectionToolbar(
-                                    onTapGallery: { showGallerySheet = true },
+                                    onTapGallery: { showGallerySheet = true }
                                 )
                                 .frame(maxWidth: .infinity)
                             }
