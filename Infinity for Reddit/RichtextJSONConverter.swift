@@ -48,13 +48,12 @@ class RichTextJSONConverter {
     private let IMAGE_ID = "id"
     private let DOCUMENT = "document"
 
-    private var document: [Any] = []
     private var text = ""
     private var formats: [[Int]] = []
     private var contentStack: [[Any]] = []
 
     init() {
-        contentStack.append(document)
+        contentStack.append([])
     }
 
     func constructRichtextJSON(markdown: String) -> String {
@@ -86,9 +85,13 @@ class RichTextJSONConverter {
 
         visitBlockNodes(markdown.blocks)
         var richtext = JSON()
-        richtext[DOCUMENT] = JSON(document)
+        richtext[DOCUMENT] = JSON(contentStack[0])
         
-        return richtext.stringValue
+        if let data = try? richtext.rawData(),
+           let jsonString = String(data: data, encoding: .utf8) {
+            return jsonString
+        }
+        return ""
     }
     
     private func visitBlockNodes(_ blockNodes: [BlockNode]) {
@@ -155,9 +158,7 @@ class RichTextJSONConverter {
         
         var contentArray = contentStack.popLast()
         blockquote[CONTENT] = JSON(contentArray ?? [])
-        if var content = contentStack.last {
-            content.append(blockquote)
-        }
+        appendToContentStackLastItem(blockquote)
     }
     
     private func visitBulletedList(_ rawListItems: [RawListItem]) {
@@ -173,9 +174,7 @@ class RichTextJSONConverter {
         var contentArray = contentStack.popLast()
         bulletedList[CONTENT] = JSON(contentArray ?? [])
         bulletedList[IS_ORDERED_LIST].boolValue = false
-        if var content = contentStack.last {
-            content.append(bulletedList)
-        }
+        appendToContentStackLastItem(bulletedList)
     }
     
     private func visitNumberedList(_ rawListItems: [RawListItem]) {
@@ -191,9 +190,7 @@ class RichTextJSONConverter {
         var contentArray = contentStack.popLast()
         numberedList[CONTENT] = JSON(contentArray ?? [])
         numberedList[IS_ORDERED_LIST].boolValue = true
-        if var content = contentStack.last {
-            content.append(numberedList)
-        }
+        appendToContentStackLastItem(numberedList)
     }
     
     private func visitTaskList(_ rawListItems: [RawTaskListItem]) {
@@ -209,9 +206,7 @@ class RichTextJSONConverter {
         var contentArray = contentStack.popLast()
         taskList[CONTENT] = JSON(contentArray ?? [])
         taskList[IS_ORDERED_LIST].boolValue = false
-        if var content = contentStack.last {
-            content.append(taskList)
-        }
+        appendToContentStackLastItem(taskList)
     }
     
     private func visitCodeBlock(_ content: String) {
@@ -228,9 +223,7 @@ class RichTextJSONConverter {
         }
         
         codeBlock[CONTENT] = JSON(contentArray)
-        if var content = contentStack.last {
-            content.append(codeBlock)
-        }
+        appendToContentStackLastItem(codeBlock)
     }
     
     private func visitParagraph(_ inlineNodes: [InlineNode]) {
@@ -260,12 +253,16 @@ class RichTextJSONConverter {
         }
         
         paragraph[CONTENT] = JSON(contentArray)
-        if var content = contentStack.last {
-            content.append(paragraph)
-        }
+        appendToContentStackLastItem(paragraph)
         
         formats.removeAll()
         text.removeAll()
+    }
+    
+    private func appendToContentStackLastItem(_ json: JSON) {
+        if let lastIndex = contentStack.indices.last {
+            contentStack[lastIndex].append(json)
+        }
     }
     
     private func visitHeading(level: Int, inlineNodes: [InlineNode]) {
@@ -289,9 +286,7 @@ class RichTextJSONConverter {
         
         let convertedContentArray = convertToRawTextJSONObject(contentArray: contentArray)
         heading[CONTENT] = JSON(convertedContentArray)
-        if var content = contentStack.last {
-            content.append(heading)
-        }
+        appendToContentStackLastItem(heading)
         
         formats.removeAll()
         text.removeAll()
@@ -322,9 +317,7 @@ class RichTextJSONConverter {
             table[CONTENT] = JSON(contentArray)
         }
         
-        if var content = contentStack.last {
-            content.append(table)
-        }
+        appendToContentStackLastItem(table)
         
         formats.removeAll()
         text.removeAll()
@@ -346,7 +339,7 @@ class RichTextJSONConverter {
     
     private func visitEmphasis(_ inlineNodes: [InlineNode]) {
         if let firstChild = inlineNodes.first {
-            let formatArray = getFormatArray(inlineNode: firstChild)
+            let formatArray = getFormatArray(initialFormatNum: Format.italics.rawValue, inlineNode: firstChild)
             if let formatArray {
                 formats.append(formatArray)
             }
@@ -355,7 +348,7 @@ class RichTextJSONConverter {
     
     private func visitStrong(_ inlineNodes: [InlineNode]) {
         if let firstChild = inlineNodes.first {
-            let formatArray = getFormatArray(inlineNode: firstChild)
+            let formatArray = getFormatArray(initialFormatNum: Format.bold.rawValue, inlineNode: firstChild)
             if let formatArray {
                 formats.append(formatArray)
             }
@@ -364,15 +357,15 @@ class RichTextJSONConverter {
     
     private func visitStrikethrough(_ inlineNodes: [InlineNode]) {
         if let firstChild = inlineNodes.first {
-            let formatArray = getFormatArray(inlineNode: firstChild)
+            let formatArray = getFormatArray(initialFormatNum: Format.strikethrough.rawValue, inlineNode: firstChild)
             if let formatArray {
                 formats.append(formatArray)
             }
         }
     }
     
-    private func getFormatArray(inlineNode: InlineNode) -> [Int]? {
-        var formatNum = 0
+    private func getFormatArray(initialFormatNum: Int, inlineNode: InlineNode) -> [Int]? {
+        var formatNum = initialFormatNum
         var node: InlineNode? = inlineNode
         while let temp = node {
             switch temp {
@@ -387,11 +380,11 @@ class RichTextJSONConverter {
                     format.append(content.count)
                     return format
                 }
-                break
+                node = nil
             case .softBreak:
-                break
+                node = nil
             case .lineBreak:
-                break
+                node = nil
             case .code(let content):
                 formatNum += Format.inlineCode.rawValue
                 let start = text.count
@@ -404,7 +397,7 @@ class RichTextJSONConverter {
                     format.append(content.count)
                     return format
                 }
-                break
+                node = nil
             case .html(let content):
                 let start = text.count
                 text.append(content)
@@ -416,7 +409,7 @@ class RichTextJSONConverter {
                     format.append(content.count)
                     return format
                 }
-                break
+                node = nil
             case .emphasis(let children):
                 formatNum += Format.italics.rawValue
                 node = children.first
@@ -449,9 +442,7 @@ class RichTextJSONConverter {
                 textContent[FORMAT] = JSON(requiredFormats)
             }
             
-            if var content = contentStack.last {
-                content.append(textContent)
-            }
+            appendToContentStackLastItem(textContent)
             
             formats.removeAll()
             text.removeAll()
@@ -473,9 +464,7 @@ class RichTextJSONConverter {
             link[FORMAT] = JSON(requiredFormats)
         }
         
-        if var content = contentStack.last {
-            content.append(link)
-        }
+        appendToContentStackLastItem(link)
         
         formats.removeAll()
         text.removeAll()
@@ -486,7 +475,7 @@ class RichTextJSONConverter {
         image[TYPE].stringValue = Element.image.rawValue
         image[IMAGE_ID].stringValue = imageId
         image[CONTENT].stringValue = getImageCaption(currentCaption: "", inlineNodes: inlineNodes)
-        document.append(image)
+        contentStack[0].append(image)
     }
     
     private func getImageCaption(currentCaption: String, inlineNodes: [InlineNode]) -> String {
