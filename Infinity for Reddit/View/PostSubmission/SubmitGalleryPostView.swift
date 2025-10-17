@@ -22,8 +22,8 @@ struct SubmitGalleryPostView: View {
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
     @State private var showGallerySheet: Bool = false
-    @State private var showPhotoPicker = false
-    @State private var showCamera = false
+    @State private var showPhotoPicker: Bool = false
+    @State private var showCamera: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem?
     
     init() {
@@ -75,26 +75,27 @@ struct SubmitGalleryPostView: View {
                             }
                             .padding(16)
                             
-                            if let previewImage = submitGalleryPostViewModel.capturedImage {
+                            if !submitGalleryPostViewModel.capturedImages.isEmpty {
                                 VStack(spacing: 16) {
-                                    Button(action: {
-                                        submitGalleryPostViewModel.clearCapturedImage()
-                                    }) {
-                                        Text("Select again")
-                                            .colorAccentText()
+                                    ForEach(submitGalleryPostViewModel.capturedImages.indices, id: \.self) { index in
+                                        SwiftUI.Image(uiImage: submitGalleryPostViewModel.capturedImages[index])
+                                            .resizable()
+                                            .scaledToFit()
+                                            .cornerRadius(8)
+                                            .padding(.horizontal, 16)
                                     }
-                                    .frame(maxWidth: .infinity, alignment: .leading)
                                     
-                                    SwiftUI.Image(uiImage: previewImage)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .cornerRadius(8)
+                                    if submitGalleryPostViewModel.capturedImages.count < 20 {
+                                        GallerySelectionToolbar(
+                                            onTapGallery: { showGallerySheet = true }
+                                        )
+                                        .frame(maxWidth: .infinity)
+                                    }
                                 }
-                                .padding(.horizontal, 16)
                             } else {
-                                GallerySelectionToolbar(
-                                    onTapGallery: { showGallerySheet = true }
-                                )
+                                GallerySelectionToolbar{
+                                    showGallerySheet = true
+                                }
                                 .frame(maxWidth: .infinity)
                             }
                         }
@@ -143,11 +144,11 @@ struct SubmitGalleryPostView: View {
         .sheet(isPresented: $showGallerySheet) {
             GallerySelectionSheet(
                 onCameraTap: {
-                    showPhotoPicker = true
+                    showCamera = true
                     showGallerySheet = false
                 },
                 onPhotoPickerTap: {
-                    showCamera = true
+                    showPhotoPicker = true
                     showGallerySheet = false
                 }
             )
@@ -163,7 +164,7 @@ struct SubmitGalleryPostView: View {
                 if let selectedItem = newSelectedItem,
                    let imageData = try? await selectedItem.loadTransferable(type: Data.self),
                    let pickedImage = UIImage(data: imageData) {
-                    submitGalleryPostViewModel.setCapturedImage(pickedImage)
+                    submitGalleryPostViewModel.addImage(pickedImage)
                 } else {
                     // Error handling
                 }
@@ -173,7 +174,7 @@ struct SubmitGalleryPostView: View {
             if Utils.checkCameraAvailability() {
                 MCamera()
                     .onImageCaptured { capturedImage, controller in
-                        submitGalleryPostViewModel.setCapturedImage(capturedImage)
+                        submitGalleryPostViewModel.addImage(capturedImage)
                         controller.closeMCamera()
                     }
                     .setCloseMCameraAction {

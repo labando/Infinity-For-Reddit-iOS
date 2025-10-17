@@ -12,19 +12,19 @@ class SubmitGalleryPostViewModel: ObservableObject {
     @Published var title: String = ""
     @Published var content: String = ""
     @Published var selectedAccount: Account
-    @Published var capturedImage: UIImage? = nil
+    @Published var capturedImages: [UIImage] = []
     
     init() {
         self.selectedAccount = AccountViewModel.shared.account
     }
     
-    func setCapturedImage(_ image: UIImage) {
-        capturedImage = image
-        print("Updated captured image: \(image.description)")
+    func addImage(_ image: UIImage) {
+        if capturedImages.count < 20 {
+            capturedImages.append(image)
+        }
     }
     
-    func clearCapturedImage() {
-        capturedImage = nil
-        print("Cleared captured image")
+    func clearCapturedImages() {
+        capturedImages.removeAll()
     }
 }

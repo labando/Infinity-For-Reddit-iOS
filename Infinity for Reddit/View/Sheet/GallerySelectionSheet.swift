@@ -21,13 +21,17 @@ public struct GallerySelectionSheet: View {
     public var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                SimpleTouchItemRow(text: "Select an Image", icon: "camera.fill") {
-                    onPhotoPickerTap()
-                }
+                SimpleTouchItemRow(
+                    text: "Select an Image",
+                    icon: "photo.fill.on.rectangle.fill",
+                    action: onPhotoPickerTap
+                )
                 
-                SimpleTouchItemRow(text: "Capture", icon: "photo.fill.on.rectangle.fill") {
-                    onCameraTap()
-                }
+                SimpleTouchItemRow(
+                    text: "Capture",
+                    icon: "camera.fill",
+                    action: onCameraTap
+                )
             }
             .padding(.top, 20)
         }
