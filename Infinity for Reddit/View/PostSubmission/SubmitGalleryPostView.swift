@@ -29,7 +29,9 @@ struct SubmitGalleryPostView: View {
         _postSubmissionContextViewModel = StateObject(
             wrappedValue: PostSubmissionContextViewModel(ruleRepository: RuleRepository(), flairRepository: FlairRepository())
         )
-        _submitGalleryPostViewModel = StateObject(wrappedValue: SubmitGalleryPostViewModel())
+        _submitGalleryPostViewModel = StateObject(
+            wrappedValue: SubmitGalleryPostViewModel(mediaUploadRepository: MediaUploadRepository())
+        )
     }
     
     var body: some View {
@@ -61,7 +63,8 @@ struct SubmitGalleryPostView: View {
                                 fieldType: .title,
                                 focusedField: $focusedField
                             )
-                            .padding(16)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 16)
                             
                             ZStack(alignment: .topLeading) {
                                 MarkdownTextField(text: $submitGalleryPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
@@ -74,9 +77,9 @@ struct SubmitGalleryPostView: View {
                             }
                             .padding(16)
                             
-                            if !submitGalleryPostViewModel.capturedImages.isEmpty {
+                            if !submitGalleryPostViewModel.galleryImages.isEmpty {
                                 GalleryGridView(
-                                    images: submitGalleryPostViewModel.capturedImages,
+                                    galleryImages: submitGalleryPostViewModel.galleryImages,
                                     onSelectImage: {
                                         showPhotoPicker = true
                                     }, onCaptureImage: {
@@ -226,7 +229,7 @@ private struct AddMediaButton: View {
 private struct GalleryGridView: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
-    let images: [UIImage]
+    let galleryImages: [UploadedImage]
     let onSelectImage: () -> Void
     let onCaptureImage: () -> Void
     let onDeleteImage: (Int) -> Void
@@ -241,15 +244,15 @@ private struct GalleryGridView: View {
             ],
             spacing: 16
         ) {
-            ForEach(Array(images.enumerated()), id: \.offset) { index, image in
+            ForEach(Array(galleryImages.enumerated()), id: \.offset) { index, image in
                 ZStack(alignment: .topTrailing) {
                     GeometryReader { geo in
-                        SwiftUI.Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: geo.size.width, height: geo.size.height)
-                            .clipped()
-                            .cornerRadius(8)
+                        UploadedImageView(
+                            uploadedImage: image,
+                            width: geo.size.width,
+                            height: geo.size.height,
+                            centerCrop: true
+                        )
                     }
                     
                     Button {
@@ -268,7 +271,7 @@ private struct GalleryGridView: View {
                 .aspectRatio(1, contentMode: .fill)
             }
             
-            if images.count < maxImageCount {
+            if galleryImages.count < maxImageCount {
                 GeometryReader { geometry in
                     AddMediaButton(onSelectImage: onSelectImage, onCaptureImage: onCaptureImage)
                         .frame(width: geometry.size.width, height: geometry.size.height)

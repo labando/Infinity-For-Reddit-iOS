@@ -10,29 +10,43 @@ import SwiftUI
 struct UploadedImageView: View {
     @ObservedObject var uploadedImage: UploadedImage
 
-    let onInsertImage: () -> Void
+    var width: CGFloat?
+    var height: CGFloat?
+    var centerCrop: Bool = false
+    var onImageTapped: (() -> Void)? = nil
     
     var body: some View {
         ZStack {
             SwiftUI.Image(uiImage: uploadedImage.image)
                 .resizable()
-                .scaledToFit()
+                .applyIf(centerCrop) {
+                    $0.scaledToFill()
+                        .clipped()
+                }
+                .applyIf(!centerCrop) {
+                    $0.scaledToFit()
+                }
+                .applyIf(width != nil) {
+                    $0.frame(width: width!)
+                }
+                .applyIf(height != nil) {
+                    $0.frame(height: height!)
+                }
                 .cornerRadius(8)
-                .listPlainItemNoInsets()
             
             if uploadedImage.isUploading {
                 ProgressIndicator()
             } else if !uploadedImage.isUploaded && uploadedImage.uploadError != nil {
                 SwiftUI.Image(systemName: "arrow.clockwise.circle.fill")
-                    .foregroundStyle(.black)
-                    .onTapGesture {
-                        uploadedImage.upload()
-                    }
+                    .font(.system(size: 48))
+                    .foregroundStyle(.white)
             }
         }
         .onTapGesture {
             if uploadedImage.isUploaded {
-                onInsertImage()
+                onImageTapped?()
+            } else if uploadedImage.uploadError != nil {
+                uploadedImage.upload()
             }
         }
     }

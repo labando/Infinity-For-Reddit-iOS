@@ -36,7 +36,7 @@ struct MarkdownEmbeddedImagesSheet: View {
                     spacing: 16
                 ) {
                     ForEach(embeddedImages, id: \.id) { embeddedImage in
-                        UploadedImageView(uploadedImage: embeddedImage, onInsertImage: {
+                        UploadedImageView(uploadedImage: embeddedImage, onImageTapped: {
                             caption = ""
                             selectedImage = embeddedImage
                             showCaptionAlert = true
