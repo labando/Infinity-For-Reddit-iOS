@@ -21,7 +21,6 @@ struct SubmitGalleryPostView: View {
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var bodySelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showMarkdownPreview: Bool = false
-    @State private var showGallerySheet: Bool = false
     @State private var showPhotoPicker: Bool = false
     @State private var showCamera: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem?
@@ -76,17 +75,24 @@ struct SubmitGalleryPostView: View {
                             .padding(16)
                             
                             if !submitGalleryPostViewModel.capturedImages.isEmpty {
-                                VStack(spacing: 16) {
-                                    GalleryGridView(
-                                        images: submitGalleryPostViewModel.capturedImages,
-                                        onAddTap: { showGallerySheet = true },
-                                        onDeleteTap: { index in submitGalleryPostViewModel.deleteCapturedImage(at: index) }
-                                    )
-                                }
+                                GalleryGridView(
+                                    images: submitGalleryPostViewModel.capturedImages,
+                                    onSelectImage: {
+                                        showPhotoPicker = true
+                                    }, onCaptureImage: {
+                                        showCamera = true
+                                    },
+                                    onDeleteImage: { index in
+                                        submitGalleryPostViewModel.deleteCapturedImage(at: index)
+                                    }
+                                )
+                                .padding(.horizontal, 16)
                             } else {
-                                GallerySelectionToolbar{
-                                    showGallerySheet = true
-                                }
+                                AddMediaButton(onSelectImage: {
+                                    showPhotoPicker = true
+                                }, onCaptureImage: {
+                                    showCamera = true
+                                })
                                 .frame(maxWidth: .infinity)
                             }
                         }
@@ -131,19 +137,6 @@ struct SubmitGalleryPostView: View {
         }
         .sheet(isPresented: $showMarkdownPreview) {
             MarkdownViewerSheet(markdown: submitGalleryPostViewModel.content)
-        }
-        .sheet(isPresented: $showGallerySheet) {
-            GallerySelectionSheet(
-                onCameraTap: {
-                    showCamera = true
-                    showGallerySheet = false
-                },
-                onPhotoPickerTap: {
-                    showPhotoPicker = true
-                    showGallerySheet = false
-                }
-            )
-            .presentationDragIndicator(.visible)
         }
         .photosPicker(
             isPresented: $showPhotoPicker,
@@ -200,16 +193,24 @@ struct SubmitGalleryPostView: View {
     }
 }
 
-private struct GallerySelectionToolbar: View {
+private struct AddMediaButton: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
-    let onTapGallery: () -> Void
     let buttonSize: CGFloat = 24
     
+    let onSelectImage: () -> Void
+    let onCaptureImage: () -> Void
+    
     var body: some View {
-        HStack(spacing: 32) {
-            Button {
-                onTapGallery()
+        ZStack {
+            Menu {
+                Button("Select an image") {
+                    onSelectImage()
+                }
+                
+                Button("Capture an image") {
+                    onCaptureImage()
+                }
             } label: {
                 SwiftUI.Image(systemName: "photo.fill.on.rectangle.fill")
                     .font(.system(size: buttonSize))
@@ -226,56 +227,54 @@ private struct GalleryGridView: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     let images: [UIImage]
-    let onAddTap: () -> Void
-    let onDeleteTap: (Int) -> Void
+    let onSelectImage: () -> Void
+    let onCaptureImage: () -> Void
+    let onDeleteImage: (Int) -> Void
+    
     let maxImageCount: Int = 20
     
     var body: some View {
-        ScrollView {
-            LazyVGrid(
-                columns:[
-                    GridItem(.flexible(), spacing: 10),
-                    GridItem(.flexible(), spacing: 10)
-                ],
-                spacing: 10
-            ) {
-                ForEach(Array(images.enumerated()), id: \.offset) { index, image in
-                    ZStack(alignment: .topTrailing) {
-                        GeometryReader { geometry in
-                            SwiftUI.Image(uiImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: geometry.size.width, height: geometry.size.width)
-                                .clipped()
-                                .cornerRadius(8)
-                        }
-                        .aspectRatio(1, contentMode: .fit)
-                        
-                        Button {
-                            onDeleteTap(index)
-                        } label: {
-                            SwiftUI.Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(Color(hex: customThemeViewModel.currentCustomTheme.backgroundColor))
-                                .background(
-                                    Circle()
-                                        .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
-                                )
-                                .font(.system(size: 20))
-                                .padding(6)
-                        }
-                    }
-                }
-                
-                if images.count < maxImageCount {
-                    GeometryReader { geometry in
-                        GallerySelectionToolbar(onTapGallery: onAddTap)
-                            .frame(width: geometry.size.width, height: geometry.size.width)
+        LazyVGrid(
+            columns:[
+                GridItem(.flexible(), spacing: 16),
+                GridItem(.flexible(), spacing: 16)
+            ],
+            spacing: 16
+        ) {
+            ForEach(Array(images.enumerated()), id: \.offset) { index, image in
+                ZStack(alignment: .topTrailing) {
+                    GeometryReader { geo in
+                        SwiftUI.Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: geo.size.width, height: geo.size.height)
+                            .clipped()
                             .cornerRadius(8)
                     }
-                    .aspectRatio(1, contentMode: .fit)
+                    
+                    Button {
+                        onDeleteImage(index)
+                    } label: {
+                        SwiftUI.Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(Color(hex: customThemeViewModel.currentCustomTheme.backgroundColor))
+                            .background(
+                                Circle()
+                                    .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
+                            )
+                            .font(.system(size: 20))
+                            .padding(6)
+                    }
                 }
+                .aspectRatio(1, contentMode: .fill)
             }
-            .padding(.horizontal, 16)
+            
+            if images.count < maxImageCount {
+                GeometryReader { geometry in
+                    AddMediaButton(onSelectImage: onSelectImage, onCaptureImage: onCaptureImage)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                }
+                .aspectRatio(1, contentMode: .fit)
+            }
         }
     }
 }

@@ -56,6 +56,9 @@
     "Cancel" : {
 
     },
+    "Capture an image" : {
+
+    },
     "Choose color" : {
 
     },
@@ -375,6 +378,9 @@
 
     },
     "Select again" : {
+
+    },
+    "Select an image" : {
 
     },
     "Select Sort Time" : {
