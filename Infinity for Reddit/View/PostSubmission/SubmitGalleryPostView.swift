@@ -27,6 +27,10 @@ struct SubmitGalleryPostView: View {
     @State private var showPhotoPicker: Bool = false
     @State private var showCamera: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var showCaptionAndURLAlert: Bool = false
+    @State private var caption: String = ""
+    @State private var outboundUrlString: String = ""
+    @State private var selectedImageIndex: Int? = nil
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -90,6 +94,12 @@ struct SubmitGalleryPostView: View {
                                         showPhotoPicker = true
                                     }, onCaptureImage: {
                                         showCamera = true
+                                    },
+                                    onSetCaptionAndUrl: { index in
+                                        selectedImageIndex = index
+                                        caption = submitGalleryPostViewModel.galleryImages[index].caption ?? ""
+                                        outboundUrlString = submitGalleryPostViewModel.galleryImages[index].outboundUrlString ?? ""
+                                        showCaptionAndURLAlert = true
                                     },
                                     onDeleteImage: { index in
                                         submitGalleryPostViewModel.deleteCapturedImage(at: index)
@@ -221,10 +231,41 @@ struct SubmitGalleryPostView: View {
                 }
             }
         }
+        .overlay(
+            CustomAlert(title: "Set Caption and URL", isPresented: $showCaptionAndURLAlert) {
+                CustomTextField(
+                    "Caption (optional)",
+                    text: $caption,
+                    singleLine: true,
+                    fieldType: .caption,
+                    focusedField: $focusedField
+                )
+                
+                CustomTextField(
+                    "URL (optional)",
+                    text: $outboundUrlString,
+                    singleLine: true,
+                    fieldType: .url,
+                    focusedField: $focusedField
+                )
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+            } onConfirm: {
+                if let selectedImageIndex {
+                    submitGalleryPostViewModel.setCaptionAndUrlString(
+                        index: selectedImageIndex,
+                        caption: caption,
+                        outboundUrlString: outboundUrlString
+                    )
+                }
+            }
+        )
     }
     
     private enum FieldType: Hashable {
         case title
+        case caption
+        case url
     }
 }
 
@@ -264,6 +305,7 @@ private struct GalleryGridView: View {
     let galleryImages: [UploadedImage]
     let onSelectImage: () -> Void
     let onCaptureImage: () -> Void
+    let onSetCaptionAndUrl: (Int) -> Void
     let onDeleteImage: (Int) -> Void
     
     let maxImageCount: Int = 20
@@ -284,7 +326,9 @@ private struct GalleryGridView: View {
                             width: geo.size.width,
                             height: geo.size.height,
                             centerCrop: true
-                        )
+                        ) {
+                            onSetCaptionAndUrl(index)
+                        }
                     }
                     
                     Button {

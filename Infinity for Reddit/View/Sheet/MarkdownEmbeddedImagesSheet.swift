@@ -63,7 +63,7 @@ struct MarkdownEmbeddedImagesSheet: View {
         }
         .overlay(
             CustomAlert(title: "Set Caption", isPresented: $showCaptionAlert) {
-                CustomTextField("Caption (not required)",
+                CustomTextField("Caption (optional)",
                                 text: $caption,
                                 singleLine: true,
                                 fieldType: .caption,

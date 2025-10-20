@@ -35,8 +35,8 @@ class UploadedImage: ObservableObject {
             self.isUploading = true
             do {
                 let imageId = try await uploadImage()
-                //try await Task.sleep(for: .seconds(3))
-                //let imageId = Utils.randomString()
+//                try await Task.sleep(for: .seconds(3))
+//                let imageId = Utils.randomString()
                 self.imageId = imageId
                 self.isUploaded = true
                 self.isUploading = false

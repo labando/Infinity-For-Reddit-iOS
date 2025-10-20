@@ -52,6 +52,13 @@ class SubmitGalleryPostViewModel: ObservableObject {
         galleryImages.remove(at: index)
     }
     
+    func setCaptionAndUrlString(index: Int, caption: String?, outboundUrlString: String?) {
+        if galleryImages.indices.contains(index) {
+            galleryImages[index].caption = caption
+            galleryImages[index].outboundUrlString = outboundUrlString
+        }
+    }
+    
     func submitPost(
         subreddit: SubscribedSubredditData?,
         flair: Flair?,
