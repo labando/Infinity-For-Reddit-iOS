@@ -72,4 +72,18 @@ protocol SubmitPostRepositoryProtocol {
         isSensitive: Bool,
         receivePostReplyNotifications: Bool
     ) async throws -> String
+    
+    func submitVideoPost(
+        account: Account,
+        subredditName: String,
+        title: String,
+        content: String,
+        videoUrlString: String,
+        posterUrlString: String,
+        flair: Flair?,
+        isSpoiler: Bool,
+        isSensitive: Bool,
+        receivePostReplyNotifications: Bool,
+        isRichTextJSON: Bool
+    ) async throws
 }
