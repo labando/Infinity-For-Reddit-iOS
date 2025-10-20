@@ -80,6 +80,21 @@ class SubmitGalleryPostViewModel: ObservableObject {
             return
         }
         
+        guard galleryImages.count >= 2 else {
+            error = PostSubmissionError.galleryImagesNotEnoughError
+            return
+        }
+        
+        if let uploadErrorIndex = galleryImages.firstIndex(where: { $0.uploadError != nil }) {
+            error = PostSubmissionError.galleryImageUploadError(uploadErrorIndex)
+            return
+        }
+        
+        for image in galleryImages where image.isUploading {
+            error = PostSubmissionError.galleryImageUploadingInProgress
+            return
+        }
+        
         submittedPostUrlString = nil
         
         submitPostTask = Task {
