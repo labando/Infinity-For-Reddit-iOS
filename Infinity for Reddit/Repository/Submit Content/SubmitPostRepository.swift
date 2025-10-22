@@ -87,8 +87,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) async throws {
         var params = [
             "api_type": "json",
@@ -132,8 +131,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) async throws {
         var params = [
             "api_type": "json",
@@ -178,8 +176,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) async throws -> String {
         var params = [
             "api_type": "json",
@@ -279,8 +276,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) async throws {
         var params = [
             "api_type": "json",

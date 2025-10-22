@@ -29,7 +29,6 @@ struct SubmitVideoPostView: View {
     @State private var showCamera: Bool = false
     @State private var showVideoPicker: Bool = false
     @State private var selectedVideoItem: PhotosPickerItem? = nil
-    @State private var isLoadingVideo: Bool = false
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -86,16 +85,6 @@ struct SubmitVideoPostView: View {
                             }
                             .padding(16)
                             
-                            //                            if let thumbnail = submitVideoPostViewModel.thumbnail {
-                            //                                SwiftUI.Image(uiImage: thumbnail)
-                            //                                    .resizable()
-                            //                                    .scaledToFit()
-                            //                                    .frame(maxWidth: .infinity)
-                            //                                    .frame(height: 200)
-                            //                                    .padding(.horizontal, 16)
-                            //                                    .padding(.top, 8)
-                            //                            }
-                            
                             if let videoURL = submitVideoPostViewModel.videoURL {
                                 VStack (spacing: 16) {
                                     Button(action: {
@@ -113,7 +102,7 @@ struct SubmitVideoPostView: View {
                                 }
                                 .padding(.horizontal, 16)
                             } else {
-                                if !isLoadingVideo {
+                                if submitVideoPostViewModel.processingVideoTask == nil {
                                     SelectVideoToolbar(
                                         onCameraTap: { showCamera = true },
                                         onPhotoPickerTap: { showVideoPicker = true }
@@ -129,7 +118,6 @@ struct SubmitVideoPostView: View {
                     
                     Spacer()
                         .frame(height: markdownToolbarHeight)
-                    
                 }
                 
                 MarkdownToolbar(
@@ -163,8 +151,7 @@ struct SubmitVideoPostView: View {
                         flair: postSubmissionContextViewModel.selectedFlair,
                         isSpoiler: postSubmissionContextViewModel.isSpoiler,
                         isSensitive: postSubmissionContextViewModel.isSensitive,
-                        receivePostReplyNotifications: postSubmissionContextViewModel.receivePostReplyNotification,
-                        isRichTextJSON: false
+                        receivePostReplyNotifications: postSubmissionContextViewModel.receivePostReplyNotification
                     )
                 } label: {
                     SwiftUI.Image(systemName: "paperplane.fill")
@@ -181,43 +168,14 @@ struct SubmitVideoPostView: View {
             photoLibrary: .shared()
         )
         .onChange(of: selectedVideoItem) { _, newItem in
-            Task {
-                guard let newItem else { return }
-                
-                isLoadingVideo = true
-                
-                do {
-                    if let movie = try await newItem.loadTransferable(type: Movie.self) {
-                        let fileExtension = movie.url.pathExtension.lowercased()
-                        print("Video imported:", movie.url)
-                        print("Imported video type:", fileExtension)
-                        submitVideoPostViewModel.setVideo(url: movie.url)
-                    } else {
-                        snackbarManager.showSnackbar(text: "Failed to import video.")
-                    }
-                } catch {
-                    print("Error loading video:", error)
-                    snackbarManager.showSnackbar(text: "Failed to import video.")
-                }
-                
-                isLoadingVideo = false
-            }
+            submitVideoPostViewModel.processVideo(videoItem: newItem)
         }
         .fullScreenCover(isPresented: $showCamera) {
             if Utils.checkCameraAvailability() {
                 MCamera()
                     .onVideoCaptured { videoURL, controller in
-                        isLoadingVideo = true
-                        
                         submitVideoPostViewModel.setVideo(url: videoURL)
                         controller.closeMCamera()
-                        
-                        Task {
-                            try? await Task.sleep(for: .seconds(0.8))
-                            await MainActor.run {
-                                isLoadingVideo = false
-                            }
-                        }
                     }
                     .setCloseMCameraAction {
                         showCamera = false
@@ -255,7 +213,7 @@ struct SubmitVideoPostView: View {
         }
         .onChange(of: submitVideoPostViewModel.postSubmittedFlag) { _, newValue in
             if newValue {
-                snackbarManager.showSnackbar(text: "Post submitted successfully. Your image is being processed.")
+                snackbarManager.showSnackbar(text: "Post submitted successfully. Your video is being processed.")
                 dismiss()
             }
         }
@@ -302,24 +260,5 @@ private struct SelectVideoToolbar: View {
             }
         }
         .padding(16)
-    }
-}
-
-struct Movie: Transferable {
-    let url: URL
-    
-    static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(contentType: .movie) { movie in
-            SentTransferredFile(movie.url)
-        } importing: { received in
-            let copy = URL.documentsDirectory.appending(path: "movie.mp4")
-            
-            if FileManager.default.fileExists(atPath: copy.path()) {
-                try FileManager.default.removeItem(at: copy)
-            }
-            
-            try FileManager.default.copyItem(at: received.file, to: copy)
-            return Self.init(url: copy)
-        }
     }
 }

@@ -30,8 +30,7 @@ protocol SubmitPostRepositoryProtocol {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) async throws
     
     func submitGifPost(
@@ -44,8 +43,7 @@ protocol SubmitPostRepositoryProtocol {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) async throws
     
     func submitLinkPost(
@@ -57,8 +55,7 @@ protocol SubmitPostRepositoryProtocol {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) async throws -> String
     
     func submitGalleryPost(
@@ -83,8 +80,7 @@ protocol SubmitPostRepositoryProtocol {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) async throws
     
     func submitPollPost(

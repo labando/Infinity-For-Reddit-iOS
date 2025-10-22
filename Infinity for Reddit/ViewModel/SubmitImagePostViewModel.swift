@@ -25,20 +25,6 @@ class SubmitImagePostViewModel: ObservableObject {
     private let submitPostRepository: SubmitPostRepositoryProtocol
     private let mediaUploadRepository: MediaUploadRepositoryProtocol
     
-    enum SubmitImagePostViewModelError: LocalizedError {
-        case imageNotSelectedError
-        case gifDataError
-        
-        var errorDescription: String? {
-            switch self {
-            case .imageNotSelectedError:
-                return "Please select an image first."
-            case .gifDataError:
-                return "Cannot get GIF data. Please try selecting a different one."
-            }
-        }
-    }
-    
     init(submitPostRepository: SubmitPostRepositoryProtocol, mediaUploadRepository: MediaUploadRepositoryProtocol) {
         self.selectedAccount = AccountViewModel.shared.account
         self.submitPostRepository = submitPostRepository
@@ -62,8 +48,7 @@ class SubmitImagePostViewModel: ObservableObject {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) {
         guard submitPostTask == nil else {
             return
@@ -80,12 +65,12 @@ class SubmitImagePostViewModel: ObservableObject {
         }
         
         guard let image else {
-            error = SubmitImagePostViewModelError.imageNotSelectedError
+            error = PostSubmissionError.imageNotSelectedError
             return
         }
         
         guard !(isGIF && imageData == nil) else {
-            error = SubmitImagePostViewModelError.gifDataError
+            error = PostSubmissionError.gifDataError
             return
         }
         
@@ -107,8 +92,7 @@ class SubmitImagePostViewModel: ObservableObject {
                         flair: flair,
                         isSpoiler: isSpoiler,
                         isSensitive: isSensitive,
-                        receivePostReplyNotifications: receivePostReplyNotifications,
-                        isRichTextJSON: isRichTextJSON
+                        receivePostReplyNotifications: receivePostReplyNotifications
                     )
                 } else {
                     let imageUrlString = try await mediaUploadRepository.uploadImage(account: selectedAccount, image: image, getImageId: false)
@@ -122,8 +106,7 @@ class SubmitImagePostViewModel: ObservableObject {
                         flair: flair,
                         isSpoiler: isSpoiler,
                         isSensitive: isSensitive,
-                        receivePostReplyNotifications: receivePostReplyNotifications,
-                        isRichTextJSON: isRichTextJSON
+                        receivePostReplyNotifications: receivePostReplyNotifications
                     )
                 }
                 

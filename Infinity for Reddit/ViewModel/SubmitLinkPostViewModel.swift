@@ -111,8 +111,7 @@ class SubmitLinkPostViewModel: ObservableObject {
         flair: Flair?,
         isSpoiler: Bool,
         isSensitive: Bool,
-        receivePostReplyNotifications: Bool,
-        isRichTextJSON: Bool
+        receivePostReplyNotifications: Bool
     ) {
         guard submitPostTask == nil else {
             return
@@ -146,8 +145,7 @@ class SubmitLinkPostViewModel: ObservableObject {
                     flair: flair,
                     isSpoiler: isSpoiler,
                     isSensitive: isSensitive,
-                    receivePostReplyNotifications: receivePostReplyNotifications,
-                    isRichTextJSON: isRichTextJSON
+                    receivePostReplyNotifications: receivePostReplyNotifications
                 )
             } catch {
                 self.error = error
