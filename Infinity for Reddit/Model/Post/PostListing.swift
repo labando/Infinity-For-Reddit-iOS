@@ -38,13 +38,15 @@ public class PostListing : NSObject {
         }
         let childrenArray = json["children"].arrayValue
         for childJSON in childrenArray {
-            let dataJson = childJSON["data"]
-            if !dataJson.isEmpty {
-                do {
-                    posts.append(try Post(fromJson: dataJson))
-                } catch {
-                    // Ignore the error
-                    print(error.localizedDescription)
+            if childJSON["kind"] == "t3" {
+                let dataJson = childJSON["data"]
+                if !dataJson.isEmpty {
+                    do {
+                        posts.append(try Post(fromJson: dataJson))
+                    } catch {
+                        // Ignore the error
+                        print(error.localizedDescription)
+                    }
                 }
             }
         }
