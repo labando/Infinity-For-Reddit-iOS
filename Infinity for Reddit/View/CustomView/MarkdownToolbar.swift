@@ -175,6 +175,7 @@ struct MarkdownToolbar: View {
                         CustomTextField("Text",
                                         text: $linkText,
                                         singleLine: true,
+                                        autocapitalization: .none,
                                         fieldType: .urlText,
                                         focusedField: $focusedField)
                         
@@ -183,6 +184,7 @@ struct MarkdownToolbar: View {
                                         singleLine: true,
                                         fieldType: .urlLink,
                                         focusedField: $focusedField)
+                        .urlTextField()
                     }
                 case .header:
                     VStack(spacing: 4) {

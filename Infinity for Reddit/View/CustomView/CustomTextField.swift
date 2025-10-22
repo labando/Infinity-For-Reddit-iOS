@@ -16,6 +16,7 @@ struct CustomTextField<FieldType: Hashable>: View {
     private var placeholder: String
     private let singleLine: Bool
     private let keyboardType: UIKeyboardType
+    private let autocapitalization: TextInputAutocapitalization?
     private let showBorder: Bool
     private let fieldType: FieldType
     
@@ -23,6 +24,7 @@ struct CustomTextField<FieldType: Hashable>: View {
          text: Binding<String>,
          singleLine: Bool = false,
          keyboardType: UIKeyboardType = .default,
+         autocapitalization: TextInputAutocapitalization? = nil,
          showBorder: Bool = false,
          fieldType: FieldType,
          focusedField: FocusState<FieldType?>.Binding
@@ -31,6 +33,7 @@ struct CustomTextField<FieldType: Hashable>: View {
         _text = text
         self.singleLine = singleLine
         self.keyboardType = keyboardType
+        self.autocapitalization = autocapitalization
         self.showBorder = showBorder
         self.fieldType = fieldType
         self._focusedField = focusedField
@@ -46,6 +49,7 @@ struct CustomTextField<FieldType: Hashable>: View {
         )
         .primaryText()
         .keyboardType(keyboardType)
+        .textInputAutocapitalization(autocapitalization)
         .tint(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
         .applyIf(showBorder) {
             // TODO different border color for different focus state

@@ -285,4 +285,8 @@ extension View {
     func filledButton() -> some View {
         self.modifier(FilledButtonViewModifier())
     }
+    
+    func urlTextField() -> some View {
+        self.modifier(URLTextFieldViewModifier())
+    }
 }

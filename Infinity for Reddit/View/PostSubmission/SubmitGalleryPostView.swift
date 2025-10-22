@@ -248,8 +248,7 @@ struct SubmitGalleryPostView: View {
                     fieldType: .url,
                     focusedField: $focusedField
                 )
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
+                .urlTextField()
             } onConfirm: {
                 if let selectedImageIndex {
                     submitGalleryPostViewModel.setCaptionAndUrlString(

@@ -14,6 +14,12 @@ struct MoreView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
+    @State private var activeAlert: ActiveAlert? = nil
+    @State private var handleLinkUrlString: String = ""
+    @State private var subredditName: String = ""
+    @State private var username: String = ""
+    @FocusState private var focusedField: FieldType?
+    
     var body: some View {
         List {
             Section(header: Text("Reddit").listSectionHeader()) {
@@ -33,6 +39,21 @@ struct MoreView: View {
                     }
                     .listPlainItemNoInsets()
                 }
+                
+                SimpleTouchItemRow(text: "Handle Link", icon: "link") {
+                    activeAlert = .handleLink
+                }
+                .listPlainItemNoInsets()
+                
+                SimpleTouchItemRow(text: "Go to Subreddit", icon: "bubble.left.and.text.bubble.right") {
+                    activeAlert = .goToSubreddit
+                }
+                .listPlainItemNoInsets()
+                
+                SimpleTouchItemRow(text: "Go to User", icon: "person.crop.circle") {
+                    activeAlert = .goToUser
+                }
+                .listPlainItemNoInsets()
             }
             .listPlainItem()
             
@@ -91,5 +112,83 @@ struct MoreView: View {
         }
         .themedList()
         .rootViewBackground()
+        .overlay(
+            CustomAlert(title: activeAlert?.title ?? "", isPresented: Binding(
+                get: { activeAlert != nil },
+                set: { newValue in
+                    if !newValue {
+                        activeAlert = nil
+                    }
+                }
+            )) {
+                switch activeAlert {
+                case .handleLink:
+                    CustomTextField(
+                        "URL",
+                        text: $handleLinkUrlString,
+                        singleLine: true,
+                        fieldType: .handleLink,
+                        focusedField: $focusedField
+                    )
+                    .urlTextField()
+                case .goToSubreddit:
+                    CustomTextField(
+                        "Subreddit name",
+                        text: $subredditName,
+                        singleLine: true,
+                        autocapitalization: .none,
+                        fieldType: .subredditName,
+                        focusedField: $focusedField
+                    )
+                case .goToUser:
+                    CustomTextField(
+                        "Username",
+                        text: $username,
+                        singleLine: true,
+                        autocapitalization: .none,
+                        fieldType: .username,
+                        focusedField: $focusedField
+                    )
+                case nil:
+                    EmptyView()
+                }
+            } onConfirm: {
+                if let alert = activeAlert {
+                    switch alert {
+                    case .handleLink:
+                        navigationManager.openLink(handleLinkUrlString)
+                        handleLinkUrlString = ""
+                    case .goToSubreddit:
+                        navigationManager.path.append(AppNavigation.subredditDetails(subredditName: subredditName))
+                        subredditName = ""
+                    case .goToUser:
+                        navigationManager.path.append(AppNavigation.userDetails(username: username))
+                        username = ""
+                    }
+                }
+            }
+        )
+    }
+    
+    enum FieldType: Hashable {
+        case handleLink
+        case subredditName
+        case username
+    }
+}
+
+private enum ActiveAlert: Identifiable {
+    case handleLink, goToSubreddit, goToUser
+
+    var id: Int {
+        hashValue
+    }
+    
+    var title: String {
+        switch self {
+        case .handleLink: return "Handle Link"
+        case .goToSubreddit: return "Subreddit"
+        case .goToUser: return "Username"
+        }
     }
 }

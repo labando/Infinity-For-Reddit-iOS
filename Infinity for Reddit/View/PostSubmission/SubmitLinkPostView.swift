@@ -81,8 +81,7 @@ struct SubmitLinkPostView: View {
                                 fieldType: .url,
                                 focusedField: $focusedField
                             )
-                            .autocapitalization(.none)
-                            .disableAutocorrection(true)
+                            .urlTextField()
                             .padding(.horizontal, 16)
                             .padding(.top, 16)
                             
