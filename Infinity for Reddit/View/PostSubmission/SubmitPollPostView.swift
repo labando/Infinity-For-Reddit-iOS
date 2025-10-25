@@ -11,6 +11,7 @@ import PhotosUI
 struct SubmitPollPostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var snackbarManager: SnackbarManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @StateObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     @StateObject private var submitPollPostViewModel: SubmitPollPostViewModel
@@ -82,6 +83,61 @@ struct SubmitPollPostView: View {
                                 }
                             }
                             .padding(16)
+                            
+                            Divider()
+                            
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Voting Length: \(submitPollPostViewModel.votingLength) day\(submitPollPostViewModel.votingLength > 1 ? "s" : "")")
+                                        .font(.subheadline)
+                                        .secondaryText()
+                                        .padding(.horizontal, 16)
+                                
+                                Slider(
+                                    value: Binding(
+                                        get: { Double(submitPollPostViewModel.votingLength) },
+                                        set: { submitPollPostViewModel.votingLength = Int($0) }
+                                    ),
+                                    in: 1...7,
+                                    step: 1
+                                )
+                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
+                                .padding(.horizontal, 16)
+                            }
+                            .padding(.top, 16)
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                ForEach(0..<6, id: \.self) { index in
+                                    let placeholder = index < 2
+                                    ? "Option \(index + 1) (Required)"
+                                    : "Option \(index + 1)"
+                                    
+                                    CustomTextField(
+                                        placeholder,
+                                        text: Binding(
+                                            get: {
+                                                if submitPollPostViewModel.pollOptions.indices.contains(index) {
+                                                    return submitPollPostViewModel.pollOptions[index]
+                                                } else {
+                                                    return ""
+                                                }
+                                            },
+                                            set: { newValue in
+                                                while submitPollPostViewModel.pollOptions.count <= index {
+                                                    submitPollPostViewModel.pollOptions.append("")
+                                                }
+                                                submitPollPostViewModel.pollOptions[index] = newValue
+                                            }
+                                        ),
+                                        singleLine: true,
+                                        keyboardType: .default,
+                                        showBorder: false,
+                                        fieldType: .option(index),
+                                        focusedField: $focusedField
+                                    )
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 16)
+                                }
+                            }
                         }
                     }
                     
@@ -225,6 +281,7 @@ struct SubmitPollPostView: View {
     
     private enum FieldType: Hashable {
         case title
+        case option(Int)
     }
 }
 

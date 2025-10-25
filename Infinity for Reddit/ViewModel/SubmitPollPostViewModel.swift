@@ -19,6 +19,8 @@ class SubmitPollPostViewModel: ObservableObject {
     @Published var submitPostTask: Task<Void, Error>?
     @Published var submittedPostId: String?
     @Published var error: Error? = nil
+    @Published var pollOptions: [String] = []
+    @Published var votingLength: Int = 3
     
     private let submitPostRepository: SubmitPostRepositoryProtocol
     private let mediaUploadRepository: MediaUploadRepositoryProtocol
