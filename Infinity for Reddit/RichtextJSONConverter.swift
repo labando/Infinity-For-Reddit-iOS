@@ -120,10 +120,10 @@ class RichtextJSONConverter {
                 visitLink(destination: destination, inlineNodes: inlineNodes)
             case .image(let source, let inlineNodes):
                 visitImage(imageId: source, inlineNodes: inlineNodes)
-            case .superscript(let level, let inlineNodes):
-                break
-            case .spoiler(let inlineNodes):
-                break
+            case .superscript(_, let inlineNodes):
+                visitSuperscript(inlineNodes)
+            case .spoiler(_, let inlineNodes):
+                visitSpoiler(inlineNodes)
             }
         }
     }
@@ -427,99 +427,97 @@ class RichtextJSONConverter {
     }
     
     private func visitEmphasis(_ inlineNodes: [InlineNode]) {
-        if let firstChild = inlineNodes.first {
-            let formatArray = getFormatArray(initialFormatNum: Format.italics.rawValue, inlineNode: firstChild)
-            if let formatArray {
-                formats.append(formatArray)
-            }
+        let formats = getFormatArray(initialFormatNum: Format.italics.rawValue, inlineNodes: inlineNodes)
+        for format in formats {
+            self.formats.append(format)
         }
     }
     
     private func visitStrong(_ inlineNodes: [InlineNode]) {
-        if let firstChild = inlineNodes.first {
-            let formatArray = getFormatArray(initialFormatNum: Format.bold.rawValue, inlineNode: firstChild)
-            if let formatArray {
-                formats.append(formatArray)
-            }
+        let formats = getFormatArray(initialFormatNum: Format.bold.rawValue, inlineNodes: inlineNodes)
+        for format in formats {
+            self.formats.append(format)
         }
     }
     
     private func visitStrikethrough(_ inlineNodes: [InlineNode]) {
-        if let firstChild = inlineNodes.first {
-            let formatArray = getFormatArray(initialFormatNum: Format.strikethrough.rawValue, inlineNode: firstChild)
-            if let formatArray {
-                formats.append(formatArray)
-            }
+        let formats = getFormatArray(initialFormatNum: Format.strikethrough.rawValue, inlineNodes: inlineNodes)
+        for format in formats {
+            self.formats.append(format)
         }
     }
     
-    private func getFormatArray(initialFormatNum: Int, inlineNode: InlineNode) -> [Int]? {
-        var formatNum = initialFormatNum
-        var node: InlineNode? = inlineNode
-        while let temp = node {
-            switch temp {
-            case .text(let content):
-                let start = text.count
-                text.append(content)
-                
-                if formatNum > 0 {
-                    var format: [Int] = []
-                    format.append(formatNum)
-                    format.append(start)
-                    format.append(content.count)
-                    return format
+    private func getFormatArray(initialFormatNum: Int, inlineNodes: [InlineNode]) -> [[Int]] {
+        var formats: [[Int]] = []
+        for inlineNode in inlineNodes {
+            var formatNum = initialFormatNum
+            var node: InlineNode? = inlineNode
+            while let temp = node {
+                switch temp {
+                case .text(let content):
+                    let start = text.count
+                    text.append(content)
+                    
+                    if formatNum > 0 {
+                        var format: [Int] = []
+                        format.append(formatNum)
+                        format.append(start)
+                        format.append(content.count)
+                        formats.append(format)
+                    }
+                    node = nil
+                case .softBreak:
+                    node = nil
+                case .lineBreak:
+                    node = nil
+                case .code(let content):
+                    formatNum += Format.inlineCode.rawValue
+                    let start = text.count
+                    text.append(content)
+                    
+                    if formatNum > 0 {
+                        var format: [Int] = []
+                        format.append(formatNum)
+                        format.append(start)
+                        format.append(content.count)
+                        formats.append(format)
+                    }
+                    node = nil
+                case .html(let content):
+                    let start = text.count
+                    text.append(content)
+                    
+                    if formatNum > 0 {
+                        var format: [Int] = []
+                        format.append(formatNum)
+                        format.append(start)
+                        format.append(content.count)
+                        formats.append(format)
+                    }
+                    node = nil
+                case .emphasis(let children):
+                    formatNum += Format.italics.rawValue
+                    node = children.first
+                case .strong(let children):
+                    formatNum += Format.bold.rawValue
+                    node = children.first
+                case .strikethrough(let children):
+                    formatNum += Format.strikethrough.rawValue
+                    node = children.first
+                case .link(_, let children):
+                    node = children.first
+                case .image(_, let children):
+                    node = children.first
+                case .superscript(_, let children):
+                    formatNum += Format.superscript.rawValue
+                    node = children.first
+                case .spoiler:
+                    node = nil
                 }
-                node = nil
-            case .softBreak:
-                node = nil
-            case .lineBreak:
-                node = nil
-            case .code(let content):
-                formatNum += Format.inlineCode.rawValue
-                let start = text.count
-                text.append(content)
-                
-                if formatNum > 0 {
-                    var format: [Int] = []
-                    format.append(formatNum)
-                    format.append(start)
-                    format.append(content.count)
-                    return format
-                }
-                node = nil
-            case .html(let content):
-                let start = text.count
-                text.append(content)
-                
-                if formatNum > 0 {
-                    var format: [Int] = []
-                    format.append(formatNum)
-                    format.append(start)
-                    format.append(content.count)
-                    return format
-                }
-                node = nil
-            case .emphasis(let children):
-                formatNum += Format.italics.rawValue
-                node = children.first
-            case .strong(let children):
-                formatNum += Format.bold.rawValue
-                node = children.first
-            case .strikethrough(let children):
-                formatNum += Format.strikethrough.rawValue
-                node = children.first
-            case .link(let destination, let children):
-                node = children.first
-            case .image(let source, let children):
-                node = children.first
-            case .superscript(let level, let children):
-                break
-            case .spoiler(let children):
-                break
             }
         }
         
-        return nil
+        return formats
     }
     
     private func visitLink(destination: String, inlineNodes: [InlineNode]) {
@@ -595,13 +593,77 @@ class RichtextJSONConverter {
                 break
             case .image:
                 break
-            case .superscript(let level, let children):
-                break
-            case .spoiler(let children):
-                break
+            case .superscript(_, let inlineNodes):
+                return getImageCaption(currentCaption: caption, inlineNodes: inlineNodes)
+            case .spoiler(_, let inlineNodes):
+                return getImageCaption(currentCaption: caption, inlineNodes: inlineNodes)
             }
         }
         
         return caption
+    }
+    
+    private func visitSuperscript(_ inlineNodes: [InlineNode]) {
+        let formats = getFormatArray(initialFormatNum: Format.superscript.rawValue, inlineNodes: inlineNodes)
+        for format in formats {
+            self.formats.append(format)
+        }
+    }
+    
+    private func visitSpoiler(_ inlineNodes: [InlineNode]) {
+        var spoiler: JSON = JSON()
+        spoiler[TYPE].stringValue = Element.spoiler.rawValue
+        
+        contentStack.append([])
+        
+        visitInlineNodes(inlineNodes)
+        
+        var contentArray = contentStack.popLast() ?? []
+        
+        if !text.isEmpty {
+            var textContent: JSON = JSON()
+            textContent[TYPE].stringValue = Element.text.rawValue
+            textContent[TEXT].stringValue = text
+            
+            if !formats.isEmpty {
+                var requiredFormats: [[Int]] = []
+                for format in formats {
+                    requiredFormats.append(format)
+                }
+                textContent[FORMAT] = JSON(requiredFormats)
+            }
+            
+            contentArray.append(textContent)
+        }
+        
+        spoiler[CONTENT] = JSON(contentArray)
+        appendToContentStackLastItem(spoiler)
+        
+        formats.removeAll()
+        text.removeAll()
+    }
+    
+    private func getAllText(_ inlineNodes: [InlineNode]) -> String {
+        for inlineNode in inlineNodes {
+            var node = inlineNode
+            while let firstChild = node.children.first {
+                node = firstChild
+            }
+            
+            switch node {
+            case .text(let content):
+                text.append(content)
+            case .code(let content):
+                text.append(content)
+            case .html(let content):
+                text.append(content)
+            default:
+                break
+            }
+        }
+        
+        let allText = text
+        text.removeAll()
+        return allText
     }
 }
