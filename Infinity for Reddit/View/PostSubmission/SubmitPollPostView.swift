@@ -86,21 +86,20 @@ struct SubmitPollPostView: View {
                             
                             Divider()
                             
-                            VStack(alignment: .leading, spacing: 16) {
-                                Text("Voting Length: \(submitPollPostViewModel.votingLength) day\(submitPollPostViewModel.votingLength > 1 ? "s" : "")")
-                                        .font(.subheadline)
-                                        .secondaryText()
-                                        .padding(.horizontal, 16)
-                                
-                                Slider(
-                                    value: Binding(
-                                        get: { Double(submitPollPostViewModel.votingLength) },
-                                        set: { submitPollPostViewModel.votingLength = Int($0) }
-                                    ),
-                                    in: 1...7,
-                                    step: 1
-                                )
-                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
+                            Menu {
+                                ForEach(1..<7, id: \.self) { index in
+                                    Button(index == 1 ? "1 day" : "\(index) days") {
+                                        submitPollPostViewModel.votingDuration = index
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    RowText("Voting Duration: \(submitPollPostViewModel.votingDuration) \(submitPollPostViewModel.votingDuration > 1 ? "days" : "day")")
+                                        .primaryText()
+                                    
+                                    SwiftUI.Image(systemName: "chevron.down")
+                                        .primaryIcon()
+                                }
                                 .padding(.horizontal, 16)
                             }
                             .padding(.top, 16)

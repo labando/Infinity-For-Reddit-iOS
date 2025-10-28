@@ -20,7 +20,7 @@ class SubmitPollPostViewModel: ObservableObject {
     @Published var submittedPostId: String?
     @Published var error: Error? = nil
     @Published var pollOptions: [String] = []
-    @Published var votingLength: Int = 3
+    @Published var votingDuration: Int = 3
     
     private let submitPostRepository: SubmitPostRepositoryProtocol
     private let mediaUploadRepository: MediaUploadRepositoryProtocol

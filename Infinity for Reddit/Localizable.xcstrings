@@ -10,6 +10,9 @@
     "%@" : {
 
     },
+    "%lld days" : {
+
+    },
     "%lld/%lld" : {
       "localizations" : {
         "en" : {
@@ -21,6 +24,9 @@
       }
     },
     "%lld%%" : {
+
+    },
+    "1 day" : {
 
     },
     "About" : {
@@ -2203,16 +2209,6 @@
     },
     "Video downloaded" : {
 
-    },
-    "Voting Length: %lld day%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Voting Length: %1$lld day%2$@"
-          }
-        }
-      }
     },
     "Your interesting thoughts here" : {
 
