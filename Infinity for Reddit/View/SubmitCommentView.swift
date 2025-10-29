@@ -82,16 +82,9 @@ struct SubmitCommentView: View {
                                 submitCommentViewModel.selectedAccount = $0
                             }
                             
-                            ZStack(alignment: .topLeading) {
-                                MarkdownTextField(text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
-                                    .contentShape(Rectangle())
-                                
-                                if submitCommentViewModel.text.isEmpty {
-                                    Text("Your interesting thoughts here")
-                                        .secondaryText()
-                                }
-                            }
-                            .padding(16)
+                            MarkdownTextField(hint: "Your interesting thoughts here", text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
+                                .contentShape(Rectangle())
+                                .padding(16)
                         }
                     }
                     

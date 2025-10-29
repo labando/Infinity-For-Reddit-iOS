@@ -71,17 +71,10 @@ struct SubmitTextPostView: View {
                             )
                             .padding(.horizontal, 16)
                             .padding(.top, 16)
-                            
-                            ZStack(alignment: .topLeading) {
-                                MarkdownTextField(text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                    .contentShape(Rectangle())
-                                
-                                if submitTextPostViewModel.content.isEmpty {
-                                    Text("Content")
-                                        .secondaryText()
-                                }
-                            }
-                            .padding(16)
+
+                            MarkdownTextField(hint: "Content", text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                .contentShape(Rectangle())
+                                .padding(16)
                         }
                     }
                     

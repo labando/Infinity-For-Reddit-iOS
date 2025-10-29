@@ -7,7 +7,26 @@
 
 import SwiftUI
 
-struct MarkdownTextField: UIViewRepresentable {
+struct MarkdownTextField: View {
+    let hint: String
+    @Binding var text: String
+    @Binding var selectedRange: NSRange
+    @Binding var canFocus: Bool
+    
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            MarkdownUITextField(text: $text, selectedRange: $selectedRange, canFocus: $canFocus)
+                .contentShape(Rectangle())
+            
+            if text.isEmpty {
+                Text(hint)
+                    .secondaryText()
+            }
+        }
+    }
+}
+
+private struct MarkdownUITextField: UIViewRepresentable {
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     
     @Binding var text: String
@@ -30,9 +49,9 @@ struct MarkdownTextField: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, UITextViewDelegate {
-        var parent: MarkdownTextField
+        var parent: MarkdownUITextField
 
-        init(parent: MarkdownTextField) {
+        init(parent: MarkdownUITextField) {
             self.parent = parent
         }
         

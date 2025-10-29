@@ -84,17 +84,10 @@ struct SubmitLinkPostView: View {
                             .urlTextField()
                             .padding(.horizontal, 16)
                             .padding(.top, 16)
-                            
-                            ZStack(alignment: .topLeading) {
-                                MarkdownTextField(text: $submitLinkPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                    .contentShape(Rectangle())
-                                
-                                if submitLinkPostViewModel.content.isEmpty {
-                                    Text("Content")
-                                        .secondaryText()
-                                }
-                            }
-                            .padding(16)
+
+                            MarkdownTextField(hint: "Content", text: $submitLinkPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                .contentShape(Rectangle())
+                                .padding(16)
                         }
                     }
                     

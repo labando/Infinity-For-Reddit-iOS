@@ -73,16 +73,9 @@ struct SubmitPollPostView: View {
                             .padding(.horizontal, 16)
                             .padding(.top, 16)
                             
-                            ZStack(alignment: .topLeading) {
-                                MarkdownTextField(text: $submitPollPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                    .contentShape(Rectangle())
-                                
-                                if submitPollPostViewModel.content.isEmpty {
-                                    Text("Content")
-                                        .secondaryText()
-                                }
-                            }
-                            .padding(16)
+                            MarkdownTextField(hint: "Content", text: $submitPollPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                .contentShape(Rectangle())
+                                .padding(16)
                             
                             Divider()
                             

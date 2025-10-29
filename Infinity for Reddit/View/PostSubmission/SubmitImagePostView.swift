@@ -73,16 +73,9 @@ struct SubmitImagePostView: View {
                             .padding(.horizontal, 16)
                             .padding(.top, 16)
                             
-                            ZStack(alignment: .topLeading) {
-                                MarkdownTextField(text: $submitImagePostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                    .contentShape(Rectangle())
-                                
-                                if submitImagePostViewModel.content.isEmpty {
-                                    Text("Content")
-                                        .secondaryText()
-                                }
-                            }
-                            .padding(16)
+                            MarkdownTextField(hint: "Content", text: $submitImagePostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                .contentShape(Rectangle())
+                                .padding(16)
                             
                             if let previewImage = submitImagePostViewModel.image {
                                 VStack(spacing: 16) {
