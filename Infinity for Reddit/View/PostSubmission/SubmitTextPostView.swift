@@ -101,6 +101,7 @@ struct SubmitTextPostView: View {
             }
         }
         .frame(maxHeight: .infinity)
+        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Text Post")
         .toolbar {

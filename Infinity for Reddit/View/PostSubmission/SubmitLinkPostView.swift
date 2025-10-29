@@ -110,6 +110,7 @@ struct SubmitLinkPostView: View {
             }
         }
         .frame(maxHeight: .infinity)
+        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Link Post")
         .toolbar {

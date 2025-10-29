@@ -130,6 +130,7 @@ struct SubmitGalleryPostView: View {
             }
         }
         .frame(maxHeight: .infinity)
+        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Gallery Post")
         .toolbar {

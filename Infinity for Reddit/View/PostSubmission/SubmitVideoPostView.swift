@@ -129,6 +129,7 @@ struct SubmitVideoPostView: View {
         }
         .frame(maxHeight: .infinity)
         .themedNavigationBar()
+        .rootViewBackground()
         .addTitleToInlineNavigationBar("Video Post")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {

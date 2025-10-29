@@ -83,6 +83,7 @@ private struct MarkdownUITextField: UIViewRepresentable {
         textView.tintColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
+        textView.backgroundColor = .clear
         return textView
     }
 

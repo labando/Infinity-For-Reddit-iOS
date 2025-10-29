@@ -142,6 +142,7 @@ struct SubmitPollPostView: View {
             }
         }
         .frame(maxHeight: .infinity)
+        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Poll Post")
         .toolbar {

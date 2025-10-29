@@ -123,6 +123,7 @@ struct SubmitImagePostView: View {
             }
         }
         .frame(maxHeight: .infinity)
+        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Image Post")
         .toolbar {
