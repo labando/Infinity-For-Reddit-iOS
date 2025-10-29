@@ -42,6 +42,7 @@ struct SavedView: View {
                 .tag(1)
             }
         }
+        .tabViewStyle(.page(indexDisplayMode: .never))
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Saved")
         .id(accountViewModel.account.username)

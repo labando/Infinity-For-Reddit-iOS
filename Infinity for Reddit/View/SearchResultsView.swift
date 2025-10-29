@@ -17,7 +17,7 @@ struct SearchResultsView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             SegmentedPicker(selectedValue: $selectedOption, values: ["Posts", "Subreddits", "Users"])
                 .padding(4)
             
