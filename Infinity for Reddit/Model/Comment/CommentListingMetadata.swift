@@ -12,22 +12,20 @@ public struct CommentListingMetadata {
     var pathComponents: [String: String]
     var headers: HTTPHeaders?
     var queries: [String: String]?
-    var params: [String: String]?
     
     init(commentListingType: CommentListingType,
          pathComponents: [String: String] = [:],
          headers: HTTPHeaders? = nil,
-         queries: [String: String]? = nil,
-         params: [String: String]? = nil
+         queries: [String: String]? = nil
     ) {
         self.commentListingType = commentListingType
         self.pathComponents = pathComponents
         self.headers = headers
         self.queries = queries
-        self.params = pathComponents
     }
 }
 
 public enum CommentListingType: Codable {
     case user(username: String)
+    case userSaved
 }

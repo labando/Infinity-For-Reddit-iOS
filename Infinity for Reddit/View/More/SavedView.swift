@@ -10,23 +10,41 @@ import Swinject
 import GRDB
 
 struct SavedView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var accountViewModel: AccountViewModel
     
+    @State private var selectedOption = 0
+    
     var body: some View {
-        PostListingView(
-            account: accountViewModel.account,
-            postListingMetadata: PostListingMetadata(
-                postListingType: .user(username: accountViewModel.account.username, userWhere: .saved),
-                pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.saved.rawValue],
-                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                queries: nil,
-                params: nil
-            )
-        )
-        .id(accountViewModel.account.username)
+        VStack(spacing: 0) {
+            SegmentedPicker(selectedValue: $selectedOption, values: ["Posts", "Comments"])
+                .padding(4)
+            
+            TabView(selection: $selectedOption) {
+                PostListingView(
+                    account: accountViewModel.account,
+                    postListingMetadata: PostListingMetadata(
+                        postListingType: .user(username: accountViewModel.account.username, userWhere: .saved),
+                        pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.saved.rawValue],
+                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                        queries: nil,
+                        params: nil
+                    )
+                )
+                .tag(0)
+                
+                CommentListingView(
+                    commentListingMetadata: CommentListingMetadata(
+                        commentListingType:.userSaved,
+                        pathComponents: ["username": "\(accountViewModel.account.username)"],
+                        queries: nil
+                    )
+                )
+                .tag(1)
+            }
+        }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Saved")
+        .id(accountViewModel.account.username)
     }
 }
 

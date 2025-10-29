@@ -9,5 +9,5 @@ import Combine
 import Alamofire
 
 public protocol CommentListingRepositoryProtocol {
-    func fetchComments(commentListingType: CommentListingType, pathComponents: [String: String]?, queries: [String: String]?, params: [String: String]?) async throws -> CommentListing
+    func fetchComments(commentListingType: CommentListingType, pathComponents: [String: String], queries: [String: String]) async throws -> CommentListing
 }

@@ -27,14 +27,15 @@ public class CommentListingRepository: CommentListingRepositoryProtocol {
     
     public func fetchComments(
         commentListingType: CommentListingType,
-        pathComponents: [String: String]? = nil,
-        queries: [String: String]? = [:],
-        params: [String: String]? = [:]
+        pathComponents: [String: String],
+        queries: [String: String]
     ) async throws -> CommentListing {
         let apiRequest: URLRequestConvertible
         switch commentListingType {
         case .user:
-            apiRequest = RedditOAuthAPI.getUserComments(pathComponents: pathComponents!, queries: queries!)
+            apiRequest = RedditOAuthAPI.getUserComments(pathComponents: pathComponents, queries: queries)
+        case .userSaved:
+            apiRequest = RedditOAuthAPI.getUserSavedComments(pathComponents: pathComponents, queries: queries)
         }
         
         try Task.checkCancellation()

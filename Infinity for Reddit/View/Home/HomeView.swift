@@ -189,8 +189,6 @@ struct HomeView: View {
             }
             .id(accountViewModel.account.username)
             .onChange(of: selectedTab) { oldTab, newTab in
-                print("Tab selection changed to: \(newTab)")
-                
                 if newTab == .inbox {
                     homeViewModel.markInboxAsRead()
                 }

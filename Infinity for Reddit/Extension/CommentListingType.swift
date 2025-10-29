@@ -12,6 +12,9 @@ extension CommentListingType {
         switch self {
         case .user(let username):
             return SortTypeUserDetailsUtils.getUserComment(username: username)
+        case .userSaved:
+            // Shouldn't have a sort type
+            return SortType(type: .new, time: nil)
         }
     }
     
@@ -22,6 +25,8 @@ extension CommentListingType {
             if let time = sortType.time {
                 UserDefaults.sortType?.set(time.rawValue, forKey: SortTypeUserDetailsUtils.userCommentSortTimeKey + username)
             }
+        case .userSaved:
+            break
         }
     }
 }

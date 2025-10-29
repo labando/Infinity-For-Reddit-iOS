@@ -120,8 +120,7 @@ struct UserDetailsView: View {
                                 commentListingType:.user(username: userData.name),
                                 pathComponents: ["username": "\(userData.name)"],
                                 headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                                queries: nil,
-                                params: nil
+                                queries: nil
                             )
                         )
                         .id(accountViewModel.account.username)

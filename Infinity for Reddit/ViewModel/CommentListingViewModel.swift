@@ -70,11 +70,21 @@ public class CommentListingViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            let commentListing = try await commentListingRepository.fetchComments(
-                commentListingType: commentListingMetadata.commentListingType,
-                pathComponents: commentListingMetadata.pathComponents,
-                queries: ["sort": sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new }),
-                params: commentListingMetadata.params)
+            let commentListing: CommentListing
+            switch commentListingMetadata.commentListingType {
+            case .user(username: let username):
+                commentListing = try await commentListingRepository.fetchComments(
+                    commentListingType: commentListingMetadata.commentListingType,
+                    pathComponents: commentListingMetadata.pathComponents,
+                    queries: ["sort": sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new })
+                )
+            case .userSaved:
+                commentListing = try await commentListingRepository.fetchComments(
+                    commentListingType: commentListingMetadata.commentListingType,
+                    pathComponents: commentListingMetadata.pathComponents,
+                    queries: ["limit": "100", "after": after ?? ""].merging(commentListingMetadata.queries ?? [:], uniquingKeysWith: { _, new in new })
+                )
+            }
             
             try Task.checkCancellation()
             
