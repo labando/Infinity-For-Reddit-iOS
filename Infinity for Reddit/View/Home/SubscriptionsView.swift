@@ -29,30 +29,31 @@ struct SubscriptionsView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
-                .padding(4)
-            
-            TabView(selection: $selectedOption) {
-                if let customOnTapForSearchInThing = customOnTapForSearchInThing {
-                    SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
-                        customOnTapForSearchInThing(SearchInThing.subreddit(subscribedSubredditData))
-                    }
-                    .tag(0)
-                } else {
-                    SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
+        RootView {
+            VStack(spacing: 0) {
+                SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
+                    .padding(4)
+                
+                TabView(selection: $selectedOption) {
+                    if let customOnTapForSearchInThing = customOnTapForSearchInThing {
+                        SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel) { subscribedSubredditData in
+                            customOnTapForSearchInThing(SearchInThing.subreddit(subscribedSubredditData))
+                        }
                         .tag(0)
+                    } else {
+                        SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
+                            .tag(0)
+                    }
+                    
+                    UsersView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
+                        .tag(1)
+                    
+                    CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
+                        .tag(2)
                 }
-                
-                UsersView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
-                    .tag(1)
-                
-                CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
-                    .tag(2)
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .rootViewBackground()
         .task {
             await subscriptionListingViewModel.loadSubscriptionsOnline()
             await subscriptionListingViewModel.loadMyCustomFeedsOnline()

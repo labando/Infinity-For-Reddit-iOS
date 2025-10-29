@@ -28,23 +28,24 @@ struct AnonymousSubscriptionsView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
-                .padding(4)
-            
-            TabView(selection: $selectedOption) {
-                AnonymousSubredditsView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
-                    .tag(0)
+        RootView {
+            VStack(spacing: 0) {
+                SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
+                    .padding(4)
                 
-                AnonymousUsersView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
-                    .tag(1)
-                
-                AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
-                    .tag(2)
+                TabView(selection: $selectedOption) {
+                    AnonymousSubredditsView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
+                        .tag(0)
+                    
+                    AnonymousUsersView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel, customOnTapForSearchInThing: customOnTapForSearchInThing)
+                        .tag(1)
+                    
+                    AnonymousCustomFeedView(anonymousSubscriptionListingViewModel: anonymousSubscriptionListingViewModel)
+                        .tag(2)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .rootViewBackground()
     }
     
     struct AnonymousSubredditsView: View {

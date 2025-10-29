@@ -41,67 +41,68 @@ struct SubmitTextPostView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            UserPicker {
-                                submitTextPostViewModel.selectedAccount = $0
-                            }
-                            
-                            PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
-                                postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
-                            }
-                            
-                            Divider()
-                            
-                            PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
-                            
-                            Divider()
-                            
-                            CustomTextField(
-                                "Title",
-                                text: $submitTextPostViewModel.title,
-                                singleLine: true,
-                                keyboardType: .default,
-                                showBorder: false,
-                                fieldType: .title,
-                                focusedField: $focusedField
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
+        RootView {
+            VStack(spacing: 0) {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                UserPicker {
+                                    submitTextPostViewModel.selectedAccount = $0
+                                }
+                                
+                                PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
+                                    postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                }
+                                
+                                Divider()
+                                
+                                PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
+                                
+                                Divider()
+                                
+                                CustomTextField(
+                                    "Title",
+                                    text: $submitTextPostViewModel.title,
+                                    singleLine: true,
+                                    keyboardType: .default,
+                                    showBorder: false,
+                                    fieldType: .title,
+                                    focusedField: $focusedField
+                                )
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
 
-                            MarkdownTextField(hint: "Content", text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                .contentShape(Rectangle())
-                                .padding(16)
+                                MarkdownTextField(hint: "Content", text: $submitTextPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                    .contentShape(Rectangle())
+                                    .padding(16)
+                            }
                         }
+                        
+                        Spacer()
+                            .frame(height: markdownToolbarHeight)
                     }
                     
-                    Spacer()
-                        .frame(height: markdownToolbarHeight)                    
+                    MarkdownToolbar(
+                        text: $submitTextPostViewModel.content,
+                        selectedRange: $bodySelectedRange,
+                        toolbarHeight: $markdownToolbarHeight,
+                        focusedField: $markdownToolbarFocusedField,
+                        enableImageUpload: true,
+                        onImageUpload: {
+                            showEmbeddedImagesSheet = true
+                        }
+                    )
                 }
                 
-                MarkdownToolbar(
-                    text: $submitTextPostViewModel.content,
-                    selectedRange: $bodySelectedRange,
-                    toolbarHeight: $markdownToolbarHeight,
-                    focusedField: $markdownToolbarFocusedField,
-                    enableImageUpload: true,
-                    onImageUpload: {
-                        showEmbeddedImagesSheet = true
-                    }
-                )
-            }
-            
-            KeyboardToolbar {
-                contentTextViewCanFocus = false
-                markdownToolbarFocusedField = nil
-                focusedField = nil
+                KeyboardToolbar {
+                    contentTextViewCanFocus = false
+                    markdownToolbarFocusedField = nil
+                    focusedField = nil
+                }
             }
         }
         .frame(maxHeight: .infinity)
-        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Text Post")
         .toolbar {

@@ -15,104 +15,106 @@ struct SettingsView: View {
     @State private var selectedItem: Int? = nil
     
     var body: some View {
-        List {
-            PreferenceEntryWithBackground(title: "Notification", icon: "bell", top: true) {
-                navigationManager.path.append(SettingsViewNavigation.notification)
+        RootView {
+            List {
+                PreferenceEntryWithBackground(title: "Notification", icon: "bell", top: true) {
+                    navigationManager.path.append(SettingsViewNavigation.notification)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Interface", icon: "display") {
+                    navigationManager.path.append(SettingsViewNavigation.interface)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Theme", icon: "paintpalette") {
+                    navigationManager.path.append(SettingsViewNavigation.theme)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Video", icon: "video") {
+                    navigationManager.path.append(SettingsViewNavigation.video)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Gestures & Buttons", icon: "hand.point.up.left", bottom: true) {
+                    navigationManager.path.append(SettingsViewNavigation.gesturesAndButtons)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Security", icon: "lock.shield", top: true) {
+                    navigationManager.path.append(SettingsViewNavigation.security)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Data Saving Mode", icon: "dollarsign.bank.building") {
+                    navigationManager.path.append(SettingsViewNavigation.dataSavingMode)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Proxy", icon: "arrow.trianglehead.branch", bottom: true) {
+                    navigationManager.path.append(SettingsViewNavigation.proxy)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Post History", icon: "clock", top: true) {
+                    navigationManager.path.append(SettingsViewNavigation.postHistory)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Content Sensitivity Filter", icon: "figure.child.and.lock") {
+                    navigationManager.path.append(SettingsViewNavigation.contentSensitivityFilter)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Post Filter", icon: "line.3.horizontal.decrease.circle") {
+                    navigationManager.path.append(SettingsViewNavigation.postFilter)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Comment Filter", icon: "line.3.horizontal.decrease.circle", bottom: true) {
+                    navigationManager.path.append(SettingsViewNavigation.commentFilter)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Sort Type", icon: "arrow.up.arrow.down.circle", top: true) {
+                    navigationManager.path.append(SettingsViewNavigation.sortType)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Miscellaneous", icon: "gearshape.2") {
+                    navigationManager.path.append(SettingsViewNavigation.miscellaneous)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Advanced", icon: "wrench.and.screwdriver", bottom: true) {
+                    navigationManager.path.append(SettingsViewNavigation.advanced)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Manage Subscription", icon: "crown", top: true) {
+                    navigationManager.path.append(SettingsViewNavigation.manageSubscription)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "About", icon: "questionmark.circle") {
+                    navigationManager.path.append(SettingsViewNavigation.about)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Privacy Policy", icon: "hand.raised.circle") {
+                    navigationManager.openLink("https://docile-alligator.github.io/")
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntryWithBackground(title: "Reddit User Agreement", icon: "text.document", bottom: true) {
+                    navigationManager.openLink("https://www.redditinc.com/policies/user-agreement")
+                }
+                .listPlainItemNoInsets()
+                .padding(.bottom, 16)
             }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Interface", icon: "display") {
-                navigationManager.path.append(SettingsViewNavigation.interface)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Theme", icon: "paintpalette") {
-                navigationManager.path.append(SettingsViewNavigation.theme)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Video", icon: "video") {
-                navigationManager.path.append(SettingsViewNavigation.video)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Gestures & Buttons", icon: "hand.point.up.left", bottom: true) {
-                navigationManager.path.append(SettingsViewNavigation.gesturesAndButtons)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Security", icon: "lock.shield", top: true) {
-                navigationManager.path.append(SettingsViewNavigation.security)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Data Saving Mode", icon: "dollarsign.bank.building") {
-                navigationManager.path.append(SettingsViewNavigation.dataSavingMode)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Proxy", icon: "arrow.trianglehead.branch", bottom: true) {
-                navigationManager.path.append(SettingsViewNavigation.proxy)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Post History", icon: "clock", top: true) {
-                navigationManager.path.append(SettingsViewNavigation.postHistory)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Content Sensitivity Filter", icon: "figure.child.and.lock") {
-                navigationManager.path.append(SettingsViewNavigation.contentSensitivityFilter)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Post Filter", icon: "line.3.horizontal.decrease.circle") {
-                navigationManager.path.append(SettingsViewNavigation.postFilter)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Comment Filter", icon: "line.3.horizontal.decrease.circle", bottom: true) {
-                navigationManager.path.append(SettingsViewNavigation.commentFilter)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Sort Type", icon: "arrow.up.arrow.down.circle", top: true) {
-                navigationManager.path.append(SettingsViewNavigation.sortType)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Miscellaneous", icon: "gearshape.2") {
-                navigationManager.path.append(SettingsViewNavigation.miscellaneous)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Advanced", icon: "wrench.and.screwdriver", bottom: true) {
-                navigationManager.path.append(SettingsViewNavigation.advanced)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Manage Subscription", icon: "crown", top: true) {
-                navigationManager.path.append(SettingsViewNavigation.manageSubscription)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "About", icon: "questionmark.circle") {
-                navigationManager.path.append(SettingsViewNavigation.about)
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Privacy Policy", icon: "hand.raised.circle") {
-                navigationManager.openLink("https://docile-alligator.github.io/")
-            }
-            .listPlainItemNoInsets()
-            
-            PreferenceEntryWithBackground(title: "Reddit User Agreement", icon: "text.document", bottom: true) {
-                navigationManager.openLink("https://www.redditinc.com/policies/user-agreement")
-            }
-            .listPlainItemNoInsets()
-            .padding(.bottom, 16)
+            .themedList()
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Settings")
     }

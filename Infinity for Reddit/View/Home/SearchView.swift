@@ -27,126 +27,127 @@ struct SearchView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Search bar
-            HStack(spacing: 8) {
-                SwiftUI.Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                
-                CustomTextField("Search",
-                                text: $searchViewModel.query,
-                                singleLine: true,
-                                showBorder: false,
-                                fieldType: .search,
-                                focusedField: $focusedField)
-                .submitLabel(.search)
-                .onSubmit {
-                    if !accountViewModel.account.isAnonymous() {
-                        searchViewModel.saveSearchQuery()
-                    }
-                    if let onSearch = onSearchCustomAction {
-                        onSearch(searchViewModel.query)
-                    } else {
-                        navigationManager.path.append(
-                            AppNavigation.searchResults(
-                                query: searchViewModel.query,
-                                searchInSubredditOrUserName: searchViewModel.searchInSubredditOrUserName,
-                                searchInMultiReddit: searchViewModel.searchInCustomFeed,
-                                searchInThingType: searchViewModel.searchInThingType
-                            )
-                        )
-                    }
-                }
-            }
-            .padding(.horizontal, 12)
-            .background(Color(.systemGray5))
-            .cornerRadius(10)
-            .padding(16)
-            
-            if onSearchCustomAction == nil {
-                TouchRipple(action: {
-                    showSelectSearchInThingSheet = true
-                }) {
-                    HStack(spacing: 32) {
-                        Text("Search in")
-                            .colorAccentText()
-                        
-                        if let searchInThing = searchViewModel.searchInThing {
-                            RowText(searchInThing.displayName)
-                                .primaryText()
-                        } else {
-                            RowText("All subreddits")
-                                .primaryText()
+        RootView {
+            VStack(alignment: .leading, spacing: 0) {
+                // Search bar
+                HStack(spacing: 8) {
+                    SwiftUI.Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    
+                    CustomTextField("Search",
+                                    text: $searchViewModel.query,
+                                    singleLine: true,
+                                    showBorder: false,
+                                    fieldType: .search,
+                                    focusedField: $focusedField)
+                    .submitLabel(.search)
+                    .onSubmit {
+                        if !accountViewModel.account.isAnonymous() {
+                            searchViewModel.saveSearchQuery()
                         }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .contentShape(Rectangle())
-                }
-            }
-            
-            // Recent Searches Header
-            if !searchViewModel.recentSearchQueries.isEmpty {
-                HStack {
-                    Text("Recent Searches")
-                        .font(.headline)
-                    Spacer()
-                    Button("Clear All") {
-                        searchViewModel.clearAllRecentSearchQueries()
-                    }
-                    .font(.subheadline)
-                    .foregroundColor(.blue)
-                }
-                .padding(.horizontal, 16)
-            }
-            
-            // Recent search items
-            List {
-                ForEach(searchViewModel.recentSearchQueries, id: \.time) { search in
-                    TouchRipple(action: {
                         if let onSearch = onSearchCustomAction {
-                            onSearch(search.searchQuery)
+                            onSearch(searchViewModel.query)
                         } else {
-                            navigationManager.path.append(AppNavigation.searchResults(query: search.searchQuery, searchInSubredditOrUserName: search.searchInSubredditOrUserName, searchInMultiReddit: search.customFeedPath, searchInThingType: search.searchInThingType))
+                            navigationManager.path.append(
+                                AppNavigation.searchResults(
+                                    query: searchViewModel.query,
+                                    searchInSubredditOrUserName: searchViewModel.searchInSubredditOrUserName,
+                                    searchInMultiReddit: searchViewModel.searchInCustomFeed,
+                                    searchInThingType: searchViewModel.searchInThingType
+                                )
+                            )
                         }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .background(Color(.systemGray5))
+                .cornerRadius(10)
+                .padding(16)
+                
+                if onSearchCustomAction == nil {
+                    TouchRipple(action: {
+                        showSelectSearchInThingSheet = true
                     }) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(search.searchQuery)
-                                .primaryText()
+                        HStack(spacing: 32) {
+                            Text("Search in")
+                                .colorAccentText()
                             
-                            switch search.searchInThingType {
-                            case .all:
-                                Text("All subreddits")
-                                    .secondaryText()
-                            case .subreddit:
-                                Text("r/\(search.searchInSubredditOrUserName ?? "")")
-                                    .subreddit()
-                            case .user:
-                                Text("u/\(search.searchInSubredditOrUserName ?? "")")
-                                    .username()
-                            case .customFeed:
-                                Text(search.customFeedDisplayName ?? "")
-                                    .secondaryText()
+                            if let searchInThing = searchViewModel.searchInThing {
+                                RowText(searchInThing.displayName)
+                                    .primaryText()
+                            } else {
+                                RowText("All subreddits")
+                                    .primaryText()
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity)
                         .padding(16)
                         .contentShape(Rectangle())
-                        .swipeActions(edge: .trailing) {
-                            Button {
-                                searchViewModel.deleteSearchQuery(recentSearchQuery: search)
-                            } label: {
-                                Label("Read", systemImage: "trash")
-                            }
-                            .tint(.red)
-                        }
                     }
-                    .listPlainItemNoInsets()
                 }
+                
+                // Recent Searches Header
+                if !searchViewModel.recentSearchQueries.isEmpty {
+                    HStack {
+                        Text("Recent Searches")
+                            .font(.headline)
+                        Spacer()
+                        Button("Clear All") {
+                            searchViewModel.clearAllRecentSearchQueries()
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                    }
+                    .padding(.horizontal, 16)
+                }
+                
+                // Recent search items
+                List {
+                    ForEach(searchViewModel.recentSearchQueries, id: \.time) { search in
+                        TouchRipple(action: {
+                            if let onSearch = onSearchCustomAction {
+                                onSearch(search.searchQuery)
+                            } else {
+                                navigationManager.path.append(AppNavigation.searchResults(query: search.searchQuery, searchInSubredditOrUserName: search.searchInSubredditOrUserName, searchInMultiReddit: search.customFeedPath, searchInThingType: search.searchInThingType))
+                            }
+                        }) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(search.searchQuery)
+                                    .primaryText()
+                                
+                                switch search.searchInThingType {
+                                case .all:
+                                    Text("All subreddits")
+                                        .secondaryText()
+                                case .subreddit:
+                                    Text("r/\(search.searchInSubredditOrUserName ?? "")")
+                                        .subreddit()
+                                case .user:
+                                    Text("u/\(search.searchInSubredditOrUserName ?? "")")
+                                        .username()
+                                case .customFeed:
+                                    Text(search.customFeedDisplayName ?? "")
+                                        .secondaryText()
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(16)
+                            .contentShape(Rectangle())
+                            .swipeActions(edge: .trailing) {
+                                Button {
+                                    searchViewModel.deleteSearchQuery(recentSearchQuery: search)
+                                } label: {
+                                    Label("Read", systemImage: "trash")
+                                }
+                                .tint(.red)
+                            }
+                        }
+                        .listPlainItemNoInsets()
+                    }
+                }
+                .themedList()
             }
-            .themedList()
         }
-        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Search")
         .sheet(isPresented: $showSelectSearchInThingSheet) {

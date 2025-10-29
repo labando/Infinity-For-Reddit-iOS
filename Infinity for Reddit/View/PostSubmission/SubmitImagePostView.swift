@@ -42,88 +42,89 @@ struct SubmitImagePostView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            UserPicker {
-                                submitImagePostViewModel.selectedAccount = $0
-                            }
-                            
-                            PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
-                                postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
-                            }
-                            
-                            Divider()
-                            
-                            PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
-                            
-                            Divider()
-                            
-                            CustomTextField(
-                                "Title",
-                                text: $submitImagePostViewModel.title,
-                                singleLine: true,
-                                keyboardType: .default,
-                                showBorder: false,
-                                fieldType: .title,
-                                focusedField: $focusedField
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
-                            
-                            MarkdownTextField(hint: "Content", text: $submitImagePostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                .contentShape(Rectangle())
-                                .padding(16)
-                            
-                            if let previewImage = submitImagePostViewModel.image {
-                                VStack(spacing: 16) {
-                                    Button(action: {
-                                        submitImagePostViewModel.clearCapturedImage()
-                                    }) {
-                                        Text("Select again")
-                                            .colorAccentText()
-                                    }
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    
-                                    SwiftUI.Image(uiImage: previewImage)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .cornerRadius(8)
+        RootView {
+            VStack(spacing: 0) {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                UserPicker {
+                                    submitImagePostViewModel.selectedAccount = $0
                                 }
-                                .padding(.horizontal, 16)
-                            } else {
-                                SelectImageToolbar(
-                                    onCameraTap: { showCamera = true },
-                                    onPhotoPickerTap: { showPhotoPicker = true }
+                                
+                                PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
+                                    postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                }
+                                
+                                Divider()
+                                
+                                PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
+                                
+                                Divider()
+                                
+                                CustomTextField(
+                                    "Title",
+                                    text: $submitImagePostViewModel.title,
+                                    singleLine: true,
+                                    keyboardType: .default,
+                                    showBorder: false,
+                                    fieldType: .title,
+                                    focusedField: $focusedField
                                 )
-                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                                
+                                MarkdownTextField(hint: "Content", text: $submitImagePostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                    .contentShape(Rectangle())
+                                    .padding(16)
+                                
+                                if let previewImage = submitImagePostViewModel.image {
+                                    VStack(spacing: 16) {
+                                        Button(action: {
+                                            submitImagePostViewModel.clearCapturedImage()
+                                        }) {
+                                            Text("Select again")
+                                                .colorAccentText()
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        
+                                        SwiftUI.Image(uiImage: previewImage)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .cornerRadius(8)
+                                    }
+                                    .padding(.horizontal, 16)
+                                } else {
+                                    SelectImageToolbar(
+                                        onCameraTap: { showCamera = true },
+                                        onPhotoPickerTap: { showPhotoPicker = true }
+                                    )
+                                    .frame(maxWidth: .infinity)
+                                }
                             }
                         }
+                        
+                        Spacer()
+                            .frame(height: markdownToolbarHeight)
+                        
                     }
                     
-                    Spacer()
-                        .frame(height: markdownToolbarHeight)
-                    
+                    MarkdownToolbar(
+                        text: $submitImagePostViewModel.content,
+                        selectedRange: $bodySelectedRange,
+                        toolbarHeight: $markdownToolbarHeight,
+                        focusedField: $markdownToolbarFocusedField
+                    )
                 }
                 
-                MarkdownToolbar(
-                    text: $submitImagePostViewModel.content,
-                    selectedRange: $bodySelectedRange,
-                    toolbarHeight: $markdownToolbarHeight,
-                    focusedField: $markdownToolbarFocusedField
-                )
-            }
-            
-            KeyboardToolbar {
-                contentTextViewCanFocus = false
-                markdownToolbarFocusedField = nil
-                focusedField = nil
+                KeyboardToolbar {
+                    contentTextViewCanFocus = false
+                    markdownToolbarFocusedField = nil
+                    focusedField = nil
+                }
             }
         }
         .frame(maxHeight: .infinity)
-        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Image Post")
         .toolbar {

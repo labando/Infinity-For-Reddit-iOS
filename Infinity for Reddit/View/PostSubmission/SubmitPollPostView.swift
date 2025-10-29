@@ -42,107 +42,108 @@ struct SubmitPollPostView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            UserPicker {
-                                submitPollPostViewModel.selectedAccount = $0
-                            }
-                            
-                            PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
-                                postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
-                            }
-                            
-                            Divider()
-                            
-                            PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
-                            
-                            Divider()
-                            
-                            CustomTextField(
-                                "Title",
-                                text: $submitPollPostViewModel.title,
-                                singleLine: true,
-                                keyboardType: .default,
-                                showBorder: false,
-                                fieldType: .title,
-                                focusedField: $focusedField
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
-                            
-                            MarkdownTextField(hint: "Content", text: $submitPollPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                .contentShape(Rectangle())
-                                .padding(16)
-                            
-                            Divider()
-                            
-                            Menu {
-                                ForEach(1..<8, id: \.self) { index in
-                                    Button(index == 1 ? "1 day" : "\(index) days") {
-                                        submitPollPostViewModel.votingDuration = index
-                                    }
+        RootView {
+            VStack(spacing: 0) {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                UserPicker {
+                                    submitPollPostViewModel.selectedAccount = $0
                                 }
-                            } label: {
-                                HStack(spacing: 8) {
-                                    RowText("Voting Duration: \(submitPollPostViewModel.votingDuration) \(submitPollPostViewModel.votingDuration > 1 ? "days" : "day")")
-                                        .primaryText()
-                                    
-                                    SwiftUI.Image(systemName: "chevron.down")
-                                        .primaryIcon()
+                                
+                                PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
+                                    postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
                                 }
+                                
+                                Divider()
+                                
+                                PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
+                                
+                                Divider()
+                                
+                                CustomTextField(
+                                    "Title",
+                                    text: $submitPollPostViewModel.title,
+                                    singleLine: true,
+                                    keyboardType: .default,
+                                    showBorder: false,
+                                    fieldType: .title,
+                                    focusedField: $focusedField
+                                )
                                 .padding(.horizontal, 16)
-                            }
-                            .padding(.top, 16)
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                ForEach(0..<6, id: \.self) { index in
-                                    let placeholder = index < 2
-                                    ? "Option \(index + 1) (Required)"
-                                    : "Option \(index + 1)"
-                                    
-                                    CustomTextField(
-                                        placeholder,
-                                        text: $submitPollPostViewModel.pollOptions[index],
-                                        singleLine: true,
-                                        keyboardType: .default,
-                                        showBorder: false,
-                                        fieldType: .option(index),
-                                        focusedField: $focusedField
-                                    )
+                                .padding(.top, 16)
+                                
+                                MarkdownTextField(hint: "Content", text: $submitPollPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                    .contentShape(Rectangle())
+                                    .padding(16)
+                                
+                                Divider()
+                                
+                                Menu {
+                                    ForEach(1..<8, id: \.self) { index in
+                                        Button(index == 1 ? "1 day" : "\(index) days") {
+                                            submitPollPostViewModel.votingDuration = index
+                                        }
+                                    }
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        RowText("Voting Duration: \(submitPollPostViewModel.votingDuration) \(submitPollPostViewModel.votingDuration > 1 ? "days" : "day")")
+                                            .primaryText()
+                                        
+                                        SwiftUI.Image(systemName: "chevron.down")
+                                            .primaryIcon()
+                                    }
                                     .padding(.horizontal, 16)
-                                    .padding(.top, 16)
+                                }
+                                .padding(.top, 16)
+                                
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ForEach(0..<6, id: \.self) { index in
+                                        let placeholder = index < 2
+                                        ? "Option \(index + 1) (Required)"
+                                        : "Option \(index + 1)"
+                                        
+                                        CustomTextField(
+                                            placeholder,
+                                            text: $submitPollPostViewModel.pollOptions[index],
+                                            singleLine: true,
+                                            keyboardType: .default,
+                                            showBorder: false,
+                                            fieldType: .option(index),
+                                            focusedField: $focusedField
+                                        )
+                                        .padding(.horizontal, 16)
+                                        .padding(.top, 16)
+                                    }
                                 }
                             }
                         }
+                        
+                        Spacer()
+                            .frame(height: markdownToolbarHeight)
                     }
                     
-                    Spacer()
-                        .frame(height: markdownToolbarHeight)
+                    MarkdownToolbar(
+                        text: $submitPollPostViewModel.content,
+                        selectedRange: $bodySelectedRange,
+                        toolbarHeight: $markdownToolbarHeight,
+                        focusedField: $markdownToolbarFocusedField,
+                        enableImageUpload: true,
+                        onImageUpload: {
+                            showEmbeddedImagesSheet = true
+                        }
+                    )
                 }
                 
-                MarkdownToolbar(
-                    text: $submitPollPostViewModel.content,
-                    selectedRange: $bodySelectedRange,
-                    toolbarHeight: $markdownToolbarHeight,
-                    focusedField: $markdownToolbarFocusedField,
-                    enableImageUpload: true,
-                    onImageUpload: {
-                        showEmbeddedImagesSheet = true
-                    }
-                )
-            }
-            
-            KeyboardToolbar {
-                contentTextViewCanFocus = false
-                markdownToolbarFocusedField = nil
-                focusedField = nil
+                KeyboardToolbar {
+                    contentTextViewCanFocus = false
+                    markdownToolbarFocusedField = nil
+                    focusedField = nil
+                }
             }
         }
         .frame(maxHeight: .infinity)
-        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Poll Post")
         .toolbar {

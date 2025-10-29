@@ -43,93 +43,94 @@ struct SubmitVideoPostView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            UserPicker {
-                                submitVideoPostViewModel.selectedAccount = $0
-                            }
-                            
-                            PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
-                                postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
-                            }
-                            
-                            Divider()
-                            
-                            PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
-                            
-                            Divider()
-                            
-                            CustomTextField(
-                                "Title",
-                                text: $submitVideoPostViewModel.title,
-                                singleLine: true,
-                                keyboardType: .default,
-                                showBorder: false,
-                                fieldType: .title,
-                                focusedField: $focusedField
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
-
-                            MarkdownTextField(hint: "Content", text: $submitVideoPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                .contentShape(Rectangle())
-                                .padding(16)
-                            
-                            if let videoURL = submitVideoPostViewModel.videoURL {
-                                VStack (spacing: 16) {
-                                    Button(action: {
-                                        submitVideoPostViewModel.clearVideo()
-                                    }) {
-                                        Text("Select again")
-                                            .colorAccentText()
-                                    }
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    
-                                    InlineVideoPlayer(videoURL: videoURL, aspectRatio: nil, muteVideo: true)
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 400)
-                                        .cornerRadius(8)
+        RootView {
+            VStack(spacing: 0) {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                UserPicker {
+                                    submitVideoPostViewModel.selectedAccount = $0
                                 }
+                                
+                                PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
+                                    postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                }
+                                
+                                Divider()
+                                
+                                PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
+                                
+                                Divider()
+                                
+                                CustomTextField(
+                                    "Title",
+                                    text: $submitVideoPostViewModel.title,
+                                    singleLine: true,
+                                    keyboardType: .default,
+                                    showBorder: false,
+                                    fieldType: .title,
+                                    focusedField: $focusedField
+                                )
                                 .padding(.horizontal, 16)
-                            } else {
-                                if submitVideoPostViewModel.processingVideoTask == nil {
-                                    SelectVideoToolbar(
-                                        onCameraTap: { showCamera = true },
-                                        onPhotoPickerTap: { showVideoPicker = true }
-                                    )
-                                    .frame(maxWidth: .infinity)
+                                .padding(.top, 16)
+
+                                MarkdownTextField(hint: "Content", text: $submitVideoPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                    .contentShape(Rectangle())
+                                    .padding(16)
+                                
+                                if let videoURL = submitVideoPostViewModel.videoURL {
+                                    VStack (spacing: 16) {
+                                        Button(action: {
+                                            submitVideoPostViewModel.clearVideo()
+                                        }) {
+                                            Text("Select again")
+                                                .colorAccentText()
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        
+                                        InlineVideoPlayer(videoURL: videoURL, aspectRatio: nil, muteVideo: true)
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 400)
+                                            .cornerRadius(8)
+                                    }
+                                    .padding(.horizontal, 16)
                                 } else {
-                                    ProgressIndicator()
-                                        .padding(.top, 100)
+                                    if submitVideoPostViewModel.processingVideoTask == nil {
+                                        SelectVideoToolbar(
+                                            onCameraTap: { showCamera = true },
+                                            onPhotoPickerTap: { showVideoPicker = true }
+                                        )
+                                        .frame(maxWidth: .infinity)
+                                    } else {
+                                        ProgressIndicator()
+                                            .padding(.top, 100)
+                                    }
                                 }
                             }
                         }
+                        
+                        Spacer()
+                            .frame(height: markdownToolbarHeight)
                     }
                     
-                    Spacer()
-                        .frame(height: markdownToolbarHeight)
+                    MarkdownToolbar(
+                        text: $submitVideoPostViewModel.content,
+                        selectedRange: $bodySelectedRange,
+                        toolbarHeight: $markdownToolbarHeight,
+                        focusedField: $markdownToolbarFocusedField
+                    )
                 }
                 
-                MarkdownToolbar(
-                    text: $submitVideoPostViewModel.content,
-                    selectedRange: $bodySelectedRange,
-                    toolbarHeight: $markdownToolbarHeight,
-                    focusedField: $markdownToolbarFocusedField
-                )
-            }
-            
-            KeyboardToolbar {
-                contentTextViewCanFocus = false
-                markdownToolbarFocusedField = nil
-                focusedField = nil
+                KeyboardToolbar {
+                    contentTextViewCanFocus = false
+                    markdownToolbarFocusedField = nil
+                    focusedField = nil
+                }
             }
         }
         .frame(maxHeight: .infinity)
         .themedNavigationBar()
-        .rootViewBackground()
         .addTitleToInlineNavigationBar("Video Post")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {

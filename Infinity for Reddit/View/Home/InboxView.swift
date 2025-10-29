@@ -22,22 +22,23 @@ struct InboxView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            SegmentedPicker(selectedValue: $selectedOption, values: ["Notifications", "Messages"])
-                .padding(4)
-            
-            TabView(selection: $selectedOption) {
-                InboxListingView(account: account, messageWhere: MessageWhere.inbox)
-                    .tag(0)
+        RootView {
+            VStack(spacing: 0) {
+                SegmentedPicker(selectedValue: $selectedOption, values: ["Notifications", "Messages"])
+                    .padding(4)
                 
-                InboxListingView(account: account, messageWhere: MessageWhere.messages)
-                    .tag(1)
+                TabView(selection: $selectedOption) {
+                    InboxListingView(account: account, messageWhere: MessageWhere.inbox)
+                        .tag(0)
+                    
+                    InboxListingView(account: account, messageWhere: MessageWhere.messages)
+                        .tag(1)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                
+                Spacer()
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            
-            Spacer()
         }
-        .rootViewBackground()
         .onAppear {
             applyPendingRouteIfAny()
         }

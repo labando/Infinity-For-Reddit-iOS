@@ -81,7 +81,7 @@ struct PostListingView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if postListingViewModel.posts.isEmpty {
                 ZStack {
                     if postListingViewModel.isInitialLoading || postListingViewModel.isInitialLoad {
@@ -150,7 +150,6 @@ struct PostListingView: View {
                 }
             }
         }
-        .rootViewBackground()
         .applyIf(handleToolbarMenu) {
             $0.toolbar {
                 NavigationBarMenu()

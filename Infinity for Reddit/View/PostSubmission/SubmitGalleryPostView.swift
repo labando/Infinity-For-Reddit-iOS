@@ -45,92 +45,93 @@ struct SubmitGalleryPostView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            UserPicker {
-                                submitGalleryPostViewModel.selectedAccount = $0
-                            }
-                            
-                            PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
-                                postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
-                            }
-                            
-                            Divider()
-                            
-                            PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
-                            
-                            Divider()
-                            
-                            CustomTextField(
-                                "Title",
-                                text: $submitGalleryPostViewModel.title,
-                                singleLine: true,
-                                keyboardType: .default,
-                                showBorder: false,
-                                fieldType: .title,
-                                focusedField: $focusedField
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
-                            
-                            MarkdownTextField(hint: "Content", text: $submitGalleryPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                .contentShape(Rectangle())
-                                .padding(16)
-                            
-                            if !submitGalleryPostViewModel.galleryImages.isEmpty {
-                                GalleryGridView(
-                                    galleryImages: submitGalleryPostViewModel.galleryImages,
-                                    onSelectImage: {
+        RootView {
+            VStack(spacing: 0) {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                UserPicker {
+                                    submitGalleryPostViewModel.selectedAccount = $0
+                                }
+                                
+                                PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
+                                    postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                }
+                                
+                                Divider()
+                                
+                                PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
+                                
+                                Divider()
+                                
+                                CustomTextField(
+                                    "Title",
+                                    text: $submitGalleryPostViewModel.title,
+                                    singleLine: true,
+                                    keyboardType: .default,
+                                    showBorder: false,
+                                    fieldType: .title,
+                                    focusedField: $focusedField
+                                )
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                                
+                                MarkdownTextField(hint: "Content", text: $submitGalleryPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                    .contentShape(Rectangle())
+                                    .padding(16)
+                                
+                                if !submitGalleryPostViewModel.galleryImages.isEmpty {
+                                    GalleryGridView(
+                                        galleryImages: submitGalleryPostViewModel.galleryImages,
+                                        onSelectImage: {
+                                            showPhotoPicker = true
+                                        }, onCaptureImage: {
+                                            showCamera = true
+                                        },
+                                        onSetCaptionAndUrl: { index in
+                                            selectedImageIndex = index
+                                            caption = submitGalleryPostViewModel.galleryImages[index].caption ?? ""
+                                            outboundUrlString = submitGalleryPostViewModel.galleryImages[index].outboundUrlString ?? ""
+                                            showCaptionAndURLAlert = true
+                                        },
+                                        onDeleteImage: { index in
+                                            submitGalleryPostViewModel.deleteCapturedImage(at: index)
+                                        }
+                                    )
+                                    .padding(.horizontal, 16)
+                                } else {
+                                    AddMediaButton(onSelectImage: {
                                         showPhotoPicker = true
                                     }, onCaptureImage: {
                                         showCamera = true
-                                    },
-                                    onSetCaptionAndUrl: { index in
-                                        selectedImageIndex = index
-                                        caption = submitGalleryPostViewModel.galleryImages[index].caption ?? ""
-                                        outboundUrlString = submitGalleryPostViewModel.galleryImages[index].outboundUrlString ?? ""
-                                        showCaptionAndURLAlert = true
-                                    },
-                                    onDeleteImage: { index in
-                                        submitGalleryPostViewModel.deleteCapturedImage(at: index)
-                                    }
-                                )
-                                .padding(.horizontal, 16)
-                            } else {
-                                AddMediaButton(onSelectImage: {
-                                    showPhotoPicker = true
-                                }, onCaptureImage: {
-                                    showCamera = true
-                                })
-                                .frame(maxWidth: .infinity)
+                                    })
+                                    .frame(maxWidth: .infinity)
+                                }
                             }
                         }
+                        
+                        Spacer()
+                            .frame(height: markdownToolbarHeight)
+                        
                     }
                     
-                    Spacer()
-                        .frame(height: markdownToolbarHeight)
-                    
+                    MarkdownToolbar(
+                        text: $submitGalleryPostViewModel.content,
+                        selectedRange: $bodySelectedRange,
+                        toolbarHeight: $markdownToolbarHeight,
+                        focusedField: $markdownToolbarFocusedField
+                    )
                 }
                 
-                MarkdownToolbar(
-                    text: $submitGalleryPostViewModel.content,
-                    selectedRange: $bodySelectedRange,
-                    toolbarHeight: $markdownToolbarHeight,
-                    focusedField: $markdownToolbarFocusedField
-                )
-            }
-            
-            KeyboardToolbar {
-                contentTextViewCanFocus = false
-                markdownToolbarFocusedField = nil
-                focusedField = nil
+                KeyboardToolbar {
+                    contentTextViewCanFocus = false
+                    markdownToolbarFocusedField = nil
+                    focusedField = nil
+                }
             }
         }
         .frame(maxHeight: .infinity)
-        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Gallery Post")
         .toolbar {

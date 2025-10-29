@@ -21,91 +21,92 @@ struct MoreView: View {
     @FocusState private var focusedField: FieldType?
     
     var body: some View {
-        List {
-            CustomListSection("Reddit") {
-                SimpleTouchItemRow(text: "Popular", icon: "flame") {
-                    navigationManager.path.append(MoreViewNavigation.popular)
-                }
-                .listPlainItemNoInsets()
-                
-                SimpleTouchItemRow(text: "All", icon: "globe") {
-                    navigationManager.path.append(MoreViewNavigation.all)
-                }
-                .listPlainItemNoInsets()
-                
-                if !accountViewModel.account.isAnonymous() {
-                    SimpleTouchItemRow(text: "Search", icon: "magnifyingglass") {
-                        navigationManager.path.append(AppNavigation.search)
-                    }
-                    .listPlainItemNoInsets()
-                }
-                
-                SimpleTouchItemRow(text: "Handle Link", icon: "link") {
-                    activeAlert = .handleLink
-                }
-                .listPlainItemNoInsets()
-                
-                SimpleTouchItemRow(text: "Go to Subreddit", icon: "bubble.left.and.text.bubble.right") {
-                    activeAlert = .goToSubreddit
-                }
-                .listPlainItemNoInsets()
-                
-                SimpleTouchItemRow(text: "Go to User", icon: "person.crop.circle") {
-                    activeAlert = .goToUser
-                }
-                .listPlainItemNoInsets()
-            }
-            
-            CustomListSection("Account") {
-                if !accountViewModel.account.isAnonymous() {
-                    SimpleTouchItemRow(text: "Profile", icon: "person.crop.circle") {
-                        navigationManager.path.append(MoreViewNavigation.profile)
-                    }
-                    .listPlainItemNoInsets()
-                }
-                
-                if !accountViewModel.account.isAnonymous() {
-                    SimpleTouchItemRow(text: "Upvoted", icon:"arrowshape.up") {
-                        navigationManager.path.append(MoreViewNavigation.upvoted)
+        RootView {
+            List {
+                CustomListSection("Reddit") {
+                    SimpleTouchItemRow(text: "Popular", icon: "flame") {
+                        navigationManager.path.append(MoreViewNavigation.popular)
                     }
                     .listPlainItemNoInsets()
                     
-                    SimpleTouchItemRow(text: "Downvoted", icon: "arrowshape.down") {
-                        navigationManager.path.append(MoreViewNavigation.downvoted)
+                    SimpleTouchItemRow(text: "All", icon: "globe") {
+                        navigationManager.path.append(MoreViewNavigation.all)
                     }
                     .listPlainItemNoInsets()
                     
-                    SimpleTouchItemRow(text: "Hidden", icon: "eye.slash") {
-                        navigationManager.path.append(MoreViewNavigation.hidden)
+                    if !accountViewModel.account.isAnonymous() {
+                        SimpleTouchItemRow(text: "Search", icon: "magnifyingglass") {
+                            navigationManager.path.append(AppNavigation.search)
+                        }
+                        .listPlainItemNoInsets()
+                    }
+                    
+                    SimpleTouchItemRow(text: "Handle Link", icon: "link") {
+                        activeAlert = .handleLink
                     }
                     .listPlainItemNoInsets()
                     
-                    SimpleTouchItemRow(text: "Saved", icon: "bookmark.fill") {
-                        navigationManager.path.append(MoreViewNavigation.saved)
+                    SimpleTouchItemRow(text: "Go to Subreddit", icon: "bubble.left.and.text.bubble.right") {
+                        activeAlert = .goToSubreddit
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    SimpleTouchItemRow(text: "Go to User", icon: "person.crop.circle") {
+                        activeAlert = .goToUser
                     }
                     .listPlainItemNoInsets()
                 }
                 
-                SimpleTouchItemRow(text: "History", icon: "clock") {
-                    navigationManager.path.append(MoreViewNavigation.history)
+                CustomListSection("Account") {
+                    if !accountViewModel.account.isAnonymous() {
+                        SimpleTouchItemRow(text: "Profile", icon: "person.crop.circle") {
+                            navigationManager.path.append(MoreViewNavigation.profile)
+                        }
+                        .listPlainItemNoInsets()
+                    }
+                    
+                    if !accountViewModel.account.isAnonymous() {
+                        SimpleTouchItemRow(text: "Upvoted", icon:"arrowshape.up") {
+                            navigationManager.path.append(MoreViewNavigation.upvoted)
+                        }
+                        .listPlainItemNoInsets()
+                        
+                        SimpleTouchItemRow(text: "Downvoted", icon: "arrowshape.down") {
+                            navigationManager.path.append(MoreViewNavigation.downvoted)
+                        }
+                        .listPlainItemNoInsets()
+                        
+                        SimpleTouchItemRow(text: "Hidden", icon: "eye.slash") {
+                            navigationManager.path.append(MoreViewNavigation.hidden)
+                        }
+                        .listPlainItemNoInsets()
+                        
+                        SimpleTouchItemRow(text: "Saved", icon: "bookmark.fill") {
+                            navigationManager.path.append(MoreViewNavigation.saved)
+                        }
+                        .listPlainItemNoInsets()
+                    }
+                    
+                    SimpleTouchItemRow(text: "History", icon: "clock") {
+                        navigationManager.path.append(MoreViewNavigation.history)
+                    }
+                    .listPlainItemNoInsets()
                 }
-                .listPlainItemNoInsets()
-            }
-            
-            CustomListSection("Preferences") {
-                SimpleTouchItemRow(text: "Settings", icon: "gearshape") {
-                    navigationManager.path.append(MoreViewNavigation.settings)
-                }
-                .listPlainItemNoInsets()
                 
-                SimpleTouchItemRow(text: "Test", icon: "testtube.2") {
-                    navigationManager.path.append(MoreViewNavigation.test)
+                CustomListSection("Preferences") {
+                    SimpleTouchItemRow(text: "Settings", icon: "gearshape") {
+                        navigationManager.path.append(MoreViewNavigation.settings)
+                    }
+                    .listPlainItemNoInsets()
+                    
+                    SimpleTouchItemRow(text: "Test", icon: "testtube.2") {
+                        navigationManager.path.append(MoreViewNavigation.test)
+                    }
+                    .listPlainItemNoInsets()
                 }
-                .listPlainItemNoInsets()
             }
+            .themedList()
         }
-        .themedList()
-        .rootViewBackground()
         .overlay(
             CustomAlert(title: activeAlert?.title ?? "", isPresented: Binding(
                 get: { activeAlert != nil },

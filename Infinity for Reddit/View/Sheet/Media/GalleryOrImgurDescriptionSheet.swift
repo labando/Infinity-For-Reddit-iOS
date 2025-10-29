@@ -31,7 +31,6 @@ struct GalleryOrImgurDescriptionSheet: View {
             }
             .padding(16)
         }
-        .rootViewBackground()
     }
 }
 

@@ -34,83 +34,84 @@ struct SubmitLinkPostView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            UserPicker {
-                                submitLinkPostViewModel.selectedAccount = $0
-                            }
-                            
-                            PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
-                                postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
-                            }
-                            
-                            Divider()
-                            
-                            PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
-                            
-                            Divider()
-                            
-                            HStack {
+        RootView {
+            VStack(spacing: 0) {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                UserPicker {
+                                    submitLinkPostViewModel.selectedAccount = $0
+                                }
+                                
+                                PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
+                                    postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                }
+                                
+                                Divider()
+                                
+                                PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
+                                
+                                Divider()
+                                
+                                HStack {
+                                    CustomTextField(
+                                        "Title",
+                                        text: $submitLinkPostViewModel.title,
+                                        singleLine: true,
+                                        keyboardType: .default,
+                                        showBorder: false,
+                                        fieldType: .title,
+                                        focusedField: $focusedField
+                                    )
+                                    
+                                    Button("Suggest Title") {
+                                        submitLinkPostViewModel.suggestTitle()
+                                    }
+                                    .filledButton()
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                                
                                 CustomTextField(
-                                    "Title",
-                                    text: $submitLinkPostViewModel.title,
+                                    "URL",
+                                    text: $submitLinkPostViewModel.urlString,
                                     singleLine: true,
-                                    keyboardType: .default,
+                                    keyboardType: .URL,
                                     showBorder: false,
-                                    fieldType: .title,
+                                    fieldType: .url,
                                     focusedField: $focusedField
                                 )
-                                
-                                Button("Suggest Title") {
-                                    submitLinkPostViewModel.suggestTitle()
-                                }
-                                .filledButton()
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
-                            
-                            CustomTextField(
-                                "URL",
-                                text: $submitLinkPostViewModel.urlString,
-                                singleLine: true,
-                                keyboardType: .URL,
-                                showBorder: false,
-                                fieldType: .url,
-                                focusedField: $focusedField
-                            )
-                            .urlTextField()
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
+                                .urlTextField()
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
 
-                            MarkdownTextField(hint: "Content", text: $submitLinkPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
-                                .contentShape(Rectangle())
-                                .padding(16)
+                                MarkdownTextField(hint: "Content", text: $submitLinkPostViewModel.content, selectedRange: $bodySelectedRange, canFocus: $contentTextViewCanFocus)
+                                    .contentShape(Rectangle())
+                                    .padding(16)
+                            }
                         }
+                        
+                        Spacer().frame(height: markdownToolbarHeight)
+                        
                     }
                     
-                    Spacer().frame(height: markdownToolbarHeight)
-                    
+                    MarkdownToolbar(
+                        text: $submitLinkPostViewModel.content,
+                        selectedRange: $bodySelectedRange,
+                        toolbarHeight: $markdownToolbarHeight,
+                        focusedField: $markdownToolbarFocusedField
+                    )
                 }
                 
-                MarkdownToolbar(
-                    text: $submitLinkPostViewModel.content,
-                    selectedRange: $bodySelectedRange,
-                    toolbarHeight: $markdownToolbarHeight,
-                    focusedField: $markdownToolbarFocusedField
-                )
-            }
-            
-            KeyboardToolbar {
-                contentTextViewCanFocus = false
-                markdownToolbarFocusedField = nil
-                focusedField = nil
+                KeyboardToolbar {
+                    contentTextViewCanFocus = false
+                    markdownToolbarFocusedField = nil
+                    focusedField = nil
+                }
             }
         }
         .frame(maxHeight: .infinity)
-        .rootViewBackground()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Link Post")
         .toolbar {
