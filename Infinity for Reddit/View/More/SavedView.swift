@@ -28,7 +28,8 @@ struct SavedView: View {
                         headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                         queries: nil,
                         params: nil
-                    )
+                    ),
+                    handleToolbarMenu: false
                 )
                 .tag(0)
                 
@@ -46,6 +47,9 @@ struct SavedView: View {
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Saved")
         .id(accountViewModel.account.username)
+        .toolbar {
+            NavigationBarMenu()
+        }
     }
 }
 

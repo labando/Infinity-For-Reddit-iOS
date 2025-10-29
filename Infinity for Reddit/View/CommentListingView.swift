@@ -23,7 +23,10 @@ struct CommentListingView: View {
     @State private var upcomingSortTypeKind: SortType.Kind?
     @State private var navigationBarMenuKey: UUID?
     
+    private let commentListingMetadata: CommentListingMetadata
+    
     init(commentListingMetadata: CommentListingMetadata) {
+        self.commentListingMetadata = commentListingMetadata
         _commentListingViewModel = StateObject(
             wrappedValue: CommentListingViewModel(
                 commentListingMetadata: commentListingMetadata,
@@ -82,15 +85,26 @@ struct CommentListingView: View {
             if let key = navigationBarMenuKey {
                 navigationBarMenuManager.pop(key: key)
             }
-            navigationBarMenuKey = navigationBarMenuManager.push([
-                NavigationBarMenuItem(title: "Refresh") {
-                    commentListingViewModel.refreshComments()
-                },
-                
-                NavigationBarMenuItem(title: "Sort") {
-                    showSortTypeKindSheet = true
-                }
-            ])
+            let menu: [NavigationBarMenuItem]
+            switch commentListingMetadata.commentListingType {
+            case .user:
+                menu = [
+                    NavigationBarMenuItem(title: "Refresh") {
+                        commentListingViewModel.refreshComments()
+                    },
+                    
+                    NavigationBarMenuItem(title: "Sort") {
+                        showSortTypeKindSheet = true
+                    }
+                ]
+            case .userSaved:
+                menu = [
+                    NavigationBarMenuItem(title: "Refresh") {
+                        commentListingViewModel.refreshComments()
+                    }
+                ]
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push(menu)
         }
         .onDisappear {
             guard let navigationBarMenuKey else { return }
