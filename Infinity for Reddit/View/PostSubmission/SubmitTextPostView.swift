@@ -141,52 +141,12 @@ struct SubmitTextPostView: View {
             }, onInsertImage: { uploadedImage, caption in
                 showEmbeddedImagesSheet = false
                 
-                guard let range = Range(bodySelectedRange, in: submitTextPostViewModel.content) else {
-                    return
-                }
-                
-                let beforeRange = submitTextPostViewModel.content[..<range.lowerBound]
-                let afterRange = submitTextPostViewModel.content[range.upperBound...]
-
-                let leftCount = min(2, beforeRange.count)
-                let leftStart = beforeRange.index(beforeRange.endIndex, offsetBy: -leftCount)
-                let leftSlice = beforeRange[leftStart..<beforeRange.endIndex]
-
-                let leftNewlines: Int
-                if leftSlice.allSatisfy({ $0 == "\n" || $0.isWhitespace }) {
-                    leftNewlines = leftSlice.isEmpty ? 2 : leftSlice.filter { $0 == "\n" }.count
-                } else if leftSlice.hasSuffix("\n") {
-                    leftNewlines = 1
-                } else {
-                    leftNewlines = 0
-                }
-
-                let rightCount = min(2, afterRange.count)
-                let rightEnd = afterRange.index(afterRange.startIndex, offsetBy: rightCount)
-                let rightSlice = afterRange[afterRange.startIndex..<rightEnd]
-
-                let rightNewlines: Int
-                if rightSlice.allSatisfy({ $0 == "\n" || $0.isWhitespace }) {
-                    rightNewlines = rightSlice.isEmpty ? 2 : rightSlice.filter { $0 == "\n" }.count
-                } else if rightSlice.hasPrefix("\n") {
-                    rightNewlines = 1
-                } else {
-                    rightNewlines = 0
-                }
-                
-                let imageSyntax = "\(String(repeating: "\n", count: max(0, 2 - leftNewlines)))![\(caption)](\(uploadedImage.imageId ?? ""))\(String(repeating: "\n", count: max(0, 2 - rightNewlines)))"
-                
-                let newText: String
-                if bodySelectedRange.length > 0 {
-                    newText = submitTextPostViewModel.content.replacingCharacters(in: range, with: imageSyntax)
-                    bodySelectedRange = NSRange(location: bodySelectedRange.location,
-                                            length: imageSyntax.count)
-                } else {
-                    newText = submitTextPostViewModel.content.inserting(imageSyntax, at: bodySelectedRange.location)
-                    bodySelectedRange = NSRange(location: bodySelectedRange.location + imageSyntax.count,
-                                            length: 0)
-                }
-                submitTextPostViewModel.content = newText
+                MarkdownUtils.insertImageOrGifIntoMarkdownString(
+                    content: &submitTextPostViewModel.content,
+                    selectedRange: &bodySelectedRange,
+                    caption: caption,
+                    imageOrGifId: uploadedImage.imageId ?? ""
+                )
             })
         }
         .photosPicker(
