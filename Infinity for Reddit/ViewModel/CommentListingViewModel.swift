@@ -12,7 +12,7 @@ import IdentifiedCollections
 
 public class CommentListingViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var comments: [Comment] = []
+    @Published var comments: IdentifiedArrayOf<Comment> = []
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
     @Published var isLoadingMore: Bool = false
@@ -187,5 +187,12 @@ public class CommentListingViewModel: ObservableObject {
             loadCommentsTaskId = UUID()
             commentListingMetadata.commentListingType.saveSortType(sortType: sortType)
         }
+    }
+    
+    func editComment(_ comment: Comment, commentToBeEdited: Comment) {
+        guard let index = self.comments.firstIndex(where: { $0.id == commentToBeEdited.id }) else { return }
+        self.comments[index].bodyProcessedMarkdown = comment.bodyProcessedMarkdown
+        self.comments[index].body = comment.body
+        self.comments[index].edited = true
     }
 }

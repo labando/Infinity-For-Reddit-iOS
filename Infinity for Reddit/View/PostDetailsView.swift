@@ -14,7 +14,6 @@ struct PostDetailsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject var playerManager = PlayerManager()
@@ -201,9 +200,6 @@ struct PostDetailsView: View {
             .refreshable {
                 await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
             }
-        }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
         }
         .onChange(of: commentSubmissionShareableViewModel.submittedComment) {
             if let sentComment = commentSubmissionShareableViewModel.submittedComment {

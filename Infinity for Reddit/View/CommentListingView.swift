@@ -16,12 +16,14 @@ struct CommentListingView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
     
     @StateObject var commentListingViewModel: CommentListingViewModel
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var upcomingSortTypeKind: SortType.Kind?
     @State private var navigationBarMenuKey: UUID?
+    @State private var commentToBeEdited: Comment? = nil
     
     private let commentListingMetadata: CommentListingMetadata
     
@@ -46,23 +48,23 @@ struct CommentListingView: View {
             } else {
                 List {
                     ForEach(commentListingViewModel.comments, id: \.id) { comment in
-                        TouchRipple {
+                        TouchRipple(action: {
+                            navigationManager.path.append(
+                                AppNavigation.postDetailsWithId(postId: String(comment.linkId.dropFirst(3)), commentId: comment.id)
+                            )
+                        }) {
                             CommentViewCard(
                                 account: accountViewModel.account,
                                 comment: comment,
                                 isInPostDetails: false,
                                 onEdit: {
-                                    
+                                    self.commentToBeEdited = comment
+                                    navigationManager.path.append(AppNavigation.editComment(commentToBeEdited: comment))
                                 },
                                 onDelete: {
                                     
                                 }
                             )
-                            .onTapGesture {
-                                navigationManager.path.append(
-                                    AppNavigation.postDetailsWithId(postId: String(comment.linkId.dropFirst(3)), commentId: comment.id)
-                                )
-                            }
                         }
                         .listPlainItemNoInsets()
                         .id(comment.id)
@@ -87,6 +89,15 @@ struct CommentListingView: View {
             await commentListingViewModel.refreshCommentsWithContinuation()
         }
         .listStyle(.plain)
+        .onChange(of: commentSubmissionShareableViewModel.editedComment) {
+            if let editedComment = commentSubmissionShareableViewModel.editedComment {
+                if let commentToBeEdited = self.commentToBeEdited {
+                    commentListingViewModel.editComment(editedComment, commentToBeEdited: commentToBeEdited)
+                }
+                commentSubmissionShareableViewModel.editedComment = nil
+                commentToBeEdited = nil
+            }
+        }
         .onAppear {
             if let key = navigationBarMenuKey {
                 navigationBarMenuManager.pop(key: key)

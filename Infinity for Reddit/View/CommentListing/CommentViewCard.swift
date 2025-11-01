@@ -178,29 +178,29 @@ struct CommentViewCard: View {
                             
                             Spacer()
                             
-                            Menu {
-                                ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
-                                    Text("Share")
-                                }
-                                
-                                if accountViewModel.account.username == commentViewModel.comment.author {
-                                    Button("Edit") {
-                                        onEdit()
+                            if commentViewModel.comment.depth < showFewerToolbarOptionsThreshold && isInPostDetails {
+                                Menu {
+                                    ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
+                                        Text("Share")
                                     }
                                     
-                                    Button("Delete") {
-                                        onDelete()
+                                    if accountViewModel.account.username == commentViewModel.comment.author {
+                                        Button("Edit") {
+                                            onEdit()
+                                        }
+                                        
+                                        Button("Delete") {
+                                            onDelete()
+                                        }
                                     }
+                                } label: {
+                                    SwiftUI.Image(systemName: "ellipsis.circle")
+                                        .commentIconTemplateRendering()
+                                        .commentIcon()
                                 }
-                            } label: {
-                                SwiftUI.Image(systemName: "ellipsis.circle")
-                                    .commentIconTemplateRendering()
-                                    .commentIcon()
-                            }
-                            .padding(8)
-                            .excludeFromTouchRipple()
-                            
-                            if commentViewModel.comment.depth < showFewerToolbarOptionsThreshold && isInPostDetails {
+                                .padding(8)
+                                .excludeFromTouchRipple()
+                                
                                 if let onToggleExpand, commentViewModel.comment.hasReplies {
                                     Button(action: {
                                         onToggleExpand()
@@ -229,15 +229,6 @@ struct CommentViewCard: View {
                                 .buttonStyle(.borderless)
                                 .padding(8)
                                 .contentShape(Rectangle())
-                                
-//                                ShareLink(item: "https://reddit.com" + commentViewModel.comment.permalink) {
-//                                    SwiftUI.Image(systemName: "square.and.arrow.up")
-//                                        .commentIconTemplateRendering()
-//                                        .commentIcon()
-//                                }
-//                                .buttonStyle(.borderless)
-//                                .padding(8)
-//                                .contentShape(Rectangle())
                                 
                                 if isInPostDetails {
                                     Button(action: {

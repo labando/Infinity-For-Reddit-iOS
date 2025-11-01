@@ -46,6 +46,7 @@ struct CustomNavigationStack<Content: View>: View {
                     case .userDetails(let username):
                         UserDetailsView(username: username)
                             .environmentObject(navigationManager)
+                            .environmentObject(commentSubmissionShareableViewModel)
                     case .search:
                         SearchView()
                             .environmentObject(navigationManager)
@@ -130,6 +131,7 @@ struct CustomNavigationStack<Content: View>: View {
                     case .saved:
                         SavedView()
                             .environmentObject(navigationManager)
+                            .environmentObject(commentSubmissionShareableViewModel)
                     case .settings:
                         SettingsView()
                             .environmentObject(navigationManager)

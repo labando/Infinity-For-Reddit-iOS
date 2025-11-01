@@ -474,7 +474,7 @@ public class PostDetailsViewModel: ObservableObject {
     public func loadIcon(comment: Comment) {
         guard comment.authorIconUrl == nil else { return }
         
-        let startIndex = visibleComments.firstIndex(where: { $0.id == comment.id }) ?? 0
+        let startIndex = visibleComments.index(id: comment.id) ?? 0
         let commentBatch = Array(
             visibleComments[startIndex..<min(visibleComments.count, startIndex + UserProfileImageBatchLoader.batchSize)]
         ).compactMap { item -> Comment? in
@@ -530,8 +530,8 @@ public class PostDetailsViewModel: ObservableObject {
             guard post.id == self.post?.id else { return }
             self.visibleComments.insert(.comment(comment), at: 0)
         case .comment(parentComment: let parentComment):
-            guard let visibleIndex = self.visibleComments.firstIndex(where: { $0.id == parentComment.id }) else { return }
-            guard let allIndex = self.allComments.firstIndex(where: { $0.id == parentComment.id }) else { return }
+            guard let visibleIndex = self.visibleComments.index(id: parentComment.id) else { return }
+            guard let allIndex = self.allComments.index(id: parentComment.id) else { return }
             switch visibleComments[visibleIndex] {
             case .comment(let parentComment):
                 if let replies = parentComment.replies {
@@ -552,7 +552,7 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     func editComment(_ comment: Comment, commentToBeEdited: Comment) {
-        guard let allIndex = self.allComments.firstIndex(where: { $0.id == commentToBeEdited.id }) else { return }
+        guard let allIndex = self.allComments.index(id: commentToBeEdited.id) else { return }
         switch allComments[allIndex] {
         case .comment(let oldComment):
             oldComment.bodyProcessedMarkdown = comment.bodyProcessedMarkdown
