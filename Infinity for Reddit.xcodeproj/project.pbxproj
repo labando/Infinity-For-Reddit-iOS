@@ -43,9 +43,22 @@
 		559BD24F2CF7D58600621685 /* Infinity for RedditUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Infinity for RedditUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		55C1D5EB2EB806D000C8AF67 /* Exceptions for "Infinity for Reddit" folder in "Infinity for Reddit" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Repository/Untitled.swift,
+			);
+			target = 559BD2322CF7D58500621685 /* Infinity for Reddit */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		559BD2352CF7D58500621685 /* Infinity for Reddit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				55C1D5EB2EB806D000C8AF67 /* Exceptions for "Infinity for Reddit" folder in "Infinity for Reddit" target */,
+			);
 			path = "Infinity for Reddit";
 			sourceTree = "<group>";
 		};

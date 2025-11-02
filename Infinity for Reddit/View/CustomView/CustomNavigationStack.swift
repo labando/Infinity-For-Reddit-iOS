@@ -12,6 +12,7 @@ struct CustomNavigationStack<Content: View>: View {
     
     @StateObject private var navigationManager: NavigationManager
     @StateObject var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel = CommentSubmissionShareableViewModel()
+    @StateObject var postEditingShareableViewModel: PostEditingShareableViewModel = PostEditingShareableViewModel()
     
     let content: () -> Content
     
@@ -32,6 +33,7 @@ struct CustomNavigationStack<Content: View>: View {
                         PostDetailsView(account: self.accountViewModel.account, postDetailsInput: postDetailsInput, isFromSubredditPostListing: isFromSubredditPostListing)
                             .environmentObject(navigationManager)
                             .environmentObject(commentSubmissionShareableViewModel)
+                            .environmentObject(postEditingShareableViewModel)
                     case .postDetailsWithId(let postId, let commentId, let isContinueThread):
                         PostDetailsView(account: self.accountViewModel.account,
                                         postDetailsInput: PostDetailsInput.postAndCommentId(postId: postId, commentId: commentId),
@@ -40,6 +42,7 @@ struct CustomNavigationStack<Content: View>: View {
                         )
                         .environmentObject(navigationManager)
                         .environmentObject(commentSubmissionShareableViewModel)
+                        .environmentObject(postEditingShareableViewModel)
                     case .subredditDetails(let subredditName):
                         SubredditDetailsView(subredditName: subredditName)
                             .environmentObject(navigationManager)
@@ -103,6 +106,10 @@ struct CustomNavigationStack<Content: View>: View {
                             postFilter: postFilter
                         )
                         .environmentObject(navigationManager)
+                    case .editPost(let post):
+                        EditPostView(postToBeEdited: post)
+                            .environmentObject(navigationManager)
+                            .environmentObject(postEditingShareableViewModel)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

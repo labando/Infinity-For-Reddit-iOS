@@ -103,7 +103,7 @@ struct PostListingView: View {
                             }, onSensitiveClicked: {
                                 onSensitiveClicked(post: post)
                             })
-                            //.id(post.id)
+                            .id(ObjectIdentifier(post))
                             .listPlainItemNoInsets()
                             .onAppear {
                                 if post.subredditOrUserIcon == nil {

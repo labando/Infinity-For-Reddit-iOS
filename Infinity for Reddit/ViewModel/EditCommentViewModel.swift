@@ -16,7 +16,7 @@ class EditCommentViewModel: ObservableObject {
     @Published var embeddedImages: [UploadedImage] = []
     @Published var giphyGifId: String?
     @Published var editCommentTask: Task<Void, Error>?
-    @Published var editedCommentResponse: EditCommentResponse?
+    @Published var editCommentResponse: EditCommentResponse?
     @Published var error: Error? = nil
     
     let commentToBeEdited: Comment
@@ -61,11 +61,11 @@ class EditCommentViewModel: ObservableObject {
             return
         }
         
-        editedCommentResponse = nil
+        editCommentResponse = nil
         
         editCommentTask = Task {
             do {
-                editedCommentResponse = try await editCommentRepository.editComment(
+                editCommentResponse = try await editCommentRepository.editComment(
                     content: text,
                     commentFullname: commentToBeEdited.name,
                     mediaMetadataDictionary: commentToBeEdited.mediaMetadata,

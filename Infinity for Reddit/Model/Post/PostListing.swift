@@ -153,6 +153,18 @@ public class Post : NSObject, ObservableObject, Identifiable {
         return "\(subreddit ?? "Unknown")-\(name ?? "id")"
     }
     
+    var canEditBody: Bool {
+        guard let postType else {
+            return false
+        }
+        switch postType {
+        case .text:
+            return true
+        default:
+            return !selftext.isEmpty
+        }
+    }
+    
     enum PostType: Equatable {
         case text
         case image
