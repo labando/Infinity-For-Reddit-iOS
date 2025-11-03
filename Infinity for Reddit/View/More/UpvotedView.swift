@@ -14,16 +14,24 @@ struct UpvotedView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     
     var body: some View {
-        PostListingView(
-            account: accountViewModel.account,
-            postListingMetadata: PostListingMetadata(
-                postListingType: .user(username: accountViewModel.account.username, userWhere: .upvoted),
-                pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.upvoted.rawValue],
-                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                queries: nil,
-                params: nil
-            )
-        )
+        Group {
+            if accountViewModel.account.isAnonymous() {
+                HistoryPostListingView(account: accountViewModel.account, historyPostListingMetadata: HistoryPostListingMetadata(
+                    historyPostListingType: .upvoted
+                ))
+            } else {
+                PostListingView(
+                    account: accountViewModel.account,
+                    postListingMetadata: PostListingMetadata(
+                        postListingType: .user(username: accountViewModel.account.username, userWhere: .upvoted),
+                        pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.upvoted.rawValue],
+                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                        queries: nil,
+                        params: nil
+                    )
+                )
+            }
+        }
         .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Upvoted")

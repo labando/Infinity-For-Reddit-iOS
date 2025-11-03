@@ -14,16 +14,24 @@ struct DownvotedView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     
     var body: some View {
-        PostListingView(
-            account: accountViewModel.account,
-            postListingMetadata: PostListingMetadata(
-                postListingType: .user(username: accountViewModel.account.username, userWhere: .downvoted),
-                pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.downvoted.rawValue],
-                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                queries: nil,
-                params: nil
-            )
-        )
+        Group {
+            if accountViewModel.account.isAnonymous() {
+                HistoryPostListingView(account: accountViewModel.account, historyPostListingMetadata: HistoryPostListingMetadata(
+                    historyPostListingType: .downvoted
+                ))
+            } else {
+                PostListingView(
+                    account: accountViewModel.account,
+                    postListingMetadata: PostListingMetadata(
+                        postListingType: .user(username: accountViewModel.account.username, userWhere: .downvoted),
+                        pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.downvoted.rawValue],
+                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                        queries: nil,
+                        params: nil
+                    )
+                )
+            }
+        }
         .id(accountViewModel.account.username)
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Downvoted")
