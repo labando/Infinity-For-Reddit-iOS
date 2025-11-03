@@ -100,9 +100,23 @@ struct CustomNavigationStack<Content: View>: View {
                             ))
                         }
                         .environmentObject(navigationManager)
+                    case .filterHistoryPosts(let historyPostListingMetadata):
+                        CustomizePostFilterView(PostFilter()) { postFilter in
+                            navigationManager.replaceCurrentScreen(AppNavigation.filteredHistoryPosts(
+                                historyPostListingMetadata: historyPostListingMetadata,
+                                postFilter: postFilter
+                            ))
+                        }
+                        .environmentObject(navigationManager)
                     case .filteredPosts(let postListingMetadata, let postFilter):
                         FilteredPostsView(
                             postListingMetadata: postListingMetadata,
+                            postFilter: postFilter
+                        )
+                        .environmentObject(navigationManager)
+                    case .filteredHistoryPosts(let historyPostListingMetadata, let postFilter):
+                        FilteredHistoryPostsView(
+                            historyPostListingMetadata: historyPostListingMetadata,
                             postFilter: postFilter
                         )
                         .environmentObject(navigationManager)

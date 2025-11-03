@@ -62,9 +62,9 @@ struct HistoryPostListingView: View {
                 List {
                     ForEach(historyPostListingViewModel.posts, id: \.id) { post in
                         PostViewCard(account: account, post: post, isSubredditPostListing: false, onPostTypeClicked: {
-                            //onPostTypeClicked(post: post)
+                            onPostTypeClicked(post: post)
                         }, onSensitiveClicked: {
-                            //onSensitiveClicked(post: post)
+                            onSensitiveClicked(post: post)
                         })
                         .id(ObjectIdentifier(post))
                         .listPlainItemNoInsets()
@@ -113,15 +113,15 @@ struct HistoryPostListingView: View {
                 }
             ]
             
-//            if showFilterPostsOption {
-//                options.append(NavigationBarMenuItem(title: "Filter Posts") {
-//                    navigationManager.path.append(
-//                        AppNavigation.filterPosts(
-//                            historyPostListingMetadata: historyPostListingMetadata
-//                        )
-//                    )
-//                })
-//            }
+            if showFilterPostsOption {
+                options.append(NavigationBarMenuItem(title: "Filter Posts") {
+                    navigationManager.path.append(
+                        AppNavigation.filterHistoryPosts(
+                            historyPostListingMetadata: historyPostListingMetadata
+                        )
+                    )
+                })
+            }
             
             navigationBarMenuKey = navigationBarMenuManager.push(options)
         }
@@ -141,27 +141,27 @@ struct HistoryPostListingView: View {
         .environment(\.postListingVideoManager, postListingVideoManager)
     }
     
-//    private func onPostTypeClicked(post: Post) {
-//        if showFilterPostsOption {
-//            navigationManager.path.append(
-//                AppNavigation.filteredPosts(
-//                    historyPostListingMetadata: historyPostListingMetadata,
-//                    postFilter: PostFilter.constructPostFilter(postType: post.postType)
-//                )
-//            )
-//        }
-//    }
-//    
-//    private func onSensitiveClicked(post: Post) {
-//        if showFilterPostsOption {
-//            var postFilter = PostFilter()
-//            postFilter.onlySensitive = true
-//            navigationManager.path.append(
-//                AppNavigation.filteredPosts(
-//                    historyPostListingMetadata: historyPostListingMetadata,
-//                    postFilter: postFilter
-//                )
-//            )
-//        }
-//    }
+    private func onPostTypeClicked(post: Post) {
+        if showFilterPostsOption {
+            navigationManager.path.append(
+                AppNavigation.filteredHistoryPosts(
+                    historyPostListingMetadata: historyPostListingMetadata,
+                    postFilter: PostFilter.constructPostFilter(postType: post.postType)
+                )
+            )
+        }
+    }
+    
+    private func onSensitiveClicked(post: Post) {
+        if showFilterPostsOption {
+            var postFilter = PostFilter()
+            postFilter.onlySensitive = true
+            navigationManager.path.append(
+                AppNavigation.filteredHistoryPosts(
+                    historyPostListingMetadata: historyPostListingMetadata,
+                    postFilter: postFilter
+                )
+            )
+        }
+    }
 }
