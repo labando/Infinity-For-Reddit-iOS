@@ -222,7 +222,7 @@ public class HistoryPostListingViewModel: ObservableObject {
         before = nil
         hasMorePages = true
         if refreshPostsContinuation == nil {
-            posts = []
+            posts.removeAll()
         }
     }
     
