@@ -40,8 +40,18 @@ public class PostDetailsViewModel: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     
-    enum PostDetailsViewModelError: Error {
+    enum PostDetailsViewModelError: LocalizedError {
         case postFetchError
+        case postNotLoadedError
+        
+        var errorDescription: String? {
+            switch self {
+            case .postFetchError:
+                return "Failed to fetch post."
+            case .postNotLoadedError:
+                return "Post not loaded."
+            }
+        }
     }
     
     // MARK: - Initializer
@@ -607,6 +617,31 @@ public class PostDetailsViewModel: ObservableObject {
             post.selftextProcessedMarkdown = newPost.selftextProcessedMarkdown
             post.mediaMetadata = newPost.mediaMetadata
             post.edited = true
+        }
+    }
+    
+    func deletePost() {
+        guard let post else {
+            self.error = PostDetailsViewModelError.postNotLoadedError
+            return
+        }
+        
+        Task {
+            do {
+                try await postDetailsRepository.deletePost(post)
+                
+                await MainActor.run {
+                    self.post?.author = "[deleted]"
+                    self.post?.selftext = "[deleted]"
+                    self.post?.selftextProcessedMarkdown = MarkdownContent("[deleted]")
+                    self.post?.mediaMetadata = nil
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                }
+                print(error)
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         case NetworkError(String)
         case JSONDecodingError(String)
         case commentIdNotFound
+        case postIdNotFound
         
         var errorDescription: String? {
             switch self {
@@ -25,6 +26,8 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
                 return message
             case .commentIdNotFound:
                 return "Comment ID not found"
+            case .postIdNotFound:
+                return "Post ID not found"
             }
         }
     }
@@ -208,6 +211,20 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
     public func deleteComment(_ comment: Comment) async throws {
         guard let name = comment.name else {
             throw PostDetailsRepositoryError.commentIdNotFound
+        }
+        let params = ["id": name]
+        
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(RedditOAuthAPI.deletePostOrComment(params: params))
+            .validate()
+            .serializingDecodable(Empty.self, automaticallyCancelling: true)
+            .value
+    }
+    
+    public func deletePost(_ post: Post) async throws {
+        guard let name = post.name else {
+            throw PostDetailsRepositoryError.postIdNotFound
         }
         let params = ["id": name]
         

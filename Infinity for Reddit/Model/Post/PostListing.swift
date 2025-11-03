@@ -60,7 +60,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var approvedAtUtc : String!
     var approvedBy : String!
     var archived : Bool!
-    var author : String!
+    @Published var author : String!
     var authorFlairRichtext : [FlairRichtext]! = [FlairRichtext]()
     var authorFlairText : String!
     var authorFlairType : String!

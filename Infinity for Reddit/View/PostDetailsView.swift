@@ -24,6 +24,7 @@ struct PostDetailsView: View {
     @State private var navigationBarMenuKey: UUID?
     @State private var sentCommentParent: CommentParent? = nil
     @State private var commentToBeEdited: Comment? = nil
+    @State private var activeAlert: ActiveAlert? = nil
     
     @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceComment)
     private var fullyCollapseComment: Bool = false
@@ -255,6 +256,26 @@ struct PostDetailsView: View {
             }
             .presentationDetents([.medium, .large])
         }
+        .overlay(
+            CustomAlert(title: activeAlert?.title ?? "",
+                        confirmButtonText: activeAlert?.confirmButtonText ?? "",
+                        buttonStyle: activeAlert?.buttonStyle ?? .info,
+                        isPresented: Binding(
+                            get: { activeAlert != nil },
+                            set: { newValue in
+                                if !newValue {
+                                    activeAlert = nil
+                                }
+                            }
+                        )) {} onConfirm: {
+                            if let alert = activeAlert {
+                                switch alert {
+                                case .deletePost:
+                                    postDetailsViewModel.deletePost()
+                                }
+                            }
+                        }
+        )
     }
     
     private func setUpMenu() {
@@ -283,7 +304,9 @@ struct PostDetailsView: View {
                     },
                     
                     NavigationBarMenuItem(title: "Delete post") {
-                        
+                        withAnimation(.linear(duration: 0.2)) {
+                            activeAlert = .deletePost
+                        }
                     }
                 ]
             } else {
@@ -301,7 +324,9 @@ struct PostDetailsView: View {
                     },
                     
                     NavigationBarMenuItem(title: "Delete post") {
-                        
+                        withAnimation(.linear(duration: 0.2)) {
+                            activeAlert = .deletePost
+                        }
                     }
                 ]
             }
@@ -335,6 +360,35 @@ struct PostDetailsView: View {
     private func editPost() {
         if let post = postDetailsViewModel.post {
             navigationManager.path.append(AppNavigation.editPost(post: post))
+        }
+    }
+    
+    private enum ActiveAlert: Identifiable {
+        case deletePost
+
+        var id: Int {
+            hashValue
+        }
+        
+        var title: String {
+            switch self {
+            case .deletePost:
+                return "Delete Post?"
+            }
+        }
+        
+        var confirmButtonText: String {
+            switch self {
+            case .deletePost:
+                return "Delete"
+            }
+        }
+        
+        var buttonStyle: AlertButtonStyle {
+            switch self {
+            case .deletePost:
+                return .warning
+            }
         }
     }
 }
