@@ -30,7 +30,7 @@ struct PostListingScrollView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                readPostsRepository: HistoryPostsRepository(),
+                historyPostsRepository: HistoryPostsRepository(),
                 postFeedID: postListingMetadata.getPostFeedID()
             )
         )
@@ -45,7 +45,7 @@ struct PostListingScrollView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                readPostsRepository: HistoryPostsRepository(),
+                historyPostsRepository: HistoryPostsRepository(),
                 postFeedID: postListingMetadata.getPostFeedID()
             )
         )

@@ -32,7 +32,7 @@ public class HistoryPostListingViewModel: ObservableObject {
     private var spoilerContent: Bool
     
     private let historyPostListingRepository: HistoryPostListingRepositoryProtocol
-    private let readPostsRepository: HistoryPostsRepositoryProtocol
+    private let historyPostsRepository: HistoryPostsRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
@@ -48,13 +48,13 @@ public class HistoryPostListingViewModel: ObservableObject {
         historyPostListingMetadata: HistoryPostListingMetadata,
         externalPostFilter: PostFilter?,
         historyPostListingRepository: HistoryPostListingRepositoryProtocol,
-        readPostsRepository: HistoryPostsRepositoryProtocol,
+        historyPostsRepository: HistoryPostsRepositoryProtocol,
         postFeedID: String
     ) {
         self.historyPostListingMetadata = historyPostListingMetadata
         self.externalPostFilter = externalPostFilter
         self.historyPostListingRepository = historyPostListingRepository
-        self.readPostsRepository = readPostsRepository
+        self.historyPostsRepository = historyPostsRepository
         
         self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
         self.spoilerContent = ContentSensitivityFilterUserDetailsUtils.spoilerContent
@@ -232,6 +232,27 @@ public class HistoryPostListingViewModel: ObservableObject {
     }
     
     func postProcessPosts(_ posts: [Post]) -> [Post] {
+        let upvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+            account: AccountViewModel.shared.account,
+            postIds: posts.map { $0.id },
+            postHistoryType: .upvoted
+        ) : Set<String>()
+        let downvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+            account: AccountViewModel.shared.account,
+            postIds: posts.map { $0.id },
+            postHistoryType: .downvoted
+        ) : Set<String>()
+        let hiddenPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+            account: AccountViewModel.shared.account,
+            postIds: posts.map { $0.id },
+            postHistoryType: .hidden
+        ) : Set<String>()
+        let savedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+            account: AccountViewModel.shared.account,
+            postIds: posts.map { $0.id },
+            postHistoryType: .saved
+        ) : Set<String>()
+        
         return posts.filter { post in
             return PostFilter.isPostAllowed(post: post, postFilter: postFilter)
         }.map {
@@ -239,6 +260,15 @@ public class HistoryPostListingViewModel: ObservableObject {
                 modifyPostBody($0)
                 $0.selftextProcessedMarkdown = MarkdownContent($0.selftext)
             }
+            
+            if upvotedPostIdsAnonymous.contains($0.id) {
+                $0.likes = 1
+            }
+            if downvotedPostIdsAnonymous.contains($0.id) {
+                $0.likes = -1
+            }
+            $0.hidden = hiddenPostIdsAnonymous.contains($0.id)
+            $0.saved = savedPostIdsAnonymous.contains($0.id)
             
             return $0
         }
