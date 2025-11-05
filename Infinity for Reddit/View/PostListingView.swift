@@ -204,6 +204,17 @@ struct PostListingView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .appForegroundBackgroundListener(
+            onAppEntersForeground: {
+                if lazyModeState == .paused {
+                    resumeLazyMode()
+                }
+            }, onAppEntersBackground: {
+                if lazyModeState == .started {
+                    pauseLazyMode()
+                }
+            }
+        )
         .onChange(of: lazyModeState) {
             setUpMenu()
         }
