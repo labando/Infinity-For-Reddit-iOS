@@ -62,7 +62,8 @@ struct PostListingView: View {
          postListingMetadata: PostListingMetadata,
          externalPostFilter: PostFilter? = nil,
          isRootView: Bool,
-         showFilterPostsOption: Bool = true
+         showFilterPostsOption: Bool = true,
+         scrollProxy: ScrollViewProxy? = nil
     ) {
         self.account = account
         self.isRootView = isRootView
@@ -72,6 +73,7 @@ struct PostListingView: View {
         }
         self.handleToolbarMenu = false
         self.showFilterPostsOption = showFilterPostsOption
+        self.scrollProxy = scrollProxy
         
         _postListingViewModel = StateObject(
             wrappedValue: PostListingViewModel(
@@ -112,6 +114,7 @@ struct PostListingView: View {
                                         $0.id == post.id
                                     }
                                     postListingViewModel.appearedPosts.append(post)
+                                    
                                     if post.subredditOrUserIcon == nil {
                                         Task {
                                             await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
@@ -161,13 +164,23 @@ struct PostListingView: View {
                         }, onSensitiveClicked: {
                             onSensitiveClicked(post: post)
                         })
-                        .id(post.id)
+                        .id(ObjectIdentifier(post))
                         .listPlainItemNoInsets()
                         .onAppear {
+                            postListingViewModel.appearedPosts.removeAll {
+                                $0.id == post.id
+                            }
+                            postListingViewModel.appearedPosts.append(post)
+                            
                             if post.subredditOrUserIcon == nil {
                                 Task {
                                     await postListingViewModel.loadIcon(post: post, displaySubredditIcon: !isSubredditPostListing)
                                 }
+                            }
+                        }
+                        .onDisappear {
+                            postListingViewModel.appearedPosts.removeAll {
+                                $0.id == post.id
                             }
                         }
                     }
