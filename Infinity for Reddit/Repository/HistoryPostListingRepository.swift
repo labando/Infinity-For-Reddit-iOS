@@ -49,7 +49,7 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
         historyPostListingType: HistoryPostListingType,
         username: String,
         before: Int64?
-    ) async throws -> (postListing: PostListing, before: Int64) {
+    ) async throws -> HistoryPostListingResult {
         let apiRequest: URLRequestConvertible
         let beforeResult: Int64
         let postHistory = try postHistoryDao.getAllHistoryPosts(username: username, before: before, postHistoryType: historyPostListingType.postHistoryTypeForDB)
@@ -73,7 +73,7 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
             throw HistoryPostListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
         
-        return (try PostListingRootClass(fromJson: json).data, beforeResult)
+        return HistoryPostListingResult(postListing: try PostListingRootClass(fromJson: json).data, before: beforeResult)
     }
     
     public func getPostFilter(historyPostListingType: HistoryPostListingType, externalPostFilter: PostFilter?) -> PostFilter {
