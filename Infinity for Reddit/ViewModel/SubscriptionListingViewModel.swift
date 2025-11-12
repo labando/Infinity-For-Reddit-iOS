@@ -488,7 +488,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             }
             
             for unsubscribed in unsubscribedMyCustomFeeds {
-                try myCustomFeedDao.deleteMyCustomFeed(name: unsubscribed.name, username: AccountViewModel.shared.account.username)
+                try myCustomFeedDao.deleteMyCustomFeed(path: unsubscribed.path, username: AccountViewModel.shared.account.username)
             }
             
             myCustomFeedDao.insertAll(

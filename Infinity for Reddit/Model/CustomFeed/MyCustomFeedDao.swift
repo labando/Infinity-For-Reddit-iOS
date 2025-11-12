@@ -80,18 +80,6 @@ struct MyCustomFeedDao {
         }
     }
     
-    func deleteMyCustomFeed(name: String, username: String) throws {
-        try dbPool.write { db in
-            try db.execute(
-                sql: """
-                    DELETE FROM custom_feeds 
-                    WHERE name = ? AND username = ?
-                    """,
-                arguments: [name, username]
-            )
-        }
-    }
-    
     func deleteMyCustomFeed(path: String, username: String) throws {
         try dbPool.write { db in
             try db.execute(
