@@ -93,10 +93,17 @@ struct InboxMessageItemView: View {
             TouchRipple(action: {
                 navigationManager.append(AppNavigation.inboxConversation(inbox: inbox))
             }) {
-                VStack {
-                    Text(account.username == inbox.author ? inbox.dest : inbox.author)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .username()
+                VStack(spacing: 4) {
+                    HStack(alignment: .top, spacing: 8) {
+                        Text(account.username == inbox.author ? inbox.dest : inbox.author)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .username()
+                        
+                        Spacer()
+                        
+                        TimeText(timeUTCInSeconds: time, forceShowElapsedTime: true)
+                            .primaryText()
+                    }
                     
                     Text(inbox.subject)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -114,6 +121,14 @@ struct InboxMessageItemView: View {
             Divider()
         }
         .listPlainItemNoInsets()
+    }
+    
+    private var time: Int64 {
+        if let replies = inbox.replies?.data?.inboxes, let lastReply = replies.last {
+            return lastReply.createdUtc
+        } else {
+            return inbox.createdUtc
+        }
     }
 }
 
@@ -142,7 +157,7 @@ struct InboxNotificationItemView: View {
                         Spacer()
                         
                         TimeText(timeUTCInSeconds: inbox.createdUtc, forceShowElapsedTime: true)
-                            .secondaryText()
+                            .primaryText()
                     }
                     
                     HStack(alignment: .top, spacing: 8) {
