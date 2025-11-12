@@ -25,6 +25,8 @@ struct PostListingView: View {
     @State var lazyMode: Task<Void, Error>?
     @State var lazyModeState: LazyModeState = .stopped
     
+    @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
+    
     private let postListingMetadata: PostListingMetadata
     private var isSubredditPostListing: Bool = false
     private let handleToolbarMenu: Bool
@@ -343,7 +345,7 @@ struct PostListingView: View {
         
         lazyMode = Task {
             repeat {
-                try? await Task.sleep(for: .seconds(1))
+                try? await Task.sleep(for: .seconds(lazyModeInterval))
                 await MainActor.run {
                     if Task.isCancelled {
                         return

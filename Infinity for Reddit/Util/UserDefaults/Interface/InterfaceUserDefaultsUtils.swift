@@ -15,6 +15,13 @@ class InterfaceUserDefaultsUtils {
     static let defaultSearchResultTabs: [Int] = [0, 1, 2]
     static let defaultSearchResultTabsText: [String] = ["Posts", "Subreddits", "Users"]
     
+    static let lazyModeIntervalKey = "lazy_mode_interval"
+    static var lazyModeInterval: Double {
+        return UserDefaults.video.double(forKey: lazyModeIntervalKey)
+    }
+    static let lazyModeIntervals: [Double] = [1, 2, 2.5, 3, 5, 7, 10]
+    static let lazyModeIntervalsText: [String] = ["1s", "2s", "2.5s", "3s", "5s", "7s", "10s"]
+    
     static let voteButtonsOnTheRightKey = "vote_buttons_on_the_right"
     static var voteButtonsOnTheRight: Bool {
         return UserDefaults.video.bool(forKey: voteButtonsOnTheRightKey)

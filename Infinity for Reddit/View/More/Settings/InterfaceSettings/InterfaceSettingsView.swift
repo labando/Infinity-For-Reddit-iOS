@@ -14,6 +14,7 @@ struct InterfaceSettingsView: View {
     
     @AppStorage(InterfaceUserDefaultsUtils.defaultSearchResultTabKey, store: .interface) private var defaultSearchResultTab: Int = 0
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
+    @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
     @AppStorage(InterfaceUserDefaultsUtils.showAbsoluteNumberOfVotesKey, store: .interface) private var showAbsoluteNumberOfVotes: Bool = true
     
     var body: some View {
@@ -68,6 +69,24 @@ struct InterfaceSettingsView: View {
                     icon: "text.bubble"
                 ) {
                     navigationManager.append(InterfaceSettingsViewNavigation.comment)
+                }
+                .listPlainItemNoInsets()
+                
+                BarebonePickerPreference(
+                    selected: $lazyModeInterval,
+                    items: InterfaceUserDefaultsUtils.lazyModeIntervals,
+                    title: "Lazy Mode Interval",
+                    icon: "magnifyingglass"
+                ) { interval in
+                    if let index = InterfaceUserDefaultsUtils.lazyModeIntervals.firstIndex(of: interval) {
+                        if InterfaceUserDefaultsUtils.lazyModeIntervals.indices.contains(index) {
+                            InterfaceUserDefaultsUtils.lazyModeIntervalsText[index]
+                        } else {
+                            InterfaceUserDefaultsUtils.lazyModeIntervalsText[2]
+                        }
+                    } else {
+                        InterfaceUserDefaultsUtils.lazyModeIntervalsText[2]
+                    }
                 }
                 .listPlainItemNoInsets()
                 
