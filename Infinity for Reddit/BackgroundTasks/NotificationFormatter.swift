@@ -27,7 +27,3 @@ struct NotificationFormatter {
         }
     }
 }
-
-private extension String {
-    var capitalizedFirst: String { guard let f = first else { return self }; return f.uppercased() + dropFirst() }
-}

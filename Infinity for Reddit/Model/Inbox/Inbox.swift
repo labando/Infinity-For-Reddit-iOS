@@ -18,8 +18,8 @@ public class Inbox : NSObject {
     var body : String!
     var bodyHtml : String!
     var context : String!
-    var created : Float!
-    var createdUtc : Float!
+    var created : Int64!
+    var createdUtc : Int64!
     var dest : String!
     var distinguished : String!
     var firstMessage : Int64!
@@ -50,8 +50,8 @@ public class Inbox : NSObject {
         body = json["body"].stringValue
         bodyHtml = json["body_html"].stringValue
         context = json["context"].stringValue
-        created = json["created"].floatValue
-        createdUtc = json["created_utc"].floatValue
+        created = json["created"].int64Value
+        createdUtc = json["created_utc"].int64Value
         dest = json["dest"].stringValue
         distinguished = json["distinguished"].stringValue
         firstMessage = json["first_message"].int64Value

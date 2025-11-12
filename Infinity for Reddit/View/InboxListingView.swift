@@ -133,14 +133,28 @@ struct InboxNotificationItemView: View {
             TouchRipple(action: {
                 navigationManager.openLink(inbox.context)
             }) {
-                VStack {
-                    Text(inbox.author)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .username()
+                VStack(spacing: 4) {
+                    HStack(alignment: .top, spacing: 8) {
+                        Text(inbox.author)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .username()
+                        
+                        Spacer()
+                        
+                        TimeText(timeUTCInSeconds: inbox.createdUtc, forceShowElapsedTime: true)
+                            .secondaryText()
+                    }
                     
-                    Text(inbox.linkTitle)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .primaryText()
+                    HStack(alignment: .top, spacing: 8) {
+                        Text(inbox.linkTitle)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .primaryText()
+                        
+                        Spacer()
+                        
+                        Text(inbox.subject.capitalizedFirst)
+                            .secondaryText()
+                    }
                     
                     Text(inbox.body)
                         .frame(maxWidth: .infinity, alignment: .leading)

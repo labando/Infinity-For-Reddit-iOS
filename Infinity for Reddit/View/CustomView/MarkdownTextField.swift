@@ -103,10 +103,3 @@ private struct MarkdownUITextField: UIViewRepresentable {
         }
     }
 }
-
-extension String {
-    func inserting(_ new: String, at index: Int) -> String {
-        let i = self.index(self.startIndex, offsetBy: index)
-        return String(self[..<i]) + new + String(self[i...])
-    }
-}

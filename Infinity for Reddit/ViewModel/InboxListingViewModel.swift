@@ -23,13 +23,10 @@ public class InboxListingViewModel: ObservableObject {
     
     public let inboxListingRepository: InboxListingRepositoryProtocol
     
-    // MARK: - Initializer
     init(messageWhere: MessageWhere, inboxListingRepository: InboxListingRepositoryProtocol) {
         self.messageWhere = messageWhere
         self.inboxListingRepository = inboxListingRepository
     }
-    
-    // MARK: - Methods
     
     public func initialLoadInboxes() async {
         guard isInitialLoad else {

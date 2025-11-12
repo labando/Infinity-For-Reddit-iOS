@@ -220,10 +220,3 @@ class BackgroundTasksManager {
         return !(listing.inboxes?.isEmpty ?? true)
     }
 }
-
-private extension String {
-    var capitalizedFirst: String {
-        guard let first = first else { return self }
-        return first.uppercased() + dropFirst()
-    }
-}

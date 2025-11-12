@@ -13,6 +13,7 @@ struct TimeText: View {
     
     let timeUTCInSeconds: Int64
     let formatter = DateFormatter()
+    var forceShowElapsedTime: Bool = false
     
     var formattedFormatter: DateFormatter {
         formatter.dateFormat = timeFormat
@@ -49,7 +50,7 @@ struct TimeText: View {
     }
     
     var body: some View {
-        if showElapsedTime {
+        if showElapsedTime || forceShowElapsedTime {
             Text(elapsedTime)
         } else {
             Text(formattedFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(timeUTCInSeconds))))
