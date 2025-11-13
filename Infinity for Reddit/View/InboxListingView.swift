@@ -38,7 +38,12 @@ struct InboxListingView: View {
                 List {
                     ForEach(inboxListingViewModel.inboxes, id: \.id) { inbox in
                         if inboxListingViewModel.messageWhere == .messages {
-                            InboxMessageItemView(inbox: inbox)
+                            InboxMessageItemView(inbox: inbox) { inboxToMarkAsRead in
+                                navigationManager.append(AppNavigation.inboxConversation(inbox: inbox))
+                                if let inboxToMarkAsRead {
+                                    inboxListingViewModel.markAsRead(inbox: inboxToMarkAsRead)
+                                }
+                            }
                         } else {
                             InboxNotificationItemView(inbox: inbox) {
                                 navigationManager.openLink(inbox.context)
@@ -82,24 +87,26 @@ struct InboxListingView: View {
 
 struct InboxMessageItemView: View {
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @State var inbox: Inbox
+    private let onTap: (Inbox?) -> Void
     private let account: Account
     
-    init(inbox: Inbox) {
+    init(inbox: Inbox, onTap: @escaping (Inbox?) -> Void) {
         self.inbox = inbox
+        self.onTap = onTap
         self.account = AccountViewModel.shared.account
     }
     
     var body: some View {
         VStack(spacing: 0) {
             TouchRipple(action: {
-                navigationManager.append(AppNavigation.inboxConversation(inbox: inbox))
+                onTap(inboxToMarkAsRead)
             }) {
                 VStack(spacing: 4) {
                     HStack(alignment: .top, spacing: 8) {
-                        Text(account.username == inbox.author ? inbox.dest : inbox.author)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        RowText(account.username == inbox.author ? inbox.dest : inbox.author)
                             .username()
                         
                         Spacer()
@@ -108,17 +115,16 @@ struct InboxMessageItemView: View {
                             .primaryText()
                     }
                     
-                    Text(inbox.subject)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    RowText(inbox.subject)
                         .primaryText()
                     
-                    Text(inbox.body)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    RowText(lastMessage)
                         .lineLimit(1)
                         .secondaryText()
                 }
                 .contentShape(Rectangle())
                 .padding(16)
+                .background(isNew ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
             }
             
             Divider()
@@ -131,6 +137,30 @@ struct InboxMessageItemView: View {
             return lastReply.createdUtc
         } else {
             return inbox.createdUtc
+        }
+    }
+    
+    private var lastMessage: String {
+        if let replies = inbox.replies?.data?.inboxes, let lastReply = replies.last {
+            return lastReply.body
+        } else {
+            return inbox.body
+        }
+    }
+    
+    private var isNew: Bool {
+        if let replies = inbox.replies?.data?.inboxes, let lastReply = replies.last {
+            return lastReply.isNew
+        } else {
+            return inbox.isNew
+        }
+    }
+    
+    private var inboxToMarkAsRead: Inbox? {
+        if let replies = inbox.replies?.data?.inboxes, let lastReply = replies.last {
+            return lastReply.isNew ? lastReply : nil
+        } else {
+            return inbox.isNew ? inbox : nil
         }
     }
 }
@@ -154,8 +184,7 @@ struct InboxNotificationItemView: View {
             }) {
                 VStack(spacing: 4) {
                     HStack(alignment: .top, spacing: 8) {
-                        Text(inbox.author)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        RowText(inbox.author)
                             .username()
                         
                         Spacer()
@@ -165,8 +194,7 @@ struct InboxNotificationItemView: View {
                     }
                     
                     HStack(alignment: .top, spacing: 8) {
-                        Text(inbox.linkTitle)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        RowText(inbox.linkTitle)
                             .primaryText()
                         
                         Spacer()
@@ -175,8 +203,7 @@ struct InboxNotificationItemView: View {
                             .secondaryText()
                     }
                     
-                    Text(inbox.body)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    RowText(inbox.body)
                         .lineLimit(1)
                         .secondaryText()
                 }
