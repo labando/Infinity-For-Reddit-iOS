@@ -252,7 +252,7 @@ struct PostViewCompact: View {
                     
                     Spacer()
                 }
-                .padding(.leading, 16)
+                .padding(.leading, voteButtonsOnTheRight ? 8 : 16)
                 .environment(\.layoutDirection, .leftToRight)
                 
                 Button(action: onSave) {
