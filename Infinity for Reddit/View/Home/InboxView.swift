@@ -41,8 +41,6 @@ struct InboxView: View {
                 }
                 .toolbar(.hidden, for: .tabBar)
             }
-            
-            Spacer()
         }
         .id(accountViewModel.account.username)
         .onAppear {
