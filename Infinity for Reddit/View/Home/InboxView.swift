@@ -12,13 +12,17 @@ import GRDB
 struct InboxView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var homeViewModel: HomeViewModel
+    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
+    @StateObject private var inboxViewModel: InboxViewModel
     @State private var selectedOption = 0
+    @State private var navigationBarMenuKey: UUID?
     
     private let account: Account
     
     init(account: Account) {
         self.account = account
+        self._inboxViewModel = StateObject(wrappedValue: InboxViewModel(inboxRepository: InboxRepository()))
     }
     
     var body: some View {
@@ -42,6 +46,19 @@ struct InboxView: View {
         .id(accountViewModel.account.username)
         .onAppear {
             applyPendingRouteIfAny()
+            
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Read All Messages") {
+                    inboxViewModel.readAllMessages()
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
         .onChange(of: homeViewModel.inboxNavigationTarget, initial: true) { _, _  in
             applyPendingRouteIfAny()
