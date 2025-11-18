@@ -14,12 +14,13 @@ class CrosspostViewModel: ObservableObject {
     @Published var submittedPostId: String?
     @Published var error: Error? = nil
     
-    private let postToBeCrossposted: Post
+    let postToBeCrossposted: Post
     private let submitPostRepository: SubmitPostRepositoryProtocol
     
     init(postToBeCrossposted: Post, submitPostRepository: SubmitPostRepositoryProtocol) {
         self.selectedAccount = AccountViewModel.shared.account
         self.postToBeCrossposted = postToBeCrossposted
+        self.title = postToBeCrossposted.title
         self.submitPostRepository = submitPostRepository
     }
     

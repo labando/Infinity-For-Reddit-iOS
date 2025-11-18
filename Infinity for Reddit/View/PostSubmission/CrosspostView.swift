@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MarkdownUI
 
 struct CrosspostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
@@ -33,34 +34,73 @@ struct CrosspostView: View {
     var body: some View {
         RootView {
             VStack(spacing: 0) {
-                ZStack {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            UserPicker {
-                                crosspostViewModel.selectedAccount = $0
-                            }
-                            
-                            PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
-                                postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
-                            }
-                            
-                            Divider()
-                            
-                            PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
-                            
-                            Divider()
-                            
-                            CustomTextField(
-                                "Title",
-                                text: $crosspostViewModel.title,
-                                singleLine: true,
-                                keyboardType: .default,
-                                showBorder: false,
-                                fieldType: .title,
-                                focusedField: $focusedField
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.top, 16)
+                ScrollView {
+                    VStack(spacing: 0) {
+                        UserPicker {
+                            crosspostViewModel.selectedAccount = $0
+                        }
+                        
+                        PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
+                            postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                        }
+                        
+                        Divider()
+                        
+                        PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
+                        
+                        Divider()
+                        
+                        CustomTextField(
+                            "Title",
+                            text: $crosspostViewModel.title,
+                            singleLine: true,
+                            keyboardType: .default,
+                            showBorder: false,
+                            fieldType: .title,
+                            focusedField: $focusedField
+                        )
+                        .padding(16)
+                        
+//                            switch crosspostViewModel.postToBeCrossposted.postType {
+//                            case .noPreviewLink:
+//                                if let url = URL(string: crosspostViewModel.postToBeCrossposted.url), let domain = url.host {
+//                                    NoPreviewLinkView(domain: domain) {
+//                                        navigationManager.openLink(url)
+//                                    }
+//                                } else if let crosspost = crosspostViewModel.postToBeCrossposted.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
+//                                    NoPreviewLinkView(domain: domain) {
+//                                        navigationManager.openLink(url)
+//                                    }
+//                                }
+//                            default:
+//                                EmptyView()
+//                            }
+                        
+                        if let galleryData = crosspostViewModel.postToBeCrossposted.galleryData,
+                                  !galleryData.items.isEmpty,
+                                  let mediaMetadata = crosspostViewModel.postToBeCrossposted.mediaMetadata,
+                                  let preview = mediaMetadata[galleryData.items[0].mediaId] {
+                            // May not have a preview!!!!!!
+                            GalleryCarousel(post: crosspostViewModel.postToBeCrossposted)
+                                .aspectRatio(preview.s.aspectRatio, contentMode: .fit)
+                        } else if case .redditVideo(let videoUrlString, _) = crosspostViewModel.postToBeCrossposted.postType {
+                            PostVideoView(post: crosspostViewModel.postToBeCrossposted, videoUrlString: videoUrlString)
+                        } else if case .video(let videoUrlString, _) = crosspostViewModel.postToBeCrossposted.postType {
+                            PostVideoView(post: crosspostViewModel.postToBeCrossposted, videoUrlString: videoUrlString)
+                        } else if crosspostViewModel.postToBeCrossposted.postType.isMedia {
+                            PostPreviewView(post: crosspostViewModel.postToBeCrossposted)
+                        }
+                        
+                        if let selftext = crosspostViewModel.postToBeCrossposted.selftextProcessedMarkdown {
+                            Markdown(selftext)
+                                .markdownImageProvider(WebImageProvider(mediaMetadata: crosspostViewModel.postToBeCrossposted.mediaMetadata))
+                                .font(.system(size: 24))
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 16)
+                                .themedPostCommentMarkdown()
+                                .markdownLinkHandler { url in
+                                    navigationManager.openLink(url)
+                                }
                         }
                     }
                 }
