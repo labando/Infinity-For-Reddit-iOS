@@ -13,9 +13,14 @@ struct UserFlairRowView: View {
     
     var body: some View {
         if !userFlair.richtext.isEmpty {
-            FlairRichTextView(flairRichtext: userFlair.richtext, usePrimaryTextColor: true)
-                .frame(maxWidth: .infinity)
-                .padding(16)
+            HStack {
+                FlairRichTextView(flairRichtext: userFlair.richtext, usePrimaryTextColor: true)
+                    .padding(16)
+                
+                Spacer()
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
         } else {
             HStack {
                 RowText(userFlair.text)

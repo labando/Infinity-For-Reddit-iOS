@@ -190,9 +190,11 @@ struct SubredditDetailsView: View {
             SubredditAboutSheet(subredditData: subredditDetailsViewModel.subredditData)
         }
         .wrapContentSheet(isPresented: $showUserFlairSheet) {
-            SelectUserFlairSheet(userFlairs: subredditDetailsViewModel.userFlairs) { userFlair in
+            SelectUserFlairSheet(userFlairs: subredditDetailsViewModel.userFlairs, onUserFlairSelected: { userFlair in
                 subredditDetailsViewModel.selectUserFlair(userFlair)
-            }
+            }, onClearUserFlair: {
+                
+            })
         }
     }
 }
