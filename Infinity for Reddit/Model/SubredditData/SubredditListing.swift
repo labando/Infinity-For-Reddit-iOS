@@ -260,8 +260,13 @@ class Subreddit : NSObject {
         userFlairEnabledInSr = json["user_flair_enabled_in_sr"].boolValue
         userFlairPosition = json["user_flair_position"].stringValue
         let userFlairRichtextArray = json["user_flair_richtext"].arrayValue
-        for userFlairRichtextJson in userFlairRichtextArray{
-            userFlairRichtext.append(FlairRichtext(fromJson: userFlairRichtextJson))
+        for userFlairRichtextJson in userFlairRichtextArray {
+            do {
+                let flairRichtext = try FlairRichtext(fromJson: userFlairRichtextJson)
+                userFlairRichtext.append(flairRichtext)
+            } catch {
+                // Ignore
+            }
         }
         userFlairTemplateId = json["user_flair_template_id"].stringValue
         userFlairText = json["user_flair_text"].stringValue

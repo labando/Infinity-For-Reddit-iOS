@@ -17,6 +17,7 @@ struct SubredditDetailsView: View {
     @State private var navigationBarMenuKey: UUID?
     @State private var showSubredditAboutSheet: Bool = false
     @State private var isSubredditInfoVisible: Bool = true
+    @State private var showUserFlairSheet: Bool = false
     
     @StateObject var subredditDetailsViewModel : SubredditDetailsViewModel
     
@@ -168,8 +169,30 @@ struct SubredditDetailsView: View {
             }
         }
         .id(accountViewModel.account.username)
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Select User Flair") {
+                    subredditDetailsViewModel.fetchUserFlairs()
+                    showUserFlairSheet = true
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
         .wrapContentSheet(isPresented: $showSubredditAboutSheet) {
             SubredditAboutSheet(subredditData: subredditDetailsViewModel.subredditData)
+        }
+        .wrapContentSheet(isPresented: $showUserFlairSheet) {
+            SelectUserFlairSheet(userFlairs: subredditDetailsViewModel.userFlairs) { userFlair in
+                subredditDetailsViewModel.selectUserFlair(userFlair)
+            }
         }
     }
 }

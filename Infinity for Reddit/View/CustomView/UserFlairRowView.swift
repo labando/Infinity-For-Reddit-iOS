@@ -1,27 +1,28 @@
 //
-// FlairRowView.swift
-// Infinity for Reddit
+//  UserFlairRowView.swift
+//  Infinity for Reddit
 //
-// Created by joeylr2042 on 2025-09-14
-        
+//  Created by Docile Alligator on 2025-11-17.
+//
+
 import SwiftUI
 
-struct FlairRowView: View {
-    let flair: Flair
+struct UserFlairRowView: View {
+    let userFlair: UserFlair
     private let emojiSize: CGFloat = 14
     
     var body: some View {
-        if let flairRichtext = flair.richtext, !flairRichtext.isEmpty {
-            FlairRichTextView(flairRichtext: flairRichtext, usePrimaryTextColor: true)
+        if !userFlair.richtext.isEmpty {
+            FlairRichTextView(flairRichtext: userFlair.richtext, usePrimaryTextColor: true)
                 .frame(maxWidth: .infinity)
                 .padding(16)
         } else {
             HStack {
-                RowText(flair.text)
+                RowText(userFlair.text)
                     .primaryText()
                     .padding(16)
                 
-                if flair.isEditable {
+                if userFlair.textEditable {
                     ZStack {
                         SwiftUI.Image(systemName: "pencil")
                             .primaryIcon()

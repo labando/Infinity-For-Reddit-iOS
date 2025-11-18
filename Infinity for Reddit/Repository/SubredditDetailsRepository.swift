@@ -99,4 +99,38 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
             try? subscribedSubredditDao.insert(subscribedSubredditData: subscribedSubredditData)
         }
     }
+    
+    public func fetchUserFlairs(subredditName: String) async throws -> [UserFlair] {
+        let data = try await self.session.request(RedditOAuthAPI.getUserFlairs(subredditName: subredditName))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .value
+        
+        try Task.checkCancellation()
+        
+        let json = JSON(data)
+        if let error = json.error {
+            throw SubredditDetailsRepositoryError.JSONDecodingError(error.localizedDescription)
+        }
+        
+        var result: [UserFlair] = []
+        for userFlairJson in json.arrayValue {
+            do {
+                let userFlair = try UserFlair(fromJson: userFlairJson)
+                result.append(userFlair)
+            } catch {
+                // Ignore
+            }
+        }
+        return result
+    }
+    
+    public func selectUserFlair(subredditName: String, userFlair: UserFlair) async throws {
+        let params = ["api_type": "json", "flair_template_id": userFlair.id, "name": AccountViewModel.shared.account.username, "text": userFlair.text]
+        
+        _ = await self.session.request(RedditOAuthAPI.selectUserFlair(subredditName: subredditName, params: params))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .response
+    }
 }
