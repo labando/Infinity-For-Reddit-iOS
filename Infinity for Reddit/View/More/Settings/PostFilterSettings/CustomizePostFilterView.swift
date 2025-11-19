@@ -31,6 +31,19 @@ struct CustomizePostFilterView: View {
         )
     }
     
+    init(_ postFilter: PostFilter?, postToBeAdded: Post?, selectedFieldsToAddToPostFilter: [SelectedFieldToAddToPostFilter]?) {
+        self.showInSheet = false
+        self.onApplyPostFilter = nil
+        _customizePostFilterViewModel = StateObject(
+            wrappedValue: CustomizePostFilterViewModel(
+                postFilter: postFilter,
+                postToBeAdded: postToBeAdded,
+                selectedFieldsToAddToPostFilter: selectedFieldsToAddToPostFilter,
+                customizePostFilterRepository: CustomizePostFilterRepository()
+            )
+        )
+    }
+    
     var body: some View {
         RootView {
             VStack(spacing: 0) {
