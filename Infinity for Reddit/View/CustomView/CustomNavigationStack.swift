@@ -130,6 +130,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .crosspost(let postToBeCrossposted):
                         CrosspostView(postToBeCrossposted: postToBeCrossposted)
                             .environmentObject(navigationManager)
+                    case .sendChatMessage(let username):
+                        SendChatMessageView(username: username)
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in

@@ -13,6 +13,7 @@ struct InboxView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var homeViewModel: HomeViewModel
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject var navigationManager: NavigationManager
     
     @StateObject private var inboxViewModel: InboxViewModel
     @State private var selectedOption = 0
@@ -58,6 +59,10 @@ struct InboxView: View {
                             hasReadAllMessages = true
                         }
                     }
+                },
+                
+                NavigationBarMenuItem(title: "Send Chat Message") {
+                    navigationManager.append(AppNavigation.sendChatMessage())
                 }
             ])
         }
