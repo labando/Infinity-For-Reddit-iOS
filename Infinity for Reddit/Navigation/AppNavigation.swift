@@ -29,5 +29,5 @@ enum AppNavigation: Hashable {
     case filteredHistoryPosts(historyPostListingMetadata: HistoryPostListingMetadata, postFilter: PostFilter)
     case editPost(post: Post)
     case crosspost(postToBeCrossposted: Post)
-    case sendChatMessage(username: String? = nil)
+    case sendChatMessage(recipient: String? = nil)
 }

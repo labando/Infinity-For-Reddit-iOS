@@ -181,6 +181,10 @@ struct SubredditDetailsView: View {
                 
                 NavigationBarMenuItem(title: "Add to Post Filter") {
                     navigationManager.append(SettingsViewNavigation.postFilter(subredditToBeAdded: subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName))
+                },
+                
+                NavigationBarMenuItem(title: "Contact Mods") {
+                    navigationManager.append(AppNavigation.sendChatMessage(recipient: "r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)"))
                 }
             ])
         }

@@ -6,5 +6,5 @@
 //
 
 protocol SendChatMessageRepositoryProtocol {
-    func sendChatMessage(username: String, subject: String, message: String) async throws
+    func sendChatMessage(recipient: String, subject: String, message: String) async throws
 }

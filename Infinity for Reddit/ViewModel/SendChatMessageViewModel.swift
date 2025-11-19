@@ -9,7 +9,7 @@ import Foundation
 
 @MainActor
 class SendChatMessageViewModel: ObservableObject {
-    @Published var username: String
+    @Published var recipient: String
     @Published var subject: String = ""
     @Published var message: String = ""
     @Published var sendChatMessageTask: Task<Void, Never>?
@@ -18,8 +18,8 @@ class SendChatMessageViewModel: ObservableObject {
     
     private let sendChatMessageRepository: SendChatMessageRepositoryProtocol
     
-    init(username: String?, sendChatMessageRepository: SendChatMessageRepositoryProtocol) {
-        self.username = username ?? ""
+    init(recipient: String?, sendChatMessageRepository: SendChatMessageRepositoryProtocol) {
+        self.recipient = recipient ?? ""
         self.sendChatMessageRepository = sendChatMessageRepository
     }
     
@@ -32,7 +32,7 @@ class SendChatMessageViewModel: ObservableObject {
         sendChatMessageTask = Task {
             do {
                 try await self.sendChatMessageRepository.sendChatMessage(
-                    username: self.username,
+                    recipient: self.recipient,
                     subject: self.subject,
                     message: self.message
                 )

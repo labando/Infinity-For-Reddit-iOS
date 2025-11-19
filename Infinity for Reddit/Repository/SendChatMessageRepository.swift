@@ -18,8 +18,8 @@ class SendChatMessageRepository: SendChatMessageRepositoryProtocol {
         self.session = resolvedSession
     }
     
-    func sendChatMessage(username: String, subject: String, message: String) async throws {
-        let params: [String: String] = ["api_type": "json", "return_rtjson": "true", "subject": subject, "text": message, "to": username]
+    func sendChatMessage(recipient: String, subject: String, message: String) async throws {
+        let params: [String: String] = ["api_type": "json", "return_rtjson": "true", "subject": subject, "text": message, "to": recipient]
         
         _ = try await self.session.request(RedditOAuthAPI.composeMessage(params: params))
             .validate()

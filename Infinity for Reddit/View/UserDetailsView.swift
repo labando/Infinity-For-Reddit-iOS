@@ -229,7 +229,7 @@ struct UserDetailsView: View {
                 },
                 
                 NavigationBarMenuItem(title: "Send Message") {
-                    navigationManager.append(AppNavigation.sendChatMessage(username: userDetailsViewModel.userData?.name ?? userDetailsViewModel.username))
+                    navigationManager.append(AppNavigation.sendChatMessage(recipient: userDetailsViewModel.userData?.name ?? userDetailsViewModel.username))
                 }
             ])
         }

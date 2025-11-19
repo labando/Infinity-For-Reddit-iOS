@@ -23,8 +23,8 @@ struct SendChatMessageView: View {
     @State private var subjectSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var messageSelectedRange: NSRange = NSRange(location: 0, length: 0)
     
-    init(username: String?) {
-        _sendChatMessageViewModel = StateObject(wrappedValue: SendChatMessageViewModel(username: username, sendChatMessageRepository: SendChatMessageRepository()))
+    init(recipient: String?) {
+        _sendChatMessageViewModel = StateObject(wrappedValue: SendChatMessageViewModel(recipient: recipient, sendChatMessageRepository: SendChatMessageRepository()))
     }
     
     var body: some View {
@@ -33,13 +33,13 @@ struct SendChatMessageView: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         CustomTextField(
-                            "Username",
-                            text: $sendChatMessageViewModel.username,
+                            "Recipient",
+                            text: $sendChatMessageViewModel.recipient,
                             singleLine: true,
                             keyboardType: .default,
                             autocapitalization: .never,
                             showBorder: false,
-                            fieldType: .username,
+                            fieldType: .recipient,
                             focusedField: $focusedField
                         )
                         .padding(.horizontal, 16)
@@ -112,6 +112,6 @@ struct SendChatMessageView: View {
     }
     
     private enum FieldType: Hashable {
-        case username
+        case recipient
     }
 }
