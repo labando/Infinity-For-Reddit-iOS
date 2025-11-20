@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import IdentifiedCollections
 
 class CreateCustomFeedViewModel: ObservableObject {
     @Published var name: String = ""
     @Published var description: String = ""
-    @Published var subredditsAndUsersInCustomFeed: [SubredditAndUserInCustomFeed] = []
+    @Published var subredditsAndUsersInCustomFeed: IdentifiedArrayOf<SubredditAndUserInCustomFeed> = []
     @Published var createCustomFeedTask: Task<Void, Never>?
     @Published var customFeedCreatedFlag: Bool = false
     @Published var error: Error? = nil
@@ -21,11 +22,15 @@ class CreateCustomFeedViewModel: ObservableObject {
         self.createCustomFeedRepository = createCustomFeedRepository
     }
     
-    func addSubredditsAndUsersInCustomFeed(newValues: [SubredditAndUserInCustomFeed]) {
+    func addSubredditsAndUsersInCustomFeed(_ newValues: [SubredditAndUserInCustomFeed]) {
         for newValue in newValues {
-            if !subredditsAndUsersInCustomFeed.contains(where: { $0.name == newValue.name }) {
+            if subredditsAndUsersInCustomFeed.index(id: newValue.id) == nil {
                 subredditsAndUsersInCustomFeed.append(newValue)
             }
         }
+    }
+    
+    func removeSubredditAndUserInCustomFeed(_ value: SubredditAndUserInCustomFeed) {
+        subredditsAndUsersInCustomFeed.remove(value)
     }
 }

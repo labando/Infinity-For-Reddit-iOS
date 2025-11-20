@@ -58,7 +58,7 @@ struct CreateCustomFeedView: View {
                                 text: item.name,
                                 iconUrlString: item.iconUrlString
                             ) {
-                                
+                                createCustomFeedViewModel.removeSubredditAndUserInCustomFeed(item)
                             }
                         }
                     }
@@ -117,7 +117,7 @@ struct CreateCustomFeedView: View {
         }
         .sheet(isPresented: $showSubredditAndUserMultiSelectionSheet) {
             SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditAndUserInCustomFeed(onSelectMultipleSubscriptions: { subredditsAndUsersInCustomFeed in
-                createCustomFeedViewModel.addSubredditsAndUsersInCustomFeed(newValues: subredditsAndUsersInCustomFeed)
+                createCustomFeedViewModel.addSubredditsAndUsersInCustomFeed(subredditsAndUsersInCustomFeed)
             }))
         }
     }

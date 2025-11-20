@@ -5,7 +5,7 @@
 //  Created by Docile Alligator on 2025-11-19.
 //
 
-enum SubredditAndUserInCustomFeed {
+enum SubredditAndUserInCustomFeed: Identifiable {
     case subscribedSubreddit(SubscribedSubredditData)
     case subreddit(SubredditData)
     case subscribedUser(SubscribedUserData)
