@@ -11,12 +11,15 @@ import GRDB
 import Alamofire
 
 struct AnonymousSubscriptionsView: View {
-    @Environment(\.colorScheme) var colorScheme
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @Environment(\.dismiss) private var dismiss
+    
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     @StateObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
 
     @State private var selectedOption = 0
+    @State private var navigationBarMenuKey: UUID?
     
     init(subscriptionSelectionMode: SubscriptionSelectionMode = .noSelection) {
         _anonymousSubscriptionListingViewModel = StateObject(
@@ -30,8 +33,20 @@ struct AnonymousSubscriptionsView: View {
     var body: some View {
         RootView {
             VStack(spacing: 0) {
-                SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users", "Custom Feed"])
+                switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                case .subredditAndUserInCustomFeed:
+                    SegmentedPicker(
+                        selectedValue: $selectedOption,
+                        values: ["Subreddits", "Users"]
+                    )
                     .padding(4)
+                default:
+                    SegmentedPicker(
+                        selectedValue: $selectedOption,
+                        values: ["Subreddits", "Users", "Custom Feed"]
+                    )
+                    .padding(4)
+                }
                 
                 TabView(selection: $selectedOption) {
                     switch anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
@@ -62,7 +77,37 @@ struct AnonymousSubscriptionsView: View {
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
+                
+                if case .subredditAndUserInCustomFeed(_, let onSelectMultipleSubscriptions) = anonymousSubscriptionListingViewModel.subscriptionSelectionMode {
+                    Button {
+                        onSelectMultipleSubscriptions(anonymousSubscriptionListingViewModel.getSelectedSubredditsAndUsersInCustomFeed())
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("Done")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(16)
+                    .filledButton()
+                }
             }
+        }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Create Custom Feed") {
+                    navigationManager.append(AppNavigation.createCustomFeed)
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
     }
 
