@@ -11,6 +11,19 @@ enum SubredditAndUserInCustomFeed {
     case subscribedUser(SubscribedUserData)
     case user(UserData)
     
+    var id: String {
+        switch self {
+        case .subscribedSubreddit(let subscribedSubredditData):
+            return subscribedSubredditData.name
+        case .subreddit(let subredditData):
+            return subredditData.name
+        case .subscribedUser(let subscribedUserData):
+            return subscribedUserData.name
+        case .user(let userData):
+            return userData.name
+        }
+    }
+    
     var name: String {
         switch self {
         case .subscribedSubreddit(let subscribedSubredditData):

@@ -28,7 +28,7 @@ struct CreateCustomFeedView: View {
         RootView {
             VStack(spacing: 0) {
                 ScrollView {
-                    VStack(spacing: 0) {
+                    LazyVStack(spacing: 0) {
                         CustomTextField(
                             "Name (Max 50 characters)",
                             text: $createCustomFeedViewModel.name,
@@ -52,6 +52,15 @@ struct CreateCustomFeedView: View {
                         .padding(16)
                         
                         Divider()
+                        
+                        ForEach(createCustomFeedViewModel.subredditsAndUsersInCustomFeed, id: \.id) { item in
+                            SubredditAndUserInCustomFeedItemView(
+                                text: item.name,
+                                iconUrlString: item.iconUrlString
+                            ) {
+                                
+                            }
+                        }
                     }
                 }
                 
@@ -108,12 +117,57 @@ struct CreateCustomFeedView: View {
         }
         .sheet(isPresented: $showSubredditAndUserMultiSelectionSheet) {
             SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditAndUserInCustomFeed(onSelectMultipleSubscriptions: { subredditsAndUsersInCustomFeed in
-                
+                createCustomFeedViewModel.addSubredditsAndUsersInCustomFeed(newValues: subredditsAndUsersInCustomFeed)
             }))
         }
     }
     
     private enum FieldType: Hashable {
         case name
+    }
+    
+    struct SubredditAndUserInCustomFeedItemView: View {
+        var text: String
+        var iconUrlString: String?
+        var iconSize: CGFloat = 24
+        let onDelete: () -> Void
+        
+        var body: some View {
+            HStack(spacing: 0) {
+                if let icon = iconUrlString {
+                    CustomWebImage(
+                        icon,
+                        width: iconSize,
+                        height: iconSize,
+                        circleClipped: true,
+                        handleImageTapGesture: false,
+                        fallbackView: {
+                            InitialLetterAvatarImageFallbackView(name: text, size: iconSize)
+                        }
+                    )
+                } else {
+                    Spacer()
+                        .frame(width: iconSize)
+                }
+                
+                Spacer()
+                    .frame(width: 24)
+                
+                Text(text)
+                    .primaryText()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Button(action: {
+                    onDelete()
+                }) {
+                    SwiftUI.Image(systemName: "trash")
+                        .primaryIcon()
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+            .contentShape(Rectangle())
+        }
     }
 }
