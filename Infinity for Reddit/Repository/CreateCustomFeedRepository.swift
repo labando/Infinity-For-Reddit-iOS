@@ -25,6 +25,7 @@ class CreateCustomFeedRepository: CreateCustomFeedRepositoryProtocol {
     
     private let session: Session
     private let myCustomFeedDao: MyCustomFeedDao
+    private let anonymousCustomFeedSubredditDao: AnonymousCustomFeedSubredditDao
     
     public init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self) else {
@@ -35,21 +36,13 @@ class CreateCustomFeedRepository: CreateCustomFeedRepositoryProtocol {
         }
         self.session = resolvedSession
         self.myCustomFeedDao = MyCustomFeedDao(dbPool: resolvedDBPool)
+        self.anonymousCustomFeedSubredditDao = AnonymousCustomFeedSubredditDao(dbPool: resolvedDBPool)
     }
     
-    func createCustomFeed(name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<SubredditAndUserInCustomFeed>) async throws -> CustomFeed {
-//        guard !AccountViewModel.shared.account.isAnonymous() else {
-//            try await createCustomFeedAnonymous(name: name, description: description, subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed)
-//            return
-//        }
-//        let json = JSON([
-//            "display_name": name,
-//            "description_md": description,
-//            "visibility": isPrivate ? "private" : "public",
-//            "subreddits": subredditsAndUsersInCustomFeed.map {
-//                ["name": $0.name]
-//            }
-//        ])
+    func createCustomFeed(name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<SubredditAndUserInCustomFeed>) async throws -> MyCustomFeed {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            return try await createCustomFeedAnonymous(name: name, description: description, subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed)
+        }
         
         let payload = CustomFeedModelPayload(
             name: name, description: description, visibility: isPrivate ? "private" : "public", subreddits: subredditsAndUsersInCustomFeed.map {
@@ -89,7 +82,11 @@ class CreateCustomFeedRepository: CreateCustomFeedRepositoryProtocol {
                     throw APIError.jsonDecodingError(error.localizedDescription)
                 }
                 
-                return try CustomFeed(fromJson: json["data"])
+                let createdMyCustomFeed = try CustomFeed(fromJson: json["data"]).toMyCustomFeed()
+                
+                try? myCustomFeedDao.insert(myCustomFeed: createdMyCustomFeed)
+                
+                return createdMyCustomFeed
             } else {
                 if let customFeedCreationError = try? CustomFeedCreationError(fromJson: JSON(data)) {
                     throw APIError.invalidResponse(customFeedCreationError.explanation.capitalizedFirst)
@@ -102,12 +99,38 @@ class CreateCustomFeedRepository: CreateCustomFeedRepositoryProtocol {
         }
     }
     
-//    func createCustomFeedAnonymous(name: String, description: String, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<SubredditAndUserInCustomFeed>) async throws -> MyCustomFeed {
-//        
-//    }
-    
-    func saveMyCustomFeed(_ myustomFeed: MyCustomFeed) async throws {
-        try myCustomFeedDao.insert(myCustomFeed: myustomFeed)
+    func createCustomFeedAnonymous(name: String, description: String, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<SubredditAndUserInCustomFeed>) async throws -> MyCustomFeed {
+        let myCustomFeed = MyCustomFeed(
+            path: "/user/-/m/\(name)",
+            displayName: name,
+            name: name,
+            description: description,
+            owner: "-",
+            nSubscribers: 0,
+            createdUTC: Utils.getCurrentTimeEpoch(),
+            over18: false,
+            isSubscriber: false,
+            isFavorite: false
+        )
+        try myCustomFeedDao.insert(myCustomFeed: myCustomFeed)
+        
+        let anonymousCustomFeedSubreddits: [AnonymousCustomFeedSubreddit] = subredditsAndUsersInCustomFeed.map {
+            AnonymousCustomFeedSubreddit(
+                path: myCustomFeed.path,
+                subredditName: $0.name,
+                iconUrlString: $0.iconUrlString ?? ""
+            )
+        }
+        
+        do {
+            try anonymousCustomFeedSubredditDao.insertAll(anonymousMultiredditSubreddits: anonymousCustomFeedSubreddits)
+        } catch {
+            // Ugly
+            print(error)
+            try myCustomFeedDao.anonymousDeleteMyCustomFeed(path: myCustomFeed.path)
+        }
+        
+        return myCustomFeed
     }
     
     private struct CustomFeedModelPayload: Codable {

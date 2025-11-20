@@ -43,21 +43,12 @@ class CreateCustomFeedViewModel: ObservableObject {
         
         createCustomFeedTask = Task {
             do {
-                let createdCustomFeed = try await createCustomFeedRepository.createCustomFeed(
+                self.createdMyCustomFeed = try await createCustomFeedRepository.createCustomFeed(
                     name: name,
                     description: description,
                     isPrivate: isPrivate,
                     subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed
-                ).toMyCustomFeed()
-                
-                self.createdMyCustomFeed = createdCustomFeed
-                
-                do {
-                    try await createCustomFeedRepository.saveMyCustomFeed(createdCustomFeed)
-                } catch {
-                    // Ignore
-                    print(error)
-                }
+                )
             } catch {
                 self.error = error
                 print(error)

@@ -258,6 +258,16 @@ struct RedditGRDBDatabase {
 
                 t.primaryKey(["username", "post_id", "post_history_type"], onConflict: .replace)
             }
+            
+            try db.create(table: AnonymousCustomFeedSubreddit.databaseTableName, ifNotExists: true) { t in
+                t.column("username", .text).notNull()
+                    .references(Account.databaseTableName, column: "username", onDelete: .cascade)
+                t.column("path", .text).notNull()
+                t.column("subreddit_name", .text).notNull()
+                t.column("icon_url_string", .text).notNull()
+
+                t.primaryKey(["username", "path", "subreddit_name", "icon_url_string"], onConflict: .replace)
+            }
         }
     }
 }
