@@ -9,18 +9,13 @@ import SwiftUI
 
 struct SubscribedSubredditListingMultiSelectionView: View {
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var accountViewModel: AccountViewModel
     
     @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
-
-    let onSelectCustomAction: ((SubscribedSubredditData) -> Void)?
     
     init(
-        subscriptionListingViewModel: SubscriptionListingViewModel,
-        onSelectCustomAction: ((SubscribedSubredditData) -> Void)? = nil
+        subscriptionListingViewModel: SubscriptionListingViewModel
     ) {
         self.subscriptionListingViewModel = subscriptionListingViewModel
-        self.onSelectCustomAction = onSelectCustomAction
     }
     
     var body: some View {
@@ -67,19 +62,6 @@ struct SubscribedSubredditListingMultiSelectionView: View {
                                 }
                             }
                             .listPlainItemNoInsets()
-                            .applyIf(onSelectCustomAction == nil) {
-                                $0.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button(role: .destructive) {
-                                        Task {
-                                            await subscriptionListingViewModel.unsubscribeFromSubreddit(subscription)
-                                        }
-                                    } label: {
-                                        Text("Unsubscribe")
-                                            .foregroundStyle(.white)
-                                    }
-                                    .tint(.red)
-                                }
-                            }
                         }
                     }
                 }

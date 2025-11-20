@@ -63,7 +63,7 @@ struct SubscriptionsView: View {
                             CustomFeedView(subscriptionListingViewModel: subscriptionListingViewModel, customOnTapForSearchInThing: onSelectSearchInThing)
                                 .tag(2)
                         case .subredditAndUserInCustomFeed(let onSelectMultipleSubscriptions):
-                            SubscribedSubredditListingView(subscriptionListingViewModel: subscriptionListingViewModel)
+                            SubscribedSubredditListingMultiSelectionView(subscriptionListingViewModel: subscriptionListingViewModel)
                                 .tag(0)
                         }
                     }
