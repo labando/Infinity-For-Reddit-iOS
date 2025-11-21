@@ -167,6 +167,22 @@ public class PostListingViewModel: ObservableObject {
                         postListingMetadata.pathComponents = ["subreddit": fetchedSubscriptions]
                     }
                 }
+            } else if case .anonymousCustomFeed(let myCustomFeed, let concatenatedSubscriptions) = postListingMetadata.postListingType {
+                if let subscriptions = concatenatedSubscriptions {
+                    if subscriptions.isEmpty {
+                        // No subreddits
+                    } else {
+                        postListingMetadata.pathComponents = ["subreddit": subscriptions]
+                    }
+                } else {
+                    let fetchedSubscriptions = postListingRepository.getAnonymousCustomThemeSubredditsConcatenated(myCustomFeed: myCustomFeed)
+                    postListingMetadata.postListingType = .anonymousCustomFeed(myCustomFeed: myCustomFeed, concatenatedSubscriptions: fetchedSubscriptions)
+                    if fetchedSubscriptions.isEmpty {
+                        // No subreddits
+                    } else {
+                        postListingMetadata.pathComponents = ["subreddit": fetchedSubscriptions]
+                    }
+                }
             }
             
             let postListing: PostListing

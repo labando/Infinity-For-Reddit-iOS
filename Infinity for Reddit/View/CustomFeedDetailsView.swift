@@ -24,7 +24,7 @@ struct CustomFeedDetailsView: View {
     var body: some View {
         PostListingView(
             postListingMetadata: PostListingMetadata(
-                postListingType: .customFeed(path: customFeedDetailsViewModel.myCustomFeed.path),
+                postListingType: customFeedDetailsViewModel.myCustomFeed.owner == Account.ANONYMOUS_ACCOUNT.username ? .anonymousCustomFeed(myCustomFeed: customFeedDetailsViewModel.myCustomFeed, concatenatedSubscriptions: nil) : .customFeed(path: customFeedDetailsViewModel.myCustomFeed.path),
                 pathComponents: ["multipath": customFeedDetailsViewModel.myCustomFeed.path],
                 headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                 queries: nil,
