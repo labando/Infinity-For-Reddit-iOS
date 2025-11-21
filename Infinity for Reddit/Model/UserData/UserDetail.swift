@@ -9,7 +9,7 @@ import Foundation
 import SwiftyJSON
 import GRDB
 
-class UserDetailRootClass : NSObject {
+class UserDetailRootClass: NSObject {
     var data : User!
     var kind : String!
     
@@ -24,23 +24,8 @@ class UserDetailRootClass : NSObject {
         kind = json["kind"].stringValue
     }
     
+    // Helper method
     public func toUserData() -> UserData {
-        return UserData(
-            id: data.id,
-            name: data.name,
-            iconUrl: data.iconImg,
-            banner: data.subreddit?.bannerImg,
-            commentKarma: data.commentKarma,
-            linkKarma: data.linkKarma,
-            awarderKarma: data.awarderKarma,
-            awardeeKarma: data.awardeeKarma,
-            totalKarma : data.totalKarma,
-            cakeday : data.createdUtc,
-            isGold : data.isGold,
-            canBeFollowed : data.acceptFollowers,
-            isNSFW : data.subreddit?.over18,
-            description : data.subreddit?.publicDescription,
-            title : data.subreddit?.title
-        )
+        return data.toUserData()
     }
 }

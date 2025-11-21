@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SubredditListingView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
@@ -16,12 +18,10 @@ struct SubredditListingView: View {
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
     private let iconSize: CGFloat = 28
-    private var onSelect: ((Subreddit) -> Void)?
     
-    init(account: Account, subredditListingViewModel: SubredditListingViewModel, onSelect: ((Subreddit) -> Void)? = nil) {
+    init(account: Account, subredditListingViewModel: SubredditListingViewModel) {
         self.account = account
         self.subredditListingViewModel = subredditListingViewModel
-        self.onSelect = onSelect
     }
     
     var body: some View {
@@ -48,7 +48,7 @@ struct SubredditListingView: View {
                             Spacer()
                                 .frame(width: 24)
                             
-                            VStack {
+                            VStack(spacing: 0) {
                                 Text(subreddit.displayNamePrefixed)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .primaryText()
@@ -59,16 +59,25 @@ struct SubredditListingView: View {
                             }
                             
                             Spacer()
+                            
+                            if subredditListingViewModel.thingSelectionMode.isMultiSelection {
+                                SwiftUI.Image(systemName: subredditListingViewModel.selectedSubreddits.index(id: subreddit.id) != nil ? "checkmark.square" : "square")
+                                    .primaryIcon()
+                            }
                         }
                         .contentShape(Rectangle())
                         .listPlainItem()
                         .onTapGesture {
-                            if let onSelect {
-                                onSelect(subreddit)
-                            } else {
+                            switch subredditListingViewModel.thingSelectionMode {
+                            case .noSelection:
                                 navigationManager.append(
                                     AppNavigation.subredditDetails(subredditName: subreddit.displayName)
                                 )
+                            case .thingSelection(let onSelectThing):
+                                onSelectThing(.subreddit(subreddit.toSubredditData()))
+                                dismiss()
+                            case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, let onConfirmSelection):
+                                subredditListingViewModel.toggleSelection(subreddit: subreddit)
                             }
                         }
                     }

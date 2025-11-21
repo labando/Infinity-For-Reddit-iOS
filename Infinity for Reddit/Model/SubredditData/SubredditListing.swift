@@ -53,7 +53,7 @@ public class SubredditListing : NSObject {
     }
 }
 
-class Subreddit : NSObject {
+class Subreddit: NSObject, Identifiable {
     var acceptFollowers : Bool!
     var advertiserCategory : String!
     var allOriginalContent : Bool!
@@ -96,7 +96,7 @@ class Subreddit : NSObject {
     var hideAds : Bool!
     var iconImg : String!
     var iconSize : Size!
-    var id : String!
+    public var id : String!
     var isCrosspostableSubreddit : Bool!
     var isEnrolledInNewModmail : Bool!
     var keyColor : String!
@@ -283,5 +283,21 @@ class Subreddit : NSObject {
         videostreamLinksCount = json["videostream_links_count"].intValue
         wikiEnabled = json["wiki_enabled"].boolValue
         wls = json["wls"].intValue
+    }
+    
+    public func toSubredditData() -> SubredditData {
+        return SubredditData(
+            id: id,
+            name: displayName,
+            fullName: name,
+            iconUrl: iconUrl,
+            bannerUrl: bannerBackgroundImage,
+            description: descriptionField,
+            sidebarDescription: publicDescription,
+            nSubscribers: subscribers,
+            createdUTC: createdUtc,
+            suggestedCommentSort: suggestedCommentSort,
+            isNSFW: over18
+        )
     }
 }

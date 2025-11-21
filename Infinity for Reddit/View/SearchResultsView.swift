@@ -27,12 +27,14 @@ struct SearchResultsView: View {
         _subredditListingViewModel = StateObject(
             wrappedValue: SubredditListingViewModel(
                 query: query,
+                thingSelectionMode: .noSelection,
                 subredditListingRepository: SubredditListingRepository()
             )
         )
         _userListingViewModel = StateObject(
             wrappedValue: UserListingViewModel(
                 query: query,
+                thingSelectionMode: .noSelection,
                 userListingRepository: UserListingRepository()
             )
         )

@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct UserListingView: View {
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dismiss) private var dismiss
+    
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
@@ -17,12 +18,10 @@ struct UserListingView: View {
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
     private let iconSize: CGFloat = 28
-    private var onSelect: ((User) -> Void)?
     
-    init(account: Account, userListingViewModel: UserListingViewModel, onSelect: ((User) -> Void)? = nil) {
+    init(account: Account, userListingViewModel: UserListingViewModel) {
         self.account = account
         self.userListingViewModel = userListingViewModel
-        self.onSelect = onSelect
     }
     
     var body: some View {
@@ -34,7 +33,7 @@ struct UserListingView: View {
             } else {
                 List {
                     ForEach(userListingViewModel.users, id: \.id) { user in
-                        HStack {
+                        HStack(spacing: 0) {
                             CustomWebImage(
                                 user.iconUrl,
                                 width: iconSize,
@@ -54,17 +53,27 @@ struct UserListingView: View {
                                 .primaryText()
                             
                             Spacer()
+                            
+                            if userListingViewModel.thingSelectionMode.isMultiSelection {
+                                SwiftUI.Image(systemName: userListingViewModel.selectedUsers.index(id: user.id) != nil ? "checkmark.square" : "square")
+                                    .primaryIcon()
+                            }
                         }
                         .contentShape(Rectangle())
                         .listPlainItem()
                         .onTapGesture {
-                            if let onSelect {
-                                onSelect(user)
-                            } else {
+                            switch userListingViewModel.thingSelectionMode {
+                            case .noSelection:
                                 navigationManager.append(AppNavigation.userDetails(username: user.name))
+                            case .thingSelection(let onSelectThing):
+                                onSelectThing(.user(user.toUserData()))
+                                dismiss()
+                            case .subredditAndUserMultiSelection:
+                                userListingViewModel.toggleSelection(user: user)
                             }
                         }
                     }
+                    
                     if userListingViewModel.hasMorePages {
                         ProgressIndicator()
                             .task {
@@ -77,40 +86,37 @@ struct UserListingView: View {
                 .themedList()
             }
         }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
-        }
-        .task(id: userListingViewModel.loadUsersTaskId) {
-            await userListingViewModel.initialLoadUsers()
-        }
-        .refreshable {
-            await userListingViewModel.refreshUsersWithContinuation()
-        }
-        .onAppear {
-            if let key = navigationBarMenuKey {
-                navigationBarMenuManager.pop(key: key)
-            }
-            navigationBarMenuKey = navigationBarMenuManager.push([
-                NavigationBarMenuItem(title: "Refresh") {
-                    userListingViewModel.refreshUsers()
-                },
-                
-                NavigationBarMenuItem(title: "Sort") {
-                    showSortTypeKindSheet = true
-                }
-            ])
-        }
-        .onDisappear {
-            guard let navigationBarMenuKey else { return }
-            navigationBarMenuManager.pop(key: navigationBarMenuKey)
-        }
-        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
-            SortTypeKindSheet(
-                sortTypeKindSource: OtherSortTypeKindSource.userListing,
-                currentSortTypeKind: userListingViewModel.sortType
-            ) { sortTypeKind in
-                userListingViewModel.changeSortTypeKind(sortTypeKind)
-            }
-        }
+//        .task(id: userListingViewModel.loadUsersTaskId) {
+//            await userListingViewModel.initialLoadUsers()
+//        }
+//        .refreshable {
+//            await userListingViewModel.refreshUsersWithContinuation()
+//        }
+//        .onAppear {
+//            if let key = navigationBarMenuKey {
+//                navigationBarMenuManager.pop(key: key)
+//            }
+//            navigationBarMenuKey = navigationBarMenuManager.push([
+//                NavigationBarMenuItem(title: "Refresh") {
+//                    userListingViewModel.refreshUsers()
+//                },
+//                
+//                NavigationBarMenuItem(title: "Sort") {
+//                    showSortTypeKindSheet = true
+//                }
+//            ])
+//        }
+//        .onDisappear {
+//            guard let navigationBarMenuKey else { return }
+//            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+//        }
+//        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
+//            SortTypeKindSheet(
+//                sortTypeKindSource: OtherSortTypeKindSource.userListing,
+//                currentSortTypeKind: userListingViewModel.sortType
+//            ) { sortTypeKind in
+//                userListingViewModel.changeSortTypeKind(sortTypeKind)
+//            }
+//        }
     }
 }

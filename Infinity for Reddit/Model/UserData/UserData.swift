@@ -7,10 +7,10 @@
 
 import GRDB
 
-public struct UserData: Codable, FetchableRecord, PersistableRecord {
+public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiable {
     public static let databaseTableName: String = "users"
     
-    var id: String
+    public var id: String
     var name: String
     var iconUrl: String?
     var banner: String?
