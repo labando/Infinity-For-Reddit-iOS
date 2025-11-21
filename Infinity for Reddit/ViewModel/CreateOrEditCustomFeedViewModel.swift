@@ -9,7 +9,7 @@ import Foundation
 import IdentifiedCollections
 
 @MainActor
-class CreateCustomFeedViewModel: ObservableObject {
+class CreateOrEditCustomFeedViewModel: ObservableObject {
     @Published var name: String = ""
     @Published var description: String = ""
     @Published var isPrivate: Bool = true
@@ -18,7 +18,10 @@ class CreateCustomFeedViewModel: ObservableObject {
     @Published var createdMyCustomFeed: MyCustomFeed?
     @Published var error: Error? = nil
     
-    private let createCustomFeedRepository: CreateCustomFeedRepositoryProtocol
+    @Published var myCustomFeedToEdit: MyCustomFeed?
+    @Published var hasLoadedMyCustomFeedToEdit: Bool = false
+    
+    private let createCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
     
     enum CreateCustomFeedViewModelError: LocalizedError {
         case emptyNameError
@@ -31,7 +34,8 @@ class CreateCustomFeedViewModel: ObservableObject {
         }
     }
     
-    init(createCustomFeedRepository: CreateCustomFeedRepositoryProtocol) {
+    init(myCustomFeedToEdit: MyCustomFeed?, createCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol) {
+        self.myCustomFeedToEdit = myCustomFeedToEdit
         self.createCustomFeedRepository = createCustomFeedRepository
     }
     

@@ -1,5 +1,5 @@
 //
-//  CreateCustomFeedRepository.swift
+//  CreateOrEditCustomFeedRepository.swift
 //  Infinity for Reddit
 //
 //  Created by Docile Alligator on 2025-11-19.
@@ -11,7 +11,7 @@ import SwiftyJSON
 import Foundation
 import GRDB
 
-class CreateCustomFeedRepository: CreateCustomFeedRepositoryProtocol {
+class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol {
     enum CreateCustomFeedRepositoryError: LocalizedError {
         case failedToCreateCustomFeedModel
         

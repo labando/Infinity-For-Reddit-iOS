@@ -134,7 +134,10 @@ struct CustomNavigationStack<Content: View>: View {
                         SendChatMessageView(recipient: recipient)
                             .environmentObject(navigationManager)
                     case .createCustomFeed:
-                        CreateCustomFeedView()
+                        CreateOrEditCustomFeedView()
+                            .environmentObject(navigationManager)
+                    case .editCustomFeed(let myCustomFeed):
+                        CreateOrEditCustomFeedView(myCustomFeedToEdit: myCustomFeed)
                             .environmentObject(navigationManager)
                     }
                 }

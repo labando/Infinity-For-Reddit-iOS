@@ -86,37 +86,37 @@ struct UserListingView: View {
                 .themedList()
             }
         }
-//        .task(id: userListingViewModel.loadUsersTaskId) {
-//            await userListingViewModel.initialLoadUsers()
-//        }
-//        .refreshable {
-//            await userListingViewModel.refreshUsersWithContinuation()
-//        }
-//        .onAppear {
-//            if let key = navigationBarMenuKey {
-//                navigationBarMenuManager.pop(key: key)
-//            }
-//            navigationBarMenuKey = navigationBarMenuManager.push([
-//                NavigationBarMenuItem(title: "Refresh") {
-//                    userListingViewModel.refreshUsers()
-//                },
-//                
-//                NavigationBarMenuItem(title: "Sort") {
-//                    showSortTypeKindSheet = true
-//                }
-//            ])
-//        }
-//        .onDisappear {
-//            guard let navigationBarMenuKey else { return }
-//            navigationBarMenuManager.pop(key: navigationBarMenuKey)
-//        }
-//        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
-//            SortTypeKindSheet(
-//                sortTypeKindSource: OtherSortTypeKindSource.userListing,
-//                currentSortTypeKind: userListingViewModel.sortType
-//            ) { sortTypeKind in
-//                userListingViewModel.changeSortTypeKind(sortTypeKind)
-//            }
-//        }
+        .task(id: userListingViewModel.loadUsersTaskId) {
+            await userListingViewModel.initialLoadUsers()
+        }
+        .refreshable {
+            await userListingViewModel.refreshUsersWithContinuation()
+        }
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Refresh") {
+                    userListingViewModel.refreshUsers()
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    showSortTypeKindSheet = true
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else { return }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+        .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
+            SortTypeKindSheet(
+                sortTypeKindSource: OtherSortTypeKindSource.userListing,
+                currentSortTypeKind: userListingViewModel.sortType
+            ) { sortTypeKind in
+                userListingViewModel.changeSortTypeKind(sortTypeKind)
+            }
+        }
     }
 }

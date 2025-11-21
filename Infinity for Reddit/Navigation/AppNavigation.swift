@@ -31,4 +31,5 @@ enum AppNavigation: Hashable {
     case crosspost(postToBeCrossposted: Post)
     case sendChatMessage(recipient: String? = nil)
     case createCustomFeed
+    case editCustomFeed(myCustomFeed: MyCustomFeed)
 }

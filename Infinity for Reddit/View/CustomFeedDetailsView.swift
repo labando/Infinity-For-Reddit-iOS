@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct CustomFeedDetailsView: View {
-    @EnvironmentObject var accountViewModel: AccountViewModel
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     @StateObject private var customFeedDetailsViewModel: CustomFeedDetailsViewModel
+    
+    @State private var navigationBarMenuKey: UUID?
     
     init(myCustomFeed: MyCustomFeed) {
         _customFeedDetailsViewModel = StateObject(
@@ -33,6 +37,22 @@ struct CustomFeedDetailsView: View {
         )
         .id(accountViewModel.account.username)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar(customFeedDetailsViewModel.myCustomFeed.displayName, 1.0)
+        .addTitleToInlineNavigationBar(customFeedDetailsViewModel.myCustomFeed.displayName)
+        .onAppear {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Edit Custom Feed") {
+                    navigationManager.append(AppNavigation.editCustomFeed(myCustomFeed: customFeedDetailsViewModel.myCustomFeed))
+                }
+            ])
+        }
+        .onDisappear {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
     }
 }
