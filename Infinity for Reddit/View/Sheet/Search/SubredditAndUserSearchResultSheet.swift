@@ -12,10 +12,23 @@ struct SubredditAndUserSearchResultSheet: View {
     
     @Environment(\.dismiss) var dismiss
     
+    @StateObject private var subredditListingViewModel: SubredditListingViewModel
+    
     @State private var selectedOption = 0
     
     let query: String
     let onSearchInThingSelected: (Thing) -> Void
+    
+    init(query: String, onSearchInThingSelected: @escaping (Thing) -> Void) {
+        self.query = query
+        self.onSearchInThingSelected = onSearchInThingSelected
+        _subredditListingViewModel = StateObject(
+            wrappedValue: SubredditListingViewModel(
+                query: query,
+                subredditListingRepository: SubredditListingRepository()
+            )
+        )
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -23,7 +36,7 @@ struct SubredditAndUserSearchResultSheet: View {
                 .padding(4)
             
             TabView(selection: $selectedOption) {
-                SubredditListingView(account: accountViewModel.account, query: query) { subreddit in
+                SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel) { subreddit in
                     onSearchInThingSelected(Thing.subscribedSubreddit(SubscribedSubredditData.fromSubreddit(subreddit, username: accountViewModel.account.username)))
                     dismiss()
                 }

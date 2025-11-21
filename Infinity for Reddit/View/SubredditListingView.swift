@@ -11,23 +11,17 @@ struct SubredditListingView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     
-    @StateObject var subredditListingViewModel: SubredditListingViewModel
+    @ObservedObject var subredditListingViewModel: SubredditListingViewModel
     @State private var showSortTypeKindSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     private let account: Account
     private let iconSize: CGFloat = 28
     private var onSelect: ((Subreddit) -> Void)?
     
-    init(account: Account, query: String, onSelect: ((Subreddit) -> Void)? = nil) {
+    init(account: Account, subredditListingViewModel: SubredditListingViewModel, onSelect: ((Subreddit) -> Void)? = nil) {
         self.account = account
+        self.subredditListingViewModel = subredditListingViewModel
         self.onSelect = onSelect
-        
-        _subredditListingViewModel = StateObject(
-            wrappedValue: SubredditListingViewModel(
-                query: query,
-                subredditListingRepository: SubredditListingRepository()
-            )
-        )
     }
     
     var body: some View {
@@ -39,7 +33,7 @@ struct SubredditListingView: View {
             } else {
                 List {
                     ForEach(subredditListingViewModel.subreddits, id: \.id) { subreddit in
-                        HStack {
+                        HStack(spacing: 0) {
                             CustomWebImage(
                                 subreddit.iconUrl,
                                 width: iconSize,

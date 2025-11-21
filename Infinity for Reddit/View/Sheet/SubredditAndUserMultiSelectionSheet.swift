@@ -47,7 +47,7 @@ struct SubredditAndUserMultiSelectionSheet: View {
         .sheet(isPresented: $showSearchSubredditsAndUsersView) {
             NavigationStack {
                 SearchSubredditsAndUsersSheet { thing in
-                    dismiss()
+                    
                 }
             }
         }

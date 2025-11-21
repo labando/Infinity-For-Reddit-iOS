@@ -7,10 +7,12 @@
 import SwiftUI
 
 struct SubredditSearchResultSheet: View {
+    @Environment(\.dismiss) var dismiss
+    
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     
-    @Environment(\.dismiss) var dismiss
+    @StateObject private var subredditListingViewModel: SubredditListingViewModel
     
     private let query: String
     private let onSubscribedSubredditSelected: (SubscribedSubredditData) -> Void
@@ -18,10 +20,16 @@ struct SubredditSearchResultSheet: View {
     init(query: String, onSubscribedSubredditSelected: @escaping (SubscribedSubredditData) -> Void) {
         self.query = query
         self.onSubscribedSubredditSelected = onSubscribedSubredditSelected
+        _subredditListingViewModel = StateObject(
+            wrappedValue: SubredditListingViewModel(
+                query: query,
+                subredditListingRepository: SubredditListingRepository()
+            )
+        )
     }
     
     var body: some View {
-        SubredditListingView(account: accountViewModel.account, query: query) { subreddit in
+        SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel) { subreddit in
             onSubscribedSubredditSelected(SubscribedSubredditData.fromSubreddit(subreddit, username: accountViewModel.account.username))
             dismiss()
         }
