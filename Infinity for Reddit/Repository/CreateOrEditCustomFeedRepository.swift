@@ -13,11 +13,11 @@ import GRDB
 
 class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol {
     enum CreateCustomFeedRepositoryError: LocalizedError {
-        case failedToCreateCustomFeedModel
+        case failedToCreateOrUpdateCustomFeedModel
         
         var errorDescription: String? {
             switch self {
-            case .failedToCreateCustomFeedModel:
+            case .failedToCreateOrUpdateCustomFeedModel:
                 return "Failed to create a model of the custom feed"
             }
         }
@@ -39,7 +39,7 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
         self.anonymousCustomFeedSubredditDao = AnonymousCustomFeedSubredditDao(dbPool: resolvedDBPool)
     }
     
-    func createCustomFeed(name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>) async throws -> MyCustomFeed {
+    func createOrCustomFeed(path: String, name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>, isUpdate: Bool) async throws -> MyCustomFeed {
         guard !AccountViewModel.shared.account.isAnonymous() else {
             return try await createCustomFeedAnonymous(name: name, description: description, subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed)
         }
@@ -52,24 +52,18 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
         let model = try JSONEncoder().encode(payload)
 
         if let modelString = String(data: model, encoding: .utf8) {
-            let multipathName: String
-            if let spaceIndex = name.firstIndex(of: " ") {
-                multipathName = String(name[..<spaceIndex])
-            } else {
-                multipathName = name
-            }
             
             let params: [String: String] = [
-                "multipath": "/user/\(AccountViewModel.shared.account.username)/m/\(multipathName)",
+                "multipath": path,
                 "model": String(format: modelString)
             ]
             
-            let response = await self.session.request(RedditOAuthAPI.createCustomFeed(params: params))
+            let response = await self.session.request(isUpdate ? RedditOAuthAPI.updateCustomFeed(params: params) : RedditOAuthAPI.createCustomFeed(params: params))
                 .serializingData(automaticallyCancelling: true)
                 .response
             
             guard let statusCode = response.response?.statusCode, let data = response.data else {
-                throw APIError.networkError("Cannot create this custom feed.")
+                throw APIError.networkError("Cannot \(isUpdate ? "update" : "create") this custom feed.")
             }
 
             if (200...299).contains(statusCode) {
@@ -87,11 +81,11 @@ class CreateOrEditCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
                 if let customFeedCreationError = try? CustomFeedCreationError(fromJson: JSON(data)) {
                     throw APIError.invalidResponse(customFeedCreationError.explanation.capitalizedFirst)
                 } else {
-                    throw APIError.networkError("Cannot create this custom feed.")
+                    throw APIError.networkError("Cannot \(isUpdate ? "update" : "create") this custom feed.")
                 }
             }
         } else {
-            throw CreateCustomFeedRepositoryError.failedToCreateCustomFeedModel
+            throw CreateCustomFeedRepositoryError.failedToCreateOrUpdateCustomFeedModel
         }
     }
     

@@ -133,7 +133,7 @@ struct CreateOrEditCustomFeedView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: {
-                    createOrEditCustomFeedViewModel.createCustomFeed()
+                    createOrEditCustomFeedViewModel.createOrUpdateCustomFeed()
                 }) {
                     SwiftUI.Image(systemName: "checkmark.circle")
                         .navigationBarImage()
@@ -147,7 +147,7 @@ struct CreateOrEditCustomFeedView: View {
                 await createOrEditCustomFeedViewModel.fetchCustomFeedDetailsToEdit()
             }
         }
-        .onChange(of: createOrEditCustomFeedViewModel.createCustomFeedTask) { _, newValue in
+        .onChange(of: createOrEditCustomFeedViewModel.createOrUpdateCustomFeedTask) { _, newValue in
             if newValue != nil {
                 snackbarManager.showSnackbar(
                     text: "Creating. Please wait...",
@@ -156,7 +156,7 @@ struct CreateOrEditCustomFeedView: View {
                 )
             }
         }
-        .onChange(of: createOrEditCustomFeedViewModel.createdMyCustomFeed) { _, newValue in
+        .onChange(of: createOrEditCustomFeedViewModel.createdOrUpdatedMyCustomFeed) { _, newValue in
             if let newValue {
                 snackbarManager.dismiss()
                 navigationManager.replaceCurrentScreen(AppNavigation.customFeed(myCustomFeed: newValue))

@@ -14,8 +14,8 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
     @Published var description: String = ""
     @Published var isPrivate: Bool = true
     @Published var subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing> = []
-    @Published var createCustomFeedTask: Task<Void, Never>?
-    @Published var createdMyCustomFeed: MyCustomFeed?
+    @Published var createOrUpdateCustomFeedTask: Task<Void, Never>?
+    @Published var createdOrUpdatedMyCustomFeed: MyCustomFeed?
     @Published var error: Error? = nil
     
     @Published var myCustomFeedToEdit: MyCustomFeed?
@@ -25,11 +25,14 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
     
     enum CreateCustomFeedViewModelError: LocalizedError {
         case emptyNameError
+        case myCustomFeedToEditIsNilError
         
         var errorDescription: String? {
             switch self {
             case .emptyNameError:
                 return "Name cannot be empty."
+            case .myCustomFeedToEditIsNilError:
+                return "Cannot get the current custom feed to edit."
             }
         }
     }
@@ -51,8 +54,16 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
         subredditsAndUsersInCustomFeed.remove(value)
     }
     
-    func createCustomFeed() {
-        guard createCustomFeedTask == nil else {
+    func createOrUpdateCustomFeed() {
+        if myCustomFeedToEdit == nil {
+            createCustomFeed()
+        } else {
+            updateCustomFeed()
+        }
+    }
+    
+    private func createCustomFeed() {
+        guard createOrUpdateCustomFeedTask == nil else {
             return
         }
         
@@ -61,20 +72,29 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
             return
         }
         
-        createCustomFeedTask = Task {
+        createOrUpdateCustomFeedTask = Task {
             do {
-                self.createdMyCustomFeed = try await createCustomFeedRepository.createCustomFeed(
+                let multipathName: String
+                if let spaceIndex = name.firstIndex(of: " ") {
+                    multipathName = String(name[..<spaceIndex])
+                } else {
+                    multipathName = name
+                }
+                
+                self.createdOrUpdatedMyCustomFeed = try await createCustomFeedRepository.createOrCustomFeed(
+                    path: "/user/\(AccountViewModel.shared.account.username)/m/\(multipathName)",
                     name: name,
                     description: description,
                     isPrivate: isPrivate,
-                    subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed
+                    subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed,
+                    isUpdate: false
                 )
             } catch {
                 self.error = error
                 print(error)
             }
             
-            createCustomFeedTask = nil
+            createOrUpdateCustomFeedTask = nil
         }
     }
     
@@ -102,6 +122,40 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
             myCustomFeedToEditLoadState = .loaded
         } catch {
             myCustomFeedToEditLoadState = .failed(error)
+        }
+    }
+    
+    private func updateCustomFeed() {
+        guard createOrUpdateCustomFeedTask == nil else {
+            return
+        }
+        
+        guard let myCustomFeedToEdit else {
+            self.error = CreateCustomFeedViewModelError.myCustomFeedToEditIsNilError
+            return
+        }
+        
+        guard !name.isEmpty else {
+            self.error = CreateCustomFeedViewModelError.emptyNameError
+            return
+        }
+        
+        createOrUpdateCustomFeedTask = Task {
+            do {
+                self.createdOrUpdatedMyCustomFeed = try await createCustomFeedRepository.createOrCustomFeed(
+                    path: myCustomFeedToEdit.path,
+                    name: name,
+                    description: description,
+                    isPrivate: isPrivate,
+                    subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed,
+                    isUpdate: true
+                )
+            } catch {
+                self.error = error
+                print(error)
+            }
+            
+            createOrUpdateCustomFeedTask = nil
         }
     }
 }

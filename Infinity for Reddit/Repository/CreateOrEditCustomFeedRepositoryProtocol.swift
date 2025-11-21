@@ -8,6 +8,6 @@
 import IdentifiedCollections
 
 protocol CreateOrEditCustomFeedRepositoryProtocol {
-    func createCustomFeed(name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>) async throws -> MyCustomFeed
+    func createOrCustomFeed(path: String, name: String, description: String, isPrivate: Bool, subredditsAndUsersInCustomFeed: IdentifiedArrayOf<Thing>, isUpdate: Bool) async throws -> MyCustomFeed
     func fetchCustomFeedDetails(path: String) async throws -> CustomFeed
 }
