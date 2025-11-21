@@ -20,6 +20,17 @@ class CreateCustomFeedViewModel: ObservableObject {
     
     private let createCustomFeedRepository: CreateCustomFeedRepositoryProtocol
     
+    enum CreateCustomFeedViewModelError: LocalizedError {
+        case emptyNameError
+        
+        var errorDescription: String? {
+            switch self {
+            case .emptyNameError:
+                return "Name cannot be empty."
+            }
+        }
+    }
+    
     init(createCustomFeedRepository: CreateCustomFeedRepositoryProtocol) {
         self.createCustomFeedRepository = createCustomFeedRepository
     }
@@ -38,6 +49,11 @@ class CreateCustomFeedViewModel: ObservableObject {
     
     func createCustomFeed() {
         guard createCustomFeedTask == nil else {
+            return
+        }
+        
+        guard !name.isEmpty else {
+            self.error = CreateCustomFeedViewModelError.emptyNameError
             return
         }
         
