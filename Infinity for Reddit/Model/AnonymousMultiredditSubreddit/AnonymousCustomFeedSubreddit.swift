@@ -11,7 +11,7 @@ struct AnonymousCustomFeedSubreddit: Codable, FetchableRecord, PersistableRecord
     static let databaseTableName = "anonymous_custom_feed_subreddits"
 
     var path: String
-    var username: Account = Account.ANONYMOUS_ACCOUNT
+    var username: String = Account.ANONYMOUS_ACCOUNT.username
     var subredditName: String
     var iconUrlString: String
 
