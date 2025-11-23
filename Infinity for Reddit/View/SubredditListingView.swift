@@ -132,5 +132,8 @@ struct SubredditListingView: View {
     
     func isSelected(_ subreddit: Subreddit) -> Bool {
         return subredditListingViewModel.selectedSubreddits.index(id: subreddit.id) != nil
+        || subredditListingViewModel.selectedSubredditData.index(id: subreddit.id) != nil
+        || subredditListingViewModel.selectedSubscribedSubreddits.index(id: subreddit.id) != nil
+        || subredditListingViewModel.selectedSubredditsInCustomFeed.index(id: subreddit.name) != nil
     }
 }
