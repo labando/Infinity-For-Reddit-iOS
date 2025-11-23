@@ -125,5 +125,8 @@ struct UserListingView: View {
     
     func isSelected(_ user: User) -> Bool {
         return userListingViewModel.selectedUsers.index(id: user.id) != nil
+        || userListingViewModel.selectedSubscribedUsers.index(id: user.id) != nil
+        || userListingViewModel.selectedUserData.index(id: user.id) != nil
+        || userListingViewModel.selectedUserSubredditsInCustomFeed.index(id: "u_\(user.name)") != nil
     }
 }

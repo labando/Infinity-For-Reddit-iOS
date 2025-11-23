@@ -22,8 +22,8 @@ public class SubredditListingViewModel: ObservableObject {
     @Published var sortType: SortType.Kind
     @Published var loadSubredditsTaskId = UUID()
     
-    @Published var selectedSubscribedSubreddits: IdentifiedArrayOf<SubscribedSubredditData> = []
     @Published var selectedSubreddits: IdentifiedArrayOf<Subreddit> = []
+    @Published var selectedSubscribedSubreddits: IdentifiedArrayOf<SubscribedSubredditData> = []
     @Published var selectedSubredditData: IdentifiedArrayOf<SubredditData> = []
     @Published var selectedSubredditsInCustomFeed: IdentifiedArrayOf<SubredditInCustomFeed> = []
     
