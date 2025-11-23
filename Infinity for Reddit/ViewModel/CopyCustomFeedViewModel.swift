@@ -22,6 +22,17 @@ class CopyCustomFeedViewModel: ObservableObject {
     private let path: String
     private let copyCustomFeedRepository: CopyCustomFeedRepositoryProtocol
     
+    enum CopyCustomFeedViewModelError: LocalizedError {
+        case emptyNameError
+        
+        var errorDescription: String? {
+            switch self {
+            case .emptyNameError:
+                return "Name cannot be empty."
+            }
+        }
+    }
+    
     init(path: String, copyCustomFeedRepository: CopyCustomFeedRepositoryProtocol) {
         self.path = path
         self.copyCustomFeedRepository = copyCustomFeedRepository
@@ -46,6 +57,37 @@ class CopyCustomFeedViewModel: ObservableObject {
             customFeedLoadState = .loaded
         } catch {
             customFeedLoadState = .failed(error)
+        }
+    }
+    
+    func copyCustomFeed() {
+        guard copyCustomFeedTask == nil else {
+            return
+        }
+        
+        guard customFeedLoadState.isLoaded else {
+            return
+        }
+        
+        guard !name.isEmpty else {
+            self.error = CopyCustomFeedViewModelError.emptyNameError
+            return
+        }
+        
+        copyCustomFeedTask = Task {
+            do {
+                self.copiedMyCustomFeed = try await copyCustomFeedRepository.copyCustomFeed(
+                    path: path,
+                    name: name,
+                    description: description,
+                    subredditsAndUsersInCustomFeed: subredditsAndUsersInCustomFeed
+                )
+            } catch {
+                self.error = error
+                print(error)
+            }
+            
+            copyCustomFeedTask = nil
         }
     }
 }

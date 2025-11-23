@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CopyCustomFeedView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var snackbarManager: SnackbarManager
@@ -102,7 +104,7 @@ struct CopyCustomFeedView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: {
-                    //copyCustomFeedViewModel.copyCustomFeed()
+                    copyCustomFeedViewModel.copyCustomFeed()
                 }) {
                     SwiftUI.Image(systemName: "checkmark.circle")
                         .navigationBarImage()
@@ -122,8 +124,9 @@ struct CopyCustomFeedView: View {
             }
         }
         .onChange(of: copyCustomFeedViewModel.copiedMyCustomFeed) { _, newValue in
-            if let newValue {
+            if newValue != nil {
                 snackbarManager.showSnackbar(text: "Copied")
+                dismiss()
             }
         }
         .onReceive(copyCustomFeedViewModel.$error) { newValue in
