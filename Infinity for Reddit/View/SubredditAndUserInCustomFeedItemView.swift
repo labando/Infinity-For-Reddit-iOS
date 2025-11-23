@@ -11,7 +11,7 @@ struct SubredditAndUserInCustomFeedItemView: View {
     var text: String
     var iconUrlString: String?
     var iconSize: CGFloat = 24
-    let onDelete: () -> Void
+    var onDelete: (() -> Void)?
     
     var body: some View {
         HStack(spacing: 0) {
@@ -38,11 +38,13 @@ struct SubredditAndUserInCustomFeedItemView: View {
                 .primaryText()
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            Button(action: {
-                onDelete()
-            }) {
-                SwiftUI.Image(systemName: "trash")
-                    .primaryIcon()
+            if onDelete != nil {
+                Button(action: {
+                    onDelete?()
+                }) {
+                    SwiftUI.Image(systemName: "trash")
+                        .primaryIcon()
+                }
             }
         }
         .frame(maxWidth: .infinity)

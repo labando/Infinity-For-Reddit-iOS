@@ -84,8 +84,7 @@ struct CopyCustomFeedView: View {
                                 SubredditAndUserInCustomFeedItemView(
                                     text: item.name,
                                     iconUrlString: item.iconUrlString
-                                ) {
-                                }
+                                )
                             }
                         }
                     }
