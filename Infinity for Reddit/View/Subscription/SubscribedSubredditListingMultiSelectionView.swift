@@ -31,13 +31,7 @@ struct SubscribedSubredditListingMultiSelectionView: View {
                                     iconUrl: subscription.iconUrl,
                                     isSelected: isSubredditSelected(subscription)
                                 ) {
-                                    if subscriptionListingViewModel.selectedSubscribedSubreddits.index(id: subscription.id) != nil {
-                                        subscriptionListingViewModel.selectedSubscribedSubreddits.remove(subscription)
-                                    } else if subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: subscription.name) != nil {
-                                        subscriptionListingViewModel.selectedSubredditsInCustomFeed.remove(id: subscription.name)
-                                    } else {
-                                        subscriptionListingViewModel.selectedSubscribedSubreddits.append(subscription)
-                                    }
+                                    toggleSelection(subscription)
                                 }
                                 .listPlainItemNoInsets()
                             }
@@ -51,13 +45,7 @@ struct SubscribedSubredditListingMultiSelectionView: View {
                                 iconUrl: subscription.iconUrl,
                                 isSelected: isSubredditSelected(subscription)
                             ) {
-                                if subscriptionListingViewModel.selectedSubscribedSubreddits.index(id: subscription.id) != nil {
-                                    subscriptionListingViewModel.selectedSubscribedSubreddits.remove(subscription)
-                                } else if subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: subscription.name) != nil {
-                                    subscriptionListingViewModel.selectedSubredditsInCustomFeed.remove(id: subscription.name)
-                                } else {
-                                    subscriptionListingViewModel.selectedSubscribedSubreddits.append(subscription)
-                                }
+                                toggleSelection(subscription)
                             }
                             .listPlainItemNoInsets()
                         }
@@ -69,8 +57,21 @@ struct SubscribedSubredditListingMultiSelectionView: View {
         }
     }
     
-    func isSubredditSelected(_ subscribedSubreddit: SubscribedSubredditData) -> Bool {
-        return subscriptionListingViewModel.selectedSubscribedSubreddits.index(id: subscribedSubreddit.id) != nil
-        || subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: subscribedSubreddit.name) != nil
+    func isSubredditSelected(_ subscription: SubscribedSubredditData) -> Bool {
+        return subscriptionListingViewModel.selectedSubscribedSubreddits.index(id: subscription.id) != nil
+        || subscriptionListingViewModel.selectedSubreddits.index(id: subscription.id) != nil
+        || subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: subscription.name) != nil
+    }
+    
+    func toggleSelection(_ subscription: SubscribedSubredditData) {
+        if subscriptionListingViewModel.selectedSubscribedSubreddits.index(id: subscription.id) != nil {
+            subscriptionListingViewModel.selectedSubscribedSubreddits.remove(subscription)
+        } else if subscriptionListingViewModel.selectedSubreddits.index(id: subscription.id) != nil {
+            subscriptionListingViewModel.selectedSubreddits.remove(id: subscription.id)
+        } else if subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: subscription.name) != nil {
+            subscriptionListingViewModel.selectedSubredditsInCustomFeed.remove(id: subscription.name)
+        } else {
+            subscriptionListingViewModel.selectedSubscribedSubreddits.append(subscription)
+        }
     }
 }

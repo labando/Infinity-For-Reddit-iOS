@@ -10,7 +10,11 @@ import GRDB
 public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiable {
     public static let databaseTableName: String = "users"
     
-    public var id: String
+    public var id: String {
+        return name
+    }
+    
+    var idInReddit: String
     var name: String
     var iconUrl: String?
     var banner: String?
@@ -29,7 +33,7 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiabl
     var isSubscribed: Bool = false
     
     init(id: String, name: String, iconUrl: String? = nil, banner: String? = nil, commentKarma: Int? = nil, linkKarma: Int? = nil, awarderKarma: Int? = nil, awardeeKarma: Int? = nil, totalKarma: Int? = nil, cakeday: Int64? = nil, isGold: Bool? = nil, canBeFollowed: Bool? = nil, isNSFW: Bool? = nil, description: String? = nil, title: String? = nil) {
-        self.id = id
+        self.idInReddit = id
         self.name = name
         self.iconUrl = iconUrl
         self.banner = banner
@@ -48,7 +52,7 @@ public struct UserData: Codable, FetchableRecord, PersistableRecord, Identifiabl
     }
     
     private enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
-        case id
+        case idInReddit = "id"
         case name
         case iconUrl = "icon_url"
         case banner = "banner_url"

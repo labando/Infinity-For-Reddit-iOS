@@ -31,13 +31,7 @@ struct SubscribedUserListingMultiSelectionView: View {
                                     iconUrl: subscription.iconUrl,
                                     isSelected: isUserSelected(subscription)
                                 ) {
-                                    if subscriptionListingViewModel.selectedSubscribedUsers.index(id: subscription.id) != nil {
-                                        subscriptionListingViewModel.selectedSubscribedUsers.remove(subscription)
-                                    } else if subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: "u_\(subscription.name)") != nil {
-                                        subscriptionListingViewModel.selectedSubredditsInCustomFeed.remove(id: "u_\(subscription.name)")
-                                    } else {
-                                        subscriptionListingViewModel.selectedSubscribedUsers.append(subscription)
-                                    }
+                                    toggleSelection(subscription)
                                 }
                                 .listPlainItemNoInsets()
                             }
@@ -51,13 +45,7 @@ struct SubscribedUserListingMultiSelectionView: View {
                                 iconUrl: subscription.iconUrl,
                                 isSelected: isUserSelected(subscription)
                             ) {
-                                if subscriptionListingViewModel.selectedSubscribedUsers.index(id: subscription.id) != nil {
-                                    subscriptionListingViewModel.selectedSubscribedUsers.remove(subscription)
-                                } else if subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: "u_\(subscription.name)") != nil {
-                                    subscriptionListingViewModel.selectedSubredditsInCustomFeed.remove(id: "u_\(subscription.name)")
-                                } else {
-                                    subscriptionListingViewModel.selectedSubscribedUsers.append(subscription)
-                                }
+                                toggleSelection(subscription)
                             }
                             .listPlainItemNoInsets()
                         }
@@ -69,8 +57,21 @@ struct SubscribedUserListingMultiSelectionView: View {
         }
     }
     
-    func isUserSelected(_ subscribedUser: SubscribedUserData) -> Bool {
-        return subscriptionListingViewModel.selectedSubscribedUsers.index(id: subscribedUser.id) != nil
-        || subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: "u_\(subscribedUser.name)") != nil
+    func isUserSelected(_ subscription: SubscribedUserData) -> Bool {
+        return subscriptionListingViewModel.selectedSubscribedUsers.index(id: subscription.id) != nil
+        || subscriptionListingViewModel.selectedUsers.index(id: subscription.name) != nil
+        || subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: "u_\(subscription.name)") != nil
+    }
+    
+    func toggleSelection(_ subscription: SubscribedUserData) {
+        if subscriptionListingViewModel.selectedSubscribedUsers.index(id: subscription.id) != nil {
+            subscriptionListingViewModel.selectedSubscribedUsers.remove(subscription)
+        } else if subscriptionListingViewModel.selectedUsers.index(id: subscription.name) != nil {
+            subscriptionListingViewModel.selectedUsers.remove(id: subscription.name)
+        } else if subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: "u_\(subscription.name)") != nil {
+            subscriptionListingViewModel.selectedSubredditsInCustomFeed.remove(id: "u_\(subscription.name)")
+        } else {
+            subscriptionListingViewModel.selectedSubscribedUsers.append(subscription)
+        }
     }
 }
