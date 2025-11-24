@@ -14,38 +14,39 @@ struct DataSavingModeSettingsView: View {
 
     var body: some View {
         RootView {
-            List {
-                if dataSavingMode != 0 {
-                    TogglePreference(
-                        isEnabled: $disableImagePreview,
-                        title: "Disable Image Preview in Data Saving Mode"
-                    )
-                    .listPlainItemNoInsets()
+            ScrollView {
+                VStack(spacing: 0) {
+                    PreferenceEntry(
+                        title: "",
+                        subtitle: "In data saving mode:\nPreview images are in lower resolution.\nVideo autoplay is disabled.",
+                        icon: "exclamationmark.circle"
+                    ) {
+                        // Empty action
+                    }
+                    
+                    BarebonePickerPreference(
+                        selected: $dataSavingMode,
+                        items: DataSavingModeUserDefaultsUtils.dataSavingModeOptions,
+                        title: "Data Saving Mode"
+                    ) { mode in
+                        DataSavingModeUserDefaultsUtils.dataSavingModeOptionsText[mode]
+                    }
+                    
+                    if dataSavingMode != 0 {
+                        TogglePreference(
+                            isEnabled: $disableImagePreview,
+                            title: "Disable Image Preview in Data Saving Mode"
+                        )
+                        .transition(.opacity)
 
-                    TogglePreference(
-                        isEnabled: $onlyDisablePreviewInVideoAndGIF,
-                        title: "Only Disable Preview in Video and Gif Posts"
-                    )
-                    .listPlainItemNoInsets()
+                        TogglePreference(
+                            isEnabled: $onlyDisablePreviewInVideoAndGIF,
+                            title: "Only Disable Preview in Video and Gif Posts"
+                        )
+                        .transition(.opacity)
+                    }
                 }
-                
-                PreferenceEntry(
-                    title: "",
-                    subtitle: "In data saving mode:\nPreview images are in lower resolution.\nVideo autoplay is disabled.",
-                    icon: "exclamationmark.circle"
-                ) {
-                    // Empty action
-                }
-                .listPlainItemNoInsets()
-                
-                BarebonePickerPreference(
-                    selected: $dataSavingMode,
-                    items: DataSavingModeUserDefaultsUtils.dataSavingModeOptions,
-                    title: "Data Saving Mode"
-                ) { mode in
-                    DataSavingModeUserDefaultsUtils.dataSavingModeOptionsText[mode]
-                }
-                .listPlainItemNoInsets()
+                .animation(.easeInOut, value: dataSavingMode)
             }
             .themedList()
         }
