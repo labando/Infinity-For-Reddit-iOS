@@ -6,15 +6,9 @@
         
 import GRDB
 
-public struct Rule: Codable, FetchableRecord, PersistableRecord, Identifiable {
-    public static let databaseTableName = "rules"
-    
+public struct Rule {
     let shortName: String
     let description: String
-    
-    public var id: String {
-        return self.shortName
-    }
     
     init(shortName: String, description: String) {
         self.shortName = shortName

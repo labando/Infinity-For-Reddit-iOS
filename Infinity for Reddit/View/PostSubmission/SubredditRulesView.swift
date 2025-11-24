@@ -13,7 +13,7 @@ struct SubredditRulesView: View {
     var body: some View {
         ScrollView {
             VStack {
-                ForEach(subredditChooseViewModel.rules, id: \.id) { rule in
+                ForEach(subredditChooseViewModel.rules, id: \.shortName) { rule in
                     Markdown(rule.shortName)
                         .markdownTextStyle {
                             FontSize(16)
