@@ -9,14 +9,17 @@ import SwiftUI
 
 struct PostVideoView: View {
     @EnvironmentObject private var networkManager: NetworkManager
-    
+
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(VideoUserDefaultsUtils.videoAutoplayKey, store: .video) private var videoAutoplay: Int = 0
     @AppStorage(VideoUserDefaultsUtils.autoplaySensitiveVideoKey, store: .video) private var autoplaySensitiveVideo: Bool = true
     @AppStorage(VideoUserDefaultsUtils.muteAutoplayingVideoKey, store: .video) private var muteAutoplayingVideo: Bool = true
     @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
-    
+    @AppStorage(DataSavingModeUserDefaultsUtils.dataSavingModeKey, store: .dataSavingMode) private var dataSavingMode: Int = 0
+    @AppStorage(DataSavingModeUserDefaultsUtils.disableImagePreviewKey, store: .dataSavingMode) private var disableImagePreview: Bool = false
+    @AppStorage(DataSavingModeUserDefaultsUtils.onlyDisablePreviewInVideoAndGIFKey, store: .dataSavingMode) private var onlyDisablePreviewInVideoAndGIF: Bool = false
+
     @State private var canPlay: Bool = false
     
     let post: Post
@@ -24,10 +27,17 @@ struct PostVideoView: View {
     var inPostListing: Bool = false
     var onReadPost: (() -> Void)? = nil
     
+    private var isDataSavingModeActive: Bool {
+        return DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
+    }
+    
+    private var shouldHideVideoPreview: Bool {
+        return isDataSavingModeActive && (disableImagePreview || onlyDisablePreviewInVideoAndGIF)
+    }
+    
     var body: some View {
         Group {
-            if VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected)
-                && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
+            if !isDataSavingModeActive && VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected) && ((post.over18 && autoplaySensitiveVideo) || !post.over18) {
                 if let preview = post.preview, preview.images.count > 0, !(limitMediaHeight && inPostListing) {
                     InlineVideoPlayer(videoURL: URL(string: videoUrlString)!, aspectRatio: preview.images[0].source.aspectRatio, muteVideo: muteAutoplayingVideo, canPlay: canPlay)
                 } else {
@@ -35,10 +45,10 @@ struct PostVideoView: View {
                         .frame(height: 200)
                 }
             } else {
-                if let preview = post.preview, preview.images.count > 0, let url = post.preview.images[0].source.url {
+                if !shouldHideVideoPreview, let preview = post.preview, preview.images.count > 0 {
                     ZStack(alignment: .topLeading) {
                         CustomWebImage(
-                            url,
+                            getPreviewUrl(preview),
                             height: limitMediaHeight && inPostListing ? 200 : nil,
                             aspectRatio: limitMediaHeight && inPostListing ? nil : preview.images[0].source.aspectRatio,
                             centerCrop: true,
@@ -54,7 +64,7 @@ struct PostVideoView: View {
                                     }
                             )
                         }
-                        
+
                         SwiftUI.Image(systemName: "play.circle")
                             .resizable()
                             .mediaIndicator()
@@ -81,5 +91,11 @@ struct PostVideoView: View {
         .onVisiblePercentageChange { percent in
             canPlay = percent > 0.5
         }
+    }
+    
+    func getPreviewUrl(_ preview: Preview) -> String {
+        return isDataSavingModeActive
+        ? (preview.images[0].resolutions.first?.url ?? preview.images[0].source.url)
+        : preview.images[0].source.url
     }
 }

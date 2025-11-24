@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PostPreviewView: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    @EnvironmentObject private var networkManager: NetworkManager
     
     let post: Post
     var inPostListing: Bool = false
@@ -18,15 +19,18 @@ struct PostPreviewView: View {
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
+    @AppStorage(DataSavingModeUserDefaultsUtils.dataSavingModeKey, store: .dataSavingMode) private var dataSavingMode: Int = 0
+    @AppStorage(DataSavingModeUserDefaultsUtils.disableImagePreviewKey, store: .dataSavingMode) private var disableImagePreview: Bool = false
+    @AppStorage(DataSavingModeUserDefaultsUtils.onlyDisablePreviewInVideoAndGIFKey, store: .dataSavingMode) private var onlyDisablePreviewInVideoAndGIF: Bool = false
     
     var body: some View {
-        if let url = resolvedPreviewImageURL {
+        if let url = previewUrlString {
             ZStack(alignment: isInCompactLayout ? .center : .topLeading) {
                 CustomWebImage(
                     url,
                     width: isInCompactLayout ? 60 : nil,
                     height: limitMediaHeight && inPostListing && !isInCompactLayout ? 200 : (isInCompactLayout ? 60 : nil),
-                    aspectRatio: (limitMediaHeight && inPostListing) || isInCompactLayout ? nil : resolvedAspectRatio,
+                    aspectRatio: (limitMediaHeight && inPostListing) || isInCompactLayout ? nil : aspectRatio,
                     handleImageTapGesture: !(isInCompactLayout && post.postType == .gallery),
                     centerCrop: true,
                     matchedGeometryEffectId: UUID().uuidString,
@@ -41,9 +45,9 @@ struct PostPreviewView: View {
                             }
                     )
                 }
-                .applyIf(isInCompactLayout && inPostListing && post.postType == .gallery) {
+                .applyIf(isInCompactLayout && post.postType == .gallery) {
                     $0.onTapGesture {
-                        if let url = resolvedPreviewImageURL {
+                        if let url = previewUrlString {
                             fullScreenMediaViewModel.show(
                                 .gallery(
                                     currentUrlString: url,
@@ -86,7 +90,7 @@ struct PostPreviewView: View {
             }
             .frame(maxWidth: .infinity)
             .applyIf((!limitMediaHeight || !inPostListing) && !isInCompactLayout) {
-                $0.aspectRatio(resolvedAspectRatio ?? CGSize(width: 0, height: 0), contentMode: .fit)
+                $0.aspectRatio(aspectRatio ?? CGSize(width: 0, height: 0), contentMode: .fit)
             }
             .applyIf(limitMediaHeight && inPostListing && !isInCompactLayout) {
                 $0.frame(height: 200)
@@ -112,8 +116,14 @@ struct PostPreviewView: View {
         }
     }
     
-    private var resolvedPreviewImageURL: String? {
-        if isInCompactLayout {
+    private var previewUrlString: String? {
+        let isDataSavingModeActive = DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
+
+        if isDataSavingModeActive && (disableImagePreview || (onlyDisablePreviewInVideoAndGIF && post.postType.isVideoOrGif)){
+            return nil
+        }
+
+        if isInCompactLayout || isDataSavingModeActive {
             if let url = post.preview?.images.first?.resolutions.first?.url {
                 return url
             } else if let url = post.preview?.images.first?.source.url {
@@ -130,7 +140,7 @@ struct PostPreviewView: View {
         return nil
     }
     
-    private var resolvedAspectRatio: CGSize? {
+    private var aspectRatio: CGSize? {
         if isInCompactLayout {
             if let ratio = post.preview?.images.first?.resolutions.first?.aspectRatio {
                 return ratio
