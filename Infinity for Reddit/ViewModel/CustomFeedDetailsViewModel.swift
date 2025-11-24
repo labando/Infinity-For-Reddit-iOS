@@ -8,11 +8,11 @@
 import Foundation
 
 public class CustomFeedDetailsViewModel: ObservableObject {
-    @Published var myCustomFeed: MyCustomFeed
+    @Published var customFeed: CustomFeedWrapper
     private let customFeedDetailsRepository: CustomFeedDetailsRepositoryProtocol
     
-    init(myCustomFeed: MyCustomFeed, customFeedDetailsRepository: CustomFeedDetailsRepositoryProtocol) {
-        self.myCustomFeed = myCustomFeed
+    init(customFeed: CustomFeedWrapper, customFeedDetailsRepository: CustomFeedDetailsRepositoryProtocol) {
+        self.customFeed = customFeed
         self.customFeedDetailsRepository = customFeedDetailsRepository
     }
 }

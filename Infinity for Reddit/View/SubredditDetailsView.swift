@@ -185,6 +185,10 @@ struct SubredditDetailsView: View {
                 
                 NavigationBarMenuItem(title: "Contact Mods") {
                     navigationManager.append(AppNavigation.sendChatMessage(recipient: "r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)"))
+                },
+                
+                NavigationBarMenuItem(title: "Report") {
+                    navigationManager.openLink("https://www.reddit.com/report")
                 }
             ])
         }

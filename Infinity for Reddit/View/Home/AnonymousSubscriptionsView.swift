@@ -129,7 +129,7 @@ struct AnonymousSubscriptionsView: View {
                             CustomListSection("Favorite") {
                                 ForEach(anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds, id: \.identityInView) { customFeed in
                                     SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
-                                        navigationManager.append(AppNavigation.customFeed(myCustomFeed: customFeed))
+                                        navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
                                     }) {
                                         customFeed.isFavorite.toggle()
                                         anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
@@ -153,7 +153,7 @@ struct AnonymousSubscriptionsView: View {
                         CustomListSection("All") {
                             ForEach(anonymousSubscriptionListingViewModel.myCustomFeeds, id: \.identityInView) { customFeed in
                                 SubscriptionItemView(text: customFeed.displayName, iconUrl: customFeed.iconUrl, isFavorite: customFeed.isFavorite, action: {
-                                    navigationManager.append(AppNavigation.customFeed(myCustomFeed: customFeed))
+                                    navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
                                 }) {
                                     customFeed.isFavorite.toggle()
                                     anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)

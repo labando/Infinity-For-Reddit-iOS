@@ -13,7 +13,7 @@ enum AppNavigation: Hashable {
     case userDetails(username: String)
     case search
     case searchResults(query: String, searchInSubredditOrUserName: String?, searchInMultiReddit: String?, searchInThingType: SearchInThingType, searchResultTab: Int)
-    case customFeed(myCustomFeed: MyCustomFeed)
+    case customFeed(customFeed: CustomFeedWrapper)
     case inboxConversation(inbox: Inbox)
     case submitComment(commentParent: CommentParent)
     case editComment(commentToBeEdited: Comment)
@@ -31,5 +31,7 @@ enum AppNavigation: Hashable {
     case crosspost(postToBeCrossposted: Post)
     case sendChatMessage(recipient: String? = nil)
     case createCustomFeed
-    case editCustomFeed(myCustomFeed: MyCustomFeed)
+    case editCustomFeed(customFeedToEdit: CustomFeedWrapper)
+    case copyCustomFeed(path: String)
+    case report(subredditName: String, thingFullname: String)
 }

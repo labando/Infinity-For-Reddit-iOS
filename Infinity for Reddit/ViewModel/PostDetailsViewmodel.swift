@@ -9,12 +9,14 @@ import Foundation
 import Combine
 import MarkdownUI
 import IdentifiedCollections
+import SwiftUI
 
 public class PostDetailsViewModel: ObservableObject {
     // MARK: - Properties
     @Published var post: Post?
     @Published var visibleComments: IdentifiedArrayOf<CommentItem> = []
     var allComments: IdentifiedArrayOf<CommentItem> = []
+    @Published var appearedComments: [CommentItem] = []
     @Published var isSingleThread: Bool =  false
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
@@ -26,6 +28,8 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var postDetailsInput: PostDetailsInput
     @Published var singleThreadContext: Int = 8
     @Published var flairs: [Flair]?
+    @Published var searchQuery: String = ""
+    @Published var searchedComment: CommentItem?
     private let account: Account
     private var commentMore: CommentMore?
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
@@ -859,6 +863,141 @@ public class PostDetailsViewModel: ObservableObject {
             }
             
             selectFlairTask = nil
+        }
+    }
+    
+    func insertIntoAppearedComments(_ commentItem: CommentItem) {
+        self.appearedComments.removeAll {
+            $0.id == commentItem.id
+        }
+        
+        guard !self.appearedComments.isEmpty else {
+            appearedComments.append(commentItem)
+            return
+        }
+        
+        if let index = self.allComments.index(id: commentItem.id) {
+            var inserted: Bool = false
+            for (i, comment) in self.appearedComments.enumerated() {
+                if let appearedCommentIndex = self.allComments.index(id: comment.id), index < appearedCommentIndex {
+                    self.appearedComments.insert(commentItem, at: i)
+                    inserted = true
+                    break
+                }
+            }
+            if !inserted {
+                self.appearedComments.append(commentItem)
+            }
+        } else {
+            appearedComments.append(commentItem)
+        }
+    }
+    
+    func getNextParentComment() -> CommentItem? {
+        for i in appearedComments.indices.reversed() {
+            if appearedComments[i].depth == 0 && i >= 2 {
+                return appearedComments[i]
+            }
+        }
+        
+        if appearedComments.isEmpty {
+            return visibleComments.first
+        } else {
+            if let lastIndex = visibleComments.index(id: appearedComments[appearedComments.count - 1].id) {
+                for i in lastIndex..<visibleComments.count {
+                    if visibleComments[i].depth == 0 && visibleComments[i].isComment {
+                        return visibleComments[i]
+                    }
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    func getPreviousParentComment() -> CommentItem? {
+        if appearedComments.isEmpty {
+            return nil
+        } else {
+            if let firstIndex = visibleComments.index(id: appearedComments[0].id) {
+                for i in (0..<firstIndex).reversed() {
+                    if visibleComments[i].depth == 0 && visibleComments[i].isComment {
+                        return visibleComments[i]
+                    }
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    func getNextSearchedComment() -> CommentItem? {
+        if let searchedComment {
+            if let visibleIndex = visibleComments.index(id: searchedComment.id) {
+                for i in visibleIndex + 1..<visibleComments.count {
+                    if visibleComments[i].containsSearchQuery(searchQuery) {
+                        setSearchedComment(visibleComments[i])
+                        return visibleComments[i]
+                    }
+                }
+            }
+        }
+        
+        if appearedComments.isEmpty {
+            for visibleComment in visibleComments {
+                if visibleComment.containsSearchQuery(searchQuery) {
+                    setSearchedComment(visibleComment)
+                    return visibleComment
+                }
+            }
+        } else {
+            for i in appearedComments.indices.reversed() {
+                if appearedComments[i].containsSearchQuery(searchQuery) {
+                    setSearchedComment(appearedComments[i])
+                    return appearedComments[i]
+                }
+            }
+            
+            if let lastIndex = visibleComments.index(id: appearedComments[appearedComments.count - 1].id) {
+                for i in lastIndex..<visibleComments.count {
+                    if visibleComments[i].containsSearchQuery(searchQuery) {
+                        setSearchedComment(visibleComments[i])
+                        return visibleComments[i]
+                    }
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    func getPreviousSearchedComment() -> CommentItem? {
+        if let searchedComment {
+            if let visibleIndex = visibleComments.index(id: searchedComment.id) {
+                for i in (0..<visibleIndex).reversed() {
+                    if visibleComments[i].containsSearchQuery(searchQuery) {
+                        setSearchedComment(visibleComments[i])
+                        return visibleComments[i]
+                    }
+                }
+            }
+        }
+        
+        if !appearedComments.isEmpty, let firstIndex = visibleComments.index(id: appearedComments[0].id) {
+            for i in (0..<firstIndex).reversed() {
+                if visibleComments[i].containsSearchQuery(searchQuery) {
+                    setSearchedComment(visibleComments[i])
+                    return visibleComments[i]
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    private func setSearchedComment(_ comment: CommentItem) {
+        withAnimation {
+            searchedComment = comment
         }
     }
 }

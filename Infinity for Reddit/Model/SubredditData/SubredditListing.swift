@@ -71,7 +71,7 @@ class Subreddit: NSObject, Identifiable {
     var bannerBackgroundColor : String!
     var bannerBackgroundImage : String!
     var bannerImg : String!
-    var bannerSize : Size!
+    var bannerSize : Size?
     var canAssignLinkFlair : Bool!
     var canAssignUserFlair : Bool!
     var collapseDeletedComments : Bool!
@@ -91,7 +91,7 @@ class Subreddit: NSObject, Identifiable {
     var freeFormReports : Bool!
     var hasMenuWidget : Bool!
     var headerImg : String!
-    var headerSize : [Int]!
+    var headerSize : Size?
     var headerTitle : String!
     var hideAds : Bool!
     var iconImg : String!
@@ -182,11 +182,6 @@ class Subreddit: NSObject, Identifiable {
         bannerBackgroundColor = json["banner_background_color"].stringValue
         bannerBackgroundImage = json["banner_background_image"].stringValue
         bannerImg = json["banner_img"].stringValue
-        if let bannerArray = json["banner_size"].array, bannerArray.count == 2 {
-            let width = bannerArray[0].intValue
-            let height = bannerArray[1].intValue
-            bannerSize = Size(width: width, height: height)
-        }
         bannerSize = JSONUtils.parseNullableSize(json, "banner_size")
         canAssignLinkFlair = json["can_assign_link_flair"].boolValue
         canAssignUserFlair = json["can_assign_user_flair"].boolValue
@@ -210,11 +205,7 @@ class Subreddit: NSObject, Identifiable {
         freeFormReports = json["free_form_reports"].boolValue
         hasMenuWidget = json["has_menu_widget"].boolValue
         headerImg = json["header_img"].stringValue
-        headerSize = [Int]()
-        let headerSizeArray = json["header_size"].arrayValue
-        for headerSizeJson in headerSizeArray{
-            headerSize.append(headerSizeJson.intValue)
-        }
+        headerSize = JSONUtils.parseNullableSize(json, "header_size")
         headerTitle = json["header_title"].stringValue
         hideAds = json["hide_ads"].boolValue
         iconImg = json["icon_img"].stringValue

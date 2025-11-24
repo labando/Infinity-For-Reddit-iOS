@@ -23,6 +23,9 @@ public class SubredditListingViewModel: ObservableObject {
     @Published var loadSubredditsTaskId = UUID()
     
     @Published var selectedSubreddits: IdentifiedArrayOf<Subreddit> = []
+    @Published var selectedSubscribedSubreddits: IdentifiedArrayOf<SubscribedSubredditData> = []
+    @Published var selectedSubredditData: IdentifiedArrayOf<SubredditData> = []
+    @Published var selectedSubredditsInCustomFeed: IdentifiedArrayOf<SubredditInCustomFeed> = []
     
     private var after: String? = nil
     private var lastLoadedSortType: SortType.Kind? = nil
@@ -42,6 +45,37 @@ public class SubredditListingViewModel: ObservableObject {
     init(query: String, thingSelectionMode: ThingSelectionMode, subredditListingRepository: SubredditListingRepositoryProtocol) {
         self.query = query
         self.thingSelectionMode = thingSelectionMode
+        switch thingSelectionMode {
+        case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, _):
+            var selectedSubscribedSubreddits = IdentifiedArrayOf<SubscribedSubredditData>()
+            var selectedSubredditData = IdentifiedArrayOf<SubredditData>()
+            var selectedSubredditsInCustomFeed = IdentifiedArrayOf<SubredditInCustomFeed>()
+            
+            for item in selectedSubredditsAndUsers {
+                switch item {
+                case .subscribedSubreddit(let subscribedSubredditData):
+                    selectedSubscribedSubreddits.append(subscribedSubredditData)
+                case .subreddit(let subredditData):
+                    selectedSubredditData.append(subredditData)
+                case .subredditInCustomFeed(let subredditInCustomFeed):
+                    selectedSubredditsInCustomFeed.append(subredditInCustomFeed)
+                case .subredditInAnonymousCustomFeed(let anonymousCustomFeedSubreddit):
+                    selectedSubredditsInCustomFeed.append(SubredditInCustomFeed(name: anonymousCustomFeedSubreddit.subredditName))
+                case .subscribedUser(let subscribedUserData):
+                    break
+                case .user(_):
+                    break
+                case .myCustomFeed(_):
+                    break
+                }
+            }
+            
+            self.selectedSubscribedSubreddits = selectedSubscribedSubreddits
+            self.selectedSubredditData = selectedSubredditData
+            self.selectedSubredditsInCustomFeed = selectedSubredditsInCustomFeed
+        default:
+            break
+        }
         self.sortType = SortTypeUserDetailsUtils.subredditListing
         self.subredditListingRepository = subredditListingRepository
         
@@ -176,6 +210,12 @@ public class SubredditListingViewModel: ObservableObject {
     func toggleSelection(subreddit: Subreddit) {
         if selectedSubreddits.index(id: subreddit.id) != nil {
             selectedSubreddits.remove(subreddit)
+        } else if selectedSubredditData.index(id: subreddit.id) != nil {
+            selectedSubredditData.remove(id: subreddit.id)
+        } else if selectedSubscribedSubreddits.index(id: subreddit.id) != nil {
+            selectedSubscribedSubreddits.remove(id: subreddit.id)
+        } else if selectedSubredditsInCustomFeed.index(id: subreddit.name) != nil {
+            selectedSubredditsInCustomFeed.remove(id: subreddit.name)
         } else {
             selectedSubreddits.append(subreddit)
         }

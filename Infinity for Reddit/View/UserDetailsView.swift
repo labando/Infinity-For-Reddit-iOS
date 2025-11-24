@@ -230,6 +230,10 @@ struct UserDetailsView: View {
                 
                 NavigationBarMenuItem(title: "Send Message") {
                     navigationManager.append(AppNavigation.sendChatMessage(recipient: userDetailsViewModel.userData?.name ?? userDetailsViewModel.username))
+                },
+                
+                NavigationBarMenuItem(title: "Report") {
+                    navigationManager.openLink("https://www.reddit.com/report")
                 }
             ])
         }

@@ -18,7 +18,7 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
     @Published var createdOrUpdatedMyCustomFeed: MyCustomFeed?
     @Published var error: Error? = nil
     
-    @Published var myCustomFeedToEdit: MyCustomFeed?
+    @Published var customFeedToEdit: CustomFeedWrapper?
     @Published var myCustomFeedToEditLoadState: LoadState = .idle
     
     private let createCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol
@@ -37,8 +37,8 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
         }
     }
     
-    init(myCustomFeedToEdit: MyCustomFeed?, createCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol) {
-        self.myCustomFeedToEdit = myCustomFeedToEdit
+    init(customFeedToEdit: CustomFeedWrapper?, createCustomFeedRepository: CreateOrEditCustomFeedRepositoryProtocol) {
+        self.customFeedToEdit = customFeedToEdit
         self.createCustomFeedRepository = createCustomFeedRepository
     }
     
@@ -55,7 +55,7 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
     }
     
     func createOrUpdateCustomFeed() {
-        if myCustomFeedToEdit == nil {
+        if customFeedToEdit == nil {
             createCustomFeed()
         } else {
             updateCustomFeed()
@@ -99,7 +99,7 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
     }
     
     func fetchCustomFeedDetailsToEdit() async {
-        guard let myCustomFeedToEdit = myCustomFeedToEdit else {
+        guard let customFeedToEdit else {
             return
         }
         
@@ -115,7 +115,7 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
         myCustomFeedToEditLoadState = .loading
         
         do {
-            let customFeed = try await createCustomFeedRepository.fetchCustomFeedDetails(path: myCustomFeedToEdit.path)
+            let customFeed = try await createCustomFeedRepository.fetchCustomFeedDetails(path: customFeedToEdit.path)
             
             name = customFeed.name
             description = customFeed.descriptionMd
@@ -131,18 +131,20 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
     }
     
     func fetchCustomFeedDetailsToEditAnonymous() async {
-        guard let myCustomFeedToEdit = myCustomFeedToEdit else {
+        guard let customFeedToEdit else {
             return
         }
         
         myCustomFeedToEditLoadState = .loading
         
         do {
-            let anonymousCustomFeedSubreddits = try await createCustomFeedRepository.fetchAnonymousCustomFeedSubreddits(path: myCustomFeedToEdit.path)
+            let anonymousCustomFeedSubreddits = try await createCustomFeedRepository.fetchAnonymousCustomFeedSubreddits(path: customFeedToEdit.path)
             
-            name = myCustomFeedToEdit.name
-            description = myCustomFeedToEdit.description ?? ""
-            isPrivate = myCustomFeedToEdit.visibility == "private"
+            if case .myCustomFeed(let myCustomFeedToEdit) = customFeedToEdit {
+                name = myCustomFeedToEdit.name
+                description = myCustomFeedToEdit.description ?? ""
+                isPrivate = myCustomFeedToEdit.visibility == "private"
+            }
             for anonymousCustomFeedSubreddit in anonymousCustomFeedSubreddits {
                 subredditsAndUsersInCustomFeed.append(.subredditInAnonymousCustomFeed(anonymousCustomFeedSubreddit))
             }
@@ -158,7 +160,7 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
             return
         }
         
-        guard let myCustomFeedToEdit else {
+        guard let customFeedToEdit else {
             self.error = CreateCustomFeedViewModelError.myCustomFeedToEditIsNilError
             return
         }
@@ -171,7 +173,7 @@ class CreateOrEditCustomFeedViewModel: ObservableObject {
         createOrUpdateCustomFeedTask = Task {
             do {
                 self.createdOrUpdatedMyCustomFeed = try await createCustomFeedRepository.createOrUpdateCustomFeed(
-                    path: myCustomFeedToEdit.path,
+                    path: customFeedToEdit.path,
                     name: name,
                     description: description,
                     isPrivate: isPrivate,

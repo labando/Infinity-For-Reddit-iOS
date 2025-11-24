@@ -12,7 +12,7 @@ class SubscribedSubredditData: Codable, FetchableRecord, PersistableRecord, Iden
     static let databaseTableName = "subscribed_subreddits"
     
     var id: String {
-        return fullName
+        return String(fullName.dropFirst(3))
     }
     
     var fullName: String

@@ -28,7 +28,7 @@ public class User: NSObject, Identifiable {
     var isGold : Bool!
     var isMod : Bool!
     var linkKarma : Int!
-    var name : String!
+    var name : String
     var prefShowSnoovatar : Bool!
     var snoovatarImg : String!
     var snoovatarSize : Size!
@@ -44,6 +44,12 @@ public class User: NSObject, Identifiable {
         if json.isEmpty {
             throw JSONError.invalidData
         }
+        id = json["id"].stringValue
+        if id.isEmpty {
+            // The user is banned
+            throw JSONError.invalidData
+        }
+        
         acceptFollowers = json["accept_followers"].boolValue
         awardeeKarma = json["awardee_karma"].intValue
         awarderKarma = json["awarder_karma"].intValue
@@ -54,7 +60,6 @@ public class User: NSObject, Identifiable {
         hasVerifiedEmail = json["has_verified_email"].boolValue
         hideFromRobots = json["hide_from_robots"].boolValue
         iconImg = json["icon_img"].stringValue
-        id = json["id"].stringValue
         isBlocked = json["is_blocked"].boolValue
         isEmployee = json["is_employee"].boolValue
         isFriend = json["is_friend"].boolValue

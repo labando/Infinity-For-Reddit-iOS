@@ -20,10 +20,10 @@ struct CreateOrEditCustomFeedView: View {
     @State private var descriptionSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var showSubredditAndUserMultiSelectionSheet: Bool = false
     
-    init(myCustomFeedToEdit: MyCustomFeed? = nil) {
+    init(customFeedToEdit: CustomFeedWrapper? = nil) {
         _createOrEditCustomFeedViewModel = StateObject(
             wrappedValue: CreateOrEditCustomFeedViewModel(
-                myCustomFeedToEdit: myCustomFeedToEdit,
+                customFeedToEdit: customFeedToEdit,
                 createCustomFeedRepository: CreateOrEditCustomFeedRepository()
             )
         )
@@ -31,7 +31,7 @@ struct CreateOrEditCustomFeedView: View {
     
     var body: some View {
         RootView {
-            if createOrEditCustomFeedViewModel.myCustomFeedToEdit != nil && !createOrEditCustomFeedViewModel.myCustomFeedToEditLoadState.isLoaded {
+            if createOrEditCustomFeedViewModel.customFeedToEdit != nil && !createOrEditCustomFeedViewModel.myCustomFeedToEditLoadState.isLoaded {
                 switch createOrEditCustomFeedViewModel.myCustomFeedToEditLoadState {
                 case .idle:
                     Color.clear
@@ -129,7 +129,7 @@ struct CreateOrEditCustomFeedView: View {
         }
         .id(accountViewModel.account.username)
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("\(createOrEditCustomFeedViewModel.myCustomFeedToEdit != nil ? "Edit" : "Create") Custom Feed")
+        .addTitleToInlineNavigationBar("\(createOrEditCustomFeedViewModel.customFeedToEdit != nil ? "Edit" : "Create") Custom Feed")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: {
@@ -138,11 +138,9 @@ struct CreateOrEditCustomFeedView: View {
                     SwiftUI.Image(systemName: "checkmark.circle")
                         .navigationBarImage()
                 }
-                
-                NavigationBarMenu()
             }
         }
-        .applyIf(createOrEditCustomFeedViewModel.myCustomFeedToEdit != nil) {
+        .applyIf(createOrEditCustomFeedViewModel.customFeedToEdit != nil) {
             $0.task {
                 await createOrEditCustomFeedViewModel.fetchCustomFeedDetailsToEdit()
             }
@@ -159,7 +157,7 @@ struct CreateOrEditCustomFeedView: View {
         .onChange(of: createOrEditCustomFeedViewModel.createdOrUpdatedMyCustomFeed) { _, newValue in
             if let newValue {
                 snackbarManager.dismiss()
-                navigationManager.replaceCurrentScreen(AppNavigation.customFeed(myCustomFeed: newValue))
+                navigationManager.replaceCurrentScreen(AppNavigation.customFeed(customFeed: .myCustomFeed(newValue)))
             }
         }
         .onReceive(createOrEditCustomFeedViewModel.$error) { newValue in
@@ -183,50 +181,5 @@ struct CreateOrEditCustomFeedView: View {
     
     private enum FieldType: Hashable {
         case name
-    }
-    
-    struct SubredditAndUserInCustomFeedItemView: View {
-        var text: String
-        var iconUrlString: String?
-        var iconSize: CGFloat = 24
-        let onDelete: () -> Void
-        
-        var body: some View {
-            HStack(spacing: 0) {
-                if let icon = iconUrlString {
-                    CustomWebImage(
-                        icon,
-                        width: iconSize,
-                        height: iconSize,
-                        circleClipped: true,
-                        handleImageTapGesture: false,
-                        fallbackView: {
-                            InitialLetterAvatarImageFallbackView(name: text, size: iconSize)
-                        }
-                    )
-                } else {
-                    Spacer()
-                        .frame(width: iconSize)
-                }
-                
-                Spacer()
-                    .frame(width: 24)
-                
-                Text(text)
-                    .primaryText()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Button(action: {
-                    onDelete()
-                }) {
-                    SwiftUI.Image(systemName: "trash")
-                        .primaryIcon()
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .contentShape(Rectangle())
-        }
     }
 }

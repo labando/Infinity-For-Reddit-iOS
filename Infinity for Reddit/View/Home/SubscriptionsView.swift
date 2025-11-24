@@ -150,7 +150,7 @@ struct SubscriptionsView: View {
                                         if let customOnTapForSearchInThing = customOnTapForSearchInThing {
                                             customOnTapForSearchInThing(Thing.myCustomFeed(customFeed))
                                         } else {
-                                            navigationManager.append(AppNavigation.customFeed(myCustomFeed: customFeed))
+                                            navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
                                         }
                                     }) {
                                         customFeed.isFavorite.toggle()
@@ -182,7 +182,7 @@ struct SubscriptionsView: View {
                                     if let customOnTapForSearchInThing = customOnTapForSearchInThing {
                                         customOnTapForSearchInThing(Thing.myCustomFeed(customFeed))
                                     } else {
-                                        navigationManager.append(AppNavigation.customFeed(myCustomFeed: customFeed))
+                                        navigationManager.append(AppNavigation.customFeed(customFeed: .myCustomFeed(customFeed)))
                                     }
                                 }) {
                                     customFeed.isFavorite.toggle()
