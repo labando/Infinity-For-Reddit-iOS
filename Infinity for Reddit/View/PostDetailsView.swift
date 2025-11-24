@@ -251,7 +251,18 @@ struct PostDetailsView: View {
                             .fabIcon()
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                
+                                if let proxy {
+                                    if let commentItem = postDetailsViewModel.getPreviousParentComment() {
+                                        switch commentItem {
+                                        case .comment(let comment):
+                                            withAnimation {
+                                                proxy.scrollTo(ObjectIdentifier(comment), anchor: .top)
+                                            }
+                                        case .more:
+                                            break
+                                        }
+                                    }
+                                }
                             }
                         
                         CustomDivider()
@@ -272,7 +283,7 @@ struct PostDetailsView: View {
                                             withAnimation {
                                                 proxy.scrollTo(ObjectIdentifier(comment), anchor: .top)
                                             }
-                                        case .more(let commentMore):
+                                        case .more:
                                             break
                                         }
                                     }

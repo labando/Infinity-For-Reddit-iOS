@@ -911,4 +911,26 @@ public class PostDetailsViewModel: ObservableObject {
         
         return nil
     }
+    
+    func getPreviousParentComment() -> CommentItem? {
+//        for i in appearedComments.indices {
+//            if appearedComments[i].depth == 0 {
+//                return appearedComments[i]
+//            }
+//        }
+        
+        if appearedComments.isEmpty {
+            return nil
+        } else {
+            if let firstIndex = visibleComments.index(id: appearedComments[0].id) {
+                for i in (0..<firstIndex).reversed() {
+                    if visibleComments[i].depth == 0 && visibleComments[i].isComment {
+                        return visibleComments[i]
+                    }
+                }
+            }
+        }
+        
+        return nil
+    }
 }
