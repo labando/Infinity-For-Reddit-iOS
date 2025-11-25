@@ -625,7 +625,9 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     func editComment(_ comment: Comment, commentToBeEdited: Comment) {
-        guard let allIndex = self.allComments.index(id: commentToBeEdited.id) else { return }
+        guard let allIndex = self.allComments.index(id: commentToBeEdited.id) else {
+            return
+        }
         switch allComments[allIndex] {
         case .comment(let oldComment):
             oldComment.bodyProcessedMarkdown = comment.bodyProcessedMarkdown
@@ -1029,6 +1031,32 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     @MainActor
+    func approveComment(_ comment: Comment) {
+        Task {
+            do {
+                try await postModerationRepository.approveThing(thingFullname: comment.name)
+                
+                guard let allIndex = self.allComments.index(id: comment.id) else {
+                    return
+                }
+                switch allComments[allIndex] {
+                case .comment(let oldComment):
+                    oldComment.approved = true
+                    oldComment.approvedBy = account.username
+                    oldComment.approvedAtUtc = Utils.getCurrentTimeEpoch()
+                    oldComment.removed = false
+                    oldComment.spam = false
+                default:
+                    break
+                }
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
     func removePost(isSpam: Bool) {
         guard let post else {
             return
@@ -1045,6 +1073,32 @@ public class PostDetailsViewModel: ObservableObject {
                 self.post?.removedBy = account.username
                 self.post?.removedByCategory = "moderator"
                 self.post?.spam = isSpam
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func removeComment(_ comment: Comment, isSpam: Bool) {
+        Task {
+            do {
+                try await postModerationRepository.removeThing(thingFullname: comment.name, isSpam: isSpam)
+                
+                guard let allIndex = self.allComments.index(id: comment.id) else {
+                    return
+                }
+                switch allComments[allIndex] {
+                case .comment(let oldComment):
+                    oldComment.approved = false
+                    oldComment.approvedBy = ""
+                    oldComment.approvedAtUtc = 0
+                    oldComment.removed = true
+                    oldComment.spam = isSpam
+                default:
+                    break
+                }
             } catch {
                 self.error = error
                 print(error)
@@ -1071,7 +1125,7 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     @MainActor
-    func toggleLock() {
+    func toggleLockPost() {
         guard let post else {
             return
         }
@@ -1081,6 +1135,28 @@ public class PostDetailsViewModel: ObservableObject {
                 try await postModerationRepository.toggleLock(thingFullname: post.name, lock: !post.locked)
                 
                 self.post?.locked = !(self.post?.locked ?? false)
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleLockComment(_ comment: Comment) {
+        Task {
+            do {
+                try await postModerationRepository.toggleLock(thingFullname: comment.name, lock: !comment.locked)
+                
+                guard let allIndex = self.allComments.index(id: comment.id) else {
+                    return
+                }
+                switch allComments[allIndex] {
+                case .comment(let oldComment):
+                    oldComment.locked.toggle()
+                default:
+                    break
+                }
             } catch {
                 self.error = error
                 print(error)

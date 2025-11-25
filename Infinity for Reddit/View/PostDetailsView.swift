@@ -465,7 +465,7 @@ struct PostDetailsView: View {
                         postDetailsViewModel.toggleSticky()
                     },
                     onToggleLock: {
-                        postDetailsViewModel.toggleLock()
+                        postDetailsViewModel.toggleLockPost()
                     },
                     onToggleSensitive: {
                         postDetailsViewModel.toggleSensitive {
@@ -490,16 +490,16 @@ struct PostDetailsView: View {
                 CommentModerationSheet(
                     comment: commentToBeModerated,
                     onApprove: {
-                        
+                        postDetailsViewModel.approveComment(commentToBeModerated)
                     },
                     onRemove: {
-                        
+                        postDetailsViewModel.removeComment(commentToBeModerated, isSpam: false)
                     },
                     onMarkAsSpam: {
-                        
+                        postDetailsViewModel.removeComment(commentToBeModerated, isSpam: true)
                     },
                     onToggleLock: {
-                        
+                        postDetailsViewModel.toggleLockComment(commentToBeModerated)
                     }
                 )
             } else {
