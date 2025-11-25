@@ -57,7 +57,7 @@ struct PostDetailsView: View {
                 postDetailsRepository: PostDetailsRepository(),
                 historyPostsRepository: HistoryPostsRepository(),
                 flairRepository: FlairRepository(),
-                postModerationRepository: thingModerationRepository,
+                thingModerationRepository: thingModerationRepository,
                 isContinueThread: isContinueThread
             )
         )

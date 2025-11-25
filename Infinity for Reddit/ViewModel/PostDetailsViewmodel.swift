@@ -42,7 +42,7 @@ public class PostDetailsViewModel: ObservableObject {
     private let postDetailsRepository: PostDetailsRepositoryProtocol
     private let historyPostsRepository: HistoryPostsRepositoryProtocol
     private let flairRepository: FlairRepositoryProtocol
-    private let postModerationRepository: ThingModerationRepositoryProtocol
+    private let thingModerationRepository: ThingModerationRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
@@ -72,7 +72,7 @@ public class PostDetailsViewModel: ObservableObject {
         postDetailsRepository: PostDetailsRepositoryProtocol,
         historyPostsRepository: HistoryPostsRepositoryProtocol,
         flairRepository: FlairRepositoryProtocol,
-        postModerationRepository: ThingModerationRepositoryProtocol,
+        thingModerationRepository: ThingModerationRepositoryProtocol,
         isContinueThread: Bool = false
     ) {
         self.account = account
@@ -81,7 +81,7 @@ public class PostDetailsViewModel: ObservableObject {
         self.postDetailsRepository = postDetailsRepository
         self.historyPostsRepository = historyPostsRepository
         self.flairRepository = flairRepository
-        self.postModerationRepository = postModerationRepository
+        self.thingModerationRepository = thingModerationRepository
         self.showTopLevelCommentsFirst = InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirst
         if isContinueThread {
             self.singleThreadContext = 0
@@ -1014,7 +1014,7 @@ public class PostDetailsViewModel: ObservableObject {
         
         Task {
             do {
-                try await postModerationRepository.approveThing(thingFullname: post.name)
+                try await thingModerationRepository.approveThing(thingFullname: post.name)
                 
                 self.post?.approved = true
                 self.post?.approvedBy = account.username
@@ -1034,7 +1034,7 @@ public class PostDetailsViewModel: ObservableObject {
     func approveComment(_ comment: Comment) {
         Task {
             do {
-                try await postModerationRepository.approveThing(thingFullname: comment.name)
+                try await thingModerationRepository.approveThing(thingFullname: comment.name)
                 
                 guard let allIndex = self.allComments.index(id: comment.id) else {
                     return
@@ -1064,7 +1064,7 @@ public class PostDetailsViewModel: ObservableObject {
         
         Task {
             do {
-                try await postModerationRepository.removeThing(thingFullname: post.name, isSpam: isSpam)
+                try await thingModerationRepository.removeThing(thingFullname: post.name, isSpam: isSpam)
                 
                 self.post?.approved = false
                 self.post?.approvedBy = ""
@@ -1084,7 +1084,7 @@ public class PostDetailsViewModel: ObservableObject {
     func removeComment(_ comment: Comment, isSpam: Bool) {
         Task {
             do {
-                try await postModerationRepository.removeThing(thingFullname: comment.name, isSpam: isSpam)
+                try await thingModerationRepository.removeThing(thingFullname: comment.name, isSpam: isSpam)
                 
                 guard let allIndex = self.allComments.index(id: comment.id) else {
                     return
@@ -1114,7 +1114,7 @@ public class PostDetailsViewModel: ObservableObject {
         
         Task {
             do {
-                try await postModerationRepository.toggleSticky(post: post)
+                try await thingModerationRepository.toggleSticky(post: post)
                 
                 self.post?.stickied = !(self.post?.stickied ?? false)
             } catch {
@@ -1132,7 +1132,7 @@ public class PostDetailsViewModel: ObservableObject {
         
         Task {
             do {
-                try await postModerationRepository.toggleLock(thingFullname: post.name, lock: !post.locked)
+                try await thingModerationRepository.toggleLock(thingFullname: post.name, lock: !post.locked)
                 
                 self.post?.locked = !(self.post?.locked ?? false)
             } catch {
@@ -1146,7 +1146,7 @@ public class PostDetailsViewModel: ObservableObject {
     func toggleLockComment(_ comment: Comment) {
         Task {
             do {
-                try await postModerationRepository.toggleLock(thingFullname: comment.name, lock: !comment.locked)
+                try await thingModerationRepository.toggleLock(thingFullname: comment.name, lock: !comment.locked)
                 
                 guard let allIndex = self.allComments.index(id: comment.id) else {
                     return
@@ -1172,7 +1172,7 @@ public class PostDetailsViewModel: ObservableObject {
         
         Task {
             do {
-                try await postModerationRepository.toggleDistinguishAsMod(post: post)
+                try await thingModerationRepository.toggleDistinguishAsMod(post: post)
                 
                 self.post?.distinguished = (self.post?.distinguished ?? "") == "moderator" ? "" : "moderator"
             } catch {

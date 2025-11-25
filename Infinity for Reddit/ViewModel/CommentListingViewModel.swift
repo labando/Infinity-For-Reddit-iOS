@@ -23,16 +23,20 @@ public class CommentListingViewModel: ObservableObject {
     
     private var after: String? = nil
     public let commentListingRepository: CommentListingRepositoryProtocol
+    private let thingModerationRepository: ThingModerationRepositoryProtocol
     private let commentListingMetadata: CommentListingMetadata
     private var lastLoadedSortType: SortType? = nil
     
     private var refreshCommentsContinuation: CheckedContinuation<Void, Never>?
     
     // MARK: - Initializer
-    init(commentListingMetadata: CommentListingMetadata, commentListingRepository: CommentListingRepositoryProtocol) {
+    init(commentListingMetadata: CommentListingMetadata,
+         commentListingRepository: CommentListingRepositoryProtocol,
+         thingModerationRepository: ThingModerationRepositoryProtocol) {
         self.sortType = commentListingMetadata.commentListingType.savedSortType
         self.commentListingMetadata = commentListingMetadata
         self.commentListingRepository = commentListingRepository
+        self.thingModerationRepository = thingModerationRepository
     }
     
     // MARK: - Methods
@@ -72,7 +76,7 @@ public class CommentListingViewModel: ObservableObject {
             
             let commentListing: CommentListing
             switch commentListingMetadata.commentListingType {
-            case .user(username: let username):
+            case .user:
                 commentListing = try await commentListingRepository.fetchComments(
                     commentListingType: commentListingMetadata.commentListingType,
                     pathComponents: commentListingMetadata.pathComponents,
@@ -212,6 +216,65 @@ public class CommentListingViewModel: ObservableObject {
                 await MainActor.run {
                     self.error = error
                 }
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func approveComment(_ comment: Comment) {
+        Task {
+            do {
+                try await thingModerationRepository.approveThing(thingFullname: comment.name)
+                
+                guard let index = self.comments.index(id: comment.id) else {
+                    return
+                }
+                comments[index].approved = true
+                comments[index].approvedBy = AccountViewModel.shared.account.username
+                comments[index].approvedAtUtc = Utils.getCurrentTimeEpoch()
+                comments[index].removed = false
+                comments[index].spam = false
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func removeComment(_ comment: Comment, isSpam: Bool) {
+        Task {
+            do {
+                try await thingModerationRepository.removeThing(thingFullname: comment.name, isSpam: isSpam)
+                
+                guard let index = self.comments.index(id: comment.id) else {
+                    return
+                }
+                comments[index].approved = false
+                comments[index].approvedBy = ""
+                comments[index].approvedAtUtc = 0
+                comments[index].removed = true
+                comments[index].spam = isSpam
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleLockComment(_ comment: Comment) {
+        Task {
+            do {
+                try await thingModerationRepository.toggleLock(thingFullname: comment.name, lock: !comment.locked)
+                
+                guard let index = self.comments.index(id: comment.id) else {
+                    return
+                }
+                comments[index].locked.toggle()
+            } catch {
+                self.error = error
                 print(error)
             }
         }

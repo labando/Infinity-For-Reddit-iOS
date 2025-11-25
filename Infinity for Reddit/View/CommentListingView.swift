@@ -20,9 +20,11 @@ struct CommentListingView: View {
     @StateObject var commentListingViewModel: CommentListingViewModel
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
+    @State private var showCommentModerationSheet: Bool = false
     @State private var upcomingSortTypeKind: SortType.Kind?
     @State private var navigationBarMenuKey: UUID?
     @State private var commentToBeEdited: Comment? = nil
+    @State private var commentToBeModerated: Comment? = nil
     
     private let commentListingMetadata: CommentListingMetadata
     private let thingModerationRepository: ThingModerationRepositoryProtocol = ThingModerationRepository()
@@ -34,7 +36,8 @@ struct CommentListingView: View {
         _commentListingViewModel = StateObject(
             wrappedValue: CommentListingViewModel(
                 commentListingMetadata: commentListingMetadata,
-                commentListingRepository: CommentListingRepository()
+                commentListingRepository: CommentListingRepository(),
+                thingModerationRepository: ThingModerationRepository()
             )
         )
     }
@@ -71,7 +74,8 @@ struct CommentListingView: View {
                                     navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
                                 },
                                 onModerate: {
-                                    
+                                    commentToBeModerated = comment
+                                    showCommentModerationSheet = true
                                 }
                             )
                         }
@@ -164,6 +168,27 @@ struct CommentListingView: View {
                 if let upcomingSortTypeKind = upcomingSortTypeKind {
                     commentListingViewModel.changeSortType(sortType: SortType(type: upcomingSortTypeKind, time: sortTypeTime))
                 }
+            }
+        }
+        .wrapContentSheet(isPresented: $showCommentModerationSheet) {
+            if let commentToBeModerated {
+                CommentModerationSheet(
+                    comment: commentToBeModerated,
+                    onApprove: {
+                        commentListingViewModel.approveComment(commentToBeModerated)
+                    },
+                    onRemove: {
+                        commentListingViewModel.removeComment(commentToBeModerated, isSpam: false)
+                    },
+                    onMarkAsSpam: {
+                        commentListingViewModel.removeComment(commentToBeModerated, isSpam: true)
+                    },
+                    onToggleLock: {
+                        commentListingViewModel.toggleLockComment(commentToBeModerated)
+                    }
+                )
+            } else {
+                EmptyView()
             }
         }
     }
