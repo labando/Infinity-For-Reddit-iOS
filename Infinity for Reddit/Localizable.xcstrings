@@ -168,6 +168,9 @@
     "Failed to load image — tap to retry." : {
 
     },
+    "Failed to load wiki: %@. Tap to retry" : {
+
+    },
     "Filtered out comments will be shown as the following selected option." : {
 
     },
@@ -298,6 +301,9 @@
 
     },
     "No users" : {
+
+    },
+    "No wiki found" : {
 
     },
     "OK" : {

@@ -69,6 +69,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     case lockThing(params: [String: String])
     case unlockThing(params: [String: String])
     case toggleDistinguishedThing(params: [String: String])
+    case getWikiPage(subredditName: String, wikiPage: String)
     
     private var baseURL: String {
         return "https://oauth.reddit.com"
@@ -76,7 +77,7 @@ enum RedditOAuthAPI: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo:
+        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .getInfo, .getUserFlairs, .getCustomFeedInfo, .getWikiPage:
             return .get
         case .vote, .subsrcribeToSubreddit, .saveThing, .unsaveThing, .getMoreCommentsForCommentMore, .sendCommentOrReplyToMessage, .favoriteThing, .favoriteCustomFeed, .submitPost, .uploadMediaMetadata, .submitGalleryPost, .submitPollPost, .editPostOrComment, .deletePostOrComment, .hidePost, .unhidePost, .readMessage, .readAllMessages, .markSensitive, .unmarkSensitive, .markSpoiler, .unmarkSpoiler, .selectFlair, .selectUserFlair, .composeMessage, .createCustomFeed, .copyCustomFeed, .report, .approveThing, .removeThing, .toggleStickyPost, .lockThing, .unlockThing, .toggleDistinguishedThing:
             return .post
@@ -209,15 +210,17 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return "/api/unlock"
         case .toggleDistinguishedThing:
             return "/api/distinguish"
+        case .getWikiPage(let subredditName, let wikiPage):
+            return "/r/\(subredditName)/wiki/\(wikiPage).json"
         }
     }
     
     var parameters: [String: String]? {
         switch self {
-        case .getMyInfo, .getFrontPagePosts, .getUserData, .getSubredditData, .getSubredditPosts, .getUserPosts, .getSearchPosts, .getSearchPostsInSpecificThing, .getCustomFeedPosts, .getSubredditConcatPosts, .getSubscribedThings, .getMyCustomFeeds, .getUserComments, .getUserSavedComments, .getPostAndCommentsById, .getPostAndCommentsSingleThreadById, .searchSubreddits, .searchUsers, .getInbox, .getRules, .getFlairs, .submitGalleryPost, .submitPollPost, .getInfo, .deleteCustomFeed, .readAllMessages, .getUserFlairs, .getCustomFeedInfo:
-            return nil
         case .vote(let params), .subsrcribeToSubreddit(let params), .saveThing(let params), .unsaveThing(let params), .getMoreCommentsForCommentMore(let params), .sendCommentOrReplyToMessage(let params), .favoriteThing(let params), .favoriteCustomFeed(let params), .submitPost(let params), .uploadMediaMetadata(let params), .editPostOrComment(let params), .deletePostOrComment(let params), .hidePost(let params), .unhidePost(let params), .readMessage(let params), .markSensitive(let params), .unmarkSensitive(let params), .markSpoiler(let params), .unmarkSpoiler(let params), .selectFlair(_, let params), .selectUserFlair(_, let params), .composeMessage(let params), .createCustomFeed(let params), .updateCustomFeed(let params), .copyCustomFeed(let params), .report(let params), .approveThing(let params), .removeThing(let params), .toggleStickyPost(let params), .lockThing(let params), .unlockThing(let params), .toggleDistinguishedThing(let params):
             return params
+        default:
+            return nil
         }
     }
     
@@ -283,6 +286,8 @@ enum RedditOAuthAPI: URLRequestConvertible {
             return ["raw_json": "1"]
         case .getCustomFeedInfo(let queries):
             return queries
+        case .getWikiPage:
+            return ["raw_json": "1"]
         default:
             return nil
         }
