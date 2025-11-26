@@ -32,12 +32,20 @@ struct PostDetailsViewCard: View {
 
     let isFromSubredditPostListing: Bool
     let onSendComment: () -> Void
+    let onLongPress: () -> Void
     
     private let iconSize: CGFloat = 24
     
-    init(account: Account, post: Post, isFromSubredditPostListing: Bool, onSendComment: @escaping () -> Void) {
+    init(
+        account: Account,
+        post: Post,
+        isFromSubredditPostListing: Bool,
+        onSendComment: @escaping () -> Void,
+        onLongPress: @escaping () -> Void
+    ) {
         self.isFromSubredditPostListing = isFromSubredditPostListing
         self.onSendComment = onSendComment
+        self.onLongPress = onLongPress
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
     }
     
@@ -225,6 +233,12 @@ struct PostDetailsViewCard: View {
                     .markdownLinkHandler { url in
                         navigationManager.openLink(url)
                     }
+                    .highPriorityGesture(
+                        LongPressGesture()
+                            .onEnded { _ in
+                                
+                            }
+                    )
             }
             
             HStack(spacing: 0) {
@@ -311,6 +325,10 @@ struct PostDetailsViewCard: View {
             .padding(8)
         }
         .padding(.vertical, 0)
+        .contentShape(Rectangle())
+        .onLongPressGesture {
+            onLongPress()
+        }
     }
     
     private func goToSubredditDetails() {

@@ -30,6 +30,10 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var flairs: [Flair]?
     @Published var searchQuery: String = ""
     @Published var searchedComment: CommentItem?
+    
+    @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
+    @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
+    
     private let account: Account
     private var commentMore: CommentMore?
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
@@ -1178,6 +1182,71 @@ public class PostDetailsViewModel: ObservableObject {
             } catch {
                 self.error = error
                 print(error)
+            }
+        }
+    }
+    
+    func downloadMedia() {
+        guard let post else {
+            return
+        }
+        
+        guard let downloadMediaType = post.getDownloadMediaType() else {
+            return
+        }
+        
+        Task {
+            do {
+                try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, progress in
+                    
+                })
+                
+                await MainActor.run {
+                    self.showMediaDownloadFinishedMessageTrigger.toggle()
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                    print(error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func downloadAllGalleryMedia() {
+        guard let post else {
+            return
+        }
+        
+        guard let items = post.galleryData?.items else {
+            return
+        }
+        
+        Task {
+            await withTaskGroup(of: Void.self) { group in
+                for item in items {
+                    group.addTask { [weak self] in
+                        await self?.downloadGalleryOrImgurItemMediaAsync(downloadMediaType: item.toDownloadMediaType(post: post))
+                    }
+                }
+                
+                for await _ in group {
+                    
+                }
+                
+                await MainActor.run {
+                    self.showAllGalleryMediaDownloadFinishedMessageTrigger.toggle()
+                }
+            }
+        }
+    }
+    
+    private func downloadGalleryOrImgurItemMediaAsync(downloadMediaType: DownloadMediaType) async {
+        do {
+            try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, _ in })
+        } catch {
+            await MainActor.run {
+                self.error = error
             }
         }
     }

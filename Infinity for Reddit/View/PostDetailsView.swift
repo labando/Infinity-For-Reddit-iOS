@@ -16,6 +16,7 @@ struct PostDetailsView: View {
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
     @EnvironmentObject private var postEditingShareableViewModel: PostEditingShareableViewModel
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     
     @StateObject var playerManager = PlayerManager()
     @StateObject var postDetailsViewModel: PostDetailsViewModel
@@ -26,6 +27,7 @@ struct PostDetailsView: View {
     @State private var showSelectFlairSheet: Bool = false
     @State private var showPostModerationSheet: Bool = false
     @State private var showCommentModerationSheet: Bool = false
+    @State private var showPostOptionsSheet: Bool = false
     @State private var navigationBarMenuKey: UUID?
     @State private var sentCommentParent: CommentParent? = nil
     @State private var commentToBeEdited: Comment? = nil
@@ -69,9 +71,17 @@ struct PostDetailsView: View {
                 ScrollViewReader { proxy in
                     List {
                         if let post = postDetailsViewModel.post {
-                            PostDetailsViewCard(account: account, post: post, isFromSubredditPostListing: isFromSubredditPostListing) {
-                                sendComment()
-                            }
+                            PostDetailsViewCard(
+                                account: account,
+                                post: post,
+                                isFromSubredditPostListing: isFromSubredditPostListing,
+                                onSendComment: {
+                                    sendComment()
+                                },
+                                onLongPress: {
+                                    showPostOptionsSheet = true
+                                }
+                            )
                             .listPlainItemNoInsets()
                             .id(ObjectIdentifier(post))
                             .onAppear {
@@ -420,6 +430,12 @@ struct PostDetailsView: View {
                 postEditingShareableViewModel.editedPost = nil
             }
         }
+        .onChange(of: postDetailsViewModel.showMediaDownloadFinishedMessageTrigger) {
+            snackbarManager.showSnackbar(.info("Download complete."))
+        }
+        .onChange(of: postDetailsViewModel.showAllGalleryMediaDownloadFinishedMessageTrigger) {
+            snackbarManager.showSnackbar(.info("Gallery download complete."))
+        }
         .task(id: postDetailsViewModel.loadPostAndCommentsTaskId) {
             await postDetailsViewModel.initialLoadPostAndComments()
         }
@@ -446,6 +462,45 @@ struct PostDetailsView: View {
         .wrapContentSheet(isPresented: $showSelectFlairSheet) {
             SelectPostFlairSheet(flairs: postDetailsViewModel.flairs) { flair in
                 postDetailsViewModel.selectFlair(flair)
+            }
+        }
+        .wrapContentSheet(isPresented: $showPostOptionsSheet) {
+            if let post = postDetailsViewModel.post {
+                PostOptionsSheet(
+                    post: post,
+                    onComment: {
+                        navigationManager.append(AppNavigation.submitComment(commentParent: .post(parentPost: post)))
+                    },
+                    onAddToPostFilter: {
+                        navigationManager.append(SettingsViewNavigation.postFilter(postToBeAdded: post))
+                    },
+                    onToggleHidePost: {
+                        postDetailsViewModel.toggleHidePost {
+                            setUpMenu()
+                        }
+                    },
+                    onCrosspost: {
+                        navigationManager.append(AppNavigation.crosspost(postToBeCrossposted: post))
+                    },
+                    onDownloadMedia: {
+                        postDetailsViewModel.downloadMedia()
+                    },
+                    onDownloadAllGalleryMedia: {
+                        postDetailsViewModel.downloadAllGalleryMedia()
+                    },
+                    onReport: {
+                        if AccountViewModel.shared.account.isAnonymous() {
+                            navigationManager.openLink("https://www.reddit.com/report")
+                        } else {
+                            navigationManager.append(AppNavigation.report(subredditName: post.subreddit, thingFullname: post.name))
+                        }
+                    },
+                    onModeration: {
+                        showPostModerationSheet = true
+                    }
+                )
+            } else {
+                EmptyView()
             }
         }
         .wrapContentSheet(isPresented: $showPostModerationSheet) {
