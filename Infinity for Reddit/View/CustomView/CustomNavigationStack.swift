@@ -145,6 +145,9 @@ struct CustomNavigationStack<Content: View>: View {
                     case .report(let subredditName, let thingFullname):
                         ReportView(subredditName: subredditName, thingFullname: thingFullname)
                             .environmentObject(navigationManager)
+                    case .wiki(let subredditName, let wikiPath):
+                        WikiView(subredditName: subredditName, wikiPath: wikiPath)
+                            .environmentObject(navigationManager)
                     }
                 }
                 .navigationDestination(for: MoreViewNavigation.self) { destination in
