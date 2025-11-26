@@ -102,7 +102,7 @@ struct PostOptionsSheet: View {
 private extension Post.PostType {
     var downloadText: String? {
         switch self {
-        case .image, .gallery, .imageWithUrlPreview:
+        case .image, .imageWithUrlPreview:
             return "Download Image"
         case .gif:
             return "Download Gif"

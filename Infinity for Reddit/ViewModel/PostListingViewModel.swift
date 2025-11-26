@@ -658,14 +658,15 @@ public class PostListingViewModel: ObservableObject {
                 try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, progress in
                     
                 })
+                
+                await MainActor.run {
+                    self.showMediaDownloadFinishedMessageTrigger.toggle()
+                }
             } catch {
                 await MainActor.run {
                     self.error = error
+                    print(error.localizedDescription)
                 }
-            }
-            
-            await MainActor.run {
-                self.showMediaDownloadFinishedMessageTrigger.toggle()
             }
         }
     }

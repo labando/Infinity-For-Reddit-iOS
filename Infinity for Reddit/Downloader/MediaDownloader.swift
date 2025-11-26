@@ -26,7 +26,7 @@ class MediaDownloader {
     static let shared = MediaDownloader()
     
     private let session: Session
-    private let possibleRedditVideoAudioTrackURLSuffices = ["/DASH_AUDIO_128.mp4", "/DASH_audio.mp4", "/DASH_audio", "/audio.mp4", "/audio"]
+    private let possibleRedditVideoAudioTrackURLSuffices = ["/CMAF_AUDIO_128.mp4", "/CMAF_AUDIO_64.mp4", "/DASH_AUDIO_128.mp4", "/DASH_audio.mp4", "/DASH_audio", "/audio.mp4", "/audio"]
     
     private init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self, name: "plain") else {
@@ -82,7 +82,7 @@ class MediaDownloader {
             return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
         }
         
-        let request = session.download(downloadURL, to: destination)
+        let request = session.download(downloadURL, to: destination).validate()
         
         Task {
             for await progress in request.downloadProgress() {
@@ -118,15 +118,20 @@ class MediaDownloader {
                         break
                     } catch {
                         // Ignore
+                        audioTrackDownloadedFileURL = nil
                     }
                 }
             }
         }
 
         if let audioTrackDownloadedFileURL {
-            await onProgressWithTitle("Muxing video and audio...", 0)
-            let exportedMuxedVideoURL = try await muxVideoAndAudio(downloadedVideoURL: videoTrackDownloadedFileURL, downloadedAudioURL: audioTrackDownloadedFileURL, fileName: fileName)
-            try await saveVideoToPhotosLibrary(exportedMuxedVideoURL)
+            do {
+                await onProgressWithTitle("Muxing video and audio...", 0)
+                let exportedMuxedVideoURL = try await muxVideoAndAudio(downloadedVideoURL: videoTrackDownloadedFileURL, downloadedAudioURL: audioTrackDownloadedFileURL, fileName: fileName)
+                try await saveVideoToPhotosLibrary(exportedMuxedVideoURL)
+            } catch {
+                try await saveVideoToPhotosLibrary(videoTrackDownloadedFileURL)
+            }
         } else {
             try await saveVideoToPhotosLibrary(videoTrackDownloadedFileURL)
         }
