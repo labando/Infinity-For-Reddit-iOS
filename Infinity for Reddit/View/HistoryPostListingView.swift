@@ -6,23 +6,28 @@
 //
 
 import SwiftUI
-import Swinject
 import GRDB
 import Alamofire
 
 struct HistoryPostListingView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     
     @StateObject var historyPostListingViewModel: HistoryPostListingViewModel
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
+    
+    @State private var scrollProxy: ScrollViewProxy? = nil
     @State private var navigationBarMenuKey: UUID?
     @State private var showLayoutTypeSheet: Bool = false
     @State private var showPostOptionsSheet: Bool = false
     @State private var showPostShareSheet: Bool = false
     @State private var showPostModerationSheet: Bool = false
     @State private var postForPostOptionsSheet: Post?
+    @State var lazyMode: Task<Void, Error>?
+    @State var lazyModeState: LazyModeState = .stopped
+    
+    @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
 
     private let historyPostListingMetadata: HistoryPostListingMetadata
     private let handleToolbarMenu: Bool
@@ -61,49 +66,67 @@ struct HistoryPostListingView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List {
-                    ForEach(historyPostListingViewModel.posts, id: \.id) { post in
-                        PostView(
-                            post: post,
-                            postLayout: historyPostListingViewModel.postLayout,
-                            isSubredditPostListing: false,
-                            onPostTypeTap: {
-                                onPostTypeClicked(post: post)
-                            },
-                            onSensitiveTap: {
-                                onSensitiveClicked(post: post)
-                            },
-                            onLongPressPost: {
-                                postForPostOptionsSheet = post
-                                showPostOptionsSheet = true
-                            },
-                            onShare: {
-                                postForPostOptionsSheet = post
-                                showPostShareSheet = true
-                            }
-                        )
-                        .id(ObjectIdentifier(post))
-                        .listPlainItemNoInsets()
-                        .onAppear {
-                            if post.subredditOrUserIcon == nil {
-                                Task {
-                                    await historyPostListingViewModel.loadIcon(post: post)
+                ScrollViewReader { proxy in
+                    List {
+                        ForEach(historyPostListingViewModel.posts, id: \.id) { post in
+                            PostView(
+                                post: post,
+                                postLayout: historyPostListingViewModel.postLayout,
+                                isSubredditPostListing: false,
+                                onPostTypeTap: {
+                                    onPostTypeClicked(post: post)
+                                },
+                                onSensitiveTap: {
+                                    onSensitiveClicked(post: post)
+                                },
+                                onLongPressPost: {
+                                    postForPostOptionsSheet = post
+                                    showPostOptionsSheet = true
+                                },
+                                onShare: {
+                                    postForPostOptionsSheet = post
+                                    showPostShareSheet = true
+                                }
+                            )
+                            .id(ObjectIdentifier(post))
+                            .listPlainItemNoInsets()
+                            .onAppear {
+                                if post.subredditOrUserIcon == nil {
+                                    Task {
+                                        await historyPostListingViewModel.loadIcon(post: post)
+                                    }
                                 }
                             }
                         }
+                        if historyPostListingViewModel.hasMorePages {
+                            ProgressIndicator()
+                                .task {
+                                    await historyPostListingViewModel.loadPosts()
+                                }
+                                .listPlainItem()
+                        }
                     }
-                    if historyPostListingViewModel.hasMorePages {
-                        ProgressIndicator()
-                            .task {
-                                await historyPostListingViewModel.loadPosts()
+                    .scrollBounceBehavior(.basedOnSize)
+                    .themedList()
+                    .refreshable {
+                        await historyPostListingViewModel.refreshPostsWithContinuation()
+                    }
+                    .onAppear {
+                        scrollProxy = proxy
+                    }
+                    .simultaneousGesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                if lazyModeState == .started {
+                                    pauseLazyMode(resetScrolledPost: true)
+                                }
                             }
-                            .listPlainItem()
-                    }
-                }
-                .scrollBounceBehavior(.basedOnSize)
-                .themedList()
-                .refreshable {
-                    await historyPostListingViewModel.refreshPostsWithContinuation()
+                            .onEnded { value in
+                                if lazyModeState == .paused {
+                                    resumeLazyMode()
+                                }
+                            }
+                    )
                 }
             }
         }
@@ -116,34 +139,39 @@ struct HistoryPostListingView: View {
             await historyPostListingViewModel.initialLoadPosts()
         }
         .onAppear {
-            if let key = navigationBarMenuKey {
-                navigationBarMenuManager.pop(key: key)
-            }
-            var options = [
-                NavigationBarMenuItem(title: "Refresh") {
-                    historyPostListingViewModel.refreshPosts()
-                },
-                
-                NavigationBarMenuItem(title: "Change Post Layout") {
-                    showLayoutTypeSheet = true
-                }
-            ]
-            
-            if showFilterPostsOption {
-                options.append(NavigationBarMenuItem(title: "Filter Posts") {
-                    navigationManager.append(
-                        AppNavigation.filterHistoryPosts(
-                            historyPostListingMetadata: historyPostListingMetadata
-                        )
-                    )
-                })
+            if lazyModeState == .paused {
+                resumeLazyMode()
             }
             
-            navigationBarMenuKey = navigationBarMenuManager.push(options)
+            setUpMenu()
         }
         .onDisappear {
+            if lazyModeState == .started {
+                pauseLazyMode(resetScrolledPost: false)
+            }
+            
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
+        .appForegroundBackgroundListener(
+            onAppEntersForeground: {
+                if lazyModeState == .paused {
+                    resumeLazyMode()
+                }
+            }, onAppEntersBackground: {
+                if lazyModeState == .started {
+                    pauseLazyMode(resetScrolledPost: false)
+                }
+            }
+        )
+        .onChange(of: lazyModeState) {
+            setUpMenu()
+        }
+        .onChange(of: historyPostListingViewModel.showMediaDownloadFinishedMessageTrigger) {
+            snackbarManager.showSnackbar(.info("Download complete."))
+        }
+        .onChange(of: historyPostListingViewModel.showAllGalleryMediaDownloadFinishedMessageTrigger) {
+            snackbarManager.showSnackbar(.info("Gallery download complete."))
         }
         .wrapContentSheet(isPresented: $showLayoutTypeSheet) {
             PostLayoutSheet(
@@ -236,6 +264,41 @@ struct HistoryPostListingView: View {
         .environment(\.postListingVideoManager, postListingVideoManager)
     }
     
+    private func setUpMenu() {
+        if let key = navigationBarMenuKey {
+            navigationBarMenuManager.pop(key: key)
+        }
+        var options = [
+            NavigationBarMenuItem(title: "Refresh") {
+                historyPostListingViewModel.refreshPosts()
+            },
+            
+            NavigationBarMenuItem(title: "Change Post Layout") {
+                showLayoutTypeSheet = true
+            },
+            
+            NavigationBarMenuItem(title: lazyModeState == .stopped ? "Start Lazy Mode" : "Stop Lazy Mode") {
+                if lazyModeState == .stopped {
+                    startLazyMode()
+                } else {
+                    stopLazyMode()
+                }
+            }
+        ]
+        
+        if showFilterPostsOption {
+            options.append(NavigationBarMenuItem(title: "Filter Posts") {
+                navigationManager.append(
+                    AppNavigation.filterHistoryPosts(
+                        historyPostListingMetadata: historyPostListingMetadata
+                    )
+                )
+            })
+        }
+        
+        navigationBarMenuKey = navigationBarMenuManager.push(options)
+    }
+    
     private func onPostTypeClicked(post: Post) {
         if showFilterPostsOption {
             navigationManager.append(
@@ -258,5 +321,108 @@ struct HistoryPostListingView: View {
                 )
             )
         }
+    }
+    
+    private func startLazyMode() {
+        guard lazyMode == nil else {
+            return
+        }
+        
+        lazyModeState = .started
+        
+        if historyPostListingViewModel.lazyModeScrolledPost == nil {
+            if !historyPostListingViewModel.appearedPosts.isEmpty {
+                historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.appearedPosts[0]
+            } else if !historyPostListingViewModel.posts.isEmpty {
+                historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.posts[0]
+            }
+        }
+        
+        lazyMode = Task {
+            repeat {
+                try? await Task.sleep(for: .seconds(lazyModeInterval))
+                await MainActor.run {
+                    if Task.isCancelled {
+                        return
+                    }
+                    
+                    if let scrollProxy = scrollProxy, !historyPostListingViewModel.posts.isEmpty {
+                        if let scrolledParent = historyPostListingViewModel.lazyModeScrolledPost {
+                            if let index = historyPostListingViewModel.posts.index(id: scrolledParent.id) {
+                                if index < historyPostListingViewModel.posts.count - 1 {
+                                    historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.posts[index + 1]
+                                    withAnimation {
+                                        scrollProxy.scrollTo(ObjectIdentifier(historyPostListingViewModel.posts[index + 1]), anchor: .top)
+                                    }
+                                }
+                            } else {
+                                historyPostListingViewModel.lazyModeScrolledPost = nil
+                                if !historyPostListingViewModel.appearedPosts.isEmpty {
+                                    historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.appearedPosts[historyPostListingViewModel.appearedPosts.count - 1]
+                                    for appearedPost in historyPostListingViewModel.appearedPosts.reversed() {
+                                        if let index = historyPostListingViewModel.posts.index(id: appearedPost.id) {
+                                            if index < historyPostListingViewModel.posts.count {
+                                                historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.posts[index + 1]
+                                                withAnimation {
+                                                    scrollProxy.scrollTo(ObjectIdentifier(historyPostListingViewModel.posts[index + 1]), anchor: .top)
+                                                }
+                                            }
+                                            break
+                                        }
+                                    }
+                                } else if !historyPostListingViewModel.posts.isEmpty {
+                                    historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.posts[0]
+                                    withAnimation {
+                                        scrollProxy.scrollTo(ObjectIdentifier(historyPostListingViewModel.posts[0]), anchor: .top)
+                                    }
+                                }
+                            }
+                        } else {
+                            if !historyPostListingViewModel.appearedPosts.isEmpty {
+                                historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.appearedPosts[historyPostListingViewModel.appearedPosts.count - 1]
+                                for appearedPost in historyPostListingViewModel.appearedPosts.reversed() {
+                                    if let index = historyPostListingViewModel.posts.index(id: appearedPost.id) {
+                                        if index < historyPostListingViewModel.posts.count {
+                                            historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.posts[index + 1]
+                                            withAnimation {
+                                                scrollProxy.scrollTo(ObjectIdentifier(historyPostListingViewModel.posts[index + 1]), anchor: .top)
+                                            }
+                                        }
+                                        break
+                                    }
+                                }
+                            } else if !historyPostListingViewModel.posts.isEmpty {
+                                historyPostListingViewModel.lazyModeScrolledPost = historyPostListingViewModel.posts[0]
+                                withAnimation {
+                                    scrollProxy.scrollTo(ObjectIdentifier(historyPostListingViewModel.posts[0]), anchor: .top)
+                                }
+                            }
+                        }
+                    }
+                }
+            } while !Task.isCancelled
+        }
+    }
+    
+    private func stopLazyMode() {
+        historyPostListingViewModel.lazyModeScrolledPost = nil
+        lazyModeState = .stopped
+        lazyMode?.cancel()
+        lazyMode = nil
+    }
+    
+    private func pauseLazyMode(resetScrolledPost: Bool) {
+        if resetScrolledPost {
+            historyPostListingViewModel.lazyModeScrolledPost = nil
+        }
+        lazyModeState = .paused
+        lazyMode?.cancel()
+        lazyMode = nil
+    }
+    
+    private func resumeLazyMode() {
+        lazyMode?.cancel()
+        lazyMode = nil
+        startLazyMode()
     }
 }

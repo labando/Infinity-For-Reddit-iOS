@@ -17,6 +17,7 @@ struct PostListingView: View {
     
     @StateObject var postListingViewModel: PostListingViewModel
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
+    
     @State private var scrollProxy: ScrollViewProxy? = nil
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
@@ -529,11 +530,5 @@ struct PostListingView: View {
         lazyMode?.cancel()
         lazyMode = nil
         startLazyMode()
-    }
-    
-    enum LazyModeState {
-        case stopped
-        case started
-        case paused
     }
 }
