@@ -19,6 +19,10 @@ struct HistoryPostListingView: View {
     @StateObject var postListingVideoManager: PostListingVideoManager = .init()
     @State private var navigationBarMenuKey: UUID?
     @State private var showLayoutTypeSheet: Bool = false
+    @State private var showPostOptionsSheet: Bool = false
+    @State private var showPostShareSheet: Bool = false
+    @State private var showPostModerationSheet: Bool = false
+    @State private var postForPostOptionsSheet: Post?
 
     private let historyPostListingMetadata: HistoryPostListingMetadata
     private let handleToolbarMenu: Bool
@@ -39,6 +43,7 @@ struct HistoryPostListingView: View {
                 externalPostFilter: externalPostFilter,
                 historyPostListingRepository: HistoryPostListingRepository(),
                 historyPostsRepository: HistoryPostsRepository(),
+                thingModerationRepository: ThingModerationRepository(),
                 postFeedID: "read_posts"
             )
         )
@@ -69,10 +74,12 @@ struct HistoryPostListingView: View {
                                 onSensitiveClicked(post: post)
                             },
                             onLongPressPost: {
-                                
+                                postForPostOptionsSheet = post
+                                showPostOptionsSheet = true
                             },
                             onShare: {
-                                
+                                postForPostOptionsSheet = post
+                                showPostShareSheet = true
                             }
                         )
                         .id(ObjectIdentifier(post))
@@ -145,6 +152,86 @@ struct HistoryPostListingView: View {
                     historyPostListingViewModel.changePostLayout(newLayout)
                 }
             )
+        }
+        .wrapContentSheet(isPresented: $showPostOptionsSheet) {
+            if let postForPostOptionsSheet {
+                PostOptionsSheet(
+                    post: postForPostOptionsSheet,
+                    onComment: {
+                        navigationManager.append(AppNavigation.submitComment(commentParent: .post(parentPost: postForPostOptionsSheet)))
+                    },
+                    onShare: {
+                        showPostShareSheet = true
+                    },
+                    onAddToPostFilter: {
+                        navigationManager.append(SettingsViewNavigation.postFilter(postToBeAdded: postForPostOptionsSheet))
+                    },
+                    onToggleHidePost: {
+                        historyPostListingViewModel.toggleHidePost(postForPostOptionsSheet)
+                    },
+                    onCrosspost: {
+                        navigationManager.append(AppNavigation.crosspost(postToBeCrossposted: postForPostOptionsSheet))
+                    },
+                    onDownloadMedia: {
+                        historyPostListingViewModel.downloadMedia(postForPostOptionsSheet)
+                    },
+                    onDownloadAllGalleryMedia: {
+                        historyPostListingViewModel.downloadAllGalleryMedia(post: postForPostOptionsSheet)
+                    },
+                    onReport: {
+                        if AccountViewModel.shared.account.isAnonymous() {
+                            navigationManager.openLink("https://www.reddit.com/report")
+                        } else {
+                            navigationManager.append(AppNavigation.report(subredditName: postForPostOptionsSheet.subreddit, thingFullname: postForPostOptionsSheet.name))
+                        }
+                    },
+                    onModeration: {
+                        showPostModerationSheet = true
+                    }
+                )
+            } else {
+                EmptyView()
+            }
+        }
+        .wrapContentSheet(isPresented: $showPostModerationSheet) {
+            if let postForPostOptionsSheet {
+                PostModerationSheet(
+                    post: postForPostOptionsSheet,
+                    onApprove: {
+                        historyPostListingViewModel.approvePost(postForPostOptionsSheet)
+                    },
+                    onRemove: {
+                        historyPostListingViewModel.removePost(postForPostOptionsSheet, isSpam: false)
+                    },
+                    onMarkAsSpam: {
+                        historyPostListingViewModel.removePost(postForPostOptionsSheet, isSpam: true)
+                    },
+                    onToggleStickyPost: {
+                        historyPostListingViewModel.toggleSticky(postForPostOptionsSheet)
+                    },
+                    onToggleLock: {
+                        historyPostListingViewModel.toggleLockPost(postForPostOptionsSheet)
+                    },
+                    onToggleSensitive: {
+                        historyPostListingViewModel.toggleSensitive(postForPostOptionsSheet)
+                    },
+                    onToggleSpoiler: {
+                        historyPostListingViewModel.toggleSpoiler(postForPostOptionsSheet)
+                    },
+                    onToggleDistinguishAsModerator: {
+                        historyPostListingViewModel.toggleDistinguishAsMod(postForPostOptionsSheet)
+                    }
+                )
+            } else {
+                EmptyView()
+            }
+        }
+        .wrapContentSheet(isPresented: $showPostShareSheet) {
+            if let postForPostOptionsSheet {
+                PostShareSheet(post: postForPostOptionsSheet)
+            } else {
+                EmptyView()
+            }
         }
         .environment(\.postListingVideoManager, postListingVideoManager)
     }
