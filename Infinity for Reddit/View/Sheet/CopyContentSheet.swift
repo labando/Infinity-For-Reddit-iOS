@@ -6,40 +6,59 @@
 //
 
 import SwiftUI
+import WebKit
 
 struct CopyContentSheet: View {
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
-    let markdown: String
-    let plainText: String
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontScaleKey, store: .interfaceFont) private var contentFontScale: Int = 2
     
-    let onCopyMarkdown: () -> Void
-    let onCopyPlainText: () -> Void
+    let content: String
+    
+    var textColor: String? {
+        return Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor).toHexString()
+    }
+    
+    var html: String {
+        return """
+               <head>
+               <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'>
+               <style>
+                           body {
+                               color: \(textColor ?? "#000000");
+                               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                           }
+                       </style>
+               </head>
+               """ + content
+    }
+    
+    init(content: String) {
+        self.content = content
+    }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                IconTextButton(startIconUrl: "document.on.document", text: "Copy All Markdown") {
-                    Utils.copyText(markdown)
-                    dismiss()
-                }
-                
-                IconTextButton(startIconUrl: "document.on.document", text: "Copy Markdown") {
-                    onCopyMarkdown()
-                    dismiss()
-                }
-                
-                IconTextButton(startIconUrl: "document.on.document", text: "Copy All Plain Text") {
-                    Utils.copyText(plainText)
-                    dismiss()
-                }
-                
-                IconTextButton(startIconUrl: "document.on.document", text: "Copy Plain Text") {
-                    onCopyPlainText()
-                    dismiss()
-                }
-            }
-            .padding(.top, 24)
-        }
+        HTMLStringView(
+            content: html,
+            tintColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
+        )
+        .padding(16)
+    }
+}
+
+struct HTMLStringView: UIViewRepresentable {
+    let content: String
+    let tintColor: UIColor
+
+    func makeUIView(context: Context) -> WKWebView {
+        let wv = WKWebView()
+        wv.tintColor = tintColor
+        return wv
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        uiView.loadHTMLString(content, baseURL: nil)
+        uiView.tintColor = tintColor
     }
 }

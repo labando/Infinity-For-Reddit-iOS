@@ -29,9 +29,11 @@ struct PostDetailsView: View {
     @State private var showCommentModerationSheet: Bool = false
     @State private var showPostOptionsSheet: Bool = false
     @State private var showPostShareSheet: Bool = false
+    @State private var showCopyContentOptionsSheet: Bool = false
     @State private var showCopyContentSheet: Bool = false
     @State private var markdownToBeCopied: String = ""
     @State private var plainTextToBeCopied: String = ""
+    @State private var textToBeSelectedAndCopiedItem: TextToBeSelectedAndCopiedItem?
     @State private var navigationBarMenuKey: UUID?
     @State private var sentCommentParent: CommentParent? = nil
     @State private var commentToBeEdited: Comment? = nil
@@ -49,6 +51,11 @@ struct PostDetailsView: View {
     private let account: Account
     private let isFromSubredditPostListing: Bool
     private let thingModerationRepository: ThingModerationRepositoryProtocol
+    
+    struct TextToBeSelectedAndCopiedItem: Identifiable {
+        var content: String
+        var id = UUID()
+    }
     
     init(account: Account, postDetailsInput: PostDetailsInput, isFromSubredditPostListing: Bool, isContinueThread: Bool = false) {
         self.account = account
@@ -88,7 +95,7 @@ struct PostDetailsView: View {
                                 onLongPressOnContent: {
                                     markdownToBeCopied = post.selftext
                                     plainTextToBeCopied = post.selftextHtml
-                                    showCopyContentSheet = true
+                                    showCopyContentOptionsSheet = true
                                 }
                             )
                             .listPlainItemNoInsets()
@@ -580,17 +587,22 @@ struct PostDetailsView: View {
                 EmptyView()
             }
         }
-        .wrapContentSheet(isPresented: $showCopyContentSheet) {
-            CopyContentSheet(
+        .wrapContentSheet(isPresented: $showCopyContentOptionsSheet) {
+            CopyContentOptionsSheet(
                 markdown: markdownToBeCopied,
                 plainText: plainTextToBeCopied,
                 onCopyMarkdown: {
-                    
+                    textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
+                    showCopyContentSheet = true
                 },
                 onCopyPlainText: {
-                    
+                    textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: plainTextToBeCopied)
+                    showCopyContentSheet = true
                 }
             )
+        }
+        .sheet(item: $textToBeSelectedAndCopiedItem) { content in
+            CopyContentSheet(content: content.content)
         }
         .overlay(
             CustomAlert(
