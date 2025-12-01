@@ -18,7 +18,7 @@ class SubredditAutoCompleteRepository: SubredditAutoCompleteRepositoryProtocol {
         self.session = resolvedSession
     }
     
-    func getSubredditAutoComplete(query: String, over18: Bool) async throws -> SubredditListing {
+    func fetchSubreddits(query: String, over18: Bool) async throws -> SubredditListing {
         let queries: [String: String] = ["query": query, "over18": over18 ? "true" : "false"]
         let apiRequest = RedditOAuthAPI.subredditAutoComplete(queries: queries)
         

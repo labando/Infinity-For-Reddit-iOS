@@ -6,5 +6,5 @@
 //
 
 protocol SubredditAutoCompleteRepositoryProtocol {
-    func getSubredditAutoComplete(query: String, over18: Bool) async throws -> SubredditListing
+    func fetchSubreddits(query: String, over18: Bool) async throws -> SubredditListing
 }

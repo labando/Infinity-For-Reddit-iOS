@@ -59,7 +59,7 @@ class SubredditAutoCompleteViewModel: ObservableObject {
         self.subredditAutoCompleteRepository = subredditAutoCompleteRepository
     }
     
-    func fetchSubredditsAutoComplete(query: String, over18: Bool) {
+    func fetchSubreddits(query: String, over18: Bool) {
         fetchSubredditsTask?.cancel()
         
         fetchSubredditsTask = Task {
@@ -67,7 +67,7 @@ class SubredditAutoCompleteViewModel: ObservableObject {
                 try await Task.sleep(for: .milliseconds(500))
                 try Task.checkCancellation()
                 
-                let subredditListing = try await self.subredditAutoCompleteRepository.getSubredditAutoComplete(query: query, over18: over18)
+                let subredditListing = try await self.subredditAutoCompleteRepository.fetchSubreddits(query: query, over18: over18)
                 
                 try Task.checkCancellation()
                 

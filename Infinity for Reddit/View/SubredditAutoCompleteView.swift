@@ -18,10 +18,12 @@ struct SubredditAutoCompleteView: View {
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey, store: .contentSensitivityFilter) private var sensitiveContent: Bool = false
     
     private let iconSize: CGFloat = 28
-    private let onGoToSubreddit: (() -> Void)?
+    private let itemPadding: CGFloat
+    private let onGoToSubreddit: (Subreddit) -> Void
     
-    init(query: Binding<String>, thingSelectionMode: ThingSelectionMode = .noSelection, onGoToSubreddit: (() -> Void)? = nil) {
+    init(query: Binding<String>, thingSelectionMode: ThingSelectionMode = .noSelection, itemPadding: CGFloat = 16, onGoToSubreddit: @escaping (Subreddit) -> Void) {
         _query = query
+        self.itemPadding = itemPadding
         self.onGoToSubreddit = onGoToSubreddit
         _subredditAutoCompleteViewModel = StateObject(
             wrappedValue: SubredditAutoCompleteViewModel(
@@ -71,16 +73,13 @@ struct SubredditAutoCompleteView: View {
                             }
                         }
                         .listPlainItemNoInsets()
-                        .padding(8)
+                        .padding(itemPadding)
                         .background(isSelected(subreddit) ? Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor) : Color.clear)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             switch subredditAutoCompleteViewModel.thingSelectionMode {
                             case .noSelection:
-                                navigationManager.append(
-                                    AppNavigation.subredditDetails(subredditName: subreddit.displayName)
-                                )
-                                onGoToSubreddit?()
+                                onGoToSubreddit(subreddit)
                             case .thingSelection(let onSelectThing):
                                 onSelectThing(.subreddit(subreddit.toSubredditData()))
                             case .subredditAndUserMultiSelection:
@@ -97,7 +96,7 @@ struct SubredditAutoCompleteView: View {
             if newValue.trimmingCharacters(in: .whitespaces).isEmpty {
                 subredditAutoCompleteViewModel.clearSubreddits()
             } else {
-                subredditAutoCompleteViewModel.fetchSubredditsAutoComplete(query: query, over18: sensitiveContent)
+                subredditAutoCompleteViewModel.fetchSubreddits(query: query, over18: sensitiveContent)
             }
         }
     }

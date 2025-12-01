@@ -143,7 +143,10 @@ struct MoreView: View {
                         focusedField: $focusedField
                     )
                     
-                    SubredditAutoCompleteView(query: $subredditName) {
+                    SubredditAutoCompleteView(query: $subredditName, itemPadding: 8) { subreddit in
+                        navigationManager.append(
+                            AppNavigation.subredditDetails(subredditName: subreddit.displayName)
+                        )
                         withAnimation {
                             activeAlert = nil
                         }
