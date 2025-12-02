@@ -5,6 +5,7 @@
 //  Created by Joeylr on 2025-11-25.
 //
 
+import Network
 import SwiftUI
 
 struct ProxySettingsView: View {
@@ -13,6 +14,7 @@ struct ProxySettingsView: View {
     @AppStorage(ProxyUserDefaultsUtils.proxyHostnameKey, store: .proxy) private var proxyHostname: String = ""
     @AppStorage(ProxyUserDefaultsUtils.proxyPortKey, store: .proxy) private var proxyPort: String = ""
     
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     @State private var activeAlert: ActiveAlert? = nil
     @State private var proxyHostnameString: String = ""
     @State private var proxyPortString: String = ""
@@ -85,6 +87,7 @@ struct ProxySettingsView: View {
                         "Port",
                         text: $proxyPortString,
                         singleLine: true,
+                        keyboardType: .numberPad,
                         fieldType: .port,
                         focusedField: $focusedField
                     )
@@ -92,13 +95,40 @@ struct ProxySettingsView: View {
                     EmptyView()
                 }
             } onConfirm: {
-                if let alert = activeAlert {
-                    switch alert {
-                    case .hostname:
-                        proxyHostname = proxyHostnameString
-                    case .port:
-                        proxyPort = proxyPortString
+                guard let alert = activeAlert else {
+                    return
+                }
+
+                switch alert {
+                case .hostname:
+                    let trimmed = proxyHostnameString.trimmingCharacters(in: .whitespacesAndNewlines)
+                    proxyHostnameString = trimmed
+                    guard ProxyInputValidator.isValidHostname(trimmed) else {
+                        snackbarManager.showSnackbar(.info("Not a valid IP or host name"))
+                        DispatchQueue.main.async {
+                            activeAlert = .hostname
+                        }
+                        return
                     }
+                    proxyHostname = trimmed
+                case .port:
+                    let trimmed = proxyPortString.trimmingCharacters(in: .whitespacesAndNewlines)
+                    proxyPortString = trimmed
+                    guard let portValue = Int(trimmed) else {
+                        snackbarManager.showSnackbar(.info("Not a valid number"))
+                        DispatchQueue.main.async {
+                            activeAlert = .port
+                        }
+                        return
+                    }
+                    guard ProxyInputValidator.isValidPort(portValue) else {
+                        snackbarManager.showSnackbar(.info("Not a valid port (0 - 65535)"))
+                        DispatchQueue.main.async {
+                            activeAlert = .port
+                        }
+                        return
+                    }
+                    proxyPort = trimmed
                 }
             }
         )
@@ -135,5 +165,26 @@ private enum ActiveAlert: Identifiable {
         case .hostname: return "Hostname"
         case .port: return "Port"
         }
+    }
+}
+
+private enum ProxyInputValidator {
+    private static let hostnameRegex = "^(?=^.{1,253}$)(([a-z\\d]([a-z\\d-]{0,62}[a-z\\d])*[\\.]){1,3}[a-z]{1,61})$"
+
+    static func isValidHostname(_ value: String) -> Bool {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return false
+        }
+
+        if IPv4Address(trimmed) != nil || IPv6Address(trimmed) != nil {
+            return true
+        }
+
+        return trimmed.range(of: hostnameRegex, options: .regularExpression) != nil
+    }
+
+    static func isValidPort(_ value: Int) -> Bool {
+        return (0...65535).contains(value)
     }
 }
