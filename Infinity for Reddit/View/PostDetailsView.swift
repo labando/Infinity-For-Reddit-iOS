@@ -100,7 +100,7 @@ struct PostDetailsView: View {
                             .onAppear {
                                 if post.subredditOrUserIconInPostDetails == nil {
                                     Task {
-                                        await postDetailsViewModel.loadIcon(isFromSubredditPostListing: isFromSubredditPostListing)
+                                        await postDetailsViewModel.loadPostIcon(isFromSubredditPostListing: isFromSubredditPostListing)
                                     }
                                 }
                             }

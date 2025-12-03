@@ -41,7 +41,7 @@ actor UserProfileImageBatchLoader {
         self.partialUserDao = PartialUserDao(dbPool: resolvedDBPool)
     }
     
-    func loadIcons(for comments: [Comment]) async -> String {
+    func loadIcons(comments: [Comment]) async -> String {
         guard let callingComment = comments.first,
               let callingAuthorFullname = callingComment.authorFullname,
               let callingAuthorUsername = callingComment.author else {
@@ -53,14 +53,12 @@ actor UserProfileImageBatchLoader {
         }
         
         if let partialUserData = try? await partialUserDao.getPartialUserData(username: callingAuthorUsername) {
-            print("from partial database")
             let iconUrlString = partialUserData.profileImageUrlString
             cache[callingAuthorFullname] = iconUrlString
             return iconUrlString
         }
         
         if let userData = try? await userDao.getUserData(username: callingAuthorUsername) {
-            print("from database")
             let iconUrlString = userData.iconUrl ?? ""
             cache[callingAuthorFullname] = iconUrlString
             return iconUrlString
@@ -74,6 +72,62 @@ actor UserProfileImageBatchLoader {
         
         let batch = comments
             .map(\.authorFullname)
+            .filter { !cache.keys.contains($0) && !inFlight.contains($0) }
+            .prefix(UserProfileImageBatchLoader.batchSize)
+        
+        for author in batch {
+            inFlight.insert(author)
+        }
+        
+        loadingQueue.append(contentsOf: batch)
+        
+        Task {
+            await processNextBatchIfNeeded()
+        }
+        
+        return await withCheckedContinuation { continuation in
+            waitingContinuations[callingAuthorFullname, default: []].append(continuation)
+        }
+    }
+    
+    func loadIcons(posts: [Post]) async -> String {
+        guard let callingPost = posts.first,
+              !callingPost.isAuthorDeleted(),
+              let callingAuthorFullname = callingPost.authorFullname,
+              let callingAuthorUsername = callingPost.author else {
+            return ""
+        }
+        
+        if let cached = cache[callingAuthorFullname] {
+            return cached
+        }
+        
+        if let partialUserData = try? await partialUserDao.getPartialUserData(username: callingAuthorUsername) {
+            let iconUrlString = partialUserData.profileImageUrlString
+            cache[callingAuthorFullname] = iconUrlString
+            return iconUrlString
+        }
+        
+        if let userData = try? await userDao.getUserData(username: callingAuthorUsername) {
+            let iconUrlString = userData.iconUrl ?? ""
+            cache[callingAuthorFullname] = iconUrlString
+            return iconUrlString
+        }
+        
+        if inFlight.contains(callingAuthorFullname) {
+            return await withCheckedContinuation { continuation in
+                waitingContinuations[callingAuthorFullname, default: []].append(continuation)
+            }
+        }
+        
+        let batch = posts
+            .compactMap {
+                if $0.isAuthorDeleted() {
+                    return nil
+                } else {
+                    return $0.authorFullname
+                }
+            }
             .filter { !cache.keys.contains($0) && !inFlight.contains($0) }
             .prefix(UserProfileImageBatchLoader.batchSize)
         

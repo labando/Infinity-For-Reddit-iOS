@@ -145,39 +145,27 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         }
     }
     
-    public func loadIcon(post: Post, displaySubredditIcon: Bool) async throws {
+    public func loadIcon(post: Post) async throws {
         try Task.checkCancellation()
         
         guard post.subredditOrUserIcon == nil else { return }
         
-        if displaySubredditIcon {
-            if "u/\(post.author ?? "")" == post.subredditNamePrefixed {
-                // User's own subreddit
-                if subredditOrUserIcons[post.author] != nil {
-                    await MainActor.run {
-                        post.subredditOrUserIcon = subredditOrUserIcons[post.author]
-                    }
-                } else {
-                    try await loadUserIcon(post: post)
+        if "u/\(post.author ?? "")" == post.subredditNamePrefixed {
+            // User's own subreddit
+            if subredditOrUserIcons[post.author] != nil {
+                await MainActor.run {
+                    post.subredditOrUserIcon = subredditOrUserIcons[post.author]
                 }
             } else {
-                if subredditOrUserIcons[post.subreddit] != nil {
-                    await MainActor.run {
-                        post.subredditOrUserIcon = subredditOrUserIcons[post.subreddit]
-                    }
-                } else {
-                    try await loadSubredditIcon(post: post)
-                }
+                try await loadUserIcon(post: post)
             }
         } else {
-            if !post.isAuthorDeleted() {
-                if subredditOrUserIcons[post.author] != nil {
-                    await MainActor.run {
-                        post.subredditOrUserIcon = subredditOrUserIcons[post.author]
-                    }
-                } else {
-                    try await loadUserIcon(post: post)
+            if subredditOrUserIcons[post.subreddit] != nil {
+                await MainActor.run {
+                    post.subredditOrUserIcon = subredditOrUserIcons[post.subreddit]
                 }
+            } else {
+                try await loadSubredditIcon(post: post)
             }
         }
     }

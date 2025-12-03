@@ -428,13 +428,27 @@ public class PostListingViewModel: ObservableObject {
         self.postFilter?.allowSpoiler = spoilerContent
     }
     
-    func loadIcon(post: Post, displaySubredditIcon: Bool) async {
+    func loadIcon(post: Post, displaySubredditIcon: Bool) {
         guard post.subredditOrUserIcon == nil else { return }
         
-        do {
-            try await postListingRepository.loadIcon(post: post, displaySubredditIcon: displaySubredditIcon)
-        } catch {
-            print("Load icon failed")
+        Task {
+            do {
+                if displaySubredditIcon {
+                    try await postListingRepository.loadIcon(post: post)
+                } else {
+                    let startIndex = posts.index(id: post.id) ?? 0
+                    let postBatch = Array(
+                        posts[startIndex..<min(posts.count, startIndex + UserProfileImageBatchLoader.batchSize)]
+                    )
+
+                    let iconUrl = await UserProfileImageBatchLoader.shared.loadIcons(posts: postBatch)
+                    await MainActor.run {
+                        post.subredditOrUserIcon = iconUrl
+                    }
+                }
+            } catch {
+                print("Load icon failed")
+            }
         }
     }
     

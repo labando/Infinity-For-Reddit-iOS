@@ -563,14 +563,14 @@ public class PostDetailsViewModel: ObservableObject {
         }
 
         Task {
-            let iconUrl = await UserProfileImageBatchLoader.shared.loadIcons(for: commentBatch)
+            let iconUrl = await UserProfileImageBatchLoader.shared.loadIcons(comments: commentBatch)
             await MainActor.run {
                 comment.authorIconUrlString = iconUrl
             }
         }
     }
     
-    func loadIcon(isFromSubredditPostListing: Bool) async {
+    func loadPostIcon(isFromSubredditPostListing: Bool) async {
         guard let post else { return }
         guard post.subredditOrUserIconInPostDetails == nil else { return }
         
