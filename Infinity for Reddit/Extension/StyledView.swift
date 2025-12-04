@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 extension View {
     func themedList() -> some View {
@@ -321,5 +322,11 @@ extension View {
         _ action: @escaping (CGFloat) -> Void
     ) -> some View {
         modifier(VisiblePercentageModifier(onChange: action, space: space))
+    }
+    
+    func showErrorUsingSnackbar<P: Publisher>(
+        _ errorPublisher: P
+    ) -> some View where P.Output == Error?, P.Failure == Never {
+        self.modifier(SnackbarErrorViewModifier(errorPublisher: errorPublisher))
     }
 }

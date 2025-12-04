@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct NoPreviewPostTypeIndicatorBackgroundViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
@@ -277,5 +278,22 @@ struct VisiblePercentageKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
+    }
+}
+
+struct SnackbarErrorViewModifier<P: Publisher>: ViewModifier where P.Output == Error?, P.Failure == Never {
+    @EnvironmentObject private var snackbarManager: SnackbarManager
+    
+    let errorPublisher: P
+    
+    func body(content: Content) -> some View {
+        content
+            .onReceive(errorPublisher) { newValue in
+                if let newValue {
+                    snackbarManager.showSnackbar(.error(newValue))
+                } else {
+                    snackbarManager.dismiss()
+                }
+            }
     }
 }

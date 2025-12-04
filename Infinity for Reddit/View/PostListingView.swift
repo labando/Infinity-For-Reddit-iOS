@@ -111,10 +111,16 @@ struct PostListingView: View {
         RootView {
             if postListingViewModel.posts.isEmpty {
                 ZStack {
-                    if postListingViewModel.isInitialLoading || postListingViewModel.isInitialLoad {
+                    if postListingViewModel.isInitialLoading {
                         ProgressIndicator()
+                    } else if postListingViewModel.isInitialLoad, let error = postListingViewModel.error {
+                        Text("Unable to load posts. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
                     } else {
                         Text("No posts")
+                            .primaryText()
+                            .padding(16)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -196,6 +202,7 @@ struct PostListingView: View {
                         }
                     }
                 }
+                .showErrorUsingSnackbar(postListingViewModel.$error)
             }
         }
         .applyIf(handleToolbarMenu) {

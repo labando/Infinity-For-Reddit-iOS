@@ -2133,6 +2133,9 @@
     "u/%@" : {
 
     },
+    "Unable to load posts. Error: %@" : {
+
+    },
     "Unfollow" : {
 
     },
