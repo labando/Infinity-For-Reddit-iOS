@@ -17,12 +17,22 @@ struct SubscribedUserListingView: View {
     var body: some View {
         Group {
             if subscriptionListingViewModel.userSubscriptions.isEmpty {
-                if subscriptionListingViewModel.isLoadingSubscriptions {
-                    ProgressIndicator()
-                } else {
-                    Text("No subscribed users")
-                        .primaryText()
+                ZStack {
+                    if subscriptionListingViewModel.isLoadingSubscriptions {
+                        ProgressIndicator()
+                    } else if let error = subscriptionListingViewModel.error {
+                        Text("Unable to load subscribed users. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                subscriptionListingViewModel.refreshSubscriptions()
+                            }
+                    } else {
+                        Text("No subscribed users")
+                            .primaryText()
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
                     if !subscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {

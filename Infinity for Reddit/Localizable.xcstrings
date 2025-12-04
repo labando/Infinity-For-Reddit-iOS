@@ -2133,7 +2133,7 @@
     "u/%@" : {
 
     },
-    "Unable to load comments. Error: %@" : {
+    "Unable to load comments. Tap to retry. Error: %@" : {
 
     },
     "Unable to load inbox. Tap to retry. Error: %@" : {
@@ -2146,6 +2146,12 @@
 
     },
     "Unable to load subreddits. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load subscribed subreddits. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load subscribed users. Tap to retry. Error: %@" : {
 
     },
     "Unable to load users. Tap to retry. Error: %@" : {
