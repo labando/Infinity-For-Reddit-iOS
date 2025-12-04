@@ -74,10 +74,10 @@ struct PostDetailsView: View {
     
     var body: some View {
         RootView {
-            ZStack(alignment: .bottom) {
-                ScrollViewReader { proxy in
-                    List {
-                        if let post = postDetailsViewModel.post {
+            if let post = postDetailsViewModel.post {
+                ZStack(alignment: .bottom) {
+                    ScrollViewReader { proxy in
+                        List {
                             PostDetailsViewCard(
                                 account: account,
                                 post: post,
@@ -119,42 +119,86 @@ struct PostDetailsView: View {
                                 }
                                 .listPlainItemNoInsets()
                             }
-                        }
-                        
-                        if postDetailsViewModel.visibleComments.isEmpty {
-                            if postDetailsViewModel.isInitialLoading || postDetailsViewModel.isInitialLoad {
-                                ProgressIndicator()
+                            
+                            if postDetailsViewModel.visibleComments.isEmpty {
+                                if postDetailsViewModel.isInitialLoading || postDetailsViewModel.isInitialLoad {
+                                    ProgressIndicator()
+                                        .frame(maxWidth: .infinity)
+                                        .listPlainItem()
+                                } else {
+                                    ZStack {
+                                        VStack(spacing: 8) {
+                                            SwiftUI.Image(systemName: "plus.circle")
+                                                .primaryIcon()
+                                            
+                                            Text("No comments yet. Be the first to share your thoughts!")
+                                                .primaryText()
+                                                .multilineTextAlignment(.center)
+                                        }
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            sendComment()
+                                        }
+                                    }
                                     .frame(maxWidth: .infinity)
-                                    .listPlainItem()
-                            } else {
-                                ZStack {
-                                    VStack(spacing: 8) {
-                                        SwiftUI.Image(systemName: "plus.circle")
-                                            .primaryIcon()
-                                        
-                                        Text("No comments yet. Be the first to share your thoughts!")
-                                            .primaryText()
-                                            .multilineTextAlignment(.center)
-                                    }
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        sendComment()
-                                    }
+                                    .padding(16)
+                                    .listPlainItemNoInsets()
                                 }
-                                .frame(maxWidth: .infinity)
-                                .padding(16)
-                                .listPlainItemNoInsets()
-                            }
-                        } else {
-                            ForEach(postDetailsViewModel.visibleComments, id: \.id) { commentItem in
-                                if case let .comment(comment) = commentItem {
-                                    CommentViewCard(
-                                        account: account,
-                                        comment: comment,
-                                        isInPostDetails: true,
-                                        highlightComment: postDetailsViewModel.postDetailsInput.getHighlightCommentId == comment.id || postDetailsViewModel.searchedComment?.id == comment.id,
-                                        thingModerationRepository: thingModerationRepository,
-                                        onToggleExpand: {
+                            } else {
+                                ForEach(postDetailsViewModel.visibleComments, id: \.id) { commentItem in
+                                    if case let .comment(comment) = commentItem {
+                                        CommentViewCard(
+                                            account: account,
+                                            comment: comment,
+                                            isInPostDetails: true,
+                                            highlightComment: postDetailsViewModel.postDetailsInput.getHighlightCommentId == comment.id || postDetailsViewModel.searchedComment?.id == comment.id,
+                                            thingModerationRepository: thingModerationRepository,
+                                            onToggleExpand: {
+                                                if fullyCollapseComment {
+                                                    if comment.isCollasped {
+                                                        postDetailsViewModel.expandComments(comment: comment)
+                                                    } else {
+                                                        postDetailsViewModel.collapseComments(comment: comment)
+                                                    }
+                                                } else {
+                                                    withAnimation {
+                                                        if comment.isCollasped {
+                                                            postDetailsViewModel.expandComments(comment: comment)
+                                                        } else {
+                                                            postDetailsViewModel.collapseComments(comment: comment)
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            onReply: {
+                                                let commentParent = CommentParent.comment(parentComment: comment)
+                                                self.sentCommentParent = commentParent
+                                                navigationManager.append(AppNavigation.submitComment(commentParent: commentParent))
+                                            },
+                                            onEdit: {
+                                                self.commentToBeEdited = comment
+                                                navigationManager.append(AppNavigation.editComment(commentToBeEdited: comment))
+                                            },
+                                            onDelete: {
+                                                postDetailsViewModel.deleteComment(comment)
+                                            },
+                                            onAddToCommentFilter: {
+                                                navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
+                                            },
+                                            onModerate: {
+                                                commentToBeModerated = comment
+                                                showCommentModerationSheet = true
+                                            },
+                                            onCopy: {
+                                                titleToBeCopied = nil
+                                                markdownToBeCopied = comment.body
+                                                plainTextToBeCopied = comment.bodyHtml
+                                                showCopyContentOptionsSheet = true
+                                            }
+                                        )
+                                        .listPlainItemNoInsets()
+                                        .id(ObjectIdentifier(comment))
+                                        .onLongPressGesture {
                                             if fullyCollapseComment {
                                                 if comment.isCollasped {
                                                     postDetailsViewModel.expandComments(comment: comment)
@@ -170,256 +214,227 @@ struct PostDetailsView: View {
                                                     }
                                                 }
                                             }
-                                        },
-                                        onReply: {
-                                            let commentParent = CommentParent.comment(parentComment: comment)
-                                            self.sentCommentParent = commentParent
-                                            navigationManager.append(AppNavigation.submitComment(commentParent: commentParent))
-                                        },
-                                        onEdit: {
-                                            self.commentToBeEdited = comment
-                                            navigationManager.append(AppNavigation.editComment(commentToBeEdited: comment))
-                                        },
-                                        onDelete: {
-                                            postDetailsViewModel.deleteComment(comment)
-                                        },
-                                        onAddToCommentFilter: {
-                                            navigationManager.append(SettingsViewNavigation.commentFilter(commentToBeAdded: comment))
-                                        },
-                                        onModerate: {
-                                            commentToBeModerated = comment
-                                            showCommentModerationSheet = true
-                                        },
-                                        onCopy: {
-                                            titleToBeCopied = nil
-                                            markdownToBeCopied = comment.body
-                                            plainTextToBeCopied = comment.bodyHtml
-                                            showCopyContentOptionsSheet = true
                                         }
-                                    )
-                                    .listPlainItemNoInsets()
-                                    .id(ObjectIdentifier(comment))
-                                    .onLongPressGesture {
-                                        if fullyCollapseComment {
-                                            if comment.isCollasped {
-                                                postDetailsViewModel.expandComments(comment: comment)
-                                            } else {
-                                                postDetailsViewModel.collapseComments(comment: comment)
+                                        .transition(.slide)
+                                        .onAppear {
+                                            postDetailsViewModel.insertIntoAppearedComments(commentItem)
+                                            
+                                            if showAuthorAvatar {
+                                                postDetailsViewModel.loadIcon(comment: comment)
                                             }
-                                        } else {
-                                            withAnimation {
-                                                if comment.isCollasped {
-                                                    postDetailsViewModel.expandComments(comment: comment)
+                                        }
+                                        .onDisappear {
+                                            postDetailsViewModel.appearedComments.removeAll {
+                                                $0.id == commentItem.id
+                                            }
+                                        }
+                                    } else if case let .more(commentMore) = commentItem {
+                                        CommentMoreViewCard(commentMore: commentMore)
+                                            .listPlainItemNoInsets()
+                                            .id(commentMore.id)
+                                            .onTapGesture {
+                                                if commentMore.children.count > 0 {
+                                                    Task {
+                                                        await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: commentMore)
+                                                    }
                                                 } else {
-                                                    postDetailsViewModel.collapseComments(comment: comment)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .transition(.slide)
-                                    .onAppear {
-                                        postDetailsViewModel.insertIntoAppearedComments(commentItem)
-                                        
-                                        if showAuthorAvatar {
-                                            postDetailsViewModel.loadIcon(comment: comment)
-                                        }
-                                    }
-                                    .onDisappear {
-                                        postDetailsViewModel.appearedComments.removeAll {
-                                            $0.id == commentItem.id
-                                        }
-                                    }
-                                } else if case let .more(commentMore) = commentItem {
-                                    CommentMoreViewCard(commentMore: commentMore)
-                                        .listPlainItemNoInsets()
-                                        .id(commentMore.id)
-                                        .onTapGesture {
-                                            if commentMore.children.count > 0 {
-                                                Task {
-                                                    await postDetailsViewModel.fetchMoreCommentsInCommentMore(commentMore: commentMore)
-                                                }
-                                            } else {
-                                                // Continue thread
-                                                if let postId = postDetailsViewModel.post?.id {
-                                                    navigationManager.append(
-                                                        AppNavigation.postDetailsWithId(
-                                                            postId: postId,
-                                                            commentId: commentMore.parentFullname.substring(from: 3),
-                                                            isContinueThread: true
+                                                    // Continue thread
+                                                    if let postId = postDetailsViewModel.post?.id {
+                                                        navigationManager.append(
+                                                            AppNavigation.postDetailsWithId(
+                                                                postId: postId,
+                                                                commentId: commentMore.parentFullname.substring(from: 3),
+                                                                isContinueThread: true
+                                                            )
                                                         )
-                                                    )
+                                                    }
                                                 }
                                             }
-                                        }
-                                }
-                            }
-                            if postDetailsViewModel.hasMoreComments {
-                                Text("Loading more comments")
-                                    .primaryText()
-                                    .task {
-                                        await postDetailsViewModel.fetchCommentsPagination()
                                     }
-                                    .listPlainItem()
-                            }
-                        }
-                    }
-                    .themedList()
-                    .scrollBounceBehavior(.basedOnSize)
-                    .onAppear {
-                        self.listProxy = proxy
-                    }
-                    .refreshable {
-                        await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
-                    }
-                    .onScrollPhaseChange { _, phase in
-                        switch phase {
-                        case .idle:
-                            withAnimation {
-                                showActionBar = true
-                            }
-                        case .interacting:
-                            withAnimation {
-                                showActionBar = false
-                            }
-                        default:
-                            break
-                        }
-                    }
-                }
-                
-                if showSearchBar {
-                    HStack(spacing: 0) {
-                        CustomTextField(
-                            "Search",
-                            text: $postDetailsViewModel.searchQuery,
-                            singleLine: false,
-                            keyboardType: .default,
-                            autocapitalization: .never,
-                            customTextFieldScheme: .fab,
-                            showBorder: false,
-                            showBackground: false,
-                            fieldType: .search,
-                            focusedField: $focusedField
-                        )
-                        .onSubmit {
-                            if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
-                                scrollToComment(listProxy: listProxy, commentItem: commentItem)
-                            }
-                        }
-                        
-                        SwiftUI.Image(systemName: "chevron.up")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16)
-                            .padding(16)
-                            .fabIcon()
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
-                                    scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                }
+                                if postDetailsViewModel.hasMoreComments {
+                                    Text("Loading more comments")
+                                        .primaryText()
+                                        .task {
+                                            await postDetailsViewModel.fetchCommentsPagination()
+                                        }
+                                        .listPlainItem()
                                 }
                             }
-                        
-                        SwiftUI.Image(systemName: "chevron.down")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16)
-                            .padding(16)
-                            .fabIcon()
-                            .contentShape(Rectangle())
-                            .onTapGesture {
+                        }
+                        .themedList()
+                        .scrollBounceBehavior(.basedOnSize)
+                        .onAppear {
+                            self.listProxy = proxy
+                        }
+                        .refreshable {
+                            await postDetailsViewModel.refreshPostAndCommentsWithContinuation()
+                        }
+                        .onScrollPhaseChange { _, phase in
+                            switch phase {
+                            case .idle:
+                                withAnimation {
+                                    showActionBar = true
+                                }
+                            case .interacting:
+                                withAnimation {
+                                    showActionBar = false
+                                }
+                            default:
+                                break
+                            }
+                        }
+                    }
+                    
+                    if showSearchBar {
+                        HStack(spacing: 0) {
+                            CustomTextField(
+                                "Search",
+                                text: $postDetailsViewModel.searchQuery,
+                                singleLine: false,
+                                keyboardType: .default,
+                                autocapitalization: .never,
+                                customTextFieldScheme: .fab,
+                                showBorder: false,
+                                showBackground: false,
+                                fieldType: .search,
+                                focusedField: $focusedField
+                            )
+                            .onSubmit {
                                 if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
                                     scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                 }
                             }
-                        
-                        SwiftUI.Image(systemName: "xmark")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16)
-                            .padding(16)
-                            .fabIcon()
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                withAnimation {
-                                    showSearchBar = false
-                                    postDetailsViewModel.searchedComment = nil
-                                    postDetailsViewModel.searchQuery = ""
-                                }
-                            }
-                    }
-                    .padding(.vertical, 16)
-                    .padding(.leading, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
-                            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
-                    )
-                    .padding(16)
-                    .contentShape(RoundedRectangle(cornerRadius: 12))
-                    .transition(.move(edge: .bottom))
-                    .zIndex(2)
-                } else if showActionBar {
-                    HStack(spacing: 0) {
-                        SwiftUI.Image(systemName: "chevron.up")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24)
-                            .padding(16)
-                            .fabIcon()
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                if let listProxy {
-                                    if let commentItem = postDetailsViewModel.getPreviousParentComment() {
+                            
+                            SwiftUI.Image(systemName: "chevron.up")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16)
+                                .padding(16)
+                                .fabIcon()
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    if let listProxy, let commentItem = postDetailsViewModel.getPreviousSearchedComment() {
                                         scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                     }
                                 }
-                            }
-                        
-                        CustomDivider()
-                            .frame(width: 2, height: 32)
-                        
-                        SwiftUI.Image(systemName: "magnifyingglass")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24)
-                            .padding(16)
-                            .fabIcon()
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                withAnimation {
-                                    showSearchBar = true
-                                }
-                            }
-                        
-                        CustomDivider()
-                            .frame(width: 2, height: 32)
-                        
-                        SwiftUI.Image(systemName: "chevron.down")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24)
-                            .padding(16)
-                            .fabIcon()
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                if let listProxy {
-                                    if let commentItem = postDetailsViewModel.getNextParentComment() {
+                            
+                            SwiftUI.Image(systemName: "chevron.down")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16)
+                                .padding(16)
+                                .fabIcon()
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
                                         scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                     }
                                 }
-                            }
+                            
+                            SwiftUI.Image(systemName: "xmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16)
+                                .padding(16)
+                                .fabIcon()
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    withAnimation {
+                                        showSearchBar = false
+                                        postDetailsViewModel.searchedComment = nil
+                                        postDetailsViewModel.searchQuery = ""
+                                    }
+                                }
+                        }
+                        .padding(.vertical, 16)
+                        .padding(.leading, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+                                .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
+                        )
+                        .padding(16)
+                        .contentShape(RoundedRectangle(cornerRadius: 12))
+                        .transition(.move(edge: .bottom))
+                        .zIndex(2)
+                    } else if showActionBar {
+                        HStack(spacing: 0) {
+                            SwiftUI.Image(systemName: "chevron.up")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24)
+                                .padding(16)
+                                .fabIcon()
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    if let listProxy {
+                                        if let commentItem = postDetailsViewModel.getPreviousParentComment() {
+                                            scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                        }
+                                    }
+                                }
+                            
+                            CustomDivider()
+                                .frame(width: 2, height: 32)
+                            
+                            SwiftUI.Image(systemName: "magnifyingglass")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24)
+                                .padding(16)
+                                .fabIcon()
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    withAnimation {
+                                        showSearchBar = true
+                                    }
+                                }
+                            
+                            CustomDivider()
+                                .frame(width: 2, height: 32)
+                            
+                            SwiftUI.Image(systemName: "chevron.down")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24)
+                                .padding(16)
+                                .fabIcon()
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    if let listProxy {
+                                        if let commentItem = postDetailsViewModel.getNextParentComment() {
+                                            scrollToComment(listProxy: listProxy, commentItem: commentItem)
+                                        }
+                                    }
+                                }
+                        }
+                        .background(
+                            Capsule()
+                                .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
+                                .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
+                        )
+                        .padding(.bottom, 32)
+                        .contentShape(Capsule())
+                        .transition(.move(edge: .bottom))
+                        .zIndex(1)
                     }
-                    .background(
-                        Capsule()
-                            .fill(Color(hex: customThemeViewModel.currentCustomTheme.colorAccent))
-                            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 8)
-                    )
-                    .padding(.bottom, 32)
-                    .contentShape(Capsule())
-                    .transition(.move(edge: .bottom))
-                    .zIndex(1)
                 }
+                .showErrorUsingSnackbar(postDetailsViewModel.$error)
+            } else {
+                ZStack {
+                    if postDetailsViewModel.isInitialLoading {
+                        ProgressIndicator()
+                    } else if postDetailsViewModel.isInitialLoad, let error = postDetailsViewModel.error {
+                        Text("Unable to load post and comments. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                postDetailsViewModel.refreshPostAndComments()
+                            }
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .onChange(of: postDetailsViewModel.post) {

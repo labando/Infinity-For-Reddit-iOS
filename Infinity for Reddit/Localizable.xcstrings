@@ -222,7 +222,7 @@
     "New Post" : {
 
     },
-    "No Comments" : {
+    "No comments" : {
 
     },
     "No comments yet. Be the first to share your thoughts!" : {
@@ -2131,6 +2131,12 @@
 
     },
     "u/%@" : {
+
+    },
+    "Unable to load comments. Error: %@" : {
+
+    },
+    "Unable to load post and comments. Tap to retry. Error: %@" : {
 
     },
     "Unable to load posts. Error: %@" : {

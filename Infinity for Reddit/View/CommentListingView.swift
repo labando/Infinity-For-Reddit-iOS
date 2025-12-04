@@ -50,10 +50,15 @@ struct CommentListingView: View {
     var body: some View {
         RootView {
             if commentListingViewModel.comments.isEmpty {
-                if commentListingViewModel.isInitialLoading || commentListingViewModel.isInitialLoad {
+                if commentListingViewModel.isInitialLoading {
                     ProgressIndicator()
+                } else if commentListingViewModel.isInitialLoad, let error = commentListingViewModel.error {
+                    Text("Unable to load comments. Error: \(error.localizedDescription)")
+                        .primaryText()
+                        .padding(16)
                 } else {
-                    Text("No Comments")
+                    Text("No comments")
+                        .primaryText()
                 }
             } else {
                 List {
@@ -108,6 +113,7 @@ struct CommentListingView: View {
                         }
                     }
                 }
+                .showErrorUsingSnackbar(commentListingViewModel.$error)
             }
         }
         .task(id: commentListingViewModel.loadCommentsTaskId) {
