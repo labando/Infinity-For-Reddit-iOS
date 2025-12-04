@@ -20,10 +20,7 @@ struct PostSubmissionContextView: View {
                         if postSubmissionContextViewModel.selectedFlair != nil {
                             postSubmissionContextViewModel.selectedFlair = nil
                         } else {
-                            Task {
-                                await postSubmissionContextViewModel.fetchFlairs()
-                                showFlairSheet = true
-                            }
+                            showFlairSheet = true
                         }
                     }
                 }

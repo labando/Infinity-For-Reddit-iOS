@@ -8,20 +8,20 @@ import SwiftUI
 import MarkdownUI
 
 struct SubredditRulesSheet: View {
-    @EnvironmentObject private var subredditChooseViewModel: PostSubmissionContextViewModel
+    @EnvironmentObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     
     var body: some View {
         Group {
-            if subredditChooseViewModel.rules.isEmpty {
+            if postSubmissionContextViewModel.rules.isEmpty {
                 ZStack {
-                    if subredditChooseViewModel.isLoadingRules {
+                    if postSubmissionContextViewModel.isLoadingRules {
                         ProgressIndicator()
-                    } else if let error = subredditChooseViewModel.rulesError {
-                        Text("Unable to load posts. Tap to retry. Error: \(error.localizedDescription)")
+                    } else if let error = postSubmissionContextViewModel.rulesError {
+                        Text("Unable to load rules. Tap to retry. Error: \(error.localizedDescription)")
                             .primaryText()
                             .padding(16)
                             .onTapGesture {
-                                subredditChooseViewModel.fetchRules()
+                                postSubmissionContextViewModel.fetchRules()
                             }
                     } else {
                         Text("No subreddit-specific rules.")
@@ -31,14 +31,17 @@ struct SubredditRulesSheet: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
-                    LazyVStack {
-                        ForEach(subredditChooseViewModel.rules, id: \.shortName) { rule in
+                    LazyVStack(spacing: 0) {
+                        ForEach(postSubmissionContextViewModel.rules, id: \.shortName) { rule in
                             Markdown(rule.shortName)
                                 .markdownTextStyle {
                                     FontSize(16)
                                 }
                                 .themedMarkdown()
-                                .padding(.vertical, 22)
+                                .padding(.vertical, 16)
+                            
+                            Spacer()
+                                .frame(height: 8)
                             
                             Markdown(rule.description)
                                 .markdownTextStyle {
@@ -51,9 +54,8 @@ struct SubredditRulesSheet: View {
                 .padding(.horizontal, 12)
             }
         }
-        .themedNavigationBar()
         .onAppear {
-            subredditChooseViewModel.fetchRules()
+            postSubmissionContextViewModel.fetchRules()
         }
     }
 }

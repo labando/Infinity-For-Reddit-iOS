@@ -2139,6 +2139,9 @@
     "Unable to load comments. Tap to retry. Error: %@" : {
 
     },
+    "Unable to load flairs. Tap to retry. Error: %@" : {
+
+    },
     "Unable to load inbox. Tap to retry. Error: %@" : {
 
     },
@@ -2146,6 +2149,9 @@
 
     },
     "Unable to load posts. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load rules. Tap to retry. Error: %@" : {
 
     },
     "Unable to load subreddits. Tap to retry. Error: %@" : {

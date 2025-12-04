@@ -15,14 +15,8 @@ class PostSubmissionContextViewModel: ObservableObject {
             flairsError = nil
             isLoadingRules = false
             isLoadingFlairs = false
-            
-            if let name = selectedSubreddit?.name {
-                rules = allRules[name] ?? []
-                flairs = allFlairs[name] ?? []
-            } else {
-                rules = []
-                flairs = []
-            }
+            rules = []
+            flairs = []
         }
     }
     @Published var selectedFlair: Flair?
@@ -54,7 +48,6 @@ class PostSubmissionContextViewModel: ObservableObject {
     
     func fetchRules(forceFetch: Bool = false) {
         guard loadRulesTask == nil, let subredditName = selectedSubreddit?.name, !subredditName.isEmpty else {
-            self.rules = []
             return
         }
         
@@ -84,8 +77,8 @@ class PostSubmissionContextViewModel: ObservableObject {
         }
     }
     
-    func fetchFlairs(forceFetch: Bool = false) async {
-        guard let subredditName = selectedSubreddit?.name, !subredditName.isEmpty else { return }
+    func fetchFlairs(forceFetch: Bool = false) {
+        guard loadFlairsTask == nil, let subredditName = selectedSubreddit?.name, !subredditName.isEmpty else { return }
         
         if !forceFetch, let cached = allFlairs[subredditName] {
             self.flairs = cached
@@ -95,18 +88,21 @@ class PostSubmissionContextViewModel: ObservableObject {
         isLoadingFlairs = true
         flairsError = nil
         
-        do {
-            try Task.checkCancellation()
+        loadFlairsTask = Task {
+            do {
+                try Task.checkCancellation()
+                
+                let fetched = try await flairRepository.fetchFlairs(subreddit: subredditName)
+                
+                flairs = fetched
+                allFlairs[subredditName] = fetched
+            } catch {
+                self.flairsError = error
+                flairs = []
+            }
             
-            let fetched = try await flairRepository.fetchFlairs(subreddit: subredditName)
-            
-            flairs = fetched
-            allFlairs[subredditName] = fetched
-        } catch {
-            self.flairsError = error
-            flairs = []
+            loadFlairsTask = nil
+            isLoadingFlairs = false
         }
-        
-        isLoadingFlairs = false
     }
 }
