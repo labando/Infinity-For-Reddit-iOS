@@ -21,8 +21,7 @@ struct MarkdownViewerSheet: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                //Markdown(markdown)
-                Markdown(test)
+                Markdown(markdown)
                     .font(.system(size: 24))
                     .padding(16)
                     .themedCommentMarkdown()
