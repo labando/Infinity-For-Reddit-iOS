@@ -294,7 +294,9 @@ struct PostDetailsViewCard: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        onSendComment()
+                        if !accountViewModel.account.isAnonymous() && postViewModel.post.canReply {
+                            onSendComment()
+                        }
                     }
                     
                     Spacer()

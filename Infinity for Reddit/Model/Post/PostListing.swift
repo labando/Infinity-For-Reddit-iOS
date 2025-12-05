@@ -173,6 +173,10 @@ public class Post : NSObject, ObservableObject, Identifiable {
         return "https://reddit.com\(permalink)"
     }
     
+    var canReply: Bool {
+        return !locked && !archived
+    }
+    
     enum PostType: Equatable {
         case text
         case image

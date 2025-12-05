@@ -309,20 +309,14 @@ struct PostViewCard: View {
 
                 HStack {
                     if !hideNComments {
-                        Button(action: {
-                            onCommentsTap()
-                        }) {
-                            HStack() {
-                                SwiftUI.Image(systemName: "text.bubble")
-                                    .postIconTemplateRendering()
-                                    .postIcon()
-                                
-                                Text(String(postViewModel.post.numComments))
-                                    .postInfo()
-                            }
+                        HStack() {
+                            SwiftUI.Image(systemName: "text.bubble")
+                                .postIconTemplateRendering()
+                                .postIcon()
+                            
+                            Text(String(postViewModel.post.numComments))
+                                .postInfo()
                         }
-                        .buttonStyle(.borderless)
-                        .contentShape(Rectangle())
                     }
                     
                     Spacer()

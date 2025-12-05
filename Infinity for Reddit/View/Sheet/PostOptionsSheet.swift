@@ -26,9 +26,11 @@ struct PostOptionsSheet: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                IconTextButton(startIconUrl: "text.bubble", text: "Comment") {
-                    onComment()
-                    dismiss()
+                if !AccountViewModel.shared.account.isAnonymous() && post.canReply {
+                    IconTextButton(startIconUrl: "text.bubble", text: "Comment") {
+                        onComment()
+                        dismiss()
+                    }
                 }
                 
                 IconTextButton(startIconUrl: "square.and.arrow.up", text: "Share") {

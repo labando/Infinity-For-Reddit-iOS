@@ -675,10 +675,6 @@ struct PostDetailsView: View {
                         showSortTypeSheet = true
                     },
                     
-                    NavigationBarMenuItem(title: "Send comment") {
-                        sendComment()
-                    },
-                    
                     NavigationBarMenuItem(title: postDetailsViewModel.post?.hidden ?? false ? "Unhide post" : "Hide post") {
                         postDetailsViewModel.toggleHidePost {
                             setUpMenu()
@@ -722,10 +718,6 @@ struct PostDetailsView: View {
                         showSortTypeSheet = true
                     },
                     
-                    NavigationBarMenuItem(title: "Send comment") {
-                        sendComment()
-                    },
-                    
                     NavigationBarMenuItem(title: postDetailsViewModel.post?.hidden ?? false ? "Unhide post" : "Hide post") {
                         postDetailsViewModel.toggleHidePost {
                             setUpMenu()
@@ -766,16 +758,20 @@ struct PostDetailsView: View {
                     showSortTypeSheet = true
                 },
                 
-                NavigationBarMenuItem(title: "Send comment") {
-                    sendComment()
-                },
-                
                 NavigationBarMenuItem(title: postDetailsViewModel.post?.hidden ?? false ? "Unhide post" : "Hide post") {
                     postDetailsViewModel.toggleHidePost {
                         setUpMenu()
                     }
                 }
             ]
+        }
+        
+        if !account.isAnonymous() && postDetailsViewModel.post?.canReply == true {
+            menuItems.append(
+                NavigationBarMenuItem(title: "Send comment") {
+                    sendComment()
+                }
+            )
         }
         
         if postDetailsViewModel.post?.isCrosspostable ?? false {
