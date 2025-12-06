@@ -34,13 +34,12 @@ struct ProxyConfiguration {
         guard let proxyType = ProxyType(rawValue: ProxyUserDefaultsUtils.proxyType) else {
             return nil
         }
-        self.type = proxyType
         
         if proxyType == .direct {
-            self.host = nil
-            self.port = nil
-            return
+            return nil
         }
+        
+        self.type = proxyType
         
         let rawHost = ProxyUserDefaultsUtils.proxyHost.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !rawHost.isEmpty else {

@@ -134,18 +134,6 @@ struct ProxySettingsView: View {
                 }
             }
         )
-        .onChange(of: enableProxy, initial: false) { _, _ in
-            ProxyManager.shared.reloadConfiguration()
-        }
-        .onChange(of: proxyType, initial: false) { _, _ in
-            ProxyManager.shared.reloadConfiguration()
-        }
-        .onChange(of: proxyHost, initial: false) { _, _ in
-            ProxyManager.shared.reloadConfiguration()
-        }
-        .onChange(of: proxyPort, initial: false) { _, _ in
-            ProxyManager.shared.reloadConfiguration()
-        }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Proxy")
     }

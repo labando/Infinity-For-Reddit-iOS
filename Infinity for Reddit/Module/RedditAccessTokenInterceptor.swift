@@ -91,8 +91,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
         
         let parameters: [String: String] = ["grant_type": "refresh_token", "refresh_token": refreshToken]
         
-        let session = ProxyUtils.makeSession()
-        session.request("https://www.reddit.com/api/v1/access_token", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: APIUtils.getHttpBasicAuthHeader())
+        ProxyUtils.makeSession().request("https://www.reddit.com/api/v1/access_token", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: APIUtils.getHttpBasicAuthHeader())
             .validate()
             .responseDecodable(of: AccessTokenResponse.self) { response in
                 switch response.result {

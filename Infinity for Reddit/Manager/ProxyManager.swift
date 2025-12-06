@@ -221,25 +221,4 @@ final class ProxyManager {
             return proxied
         }
     }
-
-    func reloadConfiguration() {
-        controlQueue.async { [weak self] in
-            guard let self else {
-                return
-            }
-
-            self.stopLocked()
-            self.proxyServer = nil
-
-            guard let newConfiguration = self.resolveConfiguration() else {
-                self.configuration = nil
-                return
-            }
-
-            self.configuration = newConfiguration
-            if self.configureProxyServer(with: newConfiguration) {
-                self.startLocked()
-            }
-        }
-    }
 }

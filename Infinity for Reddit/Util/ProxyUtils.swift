@@ -17,7 +17,14 @@ enum ProxyUtils {
     static let timeoutRequest: TimeInterval = 30
     static let timeoutResource: TimeInterval = 300
 
-    static func applyProxyIfNeeded(configuration: URLSessionConfiguration) {
+    static func makeSession(configuration: URLSessionConfiguration = .af.default,
+                            interceptor: RequestInterceptor? = nil) -> Session {
+        let mutableConfiguration = configuration
+        applyProxyIfNeeded(configuration: mutableConfiguration)
+        return Session(configuration: mutableConfiguration, interceptor: interceptor)
+    }
+    
+    private static func applyProxyIfNeeded(configuration: URLSessionConfiguration) {
         guard let proxyConfiguration = ProxyConfiguration() else {
             configuration.connectionProxyDictionary = nil
             return
@@ -26,13 +33,6 @@ enum ProxyUtils {
         configuration.connectionProxyDictionary = proxyConfiguration.connectionProxyDictionary
         configuration.timeoutIntervalForRequest = timeoutRequest
         configuration.timeoutIntervalForResource = timeoutResource
-    }
-
-    static func makeSession(configuration: URLSessionConfiguration = .af.default,
-                            interceptor: RequestInterceptor? = nil) -> Session {
-        let mutableConfiguration = configuration
-        applyProxyIfNeeded(configuration: mutableConfiguration)
-        return Session(configuration: mutableConfiguration, interceptor: interceptor)
     }
     
     static func isValidHostname(_ value: String) -> Bool {
