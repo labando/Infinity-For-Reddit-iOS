@@ -17,23 +17,11 @@ public class CommentFilterUsageListingRepository: CommentFilterUsageListingRepos
         self.commentFilterUsageDao = CommentFilterUsageDao(dbPool: resolvedDBPool)
     }
     
-    public func saveCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) -> Bool {
-        do {
-            try commentFilterUsageDao.insert(commentFilterUsage: commentFilterUsage)
-            return true
-        } catch {
-            print("Save comment filter usage failed with error: \(error)")
-            return false
-        }
+    public func saveCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) async throws {
+        try await commentFilterUsageDao.insert(commentFilterUsage: commentFilterUsage)
     }
     
-    public func deleteCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) -> Bool {
-        do {
-            try commentFilterUsageDao.deleteCommentFilterUsage(commentFilterUsage: commentFilterUsage)
-            return true
-        } catch {
-            print("Delete comment filter usage failed with error: \(error)")
-            return false
-        }
+    public func deleteCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) async throws {
+        try await commentFilterUsageDao.deleteCommentFilterUsage(commentFilterUsage: commentFilterUsage)
     }
 }

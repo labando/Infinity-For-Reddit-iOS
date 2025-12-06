@@ -49,10 +49,12 @@ class LinkHandler {
         
         if path.hasSuffix(".mp4") {
             return LinkDestination.fullScreenMedia(FullScreenMediaType.video(urlString: finalURL.absoluteString, videoType: .direct))
-        } else if path.hasSuffix(".jpg") || path.hasSuffix(".JPG") || path.hasSuffix(".jpeg") || path.hasSuffix(".png") {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString))
+        } else if path.hasSuffix(".jpg") || path.hasSuffix(".JPG") || path.hasSuffix(".jpeg") {
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).jpg"))
+        } else if path.hasSuffix(".png") || path.hasSuffix(".PNG") {
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).png"))
         } else if path.hasSuffix(".gif") {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.gif(urlString: finalURL.absoluteString))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.gif(urlString: finalURL.absoluteString, fileName: "\(segments[segments.count - 1]).gif"))
         }
         
         switch host {
@@ -95,6 +97,9 @@ class LinkHandler {
     private func handleRedditPath(_ path: String, segments: [String], url: URL) -> LinkDestination {
         if path == "/report" {
             return LinkDestination.openInBrowser(url)
+        } else if segments.count == 4, segments[0] == "r", segments[2] == "wiki" {
+            // Wiki
+            return LinkDestination.navigation(AppNavigation.wiki(subredditName: segments[1], wikiPath: segments[3]))
         } else if segments.contains("comments"), let index = segments.lastIndex(of: "comments"), index + 1 < segments.count {
             let postId = segments[index + 1]
             if segments.count > index + 3 {
@@ -106,7 +111,10 @@ class LinkHandler {
         } else if path == "/media", let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
                   let realURLString = query.first(where: { $0.name == "url" })?.value,
                   let realURL = URL(string: realURLString) {
-            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: realURL.absoluteString))
+            return LinkDestination.fullScreenMedia(FullScreenMediaType.image(urlString: realURL.absoluteString, fileName: "\(segments[segments.count - 1]).jpg"))
+        } else if segments.count == 4, segments[0] == "user", segments[2] == "m" {
+            // Custom Feed
+            return LinkDestination.navigation(AppNavigation.customFeed(customFeed: .path(path)))
         } else if let subredditMatch = path.range(of: "/r/[\\w-]+", options: .regularExpression) {
             let subreddit = String(path[subredditMatch]).components(separatedBy: "/")[2]
             return LinkDestination.navigation(AppNavigation.subredditDetails(subredditName: subreddit))
@@ -177,7 +185,7 @@ class LinkHandler {
         let unescaped = url.absoluteString.replacingOccurrences(of: "%2F", with: "/")
         if let id = unescaped.components(separatedBy: "/").last {
             print("Uploaded image ID: \(id)")
-            return LinkDestination.fullScreenMedia(.image(urlString: unescaped))
+            return LinkDestination.fullScreenMedia(.image(urlString: unescaped, fileName: "\(Utils.randomString()).jpg"))
         }
         return LinkDestination.openInBrowser(url)
     }

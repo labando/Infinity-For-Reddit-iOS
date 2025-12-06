@@ -12,7 +12,7 @@ public protocol SearchRepositoryProtocol {
                          customFeedPath: String?,
                          customFeedDisplayName: String?,
                          searchInThingType: SearchInThingType,
-                         time: Int64)
-    func clearAllRecentSearchQueries(username: String)
-    func deleteRecentSearchQueries(recentSearchQuery: RecentSearchQuery)
+                         time: Int64) async
+    func clearAllRecentSearchQueries(username: String) async
+    func deleteRecentSearchQueries(recentSearchQuery: RecentSearchQuery) async
 }

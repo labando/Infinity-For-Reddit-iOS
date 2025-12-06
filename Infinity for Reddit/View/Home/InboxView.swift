@@ -28,19 +28,21 @@ struct InboxView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            SegmentedPicker(selectedValue: $selectedOption, values: ["Notifications", "Messages"])
-                .padding(4)
-            
-            TabView(selection: $selectedOption) {
-                Group {
-                    InboxListingView(messageWhere: MessageWhere.inbox, hasReadAllMessages: $hasReadAllMessages)
-                        .tag(0)
-                    
-                    InboxListingView(messageWhere: MessageWhere.messages, hasReadAllMessages: $hasReadAllMessages)
-                        .tag(1)
+        RootView {
+            VStack(spacing: 0) {
+                SegmentedPicker(selectedValue: $selectedOption, values: ["Notifications", "Messages"])
+                    .padding(4)
+                
+                TabView(selection: $selectedOption) {
+                    Group {
+                        InboxListingView(messageWhere: MessageWhere.inbox, hasReadAllMessages: $hasReadAllMessages)
+                            .tag(0)
+                        
+                        InboxListingView(messageWhere: MessageWhere.messages, hasReadAllMessages: $hasReadAllMessages)
+                            .tag(1)
+                    }
+                    .toolbar(.hidden, for: .tabBar)
                 }
-                .toolbar(.hidden, for: .tabBar)
             }
         }
         .id(accountViewModel.account.username)

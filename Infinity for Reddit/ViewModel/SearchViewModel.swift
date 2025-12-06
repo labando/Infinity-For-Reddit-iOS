@@ -91,22 +91,28 @@ class SearchViewModel: ObservableObject {
     }
     
     func saveSearchQuery() {
-        searchRepository.saveSearchQuery(
-            username: username,
-            query: query,
-            searchInSubredditOrUserName: searchInSubredditOrUserName,
-            customFeedPath: searchInCustomFeed,
-            customFeedDisplayName: searchInCustomFeedDisplayName,
-            searchInThingType: searchInThingType,
-            time: Int64(Date().timeIntervalSince1970)
-        )
+        Task {
+            await searchRepository.saveSearchQuery(
+                username: username,
+                query: query,
+                searchInSubredditOrUserName: searchInSubredditOrUserName,
+                customFeedPath: searchInCustomFeed,
+                customFeedDisplayName: searchInCustomFeedDisplayName,
+                searchInThingType: searchInThingType,
+                time: Int64(Date().timeIntervalSince1970)
+            )
+        }
     }
     
     func clearAllRecentSearchQueries() {
-        searchRepository.clearAllRecentSearchQueries(username: username)
+        Task {
+            await searchRepository.clearAllRecentSearchQueries(username: username)
+        }
     }
     
     func deleteSearchQuery(recentSearchQuery: RecentSearchQuery) {
-        searchRepository.deleteRecentSearchQueries(recentSearchQuery: recentSearchQuery)
+        Task {
+            await searchRepository.deleteRecentSearchQueries(recentSearchQuery: recentSearchQuery)
+        }
     }
 }

@@ -6,7 +6,7 @@
 //
 
 protocol HistoryPostsRepositoryProtocol {
-    func getReadPostsIdsByIds(readPostEnabled: Bool, account: Account, postIds: [String]) -> Set<String>
-    func getHistoryPostsIdsByIdsAnonymous(account: Account, postIds: [String], postHistoryType: PostHistoryType) -> Set<String>
-    func getIfExistInHistoryPostsAnonymous(account: Account, postId: String, postHistoryType: PostHistoryType) -> Bool
+    func getReadPostsIdsByIds(readPostEnabled: Bool, account: Account, postIds: [String]) async -> Set<String>
+    func getHistoryPostsIdsByIdsAnonymous(account: Account, postIds: [String], postHistoryType: PostHistoryType) async -> Set<String>
+    func getIfExistInHistoryPostsAnonymous(account: Account, postId: String, postHistoryType: PostHistoryType) async -> Bool
 }

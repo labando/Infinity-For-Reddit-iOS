@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public class CustomizeCommentFilterViewModel: ObservableObject {
     @Published private var id: Int? = nil
     @Published var name: String = "New Filter"
@@ -17,6 +18,9 @@ public class CustomizeCommentFilterViewModel: ObservableObject {
     @Published var minVoteString: String = "-1"
     @Published var maxVote: Int = -1
     @Published var maxVoteString: String = "-1"
+    
+    @Published var savedCommentFilterFlag: Bool = false
+    @Published var error: Error?
     
     private let customizeCommentFilterRepository: CustomizeCommentFilterRepositoryProtocol
     
@@ -55,17 +59,26 @@ public class CustomizeCommentFilterViewModel: ObservableObject {
         self.customizeCommentFilterRepository = customizeCommentFilterRepository
     }
     
-    func saveCommentFilter() -> Bool {
-        let commentFilter = CommentFilter(
-            id: id,
-            name: name,
-            displayMode: displayMode,
-            maxVote: maxVote,
-            minVote: minVote,
-            excludeStrings: excludesKeywords,
-            excludeUsers: excludeUsers
-        )
-        
-        return customizeCommentFilterRepository.saveCommentFilter(commentFilter)
+    func saveCommentFilter() {
+        Task {
+            let commentFilter = CommentFilter(
+                id: id,
+                name: name,
+                displayMode: displayMode,
+                maxVote: maxVote,
+                minVote: minVote,
+                excludeStrings: excludesKeywords,
+                excludeUsers: excludeUsers
+            )
+            
+            do {
+                try await customizeCommentFilterRepository.saveCommentFilter(commentFilter)
+                
+                savedCommentFilterFlag.toggle()
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
+        }
     }
 }

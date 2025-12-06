@@ -12,29 +12,17 @@ public class CustomizePostFilterRepository: CustomizePostFilterRepositoryProtoco
     
     init() {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError("Failed to resolve DatabasePool")
+            fatalError("Failed to resolve DatabasePool in CustomizePostFilterRepository")
         }
         self.postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
     }
     
-    public func savePostFilter(_ postFilter: PostFilter) -> Bool {
+    public func savePostFilter(_ postFilter: PostFilter) async throws {
         if postFilter.id != nil {
             // Updating a post filter
-            do {
-                try postFilterDao.updatePostFilter(updatedPostFilter: postFilter)
-                return true
-            } catch {
-                print("Error updating postFilter - \(error.localizedDescription)")
-                return false
-            }
+            try await postFilterDao.updatePostFilter(updatedPostFilter: postFilter)
         } else {
-            do {
-                try postFilterDao.insert(postFilter: postFilter)
-                return true
-            } catch {
-                print("Error inserting postFilter - \(error.localizedDescription)")
-                return false
-            }
+            try await postFilterDao.insert(postFilter: postFilter)
         }
     }
 }

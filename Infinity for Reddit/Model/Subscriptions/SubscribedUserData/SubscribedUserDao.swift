@@ -15,14 +15,14 @@ struct SubscribedUserDao {
         self.dbPool = dbPool
     }
     
-    func insert(subscribedUserData: SubscribedUserData) throws {
-        try dbPool.write { db in
+    func insert(subscribedUserData: SubscribedUserData) async throws {
+        try await dbPool.write { db in
             try subscribedUserData.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(subscribedUserDataList: [SubscribedUserData]) {
-        try? dbPool.write { db in
+    func insertAll(subscribedUserDataList: [SubscribedUserData]) async throws {
+        try await dbPool.write { db in
             for data in subscribedUserDataList {
                 try data.insert(db, onConflict: .replace)
             }
@@ -42,8 +42,8 @@ struct SubscribedUserDao {
         .eraseToAnyPublisher()
     }
     
-    func getAllSubscribedUsersList(accountName: String) throws -> [SubscribedUserData] {
-        try dbPool.read { db in
+    func getAllSubscribedUsersList(accountName: String) async throws -> [SubscribedUserData] {
+        try await dbPool.read { db in
             try SubscribedUserData.fetchAll(db, sql: """
                 SELECT *
                 FROM subscribed_users
@@ -66,8 +66,8 @@ struct SubscribedUserDao {
         .eraseToAnyPublisher()
     }
     
-    func getSubscribedUser(name: String, accountName: String) throws -> SubscribedUserData? {
-        try dbPool.read { db in
+    func getSubscribedUser(name: String, accountName: String) async throws -> SubscribedUserData? {
+        try await dbPool.read { db in
             try SubscribedUserData.fetchOne(db, sql: """
                 SELECT *
                 FROM subscribed_users
@@ -77,8 +77,8 @@ struct SubscribedUserDao {
         }
     }
     
-    func deleteSubscribedUser(name: String, accountName: String) throws {
-        try dbPool.write { db in
+    func deleteSubscribedUser(name: String, accountName: String) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: """
                 DELETE FROM subscribed_users
                 WHERE name = ? COLLATE NOCASE AND username = ? COLLATE NOCASE

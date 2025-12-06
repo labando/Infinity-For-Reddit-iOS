@@ -14,6 +14,9 @@
         }
       }
     },
+    "%lld" : {
+
+    },
     "%lld days" : {
 
     },
@@ -52,9 +55,6 @@
 
     },
     "Back" : {
-
-    },
-    "ButtonTextViewModifier" : {
 
     },
     "Cake day: %@" : {
@@ -105,15 +105,6 @@
     "Collapse Subscribed Subreddits Section" : {
 
     },
-    "ColorAccentTextViewModifier" : {
-
-    },
-    "CommentInfoTextViewModifier (time, score, etc.)" : {
-
-    },
-    "CommentMarkdownViewModifier (for markdown in comments)" : {
-
-    },
     "Comments" : {
 
     },
@@ -129,16 +120,10 @@
     "Comments will be filtered out if they contain the following keywords." : {
 
     },
-    "CommentTextViewModifier - Comment text (uses Content Font)" : {
-
-    },
-    "CONTENT FONT MODIFIERS" : {
-
-    },
     "Continue Thread" : {
 
     },
-    "Custom font family upload error." : {
+    "Copy" : {
 
     },
     "Delete" : {
@@ -180,13 +165,7 @@
     "Followed" : {
 
     },
-    "Font Modifier Test" : {
-
-    },
     "Fully collapse" : {
-
-    },
-    "GalleryIndexIndicatorViewModifier" : {
 
     },
     "Gesture & Buttons" : {
@@ -196,6 +175,9 @@
 
     },
     "Hide Favorite Subreddits Section" : {
+
+    },
+    "Hide Nav Bar" : {
 
     },
     "Hide Subscribed Subreddits Section" : {
@@ -208,9 +190,6 @@
 
     },
     "Inbox" : {
-
-    },
-    "INTERFACE FONT MODIFIERS" : {
 
     },
     "Karma: %lld" : {
@@ -228,9 +207,6 @@
     "Link posts that have the following urls will be filtered out." : {
 
     },
-    "ListSectionHeaderViewModifier" : {
-
-    },
     "Load more comments" : {
 
     },
@@ -238,12 +214,6 @@
 
     },
     "Manage Subscription" : {
-
-    },
-    "MarkdownViewModifier (general)" : {
-
-    },
-    "Miscellaneous" : {
 
     },
     "Moderate" : {
@@ -255,19 +225,10 @@
     "Navigation Drawer" : {
 
     },
-    "NavigationBarButtonViewModifier" : {
-
-    },
-    "NavigationBarPrimaryTextViewModifier" : {
-
-    },
-    "NeutralTextButtonViewModifier" : {
-
-    },
     "New Post" : {
 
     },
-    "No Comments" : {
+    "No comments" : {
 
     },
     "No comments yet. Be the first to share your thoughts!" : {
@@ -285,7 +246,7 @@
     "No posts" : {
 
     },
-    "No Subreddit Selected" : {
+    "No subreddit-specific rules." : {
 
     },
     "No subreddits" : {
@@ -304,27 +265,6 @@
 
     },
     "No wiki found" : {
-
-    },
-    "OK" : {
-
-    },
-    "Please select a subreddit first" : {
-
-    },
-    "PositiveTextButtonViewModifier" : {
-
-    },
-    "POST TITLE FONT MODIFIER" : {
-
-    },
-    "PostContentMarkdownViewModifier (for markdown in posts)" : {
-
-    },
-    "PostContentTextViewModifier - This is the post body text content that users write when creating a text post." : {
-
-    },
-    "PostInfoTextViewModifier (time, score, etc.)" : {
 
     },
     "Posts" : {
@@ -366,12 +306,6 @@
     "Posts will be filtered out if they do not contain the following keywords in their title." : {
 
     },
-    "PostTitleTextViewModifier - This is a Sample Post Title" : {
-
-    },
-    "PrimaryTextViewModifier" : {
-
-    },
     "r/%@" : {
 
     },
@@ -403,9 +337,6 @@
 
     },
     "Search in" : {
-
-    },
-    "SecondaryTextViewModifier" : {
 
     },
     "Security" : {
@@ -457,9 +388,6 @@
 
     },
     "Start by creating a post filter" : {
-
-    },
-    "SubredditTextViewModifier (r/subreddit - uses Interface Font)" : {
 
     },
     "Subscriptions" : {
@@ -2214,6 +2142,39 @@
     "u/%@" : {
 
     },
+    "Unable to load comments. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load custom feeds. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load flairs. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load inbox. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load post and comments. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load posts. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load rules. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load subreddits. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load subscribed subreddits. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load subscribed users. Tap to retry. Error: %@" : {
+
+    },
+    "Unable to load users. Tap to retry. Error: %@" : {
+
+    },
     "Unfollow" : {
 
     },
@@ -2223,16 +2184,7 @@
     "Unsubscribe" : {
 
     },
-    "UsernameOnPostTextViewModifier (requires Post)" : {
-
-    },
-    "UsernameTextViewModifier" : {
-
-    },
     "Video downloaded" : {
-
-    },
-    "WarningTextButtonViewModifier" : {
 
     }
   },

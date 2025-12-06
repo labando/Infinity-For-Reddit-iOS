@@ -70,7 +70,7 @@ class PullNotificationBackgroundTaskManager {
     
     private func getAllAccounts() async -> [Account]? {
         do {
-            return try accountDao.getAllAccounts()
+            return try await accountDao.getAllAccounts()
         } catch {
             print("Load accounts failed: \(error)")
             return nil

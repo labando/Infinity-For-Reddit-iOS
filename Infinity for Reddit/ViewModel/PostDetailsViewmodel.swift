@@ -30,6 +30,10 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var flairs: [Flair]?
     @Published var searchQuery: String = ""
     @Published var searchedComment: CommentItem?
+    
+    @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
+    @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
+    
     private let account: Account
     private var commentMore: CommentMore?
     private var lastLoadedSortTypeKind: SortType.Kind? = nil
@@ -207,7 +211,7 @@ public class PostDetailsViewModel: ObservableObject {
             }
             
             if commentFilter == nil {
-                fetchCommentFilter()
+                await fetchCommentFilter()
             }
             
             let processedComments = postProcessComments(postDetails.comments)
@@ -278,14 +282,14 @@ public class PostDetailsViewModel: ObservableObject {
         MarkdownUtils.parseRedditImagesBlock(post)
         post.selftextProcessedMarkdown = MarkdownContent(post.selftext)
         
-        if historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .upvoted) {
+        if await historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .upvoted) {
             post.likes = 1
-        } else if historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .downvoted) {
+        } else if await historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .downvoted) {
             post.likes = -1
         }
         
-        post.hidden = historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .hidden)
-        post.saved = historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .saved)
+        post.hidden = await historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .hidden)
+        post.saved = await historyPostsRepository.getIfExistInHistoryPostsAnonymous(account: account, postId: post.id, postHistoryType: .saved)
     }
     
     public func fetchCommentsPagination() async {
@@ -313,7 +317,7 @@ public class PostDetailsViewModel: ObservableObject {
             try Task.checkCancellation()
             
             if commentFilter == nil {
-                fetchCommentFilter()
+                await fetchCommentFilter()
             }
             
             let processedComments = postProcessComments(moreChildren.commentItems)
@@ -540,12 +544,12 @@ public class PostDetailsViewModel: ObservableObject {
         comment.hasExpandedBefore = true
     }
     
-    func fetchCommentFilter() {
-        self.commentFilter = postDetailsRepository.fetchCommentFilter(usageType: .subreddit, nameOfUsage: post?.subreddit ?? "")
+    func fetchCommentFilter() async {
+        self.commentFilter = await postDetailsRepository.fetchCommentFilter(usageType: .subreddit, nameOfUsage: post?.subreddit ?? "")
     }
     
-    public func loadIcon(comment: Comment) {
-        guard comment.authorIconUrl == nil else { return }
+    func loadIcon(comment: Comment) {
+        guard comment.authorIconUrlString == nil else { return }
         
         let startIndex = visibleComments.index(id: comment.id) ?? 0
         let commentBatch = Array(
@@ -559,17 +563,14 @@ public class PostDetailsViewModel: ObservableObject {
         }
 
         Task {
-            let iconUrl = await UserProfileImageBatchLoader.shared.loadIcons(for: commentBatch)
-            
-            if let iconUrl {
-                await MainActor.run {
-                    comment.authorIconUrl = iconUrl
-                }
+            let iconUrl = await UserProfileImageBatchLoader.shared.loadIcons(comments: commentBatch)
+            await MainActor.run {
+                comment.authorIconUrlString = iconUrl
             }
         }
     }
     
-    func loadIcon(isFromSubredditPostListing: Bool) async {
+    func loadPostIcon(isFromSubredditPostListing: Bool) async {
         guard let post else { return }
         guard post.subredditOrUserIconInPostDetails == nil else { return }
         
@@ -1178,6 +1179,71 @@ public class PostDetailsViewModel: ObservableObject {
             } catch {
                 self.error = error
                 print(error)
+            }
+        }
+    }
+    
+    func downloadMedia() {
+        guard let post else {
+            return
+        }
+        
+        guard let downloadMediaType = post.getDownloadMediaType() else {
+            return
+        }
+        
+        Task {
+            do {
+                try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, progress in
+                    
+                })
+                
+                await MainActor.run {
+                    self.showMediaDownloadFinishedMessageTrigger.toggle()
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                    print(error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func downloadAllGalleryMedia() {
+        guard let post else {
+            return
+        }
+        
+        guard let items = post.galleryData?.items else {
+            return
+        }
+        
+        Task {
+            await withTaskGroup(of: Void.self) { group in
+                for item in items {
+                    group.addTask { [weak self] in
+                        await self?.downloadGalleryOrImgurItemMediaAsync(downloadMediaType: item.toDownloadMediaType(post: post))
+                    }
+                }
+                
+                for await _ in group {
+                    
+                }
+                
+                await MainActor.run {
+                    self.showAllGalleryMediaDownloadFinishedMessageTrigger.toggle()
+                }
+            }
+        }
+    }
+    
+    private func downloadGalleryOrImgurItemMediaAsync(downloadMediaType: DownloadMediaType) async {
+        do {
+            try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, _ in })
+        } catch {
+            await MainActor.run {
+                self.error = error
             }
         }
     }

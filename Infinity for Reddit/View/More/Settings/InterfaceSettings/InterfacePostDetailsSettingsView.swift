@@ -20,38 +20,40 @@ struct InterfacePostDetailsSettingsView: View {
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfacePostDetails) private var markdownEmbeddedMediaType: Int = 15
     
     var body: some View {
-        List {
-            TogglePreference(isEnabled: $showPostAndCommentsInTwoColumnsInLandscape, title: "Show Post and Comments in Two Columns in Landscape Mode")
+        RootView {
+            List {
+                TogglePreference(isEnabled: $showPostAndCommentsInTwoColumnsInLandscape, title: "Show Post and Comments in Two Columns in Landscape Mode")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hidePostType, title: "Hide Post Type")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hidePostFlair, title: "Hide Post Flair")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideUpvoteRatio, title: "Hide Upvote Ratio")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideSubredditAndUserPrefix, title: "Hide Subreddit and User Prefix")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideNVotes, title: "Hide the Number of Votes")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideNComments, title: "Hide the Number of Comments")
+                    .listPlainItemNoInsets()
+                
+                BarebonePickerPreference(
+                    selected: $markdownEmbeddedMediaType,
+                    items: InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypes,
+                    title: "Markdown Embedded Media Type"
+                ) { layout in
+                    InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypesText[InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypes.firstIndex(of: layout) ?? 0]
+                }
                 .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hidePostType, title: "Hide Post Type")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hidePostFlair, title: "Hide Post Flair")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hideUpvoteRatio, title: "Hide Upvote Ratio")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hideSubredditAndUserPrefix, title: "Hide Subreddit and User Prefix")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hideNVotes, title: "Hide the Number of Votes")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hideNComments, title: "Hide the Number of Comments")
-                .listPlainItemNoInsets()
-            
-            BarebonePickerPreference(
-                selected: $markdownEmbeddedMediaType,
-                items: InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypes,
-                title: "Markdown Embedded Media Type"
-            ) { layout in
-                InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypesText[InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypes.firstIndex(of: layout) ?? 0]
             }
-            .listPlainItemNoInsets()
+            .themedList()
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Post Details")
     }

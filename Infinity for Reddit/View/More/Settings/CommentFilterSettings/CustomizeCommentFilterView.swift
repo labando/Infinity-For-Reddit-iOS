@@ -203,12 +203,11 @@ struct CustomizeCommentFilterView: View {
         .themedNavigationBar()
         .toolbar {
             Button("", systemImage: "tray.and.arrow.down.fill") {
-                if customizeCommentFilterViewModel.saveCommentFilter() {
-                    dismiss()
-                } else {
-                    // TODO handle exception
-                }
+                customizeCommentFilterViewModel.saveCommentFilter()
             }
+        }
+        .onChange(of: customizeCommentFilterViewModel.savedCommentFilterFlag) {
+            dismiss()
         }
     }
     

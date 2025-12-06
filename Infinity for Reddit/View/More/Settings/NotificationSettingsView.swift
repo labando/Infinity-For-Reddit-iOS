@@ -17,23 +17,25 @@ struct NotificationSettingsView: View {
     private let notificationSettingsViewModel = NotificationSettingsViewModel()
     
     var body: some View {
-        List {
-            TogglePreference(isEnabled: $enableNotification, title: "Enable Notification")
-                .listPlainItemNoInsets()
-            
-            if enableNotification {
-                BarebonePickerPreference(
-                    selected: $notificationInterval,
-                    items: NotificationUserDefaultsUtils.notificationIntervalOptions,
-                    title: "Check Notification Interval"
-                ) { interval in
-                    NotificationUserDefaultsUtils.notificationIntervalOptionsText[NotificationUserDefaultsUtils.notificationIntervalOptions.firstIndex(of: interval) ?? 2]
+        RootView {
+            List {
+                TogglePreference(isEnabled: $enableNotification, title: "Enable Notification")
+                    .listPlainItemNoInsets()
+                
+                if enableNotification {
+                    BarebonePickerPreference(
+                        selected: $notificationInterval,
+                        items: NotificationUserDefaultsUtils.notificationIntervalOptions,
+                        title: "Check Notification Interval"
+                    ) { interval in
+                        NotificationUserDefaultsUtils.notificationIntervalOptionsText[NotificationUserDefaultsUtils.notificationIntervalOptions.firstIndex(of: interval) ?? 2]
+                    }
+                    .listPlainItemNoInsets()
+                    .animation(.easeInOut, value: enableNotification)
                 }
-                .listPlainItemNoInsets()
-                .animation(.easeInOut, value: enableNotification)
             }
+            .themedList()
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Notification")
         .onChange(of: enableNotification) { _, newValue in

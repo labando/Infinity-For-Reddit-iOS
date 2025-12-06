@@ -45,7 +45,7 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
     }
     
     public func fetchSubredditDetails(subredditName: String) async throws -> SubredditData {
-        var subredditData = try? subredditDao.getSubredditDataByName(subredditName: subredditName)
+        var subredditData = try? await subredditDao.getSubredditDataByName(subredditName: subredditName)
         if subredditData == nil {
             let data = try await self.session.request(
                 RedditAPI.getSubredditData(subredditName: subredditName)
@@ -63,12 +63,12 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
             
             subredditData = try? SubredditDetailRootClass(fromJson: json).toSubredditData()
             if let subredditData {
-                try? subredditDao.insert(subredditData: subredditData)
+                try? await subredditDao.insert(subredditData: subredditData)
             }
         }
         
         if let sd = subredditData {
-            subredditData?.isSubscribed = (try? subscribedSubredditDao.getSubscribedSubreddit(subredditName: sd.name, accountName: AccountViewModel.shared.account.username)) != nil
+            subredditData?.isSubscribed = (try? await subscribedSubredditDao.getSubscribedSubreddit(subredditName: sd.name, accountName: AccountViewModel.shared.account.username)) != nil
         }
         
         if let subredditData {
@@ -92,17 +92,17 @@ public class SubredditDetailsRepository: SubredditDetailsRepositoryProtocol {
             .value
         
         if action == "unsub" {
-            try? subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditData.name, accountName: AccountViewModel.shared.account.username)
+            try? await subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditData.name, accountName: AccountViewModel.shared.account.username)
         } else {
-            try? subscribedSubredditDao.insert(subscribedSubredditData: subredditData.toSubscribedSubredditData())
+            try? await subscribedSubredditDao.insert(subscribedSubredditData: subredditData.toSubscribedSubredditData())
         }
     }
     
     private func anonymousSubscribeSubreddit(subredditData: SubredditData) async throws {
         if subredditData.isSubscribed {
-            try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditData.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
+            try await subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subredditData.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
         } else {
-            try subscribedSubredditDao.insert(subscribedSubredditData: subredditData.toSubscribedSubredditData())
+            try await subscribedSubredditDao.insert(subscribedSubredditData: subredditData.toSubscribedSubredditData())
         }
     }
     

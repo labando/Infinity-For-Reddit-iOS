@@ -21,6 +21,11 @@ struct CommentListingView: View {
     @State private var showSortTypeKindSheet: Bool = false
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var showCommentModerationSheet: Bool = false
+    @State private var showCopyContentOptionsSheet: Bool = false
+    @State private var showCopyContentSheet: Bool = false
+    @State private var markdownToBeCopied: String = ""
+    @State private var plainTextToBeCopied: String = ""
+    @State private var textToBeSelectedAndCopiedItem: TextToBeSelectedAndCopiedItem?
     @State private var upcomingSortTypeKind: SortType.Kind?
     @State private var navigationBarMenuKey: UUID?
     @State private var commentToBeEdited: Comment? = nil
@@ -45,11 +50,22 @@ struct CommentListingView: View {
     var body: some View {
         RootView {
             if commentListingViewModel.comments.isEmpty {
-                if commentListingViewModel.isInitialLoading || commentListingViewModel.isInitialLoad {
-                    ProgressIndicator()
-                } else {
-                    Text("No Comments")
+                ZStack {
+                    if commentListingViewModel.isInitialLoading {
+                        ProgressIndicator()
+                    } else if commentListingViewModel.isInitialLoad, let error = commentListingViewModel.error {
+                        Text("Unable to load comments. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                commentListingViewModel.refreshComments()
+                            }
+                    } else {
+                        Text("No comments")
+                            .primaryText()
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
                     ForEach(commentListingViewModel.comments, id: \.id) { comment in
@@ -76,6 +92,11 @@ struct CommentListingView: View {
                                 onModerate: {
                                     commentToBeModerated = comment
                                     showCommentModerationSheet = true
+                                },
+                                onCopy: {
+                                    markdownToBeCopied = comment.body
+                                    plainTextToBeCopied = comment.bodyHtml
+                                    showCopyContentOptionsSheet = true
                                 }
                             )
                         }
@@ -98,6 +119,7 @@ struct CommentListingView: View {
                         }
                     }
                 }
+                .showErrorUsingSnackbar(commentListingViewModel.$error)
             }
         }
         .task(id: commentListingViewModel.loadCommentsTaskId) {
@@ -190,6 +212,23 @@ struct CommentListingView: View {
             } else {
                 EmptyView()
             }
+        }
+        .wrapContentSheet(isPresented: $showCopyContentOptionsSheet) {
+            CopyContentOptionsSheet(
+                markdown: markdownToBeCopied,
+                plainText: plainTextToBeCopied,
+                onCopyMarkdown: {
+                    textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
+                    showCopyContentSheet = true
+                },
+                onCopyPlainText: {
+                    textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: plainTextToBeCopied)
+                    showCopyContentSheet = true
+                }
+            )
+        }
+        .sheet(item: $textToBeSelectedAndCopiedItem) { item in
+            CopyContentSheet(content: item.content)
         }
     }
 }

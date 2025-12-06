@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 extension View {
     func themedList() -> some View {
@@ -20,12 +21,12 @@ extension View {
         self.modifier(ListPlainItemNoInsetsThemeViewModifier())
     }
     
-    func primaryText() -> some View {
-        self.modifier(PrimaryTextViewModifier())
+    func primaryText(_ fontSize: AppFontSize = .f17) -> some View {
+        self.modifier(PrimaryTextViewModifier(fontSize: fontSize))
     }
     
-    func secondaryText() -> some View {
-        self.modifier(SecondaryTextViewModifier())
+    func secondaryText(_ fontSize: AppFontSize = .f17) -> some View {
+        self.modifier(SecondaryTextViewModifier(fontSize: fontSize))
     }
     
     func buttonText() -> some View {
@@ -148,16 +149,16 @@ extension View {
         self.modifier(ToggleCustomThemeViewModifier())
     }
     
-    func themedMarkdown() -> some View {
-        self.modifier(MarkdownViewModifier())
+    func themedMarkdown(_ fontSize: AppFontSize = .f17) -> some View {
+        self.modifier(MarkdownViewModifier(fontSize: fontSize))
     }
     
-    func themedPostCommentMarkdown() -> some View {
-        self.modifier(PostContentMarkdownViewModifier())
+    func themedPostCommentMarkdown(_ fontSize: AppFontSize = .f15) -> some View {
+        self.modifier(PostContentMarkdownViewModifier(fontSize: fontSize))
     }
     
-    func themedCommentMarkdown() -> some View {
-        self.modifier(CommentMarkdownViewModifier())
+    func themedCommentMarkdown(_ fontSize: AppFontSize = .f15) -> some View {
+        self.modifier(CommentMarkdownViewModifier(fontSize: fontSize))
     }
     
     func galleryIndexIndicator() -> some View {
@@ -321,5 +322,11 @@ extension View {
         _ action: @escaping (CGFloat) -> Void
     ) -> some View {
         modifier(VisiblePercentageModifier(onChange: action, space: space))
+    }
+    
+    func showErrorUsingSnackbar<P: Publisher>(
+        _ errorPublisher: P
+    ) -> some View where P.Output == Error?, P.Failure == Never {
+        self.modifier(SnackbarErrorViewModifier(errorPublisher: errorPublisher))
     }
 }

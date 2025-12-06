@@ -87,7 +87,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var linkFlairRichtext : [FlairRichtext]! = [FlairRichtext]()
     var linkFlairText : String!
     var linkFlairType : String!
-    var locked : Bool!
+    @Published var locked : Bool
     var media : PostMedia!
     var mediaMetadata: [String: MediaMetadata]?
     var mediaOnly : Bool!
@@ -102,7 +102,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var numCrossposts : Int!
     var numReports : Int!
     @Published var over18 : Bool!
-    var permalink : String!
+    var permalink : String
     var pinned : Bool!
     var preview : Preview!
     var pwls : Int!
@@ -130,8 +130,8 @@ public class Post : NSObject, ObservableObject, Identifiable {
     }
     var sendReplies : Bool!
     @Published var spam: Bool
-    @Published var spoiler : Bool!
-    var stickied : Bool!
+    @Published var spoiler : Bool
+    @Published var stickied : Bool
     var subreddit : String!
     var subredditId : String!
     var subredditNamePrefixed : String!
@@ -147,7 +147,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
     var url : String!
     var userReports : [[Any]]! = [[Any]]()
     
-    var postType: PostType!
+    var postType: PostType
     @Published var subredditOrUserIcon: String?
     @Published var subredditOrUserIconInPostDetails: String?
     @Published var isRead: Bool = false
@@ -157,9 +157,6 @@ public class Post : NSObject, ObservableObject, Identifiable {
     }
     
     var canEditBody: Bool {
-        guard let postType else {
-            return false
-        }
         switch postType {
         case .text:
             return true
@@ -170,6 +167,14 @@ public class Post : NSObject, ObservableObject, Identifiable {
     
     var isModerator: Bool {
         return distinguished == "moderator"
+    }
+    
+    var postUrlString: String {
+        return "https://reddit.com\(permalink)"
+    }
+    
+    var canReply: Bool {
+        return !locked && !archived
     }
     
     enum PostType: Equatable {
@@ -183,7 +188,7 @@ public class Post : NSObject, ObservableObject, Identifiable {
         case link
         case noPreviewLink
         case poll
-        case imgurVideo(url: String)
+        case imgurVideo(urlString: String)
         case redgifs(redgifsId: String)
         case streamable(shortCode: String)
         
@@ -425,9 +430,9 @@ public class Post : NSObject, ObservableObject, Identifiable {
                     return PostType.gif
                 } else if host.contains("imgur.com") && (path.hasSuffix(".gifv") || path.hasSuffix(".mp4")) {
                     if url.hasSuffix("gifv") {
-                        return PostType.imgurVideo(url: String(url.dropLast(5)) + ".mp4")
+                        return PostType.imgurVideo(urlString: String(url.dropLast(5)) + ".mp4")
                     }
-                    return PostType.imgurVideo(url: url)
+                    return PostType.imgurVideo(urlString: url)
                 } else if path.hasSuffix(".mp4") {
                     return PostType.video(videoUrlString: url, downloadUrlString: url)
                 } else {
@@ -448,6 +453,52 @@ public class Post : NSObject, ObservableObject, Identifiable {
     
     public func isAuthorDeleted() -> Bool {
         return author != nil && author! == "[deleted]"
+    }
+    
+    func getDownloadMediaType(galleryIndex: Int = 0) -> DownloadMediaType? {
+        switch postType {
+        case .image:
+            return .image(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).jpg")
+        case .imageWithUrlPreview:
+            return .image(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).jpg")
+        case .gif:
+            if let gif = preview.images.first?.gifVariant {
+                return .gif(downloadUrlString: gif.source.url, fileName: "\(fileNameWithoutExtension).gif")
+            } else {
+                return .gif(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).gif")
+            }
+        case .redditVideo:
+            return .redditVideo(post: self)
+        case .video(_, let downloadUrlString):
+            return .video(downloadUrlString: downloadUrlString, fileName: "\(fileNameWithoutExtension).mp4")
+        case .gallery:
+            if let items = galleryData?.items {
+                if items.indices.contains(galleryIndex) {
+                    return items[galleryIndex].toDownloadMediaType(post: self)
+                }
+            }
+        case .imgurVideo(let urlString):
+            return .imgurVideo(downloadUrlString: url, fileName: "\(fileNameWithoutExtension).mp4")
+        case .redgifs(let redgifsId):
+            return .redgifs(redgifsId: redgifsId, downloadUrlString: nil)
+        case .streamable(let shortCode):
+            return .streamable(shortCode: shortCode, downloadUrlString: nil)
+        default:
+            return nil
+        }
+        
+        return nil
+    }
+    
+    func getMediaShareUrlString() -> String? {
+        switch postType {
+        case .image, .imageWithUrlPreview, .gif, .link, .noPreviewLink, .redgifs, .streamable, .imgurVideo:
+            return url
+        case .redditVideo(_, let downloadUrlString), .video(_, let downloadUrlString):
+            return downloadUrlString
+        default:
+            return nil
+        }
     }
 }
 

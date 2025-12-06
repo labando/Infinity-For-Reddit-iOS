@@ -17,24 +17,12 @@ public class CustomizeCommentFilterRepository: CustomizeCommentFilterRepositoryP
         self.commentFilterDao = CommentFilterDao(dbPool: resolvedDBPool)
     }
     
-    public func saveCommentFilter(_ commentFilter: CommentFilter) -> Bool {
+    public func saveCommentFilter(_ commentFilter: CommentFilter) async throws {
         if commentFilter.id != nil {
             // Updating a comment filter
-            do {
-                try commentFilterDao.updateCommentFilter(updatedCommentFilter: commentFilter)
-                return true
-            } catch {
-                print("Error updating comment filter - \(error.localizedDescription)")
-                return false
-            }
+            try await commentFilterDao.updateCommentFilter(updatedCommentFilter: commentFilter)
         } else {
-            do {
-                try commentFilterDao.insert(commentFilter: commentFilter)
-                return true
-            } catch {
-                print("Error inserting comment filter - \(error.localizedDescription)")
-                return false
-            }
+            try await commentFilterDao.insert(commentFilter: commentFilter)
         }
     }
 }

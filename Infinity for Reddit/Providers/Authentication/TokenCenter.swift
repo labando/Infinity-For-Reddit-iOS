@@ -21,9 +21,9 @@ public actor TokenCenter: TokenProvider {
         self.dbPool = resolvedDBPool
     }
     
-    public func currentAccessToken(for username: String) -> String? {
+    public func currentAccessToken(for username: String) async -> String? {
         let accountDao = AccountDao(dbPool: dbPool)
-        return try? accountDao.getAccount(username: username)?.accessToken
+        return try? await accountDao.getAccount(username: username)?.accessToken
     }
     
     @discardableResult
@@ -43,7 +43,7 @@ public actor TokenCenter: TokenProvider {
     
     private func refreshToken(for username: String) async throws -> String {
         let accountDao = AccountDao(dbPool: dbPool)
-        guard let account = try? accountDao.getAccount(username: username),
+        guard let account = try? await accountDao.getAccount(username: username),
               let refreshToken = account.refreshToken, !refreshToken.isEmpty else {
             throw NSError(domain: "TokenCenter",
                           code: 1001,
@@ -76,11 +76,11 @@ public actor TokenCenter: TokenProvider {
         switch result {
         case .success(let response):
             if let newRefreshToken = response.refreshToken {
-                try? accountDao.updateAccessTokenAndRefreshToken(username: username,
+                try? await accountDao.updateAccessTokenAndRefreshToken(username: username,
                                                                  accessToken: response.accessToken,
                                                                  refreshToken: newRefreshToken)
             } else {
-                try? accountDao.updateAccessToken(username: username,
+                try? await accountDao.updateAccessToken(username: username,
                                                   accessToken: response.accessToken)
             }
             

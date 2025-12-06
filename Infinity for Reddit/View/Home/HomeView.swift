@@ -9,6 +9,7 @@ import SwiftUI
 import Swinject
 import GRDB
 import SDWebImageSwiftUI
+import SwiftUIIntrospect
 
 struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -48,11 +49,16 @@ struct HomeView: View {
     
     init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
-        _tab1NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
-        _tab2NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
-        _tab3NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
-        _tab4NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
-        _tab5NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel))
+        _tab1NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                                                             firstViewShouldHideNavigationBarOnScroll: true))
+        _tab2NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                                                             firstViewShouldHideNavigationBarOnScroll: false))
+        _tab3NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                                                             firstViewShouldHideNavigationBarOnScroll: false))
+        _tab4NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                                                             firstViewShouldHideNavigationBarOnScroll: false))
+        _tab5NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                                                             firstViewShouldHideNavigationBarOnScroll: false))
     }
     
     var body: some View {
@@ -85,6 +91,9 @@ struct HomeView: View {
                     .tag(Tab.home)
                     .environmentObject(tab1NavigationBarMenuManager)
                     .environmentObject(tab1SnackbarManager)
+                    .onChange(of: tab1NavigationManager.path) {
+                        tab1SnackbarManager.dismissIfIndefinite()
+                    }
                     
                     ZStack {
                         CustomNavigationStack(navigationManager: tab2NavigationManager) {
@@ -111,6 +120,9 @@ struct HomeView: View {
                     .tag(Tab.subscriptions)
                     .environmentObject(tab2NavigationBarMenuManager)
                     .environmentObject(tab2SnackbarManager)
+                    .onChange(of: tab2NavigationManager.path) {
+                        tab2SnackbarManager.dismissIfIndefinite()
+                    }
                     
                     if !accountViewModel.account.isAnonymous() {
                         ZStack {
@@ -131,6 +143,9 @@ struct HomeView: View {
                         .environmentObject(tab3NavigationBarMenuManager)
                         .environmentObject(homeViewModel)
                         .environmentObject(tab3SnackbarManager)
+                        .onChange(of: tab3NavigationManager.path) {
+                            tab3SnackbarManager.dismissIfIndefinite()
+                        }
                         
                         ZStack {
                             CustomNavigationStack(navigationManager: tab4NavigationManager) {
@@ -153,6 +168,9 @@ struct HomeView: View {
                         .environmentObject(tab4NavigationBarMenuManager)
                         .environmentObject(homeViewModel)
                         .environmentObject(tab4SnackbarManager)
+                        .onChange(of: tab4NavigationManager.path) {
+                            tab4SnackbarManager.dismissIfIndefinite()
+                        }
                     } else {
                         ZStack {
                             CustomNavigationStack(navigationManager: tab4NavigationManager) {
@@ -171,6 +189,9 @@ struct HomeView: View {
                         .tag(Tab.search)
                         .environmentObject(tab4NavigationBarMenuManager)
                         .environmentObject(tab4SnackbarManager)
+                        .onChange(of: tab4NavigationManager.path) {
+                            tab4SnackbarManager.dismissIfIndefinite()
+                        }
                     }
                     
                     ZStack {
@@ -190,6 +211,9 @@ struct HomeView: View {
                     .tag(Tab.more)
                     .environmentObject(tab5NavigationBarMenuManager)
                     .environmentObject(tab5SnackbarManager)
+                    .onChange(of: tab5NavigationManager.path) {
+                        tab5SnackbarManager.dismissIfIndefinite()
+                    }
                 }
                 .themedTabViewGroup()
             }
@@ -205,8 +229,8 @@ struct HomeView: View {
             .id(accountViewModel.account.username)
             
             if let media = fullScreenMediaViewModel.media {
-                if case let .image(urlString, aspectRatio, post, matchedGeometryEffectId) = media {
-                    ImageFullScreenView(urlString: urlString, matchedGeometryEffectId: matchedGeometryEffectId) {
+                if case let .image(urlString, aspectRatio, post, fileName, matchedGeometryEffectId) = media {
+                    ImageFullScreenView(urlString: urlString, fileName: fileName, matchedGeometryEffectId: matchedGeometryEffectId, isGif: false) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(urlString)
@@ -223,8 +247,8 @@ struct HomeView: View {
                     }
                     .id(urlString)
                     .zIndex(1)
-                } else if case let .gif(urlString, post) = media {
-                    ImageFullScreenView(urlString: urlString) {
+                } else if case let .gif(urlString, post, fileName) = media {
+                    ImageFullScreenView(urlString: urlString, fileName: fileName, isGif: true) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(urlString)

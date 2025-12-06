@@ -15,6 +15,8 @@ struct EditCommentView: View {
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
     @Environment(\.dismiss) var dismiss
     
     @StateObject private var editCommentViewModel: EditCommentViewModel
@@ -49,7 +51,7 @@ struct EditCommentView: View {
                         VStack(spacing: 0) {
                             if let bodyProcessedMarkdown = editCommentViewModel.commentToBeEdited.bodyProcessedMarkdown {
                                 Markdown(bodyProcessedMarkdown)
-                                    .markdownImageProvider(WebImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata))
+                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in
@@ -57,7 +59,7 @@ struct EditCommentView: View {
                                     }
                             } else if let body = editCommentViewModel.commentToBeEdited.body, !body.isEmpty {
                                 Markdown(body)
-                                    .markdownImageProvider(WebImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata))
+                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in
@@ -234,10 +236,6 @@ struct EditCommentView: View {
                 }
             }
         }
-        .onReceive(editCommentViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(editCommentViewModel.$error)
     }
 }

@@ -11,6 +11,7 @@ import MarkdownUI
 struct CrosspostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     @EnvironmentObject private var snackbarManager: SnackbarManager
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @StateObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     @StateObject private var crosspostViewModel: CrosspostViewModel
@@ -18,6 +19,7 @@ struct CrosspostView: View {
     @FocusState private var focusedField: FieldType?
 
     @State private var titleSelectedRange: NSRange = NSRange(location: 0, length: 0)
+    @State private var showNoSubredditAlert: Bool = false
     
     init(postToBeCrossposted: Post) {
         _postSubmissionContextViewModel = StateObject(
@@ -42,6 +44,8 @@ struct CrosspostView: View {
                         
                         PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
                             postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                        } onShowNoSubredditAlert: {
+                            showNoSubredditAlert = true
                         }
                         
                         Divider()
@@ -83,7 +87,7 @@ struct CrosspostView: View {
                         
                         if let selftext = crosspostViewModel.postToBeCrossposted.selftextProcessedMarkdown {
                             Markdown(selftext)
-                                .markdownImageProvider(WebImageProvider(mediaMetadata: crosspostViewModel.postToBeCrossposted.mediaMetadata))
+                                .markdownImageProvider(MarkdownImageProvider(mediaMetadata: crosspostViewModel.postToBeCrossposted.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
                                 .font(.system(size: 24))
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 16)
@@ -133,11 +137,15 @@ struct CrosspostView: View {
                 navigationManager.replaceCurrentScreen(AppNavigation.postDetailsWithId(postId: id))
             }
         }
-        .onReceive(crosspostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(crosspostViewModel.$error)
+        .overlay(
+            CustomAlert<EmptyView>(
+                title: "No Subreddit Selected",
+                confirmButtonText: "OK",
+                showDismissButton: false,
+                isPresented: $showNoSubredditAlert
+            )
+        )
     }
     
     private enum FieldType: Hashable {

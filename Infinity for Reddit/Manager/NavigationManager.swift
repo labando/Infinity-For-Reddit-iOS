@@ -10,8 +10,11 @@ import SwiftUI
 class NavigationManager: ObservableObject {
     @Published var path = NavigationPath()
     var viewShouldHideRootTabLabels: [Bool] = []
+    var viewShouldHideNavigationBarOnScroll: [Bool] = []
     
     var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
+    private var firstViewShouldHideNavigationBarOnScroll: Bool
     
     var rootTabLabelVisibility: Visibility {
         if viewShouldHideRootTabLabels.isEmpty {
@@ -21,8 +24,17 @@ class NavigationManager: ObservableObject {
         }
     }
     
-    init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
+    var hideNavigationBarOnScroll: Bool {
+        if viewShouldHideNavigationBarOnScroll.isEmpty {
+            return firstViewShouldHideNavigationBarOnScroll
+        } else {
+            return viewShouldHideNavigationBarOnScroll.last!
+        }
+    }
+    
+    init(fullScreenMediaViewModel: FullScreenMediaViewModel, firstViewShouldHideNavigationBarOnScroll: Bool) {
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
+        self.firstViewShouldHideNavigationBarOnScroll = firstViewShouldHideNavigationBarOnScroll
     }
     
     func append(_ destination: any Hashable) {
@@ -31,6 +43,35 @@ class NavigationManager: ObservableObject {
             viewShouldHideRootTabLabels.append(true)
         default:
             viewShouldHideRootTabLabels.append(false)
+        }
+        
+        switch destination {
+        case AppNavigation.postDetails,
+            AppNavigation.postDetailsWithId,
+            AppNavigation.subredditDetails,
+            AppNavigation.userDetails,
+            AppNavigation.searchResults,
+            AppNavigation.customFeed,
+            AppNavigation.filteredPosts,
+            AppNavigation.filteredHistoryPosts,
+            MoreViewNavigation.popular,
+            MoreViewNavigation.all,
+            MoreViewNavigation.history,
+            MoreViewNavigation.upvoted,
+            MoreViewNavigation.downvoted,
+            MoreViewNavigation.hidden,
+            MoreViewNavigation.saved:
+            viewShouldHideNavigationBarOnScroll.append(true)
+        default:
+            viewShouldHideNavigationBarOnScroll.append(false)
+        }
+        
+        switch destination {
+        case MoreViewNavigation.settings,
+            MoreViewNavigation.test:
+            viewShouldHideNavigationBarOnScroll.append(false)
+        default:
+            viewShouldHideNavigationBarOnScroll.append(false)
         }
         path.append(destination)
     }
@@ -61,6 +102,7 @@ class NavigationManager: ObservableObject {
     
     func replaceCurrentScreen(_ destination: any Hashable) {
         viewShouldHideRootTabLabels.removeLast()
+        viewShouldHideNavigationBarOnScroll.removeLast()
         path.removeLast()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
             self.append(destination)
@@ -69,6 +111,7 @@ class NavigationManager: ObservableObject {
     
     func replaceCurrentScreen(_ urlString: String) {
         viewShouldHideRootTabLabels.removeLast()
+        viewShouldHideNavigationBarOnScroll.removeLast()
         path.removeLast()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
             self.openLink(urlString)

@@ -46,7 +46,7 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
     }
     
     public func fetchUserDetails(username: String) async throws -> UserData {
-        var userData = try? userDao.getUserData(username: username)
+        var userData = try? await userDao.getUserData(username: username)
         if userData == nil {
             let data = try await self.session.request(
                 RedditAPI.getUserData(username: username)
@@ -64,11 +64,11 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
             
             userData = try UserDetailRootClass(fromJson: json).toUserData()
             
-            try? userDao.insert(userData: userData!)
+            try? await userDao.insert(userData: userData!)
         }
         
         if let ud = userData {
-            userData?.isSubscribed = (try? subscribedUserDao.getSubscribedUser(name: ud.name, accountName: AccountViewModel.shared.account.username)) != nil
+            userData?.isSubscribed = (try? await subscribedUserDao.getSubscribedUser(name: ud.name, accountName: AccountViewModel.shared.account.username)) != nil
         }
         
         if let userData = userData {
@@ -92,18 +92,18 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
             .value
 
         if action == "unsub" {
-            try? subscribedUserDao.deleteSubscribedUser(name: userData.name, accountName: AccountViewModel.shared.account.username)
+            try? await subscribedUserDao.deleteSubscribedUser(name: userData.name, accountName: AccountViewModel.shared.account.username)
         } else {
             let subscribedUserData = userData.toSubscribedUserData()
-            try? subscribedUserDao.insert(subscribedUserData: subscribedUserData)
+            try? await subscribedUserDao.insert(subscribedUserData: subscribedUserData)
         }
     }
     
     private func anonymoustFollowUser(userData: UserData) async throws {
         if userData.isSubscribed {
-            try subscribedUserDao.deleteSubscribedUser(name: userData.name, accountName: AccountViewModel.shared.account.username)
+            try await subscribedUserDao.deleteSubscribedUser(name: userData.name, accountName: AccountViewModel.shared.account.username)
         } else {
-            try subscribedUserDao.insert(subscribedUserData: userData.toSubscribedUserData())
+            try await subscribedUserDao.insert(subscribedUserData: userData.toSubscribedUserData())
         }
     }
 }

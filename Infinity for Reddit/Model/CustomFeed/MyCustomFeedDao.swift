@@ -15,14 +15,14 @@ struct MyCustomFeedDao {
         self.dbPool = dbPool
     }
     
-    func insert(myCustomFeed: MyCustomFeed) throws {
-        try dbPool.write { db in
+    func insert(myCustomFeed: MyCustomFeed) async throws {
+        try await dbPool.write { db in
             try myCustomFeed.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(myCustomFeeds: [MyCustomFeed]) {
-        try? dbPool.write { db in
+    func insertAll(myCustomFeeds: [MyCustomFeed]) async throws {
+        try await dbPool.write { db in
             for data in myCustomFeeds {
                 do {
                     try data.insert(db, onConflict: .replace)
@@ -46,8 +46,8 @@ struct MyCustomFeedDao {
         .eraseToAnyPublisher()
     }
     
-    func getAllMyCustomFeedsList(username: String) throws -> [MyCustomFeed] {
-        try dbPool.read { db in
+    func getAllMyCustomFeedsList(username: String) async throws -> [MyCustomFeed] {
+        try await dbPool.read { db in
             try MyCustomFeed.fetchAll(db, sql: """
                 SELECT * 
                 FROM custom_feeds 
@@ -70,8 +70,8 @@ struct MyCustomFeedDao {
         .eraseToAnyPublisher()
     }
     
-    func getMyCustomFeed(path: String, username: String) throws -> MyCustomFeed? {
-        try dbPool.read { db in
+    func getMyCustomFeed(path: String, username: String) async throws -> MyCustomFeed? {
+        try await dbPool.read { db in
             try MyCustomFeed.fetchOne(db, sql: """
                 SELECT * 
                 FROM custom_feeds 
@@ -80,8 +80,8 @@ struct MyCustomFeedDao {
         }
     }
     
-    func deleteMyCustomFeed(path: String, username: String) throws {
-        try dbPool.write { db in
+    func deleteMyCustomFeed(path: String, username: String) async throws {
+        try await dbPool.write { db in
             try db.execute(
                 sql: """
                     DELETE FROM custom_feeds 
@@ -92,8 +92,8 @@ struct MyCustomFeedDao {
         }
     }
     
-    func anonymousDeleteMyCustomFeed(path: String) throws {
-        try dbPool.write { db in
+    func anonymousDeleteMyCustomFeed(path: String) async throws {
+        try await dbPool.write { db in
             try db.execute(
                 sql: """
                     DELETE FROM custom_feeds 
@@ -104,8 +104,8 @@ struct MyCustomFeedDao {
         }
     }
     
-    func deleteAllUserMyCustomFeeds(username: String) throws {
-        try dbPool.write { db in
+    func deleteAllUserMyCustomFeeds(username: String) async throws {
+        try await dbPool.write { db in
             try db.execute(
                 sql: """
                     DELETE FROM custom_feeds 

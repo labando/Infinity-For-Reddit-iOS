@@ -17,23 +17,11 @@ public class PostFilterUsageListingRepository: PostFilterUsageListingRepositoryP
         self.postFilterUsageDao = PostFilterUsageDao(dbPool: resolvedDBPool)
     }
     
-    public func savePostFilterUsage(_ postFilterUsage: PostFilterUsage) -> Bool {
-        do {
-            try postFilterUsageDao.insert(postFilterUsage: postFilterUsage)
-            return true
-        } catch {
-            print("Save post filter usage failed with error: \(error)")
-            return false
-        }
+    public func savePostFilterUsage(_ postFilterUsage: PostFilterUsage) async throws {
+        try await postFilterUsageDao.insert(postFilterUsage: postFilterUsage)
     }
     
-    public func deletePostFilterUsage(_ postFilterUsage: PostFilterUsage) -> Bool {
-        do {
-            try postFilterUsageDao.deletePostFilterUsage(postFilterUsage: postFilterUsage)
-            return true
-        } catch {
-            print("Delete post filter usage failed with error: \(error)")
-            return false
-        }
+    public func deletePostFilterUsage(_ postFilterUsage: PostFilterUsage) async throws {
+        try await postFilterUsageDao.deletePostFilterUsage(postFilterUsage: postFilterUsage)
     }
 }

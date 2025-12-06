@@ -43,8 +43,8 @@ struct PostHistoryDao {
         }
     }
     
-    func getAllHistoryPosts(username: String, before: Int64?, postHistoryType: PostHistoryType) throws -> [PostHistory] {
-        try dbPool.read { db in
+    func getAllHistoryPosts(username: String, before: Int64?, postHistoryType: PostHistoryType) async throws -> [PostHistory] {
+        try await dbPool.read { db in
             try PostHistory.fetchAll(db, sql: """
                 SELECT *
                 FROM post_history
@@ -55,8 +55,8 @@ struct PostHistoryDao {
         }
     }
     
-    func getReadPost(id: String) throws -> PostHistory? {
-        try dbPool.read { db in
+    func getReadPost(id: String) async throws -> PostHistory? {
+        try await dbPool.read { db in
             try PostHistory.fetchOne(db, sql: """
             SELECT *
             FROM post_history
@@ -93,14 +93,14 @@ struct PostHistoryDao {
         }
     }
     
-    func deleteAllReadPosts() throws {
-        try dbPool.write { db in
+    func deleteAllReadPosts() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM post_history WHERE post_history_type = ?", arguments: [PostHistoryType.readPosts.rawValue])
         }
     }
     
-    func getHistoryPostsIdsByIds(ids: [String], username: String, postHistoryType: PostHistoryType) throws -> Set<String> {
-        try dbPool.write { db in
+    func getHistoryPostsIdsByIds(ids: [String], username: String, postHistoryType: PostHistoryType) async throws -> Set<String> {
+        try await dbPool.write { db in
             let placeholders = Array(repeating: "?", count: ids.count).joined(separator: ", ")
             
             let arguments: [DatabaseValueConvertible?] = ids + [username, postHistoryType.rawValue]

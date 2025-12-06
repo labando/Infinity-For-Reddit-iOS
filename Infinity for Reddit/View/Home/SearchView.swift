@@ -89,74 +89,87 @@ struct SearchView: View {
                     }
                 }
                 
-                // Recent Searches Header
-                if !searchViewModel.recentSearchQueries.isEmpty {
-                    HStack {
-                        Text("Recent Searches")
-                            .font(.headline)
-                        Spacer()
-                        Button("Clear All") {
-                            searchViewModel.clearAllRecentSearchQueries()
+                if searchViewModel.query.isEmpty || onSearchCustomAction != nil {
+                    // Recent Searches Header
+                    if !searchViewModel.recentSearchQueries.isEmpty {
+                        HStack {
+                            Text("Recent Searches")
+                                .font(.headline)
+                            Spacer()
+                            Button("Clear All") {
+                                searchViewModel.clearAllRecentSearchQueries()
+                            }
+                            .font(.subheadline)
+                            .foregroundColor(.blue)
                         }
-                        .font(.subheadline)
-                        .foregroundColor(.blue)
+                        .padding(.horizontal, 16)
                     }
-                    .padding(.horizontal, 16)
+                    
+                    // Recent search items
+                    List {
+                        ForEach(searchViewModel.recentSearchQueries, id: \.time) { search in
+                            TouchRipple(action: {
+                                if let onSearch = onSearchCustomAction {
+                                    onSearch(search.searchQuery)
+                                } else {
+                                    navigationManager.append(
+                                        AppNavigation.searchResults(
+                                            query: search.searchQuery,
+                                            searchInSubredditOrUserName: search.searchInSubredditOrUserName,
+                                            searchInMultiReddit: search.customFeedPath,
+                                            searchInThingType: search.searchInThingType,
+                                            searchResultTab: defaultSearchResultTab
+                                        )
+                                    )
+                                }
+                            }) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(search.searchQuery)
+                                        .primaryText()
+                                    
+                                    switch search.searchInThingType {
+                                    case .all:
+                                        Text("All subreddits")
+                                            .secondaryText()
+                                    case .subreddit:
+                                        Text("r/\(search.searchInSubredditOrUserName ?? "")")
+                                            .subreddit()
+                                    case .user:
+                                        Text("u/\(search.searchInSubredditOrUserName ?? "")")
+                                            .username()
+                                    case .customFeed:
+                                        Text(search.customFeedDisplayName ?? "")
+                                            .secondaryText()
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(16)
+                                .contentShape(Rectangle())
+                                .swipeActions(edge: .trailing) {
+                                    Button {
+                                        searchViewModel.deleteSearchQuery(recentSearchQuery: search)
+                                    } label: {
+                                        Label("Read", systemImage: "trash")
+                                    }
+                                    .tint(.red)
+                                }
+                            }
+                            .listPlainItemNoInsets()
+                        }
+                    }
+                    .themedList()
+                } else {
+                    SubredditAutoCompleteView(query: $searchViewModel.query) { subreddit in
+                        if !accountViewModel.account.isAnonymous() {
+                            searchViewModel.saveSearchQuery()
+                        }
+                        navigationManager.append(
+                            AppNavigation.subredditDetails(subredditName: subreddit.displayName)
+                        )
+                    }
                 }
                 
-                // Recent search items
-                List {
-                    ForEach(searchViewModel.recentSearchQueries, id: \.time) { search in
-                        TouchRipple(action: {
-                            if let onSearch = onSearchCustomAction {
-                                onSearch(search.searchQuery)
-                            } else {
-                                navigationManager.append(
-                                    AppNavigation.searchResults(
-                                        query: search.searchQuery,
-                                        searchInSubredditOrUserName: search.searchInSubredditOrUserName,
-                                        searchInMultiReddit: search.customFeedPath,
-                                        searchInThingType: search.searchInThingType,
-                                        searchResultTab: defaultSearchResultTab
-                                    )
-                                )
-                            }
-                        }) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(search.searchQuery)
-                                    .primaryText()
-                                
-                                switch search.searchInThingType {
-                                case .all:
-                                    Text("All subreddits")
-                                        .secondaryText()
-                                case .subreddit:
-                                    Text("r/\(search.searchInSubredditOrUserName ?? "")")
-                                        .subreddit()
-                                case .user:
-                                    Text("u/\(search.searchInSubredditOrUserName ?? "")")
-                                        .username()
-                                case .customFeed:
-                                    Text(search.customFeedDisplayName ?? "")
-                                        .secondaryText()
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(16)
-                            .contentShape(Rectangle())
-                            .swipeActions(edge: .trailing) {
-                                Button {
-                                    searchViewModel.deleteSearchQuery(recentSearchQuery: search)
-                                } label: {
-                                    Label("Read", systemImage: "trash")
-                                }
-                                .tint(.red)
-                            }
-                        }
-                        .listPlainItemNoInsets()
-                    }
-                }
-                .themedList()
+                Spacer()
             }
         }
         .themedNavigationBar()

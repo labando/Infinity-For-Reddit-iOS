@@ -1,0 +1,178 @@
+//
+// InterfaceFontSettingsView.swift
+// Infinity for Reddit
+//
+// Created by joeylr2042 on 2024-12-05
+//
+
+import SwiftUI
+import Swinject
+import GRDB
+import UniformTypeIdentifiers
+
+struct InterfaceFontSettingsView: View {
+    @EnvironmentObject private var navigationManager: NavigationManager
+
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontFamilyKey, store: .interfaceFont) private var fontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.fontScaleKey, store: .interfaceFont) private var fontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontFamilyKey, store: .interfaceFont) private var postTitleFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.postTitleFontScaleKey, store: .interfaceFont) private var postTitleFontSize: Int = 2
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontFamilyKey, store: .interfaceFont) private var contentFontFamily: Int = 0
+    @AppStorage(InterfaceFontUserDefaultsUtils.contentFontScaleKey, store: .interfaceFont) private var contentFontSize: Int = 2
+
+    @State private var showFontPicker = false
+    @State private var showUploadError = false
+    @State private var uploadErrorMessage = ""
+    @State private var customFontDisplayName: String?
+    
+    
+    var body: some View {
+        RootView {
+            List {
+                PreferenceEntry(
+                    title: "Font Preview"
+                ) {
+                    navigationManager.append(FontSettingsViewNavigation.fontPreview)
+                }
+                .listPlainItemNoInsets()
+                
+                CustomListSection("Font") {
+                    BarebonePickerPreference(
+                        selected: $fontFamily,
+                        items: InterfaceFontUserDefaultsUtils.fontFamilies,
+                        title: "Font Family"
+                    ) { family in
+                        InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
+                    }
+                    .listPlainItemNoInsets()
+
+                    if fontFamily == 16 {
+                        PreferenceEntry(
+                            title: "Custom Font Family",
+                            subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
+                        ) {
+                            showFontPicker = true
+                        }
+                        .listPlainItemNoInsets()
+                    }
+
+                    BarebonePickerPreference(
+                        selected: $fontSize,
+                        items: InterfaceFontUserDefaultsUtils.fontScales,
+                        title: "Font Size"
+                    ) { size in
+                        InterfaceFontUserDefaultsUtils.fontScalesText[size]
+                    }
+                    .listPlainItemNoInsets()
+                }
+                
+                CustomListSection("Title") {
+                    BarebonePickerPreference(
+                        selected: $postTitleFontFamily,
+                        items: InterfaceFontUserDefaultsUtils.fontFamilies,
+                        title: "Title Font Family"
+                    ) { family in
+                        InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
+                    }
+                    .listPlainItemNoInsets()
+
+                    if postTitleFontFamily == 16 {
+                        PreferenceEntry(
+                            title: "Custom Font Family",
+                            subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
+                        ) {
+                            showFontPicker = true
+                        }
+                        .listPlainItemNoInsets()
+                    }
+
+                    BarebonePickerPreference(
+                        selected: $postTitleFontSize,
+                        items: InterfaceFontUserDefaultsUtils.fontScales,
+                        title: "Title Font Size"
+                    ) { size in
+                        InterfaceFontUserDefaultsUtils.fontScalesText[size]
+                    }
+                    .listPlainItemNoInsets()
+                }
+                
+                CustomListSection("Content") {
+                    BarebonePickerPreference(
+                        selected: $contentFontFamily,
+                        items: InterfaceFontUserDefaultsUtils.fontFamilies,
+                        title: "Content Font Family"
+                    ) { family in
+                        InterfaceFontUserDefaultsUtils.fontFamiliesText[family]
+                    }
+                    .listPlainItemNoInsets()
+
+                    if contentFontFamily == 16 {
+                        PreferenceEntry(
+                            title: "Custom Font Family",
+                            subtitle: InterfaceFontUserDefaultsUtils.hasCustomFont ? (customFontDisplayName ?? "Font Uploaded") : "Tap to upload font"
+                        ) {
+                            showFontPicker = true
+                        }
+                        .listPlainItemNoInsets()
+                    }
+
+                    BarebonePickerPreference(
+                        selected: $contentFontSize,
+                        items: InterfaceFontUserDefaultsUtils.contentFontSizes,
+                        title: "Content Font Size"
+                    ) { size in
+                        InterfaceFontUserDefaultsUtils.contentFontSizesText[size]
+                    }
+                    .listPlainItemNoInsets()
+                }
+            }
+            .themedList()
+        }
+        .id(customFontDisplayName)
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Font")
+        .fileImporter(
+            isPresented: $showFontPicker,
+            allowedContentTypes: [UTType(filenameExtension: "ttf")!, UTType(filenameExtension: "otf")!],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+
+                guard url.startAccessingSecurityScopedResource() else {
+                    uploadErrorMessage = "Failed to access the font file"
+                    showUploadError = true
+                    return
+                }
+
+                defer { url.stopAccessingSecurityScopedResource() }
+
+                if FontUtils.uploadCustomFontFamily(from: url) {
+                    customFontDisplayName = InterfaceFontUserDefaultsUtils.customFontDisplayName
+                } else {
+                    uploadErrorMessage = "Failed to upload font. Please make sure it's a valid TTF or OTF file."
+                    showUploadError = true
+                }
+
+            case .failure(let error):
+                uploadErrorMessage = "Failed to select font: \(error.localizedDescription)"
+                showUploadError = true
+            }
+        }
+        .overlay {
+            CustomAlert(
+                title: "Failed to Set Custom Font",
+                confirmButtonText: "OK",
+                showDismissButton: false,
+                isPresented: $showUploadError
+            ) {
+                Text(uploadErrorMessage)
+                    .secondaryText(.f15)
+            }
+        }
+        .onAppear {
+            customFontDisplayName = InterfaceFontUserDefaultsUtils.customFontDisplayName
+        }
+    }
+}

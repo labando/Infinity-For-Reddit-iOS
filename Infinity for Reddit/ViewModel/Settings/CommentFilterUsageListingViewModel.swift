@@ -9,8 +9,10 @@ import Foundation
 import GRDB
 import Combine
 
+@MainActor
 class CommentFilterUsageListingViewModel: ObservableObject {
     @Published var commentFilterUsages: [CommentFilterUsage] = []
+    @Published var error: Error?
     
     private let commentFilterId: Int
     private let commentFilterUsageListingRepository: CommentFilterUsageListingRepositoryProtocol
@@ -41,15 +43,25 @@ class CommentFilterUsageListingViewModel: ObservableObject {
     }
     
     func saveCommentFilterUsage(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) {
-        let commentFilterUsage = CommentFilterUsage(commentFilterId: commentFilterId, usageType: usageType, nameOfUsage: nameOfUsage)
-        if !commentFilterUsageListingRepository.saveCommentFilterUsage(commentFilterUsage) {
-            // TODO handle error
+        Task {
+            let commentFilterUsage = CommentFilterUsage(commentFilterId: commentFilterId, usageType: usageType, nameOfUsage: nameOfUsage)
+            do {
+                try await commentFilterUsageListingRepository.saveCommentFilterUsage(commentFilterUsage)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
         }
     }
     
     func deleteCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) {
-        if !commentFilterUsageListingRepository.deleteCommentFilterUsage(commentFilterUsage) {
-            // TODO handle error
+        Task {
+            do {
+                try await commentFilterUsageListingRepository.deleteCommentFilterUsage(commentFilterUsage)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
         }
     }
 }

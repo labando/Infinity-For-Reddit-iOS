@@ -12,6 +12,7 @@ import GRDB
 class PostFilterViewModel: ObservableObject {
     // MARK: - Properties
     @Published var postFilters: [PostFilter] = []
+    @Published var error: Error?
     
     let postToBeAdded: Post?
     let subredditToBeAdded: String?
@@ -51,8 +52,16 @@ class PostFilterViewModel: ObservableObject {
             }
     }
     
+    @MainActor
     func deletePostFilter(id: Int) {
-        postFilterRepository.deletePostFilter(id: id)
+        Task {
+            do {
+                try await postFilterRepository.deletePostFilter(id: id)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
+        }
     }
     
     deinit {

@@ -6,5 +6,5 @@
 //
 
 public protocol CustomizeCommentFilterRepositoryProtocol {
-    func saveCommentFilter(_ filter: CommentFilter) -> Bool
+    func saveCommentFilter(_ filter: CommentFilter) async throws
 }

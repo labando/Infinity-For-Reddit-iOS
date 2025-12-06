@@ -116,8 +116,8 @@ struct CustomWebImage<Placeholder: View, Fallback: View>: View {
                     })
                 }
             } else {
-                KFImage(URL(string: urlString!))
-                    .resizable()
+                KFAnimatedImage(URL(string: urlString!))
+                    //.resizable()
                     .placeholder { progress in
                         ProgressIndicator()
                     }

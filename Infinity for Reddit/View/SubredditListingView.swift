@@ -27,10 +27,20 @@ struct SubredditListingView: View {
     
     var body: some View {
         Group {
-            if subredditListingViewModel.isInitialLoading || subredditListingViewModel.isInitialLoad {
-                ProgressIndicator()
-            } else if subredditListingViewModel.subreddits.isEmpty {
-                Text("No subreddits")
+            if subredditListingViewModel.subreddits.isEmpty {
+                if subredditListingViewModel.isInitialLoading {
+                    ProgressIndicator()
+                } else if subredditListingViewModel.isInitialLoad, let error = subredditListingViewModel.error {
+                    Text("Unable to load subreddits. Tap to retry. Error: \(error.localizedDescription)")
+                        .primaryText()
+                        .padding(16)
+                        .onTapGesture {
+                            subredditListingViewModel.refreshSubreddits()
+                        }
+                } else {
+                    Text("No subreddits")
+                        .primaryText()
+                }
             } else {
                 List {
                     ForEach(subredditListingViewModel.subreddits, id: \.id) { subreddit in
@@ -94,6 +104,7 @@ struct SubredditListingView: View {
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .themedList()
+                .showErrorUsingSnackbar(subredditListingViewModel.$error)
             }
         }
         .task(id: subredditListingViewModel.loadSubredditsTaskId) {

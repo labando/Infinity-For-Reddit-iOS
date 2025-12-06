@@ -15,14 +15,14 @@ struct RecentSearchQueryDao {
         self.dbPool = dbPool
     }
     
-    func insert(recentSearchQuery: RecentSearchQuery) throws {
-        try dbPool.write { db in
+    func insert(recentSearchQuery: RecentSearchQuery) async throws {
+        try await dbPool.write { db in
             try recentSearchQuery.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(recentSearchQueries: [RecentSearchQuery]) throws {
-        try dbPool.write { db in
+    func insertAll(recentSearchQueries: [RecentSearchQuery]) async throws {
+        try await dbPool.write { db in
             for data in recentSearchQueries {
                 try data.insert(db, onConflict: .replace)
             }
@@ -42,8 +42,8 @@ struct RecentSearchQueryDao {
         .eraseToAnyPublisher()
     }
     
-    func getAllRecentSearchQueries(username: String) throws -> [RecentSearchQuery] {
-        try dbPool.read { db in
+    func getAllRecentSearchQueries(username: String) async throws -> [RecentSearchQuery] {
+        try await dbPool.read { db in
             try RecentSearchQuery.fetchAll(db, sql: """
                 SELECT *
                 FROM recent_search_queries
@@ -53,8 +53,8 @@ struct RecentSearchQueryDao {
         }
     }
     
-    func deleteAllRecentSearchQueries(username: String) throws {
-        try dbPool.write{ db in
+    func deleteAllRecentSearchQueries(username: String) async throws {
+        try await dbPool.write{ db in
             try db.execute(sql: """
                 DELETE FROM recent_search_queries 
                 WHERE username = ?
@@ -63,8 +63,8 @@ struct RecentSearchQueryDao {
         }
     }
     
-    func deleteRecentSearchQuery(recentSearchQuery: RecentSearchQuery) throws {
-        _ = try dbPool.write { db in
+    func deleteRecentSearchQuery(recentSearchQuery: RecentSearchQuery) async throws {
+        try await dbPool.write { db in
             try recentSearchQuery.delete(db)
         }
     }

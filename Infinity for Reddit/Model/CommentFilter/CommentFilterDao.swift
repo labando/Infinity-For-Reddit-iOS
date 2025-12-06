@@ -16,22 +16,22 @@ struct CommentFilterDao {
         self.dbPool = dbPool
     }
     
-    func insert(commentFilter: CommentFilter) throws {
-        try dbPool.write { db in
+    func insert(commentFilter: CommentFilter) async throws {
+        try await dbPool.write { db in
             try commentFilter.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(commentFilters: [CommentFilter]) throws {
-        try dbPool.write { db in
+    func insertAll(commentFilters: [CommentFilter]) async throws {
+        try await dbPool.write { db in
             for filter in commentFilters {
                 try filter.insert(db, onConflict: .replace)
             }
         }
     }
     
-    func updateCommentFilter(updatedCommentFilter: CommentFilter) throws {
-        try dbPool.write { db in
+    func updateCommentFilter(updatedCommentFilter: CommentFilter) async throws {
+        try await dbPool.write { db in
             if var existingCommentFilter = try CommentFilter.filter(Column("id") == updatedCommentFilter.id).fetchOne(db) {
                 existingCommentFilter = updatedCommentFilter
                 try existingCommentFilter.update(db)
@@ -41,26 +41,26 @@ struct CommentFilterDao {
         }
     }
     
-    func deleteAllCommentFilters() throws {
-        try dbPool.write { db in
+    func deleteAllCommentFilters() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM comment_filter")
         }
     }
     
-    func deleteCommentFilter(commentFilter: CommentFilter) throws {
-        try dbPool.write { db in
+    func deleteCommentFilter(commentFilter: CommentFilter) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM comment_filter WHERE id = ?", arguments: [commentFilter.id])
         }
     }
     
-    func deleteCommentFilter(id: Int) throws {
-        try dbPool.write { db in
+    func deleteCommentFilter(id: Int) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM comment_filter WHERE id = ?", arguments: [id])
         }
     }
     
-    func getCommentFilter(name: String) throws -> CommentFilter? {
-        try dbPool.read { db in
+    func getCommentFilter(name: String) async throws -> CommentFilter? {
+        try await dbPool.read { db in
             try CommentFilter.fetchOne(db, sql: "SELECT * FROM comment_filter WHERE name = ? LIMIT 1", arguments: [name])
         }
     }
@@ -72,14 +72,14 @@ struct CommentFilterDao {
             .eraseToAnyPublisher()
     }
     
-    func getAllCommentFilters() throws -> [CommentFilter] {
-        try dbPool.read { db in
+    func getAllCommentFilters() async throws -> [CommentFilter] {
+        try await dbPool.read { db in
             try CommentFilter.fetchAll(db)
         }
     }
     
-    func getValidCommentFilters(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) throws -> [CommentFilter] {
-        try dbPool.read { db in
+    func getValidCommentFilters(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) async throws -> [CommentFilter] {
+        try await dbPool.read { db in
             let sql = """
                 SELECT * FROM comment_filter WHERE (comment_filter.id IN 
                     (SELECT comment_filter_usage.comment_filter_id FROM comment_filter_usage 

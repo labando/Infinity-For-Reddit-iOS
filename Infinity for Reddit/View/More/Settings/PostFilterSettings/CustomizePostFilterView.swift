@@ -72,13 +72,7 @@ struct CustomizePostFilterView: View {
                         Text("Save")
                             .positiveTextButton()
                             .onTapGesture {
-                                if customizePostFilterViewModel.savePostFilter() {
-                                    onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
-                                    dismiss()
-                                } else {
-                                    // TODO handle exception
-                                    onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
-                                }
+                                customizePostFilterViewModel.savePostFilter()
                             }
                     }
                     .padding(16)
@@ -468,16 +462,16 @@ struct CustomizePostFilterView: View {
                 }
                 
                 Button("", systemImage: "tray.and.arrow.down.fill") {
-                    if customizePostFilterViewModel.savePostFilter() {
-                        dismiss()
-                    } else {
-                        // TODO handle exception
-                    }
+                    customizePostFilterViewModel.savePostFilter()
                 }
             }
         }
         .applyIf(showInSheet) {
             $0.interactiveDismissDisabled(true)
+        }
+        .onChange(of: customizePostFilterViewModel.savedPostFilterFlag) {
+            onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
+            dismiss()
         }
     }
     

@@ -17,14 +17,14 @@ class CustomThemeDao {
 
     // MARK: - Insert Operations
 
-    func insert(customTheme: CustomTheme) throws {
-        try dbPool.write { db in
+    func insert(customTheme: CustomTheme) async throws {
+        try await dbPool.write { db in
             try customTheme.insert(db, onConflict: .replace)
         }
     }
 
-    func insertAll(customThemes: [CustomTheme]) throws {
-        try dbPool.write { db in
+    func insertAll(customThemes: [CustomTheme]) async throws {
+        try await dbPool.write { db in
             for theme in customThemes {
                 try theme.insert(db, onConflict: .replace)
             }
@@ -33,8 +33,8 @@ class CustomThemeDao {
 
     // MARK: - Query All Themes
 
-    func getAllCustomThemes() throws -> [CustomTheme] {
-        try dbPool.read { db in
+    func getAllCustomThemes() async throws -> [CustomTheme] {
+        try await dbPool.read { db in
             try CustomTheme.fetchAll(db)
         }
     }
@@ -50,8 +50,8 @@ class CustomThemeDao {
 
     // MARK: - Fetch Single Themes by ID
 
-    func getCustomTheme(byId id: Int64) throws -> CustomTheme? {
-        try dbPool.read { db in
+    func getCustomTheme(byId id: Int64) async throws -> CustomTheme? {
+        try await dbPool.read { db in
             try CustomTheme
                 .filter(Column("id") == id)
                 .fetchOne(db)
@@ -107,40 +107,40 @@ class CustomThemeDao {
 
     // MARK: - Update Operations
 
-    func unsetLightTheme() throws {
-        try dbPool.write { db in
+    func unsetLightTheme() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "UPDATE custom_themes SET isLightTheme = 0 WHERE isLightTheme = 1")
         }
     }
 
-    func unsetDarkTheme() throws {
-        try dbPool.write { db in
+    func unsetDarkTheme() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "UPDATE custom_themes SET isDarkTheme = 0 WHERE isDarkTheme = 1")
         }
     }
 
-    func unsetAmoledTheme() throws {
-        try dbPool.write { db in
+    func unsetAmoledTheme() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "UPDATE custom_themes SET isAmoledTheme = 0 WHERE isAmoledTheme = 1")
         }
     }
 
-    func updateThemeName(byId id: Int64, newName: String) throws {
-        try dbPool.write { db in
+    func updateThemeName(byId id: Int64, newName: String) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "UPDATE custom_themes SET name = ? WHERE id = ?", arguments: [newName, id])
         }
     }
 
     // MARK: - Delete Operations
 
-    func deleteCustomTheme(byId id: Int64) throws {
-        try dbPool.write { db in
+    func deleteCustomTheme(byId id: Int64) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM custom_themes WHERE id = ?", arguments: [id])
         }
     }
 
-    func deleteAllCustomThemes() throws {
-        try dbPool.write { db in
+    func deleteAllCustomThemes() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM custom_themes")
         }
     }

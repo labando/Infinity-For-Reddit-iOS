@@ -15,22 +15,22 @@ struct CommentFilterUsageDao {
         self.dbPool = dbPool
     }
     
-    func insert(commentFilterUsage: CommentFilterUsage) throws {
-        try dbPool.write { db in
+    func insert(commentFilterUsage: CommentFilterUsage) async throws {
+        try await dbPool.write { db in
             try commentFilterUsage.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(commentFilterUsageList: [CommentFilterUsage]) throws {
-        try dbPool.write { db in
+    func insertAll(commentFilterUsageList: [CommentFilterUsage]) async throws {
+        try await dbPool.write { db in
             for usage in commentFilterUsageList {
                 try usage.insert(db, onConflict: .replace)
             }
         }
     }
     
-    func deleteCommentFilterUsage(commentFilterUsage: CommentFilterUsage) throws {
-        try dbPool.write { db in
+    func deleteCommentFilterUsage(commentFilterUsage: CommentFilterUsage) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM comment_filter_usage WHERE comment_filter_id = ? AND usage_type = ? AND name_of_usage = ?", arguments: [commentFilterUsage.commentFilterId, commentFilterUsage.usageType.rawValue, commentFilterUsage.nameOfUsage])
         }
     }
@@ -44,14 +44,14 @@ struct CommentFilterUsageDao {
             .eraseToAnyPublisher()
     }
     
-    func getAllCommentFilterUsage(name: String) throws -> [CommentFilterUsage] {
-        try dbPool.read { db in
+    func getAllCommentFilterUsage(name: String) async throws -> [CommentFilterUsage] {
+        try await dbPool.read { db in
             try CommentFilterUsage.fetchAll(db, sql: "SELECT * FROM comment_filter_usage WHERE name = ?", arguments: [name])
         }
     }
     
-    func getAllCommentFilterUsageForBackup() throws -> [CommentFilterUsage] {
-        try dbPool.read { db in
+    func getAllCommentFilterUsageForBackup() async throws -> [CommentFilterUsage] {
+        try await dbPool.read { db in
             try CommentFilterUsage.fetchAll(db)
         }
     }

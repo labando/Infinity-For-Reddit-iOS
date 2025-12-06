@@ -41,56 +41,58 @@ struct InterfaceCommentSettingsView: View {
     private var markdownEmbeddedMediaType: Int = 15
     
     var body: some View {
-        List {
-            TogglePreference(isEnabled: $showTopLevelCommentsFirst, title: "Show Top-level Comments First")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $showCommentDivider, title: "Show Comment Divider")
-                .listPlainItemNoInsets()
+        RootView {
+            List {
+                TogglePreference(isEnabled: $showTopLevelCommentsFirst, title: "Show Top-level Comments First")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $showCommentDivider, title: "Show Comment Divider")
+                    .listPlainItemNoInsets()
 
-            TogglePreference(isEnabled: $showOnlyOneCommentLevelIndicator, title: "Show Only One Comment Level Indicator")
-                .listPlainItemNoInsets()
+                TogglePreference(isEnabled: $showOnlyOneCommentLevelIndicator, title: "Show Only One Comment Level Indicator")
+                    .listPlainItemNoInsets()
 
-            TogglePreference(isEnabled: $hideToolbar, title: "Hide Comment Toolbar")
-                .listPlainItemNoInsets()
+                TogglePreference(isEnabled: $hideToolbar, title: "Hide Comment Toolbar")
+                    .listPlainItemNoInsets()
 
-            TogglePreference(isEnabled: $fullyCollapseComment, title: "Fully Collapse Comment")
-                .listPlainItemNoInsets()
+                TogglePreference(isEnabled: $fullyCollapseComment, title: "Fully Collapse Comment")
+                    .listPlainItemNoInsets()
 
-            TogglePreference(isEnabled: $showAuthorAvatar, title: "Show Author Avatar")
-                .listPlainItemNoInsets()
+                TogglePreference(isEnabled: $showAuthorAvatar, title: "Show Author Avatar")
+                    .listPlainItemNoInsets()
 
-            TogglePreference(isEnabled: $alwaysShowNChildComments, title: "Always Show the Number of Child Comments")
-                .listPlainItemNoInsets()
+                TogglePreference(isEnabled: $alwaysShowNChildComments, title: "Always Show the Number of Child Comments")
+                    .listPlainItemNoInsets()
 
-            TogglePreference(isEnabled: $hideNVotes, title: "Hide the Number of Votes")
+                TogglePreference(isEnabled: $hideNVotes, title: "Hide the Number of Votes")
+                    .listPlainItemNoInsets()
+                
+                SliderPreference(
+                    value: Binding(
+                        get: {
+                            Float(showFewerToolbarOptionsThreshold)
+                        },
+                        set: {
+                            showFewerToolbarOptionsThreshold = Int($0)
+                        }
+                    ),
+                    maxValue: 10,
+                    title: "Show Fewer Toolbar Options Starting From",
+                    subtitle: "Level \(showFewerToolbarOptionsThreshold)"
+                )
                 .listPlainItemNoInsets()
-            
-            SliderPreference(
-                value: Binding(
-                    get: {
-                        Float(showFewerToolbarOptionsThreshold)
-                    },
-                    set: {
-                        showFewerToolbarOptionsThreshold = Int($0)
-                    }
-                ),
-                maxValue: 10,
-                title: "Show Fewer Toolbar Options Starting From",
-                subtitle: "Level \(showFewerToolbarOptionsThreshold)"
-            )
-            .listPlainItemNoInsets()
-            
-            BarebonePickerPreference(
-                selected: $markdownEmbeddedMediaType,
-                items: InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypes,
-                title: "Markdown Embedded Media Type"
-            ) { layout in
-                InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypesText[InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypes.firstIndex(of: layout) ?? 0]
+                
+                BarebonePickerPreference(
+                    selected: $markdownEmbeddedMediaType,
+                    items: InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypes,
+                    title: "Markdown Embedded Media Type"
+                ) { layout in
+                    InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypesText[InterfaceCommentUserDefaultsUtils.markdownEmbeddedMediaTypes.firstIndex(of: layout) ?? 0]
+                }
+                .listPlainItemNoInsets()
             }
-            .listPlainItemNoInsets()
+            .themedList()
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Comment")
     }

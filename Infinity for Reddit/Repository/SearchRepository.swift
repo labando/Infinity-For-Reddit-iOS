@@ -23,47 +23,41 @@ class SearchRepository: SearchRepositoryProtocol {
                          customFeedDisplayName: String?,
                          searchInThingType: SearchInThingType,
                          time: Int64
-    ) {
-        operationQueue.addOperation {
-            do {
-                try self.recentSearchQueryDao.insert(
-                    recentSearchQuery:
-                        RecentSearchQuery(
-                            username: username,
-                            searchQuery: query,
-                            searchInSubredditOrUserName: searchInSubredditOrUserName,
-                            customFeedPath: customFeedPath,
-                            customFeedDisplayName: customFeedDisplayName,
-                            searchInThingType: searchInThingType,
-                            time: time
-                        )
-                )
-            } catch {
-                // No need to handle error
-                print(error)
-            }
+    ) async {
+        do {
+            try await self.recentSearchQueryDao.insert(
+                recentSearchQuery:
+                    RecentSearchQuery(
+                        username: username,
+                        searchQuery: query,
+                        searchInSubredditOrUserName: searchInSubredditOrUserName,
+                        customFeedPath: customFeedPath,
+                        customFeedDisplayName: customFeedDisplayName,
+                        searchInThingType: searchInThingType,
+                        time: time
+                    )
+            )
+        } catch {
+            // No need to handle error
+            print(error)
         }
     }
     
-    func clearAllRecentSearchQueries(username: String) {
-        operationQueue.addOperation {
-            do {
-                try self.recentSearchQueryDao.deleteAllRecentSearchQueries(username: username)
-            } catch {
-                // No need to handle error
-                print(error)
-            }
+    func clearAllRecentSearchQueries(username: String) async {
+        do {
+            try await self.recentSearchQueryDao.deleteAllRecentSearchQueries(username: username)
+        } catch {
+            // No need to handle error
+            print(error)
         }
     }
     
-    func deleteRecentSearchQueries(recentSearchQuery: RecentSearchQuery) {
-        operationQueue.addOperation {
-            do {
-                try self.recentSearchQueryDao.deleteRecentSearchQuery(recentSearchQuery: recentSearchQuery)
-            } catch {
-                // No need to handle error
-                print(error)
-            }
+    func deleteRecentSearchQueries(recentSearchQuery: RecentSearchQuery) async {
+        do {
+            try await self.recentSearchQueryDao.deleteRecentSearchQuery(recentSearchQuery: recentSearchQuery)
+        } catch {
+            // No need to handle error
+            print(error)
         }
     }
 }

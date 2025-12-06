@@ -31,6 +31,10 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     private let postFilterDao: PostFilterDao
     private let subscribedSubredditDao: SubscribedSubredditDao
     private let anonymousCustomFeedSubredditDao: AnonymousCustomFeedSubredditDao
+    private let postHistoryDao: PostHistoryDao
+    private let partialUserDao: PartialUserDao
+    private let userDao: UserDao
+    private let subscribedUserDao: SubscribedUserDao
     private var subredditOrUserIcons: [String: String] = [:]
     
     public init() {
@@ -45,6 +49,10 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         self.postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
         self.subscribedSubredditDao = SubscribedSubredditDao(dbPool: resolvedDBPool)
         self.anonymousCustomFeedSubredditDao = AnonymousCustomFeedSubredditDao(dbPool: resolvedDBPool)
+        self.postHistoryDao = PostHistoryDao(dbPool: resolvedDBPool)
+        self.partialUserDao = PartialUserDao(dbPool: resolvedDBPool)
+        self.userDao = UserDao(dbPool: resolvedDBPool)
+        self.subscribedUserDao = SubscribedUserDao(dbPool: resolvedDBPool)
     }
     
     public func fetchPosts(
@@ -109,9 +117,9 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         return try PostListingRootClass(fromJson: json).data
     }
     
-    public func getAnonymousSubscriptionsConcatenated() -> String {
+    public func getAnonymousSubscriptionsConcatenated() async -> String {
         do {
-            let subscribedSubreddits = try subscribedSubredditDao.getAllSubscribedSubredditsList(accountName: Account.ANONYMOUS_ACCOUNT.username)
+            let subscribedSubreddits = try await subscribedSubredditDao.getAllSubscribedSubredditsList(accountName: Account.ANONYMOUS_ACCOUNT.username)
             return subscribedSubreddits.map {
                 $0.name
             }.joined(separator: "+")
@@ -120,9 +128,9 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         }
     }
     
-    public func getAnonymousCustomThemeSubredditsConcatenated(myCustomFeed: MyCustomFeed) -> String {
+    public func getAnonymousCustomThemeSubredditsConcatenated(myCustomFeed: MyCustomFeed) async -> String {
         do {
-            let subscribedSubreddits = try anonymousCustomFeedSubredditDao.getAllAnonymousMultiRedditSubreddits(path: myCustomFeed.path)
+            let subscribedSubreddits = try await anonymousCustomFeedSubredditDao.getAllAnonymousMultiRedditSubreddits(path: myCustomFeed.path)
             return subscribedSubreddits.map {
                 $0.subredditName
             }.joined(separator: "+")
@@ -131,9 +139,9 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         }
     }
     
-    public func getPostFilter(postListingType: PostListingType, externalPostFilter: PostFilter?) -> PostFilter {
+    public func getPostFilter(postListingType: PostListingType, externalPostFilter: PostFilter?) async -> PostFilter {
         do {
-            var postFilters = try postFilterDao.getValidPostFilters(usage: postListingType.postFilterUsageType.rawValue, nameOfUsage: postListingType.postFilterNameOfUsage)
+            var postFilters = try await postFilterDao.getValidPostFilters(usage: postListingType.postFilterUsageType.rawValue, nameOfUsage: postListingType.postFilterNameOfUsage)
             if let externalPostFilter = externalPostFilter {
                 postFilters.append(externalPostFilter)
             }
@@ -143,39 +151,27 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         }
     }
     
-    public func loadIcon(post: Post, displaySubredditIcon: Bool) async throws {
+    public func loadIcon(post: Post) async throws {
         try Task.checkCancellation()
         
         guard post.subredditOrUserIcon == nil else { return }
         
-        if displaySubredditIcon {
-            if "u/\(post.author ?? "")" == post.subredditNamePrefixed {
-                // User's own subreddit
-                if subredditOrUserIcons[post.author] != nil {
-                    await MainActor.run {
-                        post.subredditOrUserIcon = subredditOrUserIcons[post.author]
-                    }
-                } else {
-                    try await loadUserIcon(post: post)
+        if "u/\(post.author ?? "")" == post.subredditNamePrefixed {
+            // User's own subreddit
+            if subredditOrUserIcons[post.author] != nil {
+                await MainActor.run {
+                    post.subredditOrUserIcon = subredditOrUserIcons[post.author]
                 }
             } else {
-                if subredditOrUserIcons[post.subreddit] != nil {
-                    await MainActor.run {
-                        post.subredditOrUserIcon = subredditOrUserIcons[post.subreddit]
-                    }
-                } else {
-                    try await loadSubredditIcon(post: post)
-                }
+                try await loadUserIcon(post: post)
             }
         } else {
-            if !post.isAuthorDeleted() {
-                if subredditOrUserIcons[post.author] != nil {
-                    await MainActor.run {
-                        post.subredditOrUserIcon = subredditOrUserIcons[post.author]
-                    }
-                } else {
-                    try await loadUserIcon(post: post)
+            if subredditOrUserIcons[post.subreddit] != nil {
+                await MainActor.run {
+                    post.subredditOrUserIcon = subredditOrUserIcons[post.subreddit]
                 }
+            } else {
+                try await loadSubredditIcon(post: post)
             }
         }
     }
@@ -185,17 +181,21 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         
         guard post.subredditOrUserIcon == nil else { return }
         
-        do {
-            let subredditData = try subredditDao.getSubredditDataByName(subredditName: post.subreddit)
-            if let subredditData {
-                await MainActor.run {
-                    post.subredditOrUserIcon = subredditData.iconUrl ?? ""
-                    subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
-                }
-                return
+        let subredditData = try? await subredditDao.getSubredditDataByName(subredditName: post.subreddit)
+        if let subredditData {
+            await MainActor.run {
+                post.subredditOrUserIcon = subredditData.iconUrl ?? ""
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
             }
-        } catch {
-            // Ignore
+            return
+        }
+        let subscribedSubredditData = try? await subscribedSubredditDao.getSubscribedSubreddit(subredditName: post.subreddit, accountName: AccountViewModel.shared.account.username)
+        if let subscribedSubredditData {
+            await MainActor.run {
+                post.subredditOrUserIcon = subscribedSubredditData.iconUrl ?? ""
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
+            }
+            return
         }
         
         let data = try await self.session.request(
@@ -211,9 +211,13 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         if let error = json.error {
             throw PostListingRepositoryError.JSONDecodingError(error.localizedDescription)
         }
+        let fetchedSubredditData = try? SubredditDetailRootClass(fromJson: json).toSubredditData()
+        if let fetchedSubredditData {
+            try? await subredditDao.insert(subredditData: fetchedSubredditData)
+        }
         
         await MainActor.run {
-            post.subredditOrUserIcon = try? SubredditDetailRootClass(fromJson: json).toSubredditData().iconUrl ?? ""
+            post.subredditOrUserIcon = fetchedSubredditData?.iconUrl ?? ""
             subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
         }
     }
@@ -222,6 +226,31 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         try Task.checkCancellation()
         
         guard post.subredditOrUserIcon == nil else { return }
+        
+        let partialUserData = try? await partialUserDao.getPartialUserData(username: post.author)
+        if let partialUserData {
+            await MainActor.run {
+                post.subredditOrUserIcon = partialUserData.profileImageUrlString
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
+            }
+            return
+        }
+        let userData = try? await userDao.getUserData(username: post.author)
+        if let userData {
+            await MainActor.run {
+                post.subredditOrUserIcon = userData.iconUrl ?? ""
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
+            }
+            return
+        }
+        let subscribedUserData = try? await subscribedUserDao.getSubscribedUser(name: post.author, accountName: AccountViewModel.shared.account.username)
+        if let subscribedUserData {
+            await MainActor.run {
+                post.subredditOrUserIcon = subscribedUserData.iconUrl ?? ""
+                subredditOrUserIcons[post.subreddit] = post.subredditOrUserIcon
+            }
+            return
+        }
         
         let data = try await self.session.request(
             RedditAPI.getUserData(username: post.author)
@@ -240,6 +269,34 @@ public class PostListingRepository: PostListingRepositoryProtocol {
         try await MainActor.run {
             post.subredditOrUserIcon = try UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
             subredditOrUserIcons[post.author] = post.subredditOrUserIcon
+        }
+    }
+    
+    public func toggleHidePost(_ post: Post) async throws {
+        let params = ["id": post.name]
+        
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(post.hidden ? RedditOAuthAPI.unhidePost(params: params) : RedditOAuthAPI.hidePost(params: params))
+            .validate()
+            .serializingDecodable(Empty.self, automaticallyCancelling: true)
+            .value
+    }
+    
+    public func toggleHidePostAnonymous(_ post: Post) async throws {
+        do {
+            if !post.hidden {
+                try await postHistoryDao.insert(
+                    postHistory: PostHistory(
+                        username: Account.ANONYMOUS_ACCOUNT.username,
+                        postId: post.id,
+                        postHistoryType: .hidden,
+                        time: Int64(Date().timeIntervalSince1970)
+                    )
+                )
+            } else {
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .hidden)
+            }
         }
     }
 }

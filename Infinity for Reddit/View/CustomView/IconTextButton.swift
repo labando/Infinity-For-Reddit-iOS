@@ -17,7 +17,7 @@ struct IconTextButton: View {
     
     var body: some View {
         TouchRipple(action: action) {
-            HStack {
+            HStack(spacing: 0) {
                 if let startIconUrl = startIconUrl {
                     switch startIconType {
                     case .webImage:

@@ -342,7 +342,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             )
         }
         
-        insertSubscribedThings(subredditSubscriptions: subredditSubscriptionsTemp, userSubscriptions: userSubscriptionsTemp, subreddits: subreddits.map {
+        await insertSubscribedThings(subredditSubscriptions: subredditSubscriptionsTemp, userSubscriptions: userSubscriptionsTemp, subreddits: subreddits.map {
             SubredditData(
                 id: $0.id,
                 name: $0.displayName,
@@ -390,7 +390,7 @@ public class SubscriptionListingViewModel: ObservableObject {
             
             try Task.checkCancellation()
             
-            insertMyCustomFeeds(myCustomFeeds: myCustomFeedsTemp)
+            await insertMyCustomFeeds(myCustomFeeds: myCustomFeedsTemp)
             
             do {
                 try await AccountViewModel.shared.updateCustomFeedSyncTime()
@@ -424,7 +424,7 @@ public class SubscriptionListingViewModel: ObservableObject {
         subscriptionAndCustomFeedLoadingTaskFlag.toggle()
     }
     
-    private func insertSubscribedThings(subredditSubscriptions: [SubscribedSubredditData], userSubscriptions: [SubscribedUserData], subreddits: [SubredditData]) {
+    private func insertSubscribedThings(subredditSubscriptions: [SubscribedSubredditData], userSubscriptions: [SubscribedUserData], subreddits: [SubredditData]) async {
         do {
             // Check if account exists
             guard !AccountViewModel.shared.account.isAnonymous(),
@@ -436,72 +436,43 @@ public class SubscriptionListingViewModel: ObservableObject {
             
             // Handle subscribed subreddits
             let subscribedSubredditDao = SubscribedSubredditDao(dbPool: dbPool)
-            let existingSubreddits = try subscribedSubredditDao.getAllSubscribedSubredditsList(accountName: accountName)
+            let existingSubreddits = try await subscribedSubredditDao.getAllSubscribedSubredditsList(accountName: accountName)
             
             let unsubscribedSubreddits = existingSubreddits.filter { existing in
                 !subredditSubscriptions.contains { $0.name == existing.name }
             }
             
             for unsubscribed in unsubscribedSubreddits {
-                try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: unsubscribed.name, accountName: accountName)
+                try? await subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: unsubscribed.name, accountName: accountName)
             }
             
-            subscribedSubredditDao.insertAll(
+            try? await subscribedSubredditDao.insertAll(
                 subscribedSubredditData: subredditSubscriptions
             )
             
-            do {
-                print(subredditSubscriptions.count)
-                let count = try dbPool.read { db in
-                    try SubscribedSubredditData.fetchCount(db)
-                }
-                print("Number of rows in SubscribedSubreddit: \(count)")
-            } catch {
-                print("Error fetching row count: \(error)")
-            }
-            
             // Handle subscribed users
             let subscribedUserDao = SubscribedUserDao(dbPool: dbPool)
-            let existingUsers = try subscribedUserDao.getAllSubscribedUsersList(accountName: accountName)
+            let existingUsers = try await subscribedUserDao.getAllSubscribedUsersList(accountName: accountName)
             
             let unsubscribedUsers = existingUsers.filter { existing in
                 !userSubscriptions.contains { $0.name == existing.name }
             }
             
             for unsubscribed in unsubscribedUsers {
-                try subscribedUserDao.deleteSubscribedUser(name: unsubscribed.name, accountName: accountName)
+                try? await subscribedUserDao.deleteSubscribedUser(name: unsubscribed.name, accountName: accountName)
             }
             
-            subscribedUserDao.insertAll(
+            try? await subscribedUserDao.insertAll(
                 subscribedUserDataList: userSubscriptions
             )
             
-            do {
-                print(userSubscriptions.count)
-                let count = try dbPool.read { db in
-                    try SubscribedUserData.fetchCount(db)
-                }
-                print("Number of rows in SubscribedUserData: \(count)")
-            } catch {
-                print("Error fetching row count: \(error)")
-            }
-            
-            try SubredditDao(dbPool: dbPool).insertAll(subredditData: subreddits)
-            
-            do {
-                let count = try dbPool.read { db in
-                    try SubredditData.fetchCount(db)
-                }
-                print("Number of rows in SubredditData: \(count)")
-            } catch {
-                print("Error fetching row count: \(error)")
-            }
+            try await SubredditDao(dbPool: dbPool).insertAll(subredditData: subreddits)
         } catch {
             print("Error updating subscribed things: \(error)")
         }
     }
     
-    private func insertMyCustomFeeds(myCustomFeeds: [MyCustomFeed]) {
+    private func insertMyCustomFeeds(myCustomFeeds: [MyCustomFeed]) async {
         do {
             // Check if account exists
             guard !AccountViewModel.shared.account.isAnonymous(),
@@ -510,29 +481,19 @@ public class SubscriptionListingViewModel: ObservableObject {
             }
             
             let myCustomFeedDao = MyCustomFeedDao(dbPool: dbPool)
-            let existingMyCustomFeeds = try myCustomFeedDao.getAllMyCustomFeedsList(username: AccountViewModel.shared.account.username)
+            let existingMyCustomFeeds = try await myCustomFeedDao.getAllMyCustomFeedsList(username: AccountViewModel.shared.account.username)
             
             let unsubscribedMyCustomFeeds = existingMyCustomFeeds.filter { existing in
                 !myCustomFeeds.contains { $0.path == existing.path }
             }
             
             for unsubscribed in unsubscribedMyCustomFeeds {
-                try myCustomFeedDao.deleteMyCustomFeed(path: unsubscribed.path, username: AccountViewModel.shared.account.username)
+                try? await myCustomFeedDao.deleteMyCustomFeed(path: unsubscribed.path, username: AccountViewModel.shared.account.username)
             }
             
-            myCustomFeedDao.insertAll(
+            try await myCustomFeedDao.insertAll(
                 myCustomFeeds: myCustomFeeds
             )
-            
-            do {
-                print(myCustomFeeds.count)
-                let count = try dbPool.read { db in
-                    try MyCustomFeed.fetchCount(db)
-                }
-                print("Number of rows in MyCustomFeed: \(count)")
-            } catch {
-                print("Error fetching row count: \(error)")
-            }
         } catch {
             print("Error updating my custom feeds: \(error)")
         }

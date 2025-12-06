@@ -18,31 +18,31 @@ class HistoryPostsRepository: HistoryPostsRepositoryProtocol {
         self.readPostDao = PostHistoryDao(dbPool: resolvedDBPool)
     }
     
-    func getReadPostsIdsByIds(readPostEnabled: Bool, account: Account, postIds: [String]) -> Set<String> {
+    func getReadPostsIdsByIds(readPostEnabled: Bool, account: Account, postIds: [String]) async -> Set<String> {
         guard !account.isAnonymous() else {
             return Set<String>()
         }
         
         do {
-            return readPostEnabled ? Set(try readPostDao.getHistoryPostsIdsByIds(ids: postIds, username: account.username, postHistoryType: .readPosts)) : Set<String>()
+            return readPostEnabled ? Set(try await readPostDao.getHistoryPostsIdsByIds(ids: postIds, username: account.username, postHistoryType: .readPosts)) : Set<String>()
         } catch {
             print("getReadPostsIdsByIds failed with error: \(error)")
             return Set<String>()
         }
     }
     
-    func getHistoryPostsIdsByIdsAnonymous(account: Account, postIds: [String], postHistoryType: PostHistoryType) -> Set<String> {
+    func getHistoryPostsIdsByIdsAnonymous(account: Account, postIds: [String], postHistoryType: PostHistoryType) async -> Set<String> {
         do {
-            return Set(try readPostDao.getHistoryPostsIdsByIds(ids: postIds, username: Account.ANONYMOUS_ACCOUNT.username, postHistoryType: postHistoryType))
+            return Set(try await readPostDao.getHistoryPostsIdsByIds(ids: postIds, username: Account.ANONYMOUS_ACCOUNT.username, postHistoryType: postHistoryType))
         } catch {
             print("getHistoryPostsIdsByIdsAnonymous failed with error: \(error)")
             return Set<String>()
         }
     }
     
-    func getIfExistInHistoryPostsAnonymous(account: Account, postId: String, postHistoryType: PostHistoryType) -> Bool {
+    func getIfExistInHistoryPostsAnonymous(account: Account, postId: String, postHistoryType: PostHistoryType) async -> Bool {
         do {
-            return try !readPostDao.getHistoryPostsIdsByIds(ids: [postId], username: Account.ANONYMOUS_ACCOUNT.username, postHistoryType: postHistoryType).isEmpty
+            return try await !readPostDao.getHistoryPostsIdsByIds(ids: [postId], username: Account.ANONYMOUS_ACCOUNT.username, postHistoryType: postHistoryType).isEmpty
         } catch {
             print("getIfExistInHistoryPostsAnonymous failed with error: \(error)")
             return false

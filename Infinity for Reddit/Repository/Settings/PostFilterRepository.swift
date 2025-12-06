@@ -17,12 +17,7 @@ public class PostFilterRepository: PostFilterRepositoryProtocol {
         self.postFilterDao = PostFilterDao(dbPool: resolvedDBPool)
     }
     
-    public func deletePostFilter(id: Int) {
-        do {
-            try postFilterDao.deletePostFilter(id: id)
-            
-        } catch {
-            print("Error deleting \(id): \(error)")
-        }
+    public func deletePostFilter(id: Int) async throws {
+        try await postFilterDao.deletePostFilter(id: id)
     }
 }

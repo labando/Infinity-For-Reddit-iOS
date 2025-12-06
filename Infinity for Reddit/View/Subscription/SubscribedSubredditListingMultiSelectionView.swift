@@ -13,14 +13,24 @@ struct SubscribedSubredditListingMultiSelectionView: View {
     @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
 
     var body: some View {
-        Group {
+        RootView {
             if subscriptionListingViewModel.subredditSubscriptions.isEmpty {
-                if subscriptionListingViewModel.isLoadingSubscriptions {
-                    ProgressIndicator()
-                } else {
-                    Text("No subscribed subreddits")
-                        .primaryText()
+                ZStack {
+                    if subscriptionListingViewModel.isLoadingSubscriptions {
+                        ProgressIndicator()
+                    } else if let error = subscriptionListingViewModel.error {
+                        Text("Unable to load subscribed subreddits. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                subscriptionListingViewModel.refreshSubscriptions()
+                            }
+                    } else {
+                        Text("No subscribed subreddits")
+                            .primaryText()
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
                     if !subscriptionListingViewModel.favoriteSubredditSubscriptions.isEmpty {

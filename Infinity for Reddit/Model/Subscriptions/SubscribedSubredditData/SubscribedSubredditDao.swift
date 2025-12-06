@@ -15,22 +15,22 @@ struct SubscribedSubredditDao {
         self.dbPool = dbPool
     }
     
-    func insert(subscribedSubredditData: SubscribedSubredditData) throws {
-        try? dbPool.write { db in
+    func insert(subscribedSubredditData: SubscribedSubredditData) async throws {
+        try await dbPool.write { db in
             try subscribedSubredditData.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(subscribedSubredditData: [SubscribedSubredditData]) {
-        try? dbPool.write { db in
+    func insertAll(subscribedSubredditData: [SubscribedSubredditData]) async throws {
+        try await dbPool.write { db in
             for data in subscribedSubredditData{
                 try data.insert(db, onConflict: .replace)
             }
         }
     }
     
-    func deleteAllSubscribedSubreddits() throws {
-        try dbPool.write { db in
+    func deleteAllSubscribedSubreddits() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM subscribed_subreddits")
         }
     }
@@ -50,8 +50,8 @@ struct SubscribedSubredditDao {
         .eraseToAnyPublisher()
     }
     
-    func getAllSubscribedSubredditsList(accountName: String) throws -> [SubscribedSubredditData] {
-        try dbPool.read { db in
+    func getAllSubscribedSubredditsList(accountName: String) async throws -> [SubscribedSubredditData] {
+        try await dbPool.read { db in
             try SubscribedSubredditData.fetchAll(db, sql: """
                 SELECT * 
                 FROM subscribed_subreddits 
@@ -77,8 +77,8 @@ struct SubscribedSubredditDao {
         .eraseToAnyPublisher()
     }
     
-    func getSubscribedSubreddit(subredditName: String, accountName: String) throws -> SubscribedSubredditData? {
-        try dbPool.read { db in
+    func getSubscribedSubreddit(subredditName: String, accountName: String) async throws -> SubscribedSubredditData? {
+        try await dbPool.read { db in
             try SubscribedSubredditData.fetchOne(db, sql: """
             SELECT * 
             FROM subscribed_subreddits 
@@ -89,8 +89,8 @@ struct SubscribedSubredditDao {
         }
     }
     
-    func deleteSubscribedSubreddit(subredditName: String, accountName: String) throws {
-        try dbPool.write { db in
+    func deleteSubscribedSubreddit(subredditName: String, accountName: String) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: """
                 DELETE FROM subscribed_subreddits 
                 WHERE name = ? COLLATE NOCASE AND username = ? COLLATE NOCASE

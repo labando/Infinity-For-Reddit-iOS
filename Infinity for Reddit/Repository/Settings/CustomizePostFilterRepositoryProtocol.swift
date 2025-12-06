@@ -6,5 +6,5 @@
 //
 
 public protocol CustomizePostFilterRepositoryProtocol {
-    func savePostFilter(_ filter: PostFilter) -> Bool
+    func savePostFilter(_ filter: PostFilter) async throws
 }

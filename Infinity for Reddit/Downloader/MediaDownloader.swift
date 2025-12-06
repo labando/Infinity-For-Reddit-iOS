@@ -11,7 +11,7 @@ import UIKit
 import Photos
 
 class MediaDownloader {
-    enum MediaDownloaderError: Error {
+    enum MediaDownloaderError: LocalizedError {
         case invalidURL
         case invalidRedditVideo
         case cannotLoadVideoTrack
@@ -21,12 +21,35 @@ class MediaDownloader {
         case failedToExportRedditVideoToTempDirectory
         case decodeImageError
         case saveToPhotosLibraryFailed
+        
+        var errorDescription: String? {
+            switch self {
+            case .invalidURL:
+                return "Invalid URL."
+            case .invalidRedditVideo:
+                return "Invalid Reddit Video URL."
+            case .cannotLoadVideoTrack:
+                return "Cannot load video track."
+            case .cannotLoadAudioTrack:
+                return "Cannot load audio track."
+            case .cannotAddVideoOrAudioTrackToExportedVideo:
+                return "Cannot add video or audio track to exported video."
+            case .cannotGetVideoExportSession:
+                return "Cannot get video export session."
+            case .failedToExportRedditVideoToTempDirectory:
+                return "Failed to export Reddit video to temp directory."
+            case .decodeImageError:
+                return "Decode image error."
+            case .saveToPhotosLibraryFailed:
+                return "Save to photos library failed."
+            }
+        }
     }
     
     static let shared = MediaDownloader()
     
     private let session: Session
-    private let possibleRedditVideoAudioTrackURLSuffices = ["/DASH_AUDIO_128.mp4", "/DASH_audio.mp4", "/DASH_audio", "/audio.mp4", "/audio"]
+    private let possibleRedditVideoAudioTrackURLSuffices = ["/CMAF_AUDIO_128.mp4", "/CMAF_AUDIO_64.mp4", "/DASH_AUDIO_128.mp4", "/DASH_audio.mp4", "/DASH_audio", "/audio.mp4", "/audio"]
     
     private init() {
         guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self, name: "plain") else {
@@ -49,10 +72,8 @@ class MediaDownloader {
         )
         
         switch downloadMediaType {
-        case .image:
-            try saveImageToPhotosLibrary(downloadedFileURL)
-        case .gif:
-            try await saveGifToPhotosLibrary(downloadedFileURL)
+        case .image, .gif:
+            try await saveImageOrGifToPhotosLibrary(downloadedFileURL)
         case .redditVideo:
             //Impossible to reach here
             break
@@ -78,11 +99,11 @@ class MediaDownloader {
         }
         
         let destination: DownloadRequest.Destination = { _, _ in
-            let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+            let fileURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent(fileName)
             return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
         }
         
-        let request = session.download(downloadURL, to: destination)
+        let request = session.download(downloadURL, to: destination).validate()
         
         Task {
             for await progress in request.downloadProgress() {
@@ -118,17 +139,22 @@ class MediaDownloader {
                         break
                     } catch {
                         // Ignore
+                        audioTrackDownloadedFileURL = nil
                     }
                 }
             }
         }
 
         if let audioTrackDownloadedFileURL {
-            await onProgressWithTitle("Muxing video and audio...", 0)
-            let exportedMuxedVideoURL = try await muxVideoAndAudio(downloadedVideoURL: videoTrackDownloadedFileURL, downloadedAudioURL: audioTrackDownloadedFileURL, fileName: fileName)
-            try await saveVideoToPhotosLibrary(exportedMuxedVideoURL)
+            do {
+                await onProgressWithTitle("Muxing video and audio...", 0)
+                let exportedMuxedVideoURL = try await muxVideoAndAudio(downloadedVideoURL: videoTrackDownloadedFileURL, downloadedAudioURL: audioTrackDownloadedFileURL, fileName: fileName)
+                try await saveVideoToPhotosLibrary(exportedMuxedVideoURL)
+            } catch {
+                try await saveRedditVideoWithOnlyVideoTrackToPhotosLibrary(videoTrackDownloadedFileURL, fileName: fileName)
+            }
         } else {
-            try await saveVideoToPhotosLibrary(videoTrackDownloadedFileURL)
+            try await saveRedditVideoWithOnlyVideoTrackToPhotosLibrary(videoTrackDownloadedFileURL, fileName: fileName)
         }
     }
     
@@ -175,7 +201,7 @@ class MediaDownloader {
             throw MediaDownloaderError.cannotGetVideoExportSession
         }
         
-        let exportedURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        let exportedURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent(fileName)
         if FileManager.default.fileExists(atPath: exportedURL.path) {
             try FileManager.default.removeItem(at: exportedURL)
         }
@@ -191,15 +217,16 @@ class MediaDownloader {
         }
     }
     
-    private func saveImageToPhotosLibrary(_ downloadedFileURL: URL) throws {
-        let data = try Data(contentsOf: downloadedFileURL)
-        guard let image = UIImage(data: data) else {
-            throw MediaDownloaderError.decodeImageError
+    private func saveRedditVideoWithOnlyVideoTrackToPhotosLibrary(_ videoTrackDownloadedFileURL: URL, fileName: String) async throws {
+        let newFileNamePath = videoTrackDownloadedFileURL.deletingLastPathComponent().appendingPathComponent(fileName)
+        if FileManager.default.fileExists(atPath: newFileNamePath.path()) {
+            try FileManager.default.removeItem(at: newFileNamePath)
         }
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        try FileManager.default.moveItem(at: videoTrackDownloadedFileURL, to: newFileNamePath)
+        try await saveVideoToPhotosLibrary(newFileNamePath)
     }
     
-    private func saveGifToPhotosLibrary(_ downloadedFileURL: URL) async throws {
+    private func saveImageOrGifToPhotosLibrary(_ downloadedFileURL: URL) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             PHPhotoLibrary.shared().performChanges({
                 PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: downloadedFileURL)

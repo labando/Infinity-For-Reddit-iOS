@@ -9,9 +9,11 @@ import GRDB
 import Foundation
 import Combine
 
+@MainActor
 class CommentFilterViewModel: ObservableObject {
     // MARK: - Properties
     @Published var commentFilters: [CommentFilter] = []
+    @Published var error: Error?
     
     let commentToBeAdded: Comment?
     private let commentFilterRepository: CommentFilterRepositoryProtocol
@@ -41,8 +43,13 @@ class CommentFilterViewModel: ObservableObject {
     
     // MARK: - Methods
     func deleteCommentFilter(id: Int) {
-        if !commentFilterRepository.deleteCommentFilter(id: id) {
-            // TODO handle error
+        Task {
+            do {
+                try await commentFilterRepository.deleteCommentFilter(id: id)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
         }
     }
 }

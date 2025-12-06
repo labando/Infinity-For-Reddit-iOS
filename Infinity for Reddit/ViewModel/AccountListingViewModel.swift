@@ -18,7 +18,6 @@ public class AccountListingViewModel: ObservableObject {
     public init(dbPool: DatabasePool) {
         self.accountDao = AccountDao(dbPool: dbPool)
         
-        
         do {
             let accounts = try accountDao.getAllAccounts()
             if let currentAccount = try accountDao.getCurrentAccount() {
@@ -32,7 +31,5 @@ public class AccountListingViewModel: ObservableObject {
             print("Error fetching accounts: \(error)")
             self.currentAccount = Account.ANONYMOUS_ACCOUNT
         }
-        
     }
-    
 }

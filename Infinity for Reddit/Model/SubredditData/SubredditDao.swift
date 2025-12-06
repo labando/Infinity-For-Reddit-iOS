@@ -15,27 +15,27 @@ struct SubredditDao {
         self.dbPool = dbPool
     }
     
-    func insert(subredditData: SubredditData) throws {
-        try? dbPool.write { db in
+    func insert(subredditData: SubredditData) async throws {
+        try await dbPool.write { db in
             try subredditData.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(subredditData: [SubredditData]) throws {
-        try? dbPool.write { db in
+    func insertAll(subredditData: [SubredditData]) async throws {
+        try await dbPool.write { db in
             for data in subredditData{
                 try data.insert(db, onConflict: .replace)
             }
         }
     }
     
-    func deleteAllSubreddits() throws {
-        try dbPool.write { db in
+    func deleteAllSubreddits() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM subreddits")
         }
     }
     
-    func getSubredditLiveDataByName(name: String) throws -> AnyPublisher<SubredditData?, Error> {
+    func getSubredditLiveDataByName(name: String) async throws -> AnyPublisher<SubredditData?, Error> {
         ValueObservation.tracking { db in
             try SubredditData.fetchOne(db, sql: "SELECT * FROM subreddits WHERE name = ? COLLATE NOCASE LIMIT 1", arguments: [name])
         }
@@ -43,14 +43,14 @@ struct SubredditDao {
         .eraseToAnyPublisher()
     }
     
-    func getSubredditDataByName(subredditName: String) throws -> SubredditData? {
-        try dbPool.read { db in
+    func getSubredditDataByName(subredditName: String) async throws -> SubredditData? {
+        try await dbPool.read { db in
             try SubredditData.fetchOne(db, sql: "SELECT * FROM subreddits WHERE name = ? COLLATE NOCASE LIMIT 1", arguments: [subredditName])
         }
     }
     
-    func updateSubscription(isSubscribed: Bool) throws {
-        try dbPool.write { db in
+    func updateSubscription(isSubscribed: Bool) async throws {
+        try await dbPool.write { db in
             try db.execute(
                 sql: """
                 UPDATE subreddits 

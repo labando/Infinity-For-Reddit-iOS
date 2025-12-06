@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public class CustomizePostFilterViewModel: ObservableObject {
     @Published private var id: Int? = nil
     @Published public var name: String = "New Filter"
@@ -36,6 +37,9 @@ public class CustomizePostFilterViewModel: ObservableObject {
     @Published public var minCommentsString: String = "-1"
     @Published public var maxComments: Int = -1
     @Published public var maxCommentsString: String = "-1"
+    
+    @Published var savedPostFilterFlag: Bool = false
+    @Published var error: Error? = nil
     
     private let customizePostFilterRepository: CustomizePostFilterRepositoryProtocol
     
@@ -168,35 +172,43 @@ public class CustomizePostFilterViewModel: ObservableObject {
         self.customizePostFilterRepository = customizePostFilterRepository
     }
     
-    func savePostFilter() -> Bool {
-        let postFilter = PostFilter(
-            id: id,
-            name: name,
-            maxVote: maxVote,
-            minVote: minVote,
-            maxComments: maxComments,
-            minComments: minComments,
-            onlySensitive: onlySensitive,
-            onlySpoiler: onlySpoiler,
-            postTitleExcludesRegex: excludesRegex,
-            postTitleContainsRegex: containsRegex,
-            postTitleExcludesStrings: excludesKeywords,
-            postTitleContainsStrings: containsKeywords,
-            excludeSubreddits: excludeSubreddits,
-            excludeUsers: excludeUsers,
-            containFlairs: containFlairs,
-            excludeFlairs: excludeFlairs,
-            excludeDomains: excludeDomains,
-            containDomains: containDomains,
-            containTextType: showText,
-            containLinkType: showLink,
-            containImageType: showImage,
-            containGifType: showGif,
-            containVideoType: showVideo,
-            containGalleryType: showGallery
-        )
-        
-        return customizePostFilterRepository.savePostFilter(postFilter)
+    func savePostFilter() {
+        Task {
+            let postFilter = PostFilter(
+                id: id,
+                name: name,
+                maxVote: maxVote,
+                minVote: minVote,
+                maxComments: maxComments,
+                minComments: minComments,
+                onlySensitive: onlySensitive,
+                onlySpoiler: onlySpoiler,
+                postTitleExcludesRegex: excludesRegex,
+                postTitleContainsRegex: containsRegex,
+                postTitleExcludesStrings: excludesKeywords,
+                postTitleContainsStrings: containsKeywords,
+                excludeSubreddits: excludeSubreddits,
+                excludeUsers: excludeUsers,
+                containFlairs: containFlairs,
+                excludeFlairs: excludeFlairs,
+                excludeDomains: excludeDomains,
+                containDomains: containDomains,
+                containTextType: showText,
+                containLinkType: showLink,
+                containImageType: showImage,
+                containGifType: showGif,
+                containVideoType: showVideo,
+                containGalleryType: showGallery
+            )
+            
+            do {
+                try await customizePostFilterRepository.savePostFilter(postFilter)
+                savedPostFilterFlag.toggle()
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
+        }
     }
     
     func getPostFilter() -> PostFilter {

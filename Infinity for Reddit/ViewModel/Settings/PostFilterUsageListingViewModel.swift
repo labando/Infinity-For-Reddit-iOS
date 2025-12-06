@@ -11,6 +11,7 @@ import Combine
 
 class PostFilterUsageListingViewModel: ObservableObject {
     @Published var postFilterUsages: [PostFilterUsage] = []
+    @Published var error: Error?
     
     private let postFilterId: Int
     private let postFilterUsageRepository: PostFilterUsageListingRepositoryProtocol
@@ -41,15 +42,25 @@ class PostFilterUsageListingViewModel: ObservableObject {
     }
     
     func savePostFilterUsage(usageType: PostFilterUsage.UsageType, nameOfUsage: String?) {
-        let postFilterUsage = PostFilterUsage(postFilterId: postFilterId, usageType: usageType, nameOfUsage: nameOfUsage)
-        if !postFilterUsageRepository.savePostFilterUsage(postFilterUsage) {
-            // TODO handle error
+        Task {
+            let postFilterUsage = PostFilterUsage(postFilterId: postFilterId, usageType: usageType, nameOfUsage: nameOfUsage)
+            do {
+                try await postFilterUsageRepository.savePostFilterUsage(postFilterUsage)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
         }
     }
     
     func deletePostFilterUsage(_ postFilterUsage: PostFilterUsage) {
-        if !postFilterUsageRepository.deletePostFilterUsage(postFilterUsage) {
-            // TODO handle error
+        Task {
+            do {
+                try await postFilterUsageRepository.deletePostFilterUsage(postFilterUsage)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
         }
     }
 }

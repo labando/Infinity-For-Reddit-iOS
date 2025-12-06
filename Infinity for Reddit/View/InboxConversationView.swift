@@ -135,6 +135,7 @@ struct InboxConversationView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .showErrorUsingSnackbar(inboxConversationViewModel.$error)
     }
 }
 

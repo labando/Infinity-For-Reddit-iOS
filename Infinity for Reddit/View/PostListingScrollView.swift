@@ -30,7 +30,8 @@ struct PostListingScrollView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository()
+                historyPostsRepository: HistoryPostsRepository(),
+                thingModerationRepository: ThingModerationRepository()
             )
         )
     }
@@ -44,7 +45,8 @@ struct PostListingScrollView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository()
+                historyPostsRepository: HistoryPostsRepository(),
+                thingModerationRepository: ThingModerationRepository()
             )
         )
     }
@@ -64,7 +66,9 @@ struct PostListingScrollView: View {
                                 postLayout: postListingViewModel.postLayout,
                                 isSubredditPostListing: false,
                                 onPostTypeTap: { },
-                                onSensitiveTap: { }
+                                onSensitiveTap: { },
+                                onLongPressPost: { },
+                                onShare: { }
                             )
                             .id(ObjectIdentifier(post))
                             .listPlainItemNoInsets()
@@ -86,7 +90,9 @@ struct PostListingScrollView: View {
                             postLayout: postListingViewModel.postLayout,
                             isSubredditPostListing: false,
                             onPostTypeTap: { },
-                            onSensitiveTap: { }
+                            onSensitiveTap: { },
+                            onLongPressPost: { },
+                            onShare: { }
                         )
                         .id(ObjectIdentifier(post))
                         .listPlainItemNoInsets()
@@ -105,7 +111,7 @@ struct PostListingScrollView: View {
             //print(colorScheme == .dark)
         }
         .task {
-            await postListingViewModel.initialLoadPosts()
+            await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: false)
         }
         .onAppear {
             if let key = navigationBarMenuKey {

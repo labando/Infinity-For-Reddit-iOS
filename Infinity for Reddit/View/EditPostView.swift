@@ -14,6 +14,8 @@ struct EditPostView: View {
     @EnvironmentObject private var postEditingShareableViewModel: PostEditingShareableViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
     @Environment(\.dismiss) var dismiss
     
     @StateObject private var editPostViewModel: EditPostViewModel
@@ -47,7 +49,7 @@ struct EditPostView: View {
                         VStack(spacing: 0) {
                             if let bodyProcessedMarkdown = editPostViewModel.postToBeEdited.selftextProcessedMarkdown {
                                 Markdown(bodyProcessedMarkdown)
-                                    .markdownImageProvider(WebImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata))
+                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in
@@ -55,7 +57,7 @@ struct EditPostView: View {
                                     }
                             } else if let selftext = editPostViewModel.postToBeEdited.selftext, !selftext.isEmpty {
                                 Markdown(selftext)
-                                    .markdownImageProvider(WebImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata))
+                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in
@@ -211,10 +213,6 @@ struct EditPostView: View {
                 }
             }
         }
-        .onReceive(editPostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(editPostViewModel.$error)
     }
 }

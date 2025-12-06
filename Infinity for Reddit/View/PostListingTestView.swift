@@ -44,7 +44,8 @@ struct PostListingTestView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository()
+                historyPostsRepository: HistoryPostsRepository(),
+                thingModerationRepository: ThingModerationRepository()
             )
         )
     }
@@ -63,7 +64,8 @@ struct PostListingTestView: View {
                 postListingMetadata: postListingMetadata,
                 externalPostFilter: nil,
                 postListingRepository: PostListingRepository(),
-                historyPostsRepository: HistoryPostsRepository()
+                historyPostsRepository: HistoryPostsRepository(),
+                thingModerationRepository: ThingModerationRepository()
             )
         )
     }
@@ -121,7 +123,7 @@ struct PostListingTestView: View {
             //print(colorScheme == .dark)
         }
         .task(id: postListingViewModel.loadPostsTaskId) {
-            await postListingViewModel.initialLoadPosts()
+            await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: false)
         }
         .onAppear {
             if let key = navigationBarMenuKey {

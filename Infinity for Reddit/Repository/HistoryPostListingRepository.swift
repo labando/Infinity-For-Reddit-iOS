@@ -52,7 +52,7 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
     ) async throws -> HistoryPostListingResult {
         let apiRequest: URLRequestConvertible
         let beforeResult: Int64
-        let postHistory = try postHistoryDao.getAllHistoryPosts(username: username, before: before, postHistoryType: historyPostListingType.postHistoryTypeForDB)
+        let postHistory = try await postHistoryDao.getAllHistoryPosts(username: username, before: before, postHistoryType: historyPostListingType.postHistoryTypeForDB)
         let postFullnames = postHistory.map {
             "t3_\($0.postId)"
         }.joined(separator: ",")
@@ -76,9 +76,9 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
         return HistoryPostListingResult(postListing: try PostListingRootClass(fromJson: json).data, before: beforeResult)
     }
     
-    public func getPostFilter(historyPostListingType: HistoryPostListingType, externalPostFilter: PostFilter?) -> PostFilter {
+    public func getPostFilter(historyPostListingType: HistoryPostListingType, externalPostFilter: PostFilter?) async -> PostFilter {
         do {
-            var postFilters = try postFilterDao.getValidPostFilters(
+            var postFilters = try await postFilterDao.getValidPostFilters(
                 usage: PostFilterUsage.UsageType.history.rawValue,
                 nameOfUsage: historyPostListingType.postFilterNameOfUsage
             )
@@ -122,7 +122,7 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
         guard post.subredditOrUserIcon == nil else { return }
         
         do {
-            let subredditData = try subredditDao.getSubredditDataByName(subredditName: post.subreddit)
+            let subredditData = try await subredditDao.getSubredditDataByName(subredditName: post.subreddit)
             if let subredditData {
                 await MainActor.run {
                     post.subredditOrUserIcon = subredditData.iconUrl ?? ""
@@ -176,6 +176,34 @@ public class HistoryPostListingRepository: HistoryPostListingRepositoryProtocol 
         try await MainActor.run {
             post.subredditOrUserIcon = try UserDetailRootClass(fromJson: json).toUserData().iconUrl ?? ""
             subredditOrUserIcons[post.author] = post.subredditOrUserIcon
+        }
+    }
+    
+    public func toggleHidePost(_ post: Post) async throws {
+        let params = ["id": post.name]
+        
+        try Task.checkCancellation()
+        
+        _ = try await self.session.request(post.hidden ? RedditOAuthAPI.unhidePost(params: params) : RedditOAuthAPI.hidePost(params: params))
+            .validate()
+            .serializingDecodable(Empty.self, automaticallyCancelling: true)
+            .value
+    }
+    
+    public func toggleHidePostAnonymous(_ post: Post) async throws {
+        do {
+            if !post.hidden {
+                try await postHistoryDao.insert(
+                    postHistory: PostHistory(
+                        username: Account.ANONYMOUS_ACCOUNT.username,
+                        postId: post.id,
+                        postHistoryType: .hidden,
+                        time: Int64(Date().timeIntervalSince1970)
+                    )
+                )
+            } else {
+                try await postHistoryDao.deletePostHistory(username: Account.ANONYMOUS_ACCOUNT.username, postId: post.id, postHistoryType: .hidden)
+            }
         }
     }
 }

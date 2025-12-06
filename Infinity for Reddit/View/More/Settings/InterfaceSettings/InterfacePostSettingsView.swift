@@ -21,47 +21,49 @@ struct InterfacePostSettingsView: View {
     @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
     
     var body: some View {
-        List {
-            BarebonePickerPreference(
-                selected: $defaultPostLayout,
-                items: InterfacePostUserDefaultsUtils.defaultPostLayouts,
-                title: "Default Post Layout"
-            ) { layout in
-                InterfacePostUserDefaultsUtils.defaultPostLayoutsText[layout]
+        RootView {
+            List {
+                BarebonePickerPreference(
+                    selected: $defaultPostLayout,
+                    items: InterfacePostUserDefaultsUtils.defaultPostLayouts,
+                    title: "Default Post Layout"
+                ) { layout in
+                    InterfacePostUserDefaultsUtils.defaultPostLayoutsText[layout]
+                }
+                .listPlainItemNoInsets()
+                
+                BarebonePickerPreference(
+                    selected: $defaultLinkPostLayout,
+                    items: InterfacePostUserDefaultsUtils.defaultLinkPostLayouts,
+                    title: "Default Link Post Layout"
+                ) { layout in
+                    InterfacePostUserDefaultsUtils.defaultLinkPostLayoutsText[layout]
+                }
+                .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hidePostType, title: "Hide Post Type")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hidePostFlair, title: "Hide Post Flair")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideSubredditAndUserPrefix, title: "Hide Subreddit and User Prefix")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideNVotes, title: "Hide the Number of Votes")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideNComments, title: "Hide the Number of Comments")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $hideTextPostContent, title: "Hide Text Post Content")
+                    .listPlainItemNoInsets()
+                
+                TogglePreference(isEnabled: $limitMediaHeight, title: "Limit Media Height")
+                    .listPlainItemNoInsets()
             }
-            .listPlainItemNoInsets()
-            
-            BarebonePickerPreference(
-                selected: $defaultLinkPostLayout,
-                items: InterfacePostUserDefaultsUtils.defaultLinkPostLayouts,
-                title: "Default Link Post Layout"
-            ) { layout in
-                InterfacePostUserDefaultsUtils.defaultLinkPostLayoutsText[layout]
-            }
-            .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hidePostType, title: "Hide Post Type")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hidePostFlair, title: "Hide Post Flair")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hideSubredditAndUserPrefix, title: "Hide Subreddit and User Prefix")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hideNVotes, title: "Hide the Number of Votes")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hideNComments, title: "Hide the Number of Comments")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $hideTextPostContent, title: "Hide Text Post Content")
-                .listPlainItemNoInsets()
-            
-            TogglePreference(isEnabled: $limitMediaHeight, title: "Limit Media Height")
-                .listPlainItemNoInsets()
+            .themedList()
         }
-        .themedList()
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Post")
     }

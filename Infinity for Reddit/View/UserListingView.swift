@@ -27,10 +27,23 @@ struct UserListingView: View {
     
     var body: some View {
         Group {
-            if userListingViewModel.isInitialLoading || userListingViewModel.isInitialLoad {
-                ProgressIndicator()
-            } else if userListingViewModel.users.isEmpty {
-                Text("No users")
+            if userListingViewModel.users.isEmpty {
+                ZStack {
+                    if userListingViewModel.isInitialLoading {
+                        ProgressIndicator()
+                    } else if userListingViewModel.isInitialLoad, let error = userListingViewModel.error {
+                        Text("Unable to load users. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                userListingViewModel.refreshUsers()
+                            }
+                    } else {
+                        Text("No users")
+                            .primaryText()
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
                     ForEach(userListingViewModel.users, id: \.id) { user in
@@ -87,6 +100,7 @@ struct UserListingView: View {
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .themedList()
+                .showErrorUsingSnackbar(userListingViewModel.$error)
             }
         }
         .task(id: userListingViewModel.loadUsersTaskId) {

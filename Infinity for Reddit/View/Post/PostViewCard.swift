@@ -38,6 +38,7 @@ struct PostViewCard: View {
     let onPostTypeClicked: () -> Void
     let onSensitiveClicked: () -> Void
     let onOpenLink: (URL) -> Void
+    let onShare: () -> Void
 
     private let iconSize: CGFloat = 24
 
@@ -53,7 +54,8 @@ struct PostViewCard: View {
         onSave: @escaping () -> Void,
         onPostTypeClicked: @escaping () -> Void,
         onSensitiveClicked: @escaping () -> Void,
-        onOpenLink: @escaping (URL) -> Void
+        onOpenLink: @escaping (URL) -> Void,
+        onShare: @escaping () -> Void
     ) {
         self.postViewModel = postViewModel
         self.isSubredditPostListing = isSubredditPostListing
@@ -67,6 +69,7 @@ struct PostViewCard: View {
         self.onPostTypeClicked = onPostTypeClicked
         self.onSensitiveClicked = onSensitiveClicked
         self.onOpenLink = onOpenLink
+        self.onShare = onShare
     }
 
     var body: some View {
@@ -306,20 +309,14 @@ struct PostViewCard: View {
 
                 HStack {
                     if !hideNComments {
-                        Button(action: {
-                            onCommentsTap()
-                        }) {
-                            HStack() {
-                                SwiftUI.Image(systemName: "text.bubble")
-                                    .postIconTemplateRendering()
-                                    .postIcon()
-                                
-                                Text(String(postViewModel.post.numComments))
-                                    .postInfo()
-                            }
+                        HStack() {
+                            SwiftUI.Image(systemName: "text.bubble")
+                                .postIconTemplateRendering()
+                                .postIcon()
+                            
+                            Text(String(postViewModel.post.numComments))
+                                .postInfo()
                         }
-                        .buttonStyle(.borderless)
-                        .contentShape(Rectangle())
                     }
                     
                     Spacer()
@@ -336,7 +333,7 @@ struct PostViewCard: View {
                 .padding(8)
                 .contentShape(Rectangle())
                 
-                ShareLink(item: postViewModel.post.url) {
+                Button(action: onShare) {
                     SwiftUI.Image(systemName: "square.and.arrow.up")
                         .postIconTemplateRendering()
                         .postIcon()

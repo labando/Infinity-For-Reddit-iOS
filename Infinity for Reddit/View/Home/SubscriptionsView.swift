@@ -124,6 +124,7 @@ struct SubscriptionsView: View {
             }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .showErrorUsingSnackbar(subscriptionListingViewModel.$error)
     }
 
     struct CustomFeedView: View {
@@ -133,14 +134,24 @@ struct SubscriptionsView: View {
         let customOnTapForSearchInThing: ((Thing) -> Void)?
         
         var body: some View {
-            Group {
+            RootView {
                 if subscriptionListingViewModel.myCustomFeeds.isEmpty {
-                    if subscriptionListingViewModel.isLoadingMyCustomFeeds {
-                        ProgressIndicator()
-                    } else {
-                        Text("No custom feeds")
-                            .primaryText()
+                    ZStack {
+                        if subscriptionListingViewModel.isLoadingMyCustomFeeds {
+                            ProgressIndicator()
+                        } else if let error = subscriptionListingViewModel.error {
+                            Text("Unable to load custom feeds. Tap to retry. Error: \(error.localizedDescription)")
+                                .primaryText()
+                                .padding(16)
+                                .onTapGesture {
+                                    subscriptionListingViewModel.refreshSubscriptions()
+                                }
+                        } else {
+                            Text("No custom feeds")
+                                .primaryText()
+                        }
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     List {
                         if !subscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {

@@ -13,6 +13,7 @@ import Flow
 struct PostDetailsViewCard: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     
     @StateObject var postViewModel: PostViewModel
     @State var voteTask: Task<Void, Never>?
@@ -32,12 +33,23 @@ struct PostDetailsViewCard: View {
 
     let isFromSubredditPostListing: Bool
     let onSendComment: () -> Void
+    let onLongPress: () -> Void
+    let onLongPressOnContent: () -> Void
     
     private let iconSize: CGFloat = 24
     
-    init(account: Account, post: Post, isFromSubredditPostListing: Bool, onSendComment: @escaping () -> Void) {
+    init(
+        account: Account,
+        post: Post,
+        isFromSubredditPostListing: Bool,
+        onSendComment: @escaping () -> Void,
+        onLongPress: @escaping () -> Void,
+        onLongPressOnContent: @escaping () -> Void
+    ) {
         self.isFromSubredditPostListing = isFromSubredditPostListing
         self.onSendComment = onSendComment
+        self.onLongPress = onLongPress
+        self.onLongPressOnContent = onLongPressOnContent
         _postViewModel = StateObject(wrappedValue: PostViewModel(account: account, post: post, postRepository: PostRepository()))
     }
     
@@ -218,13 +230,19 @@ struct PostDetailsViewCard: View {
             
             if let selftext = postViewModel.post.selftextProcessedMarkdown {
                 Markdown(selftext)
-                    .markdownImageProvider(WebImageProvider(mediaMetadata: postViewModel.post.mediaMetadata))
+                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: postViewModel.post.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
                     .themedPostCommentMarkdown()
                     .markdownLinkHandler { url in
                         navigationManager.openLink(url)
                     }
+                    .highPriorityGesture(
+                        LongPressGesture()
+                            .onEnded { _ in
+                                onLongPressOnContent()
+                            }
+                    )
             }
             
             HStack(spacing: 0) {
@@ -276,7 +294,9 @@ struct PostDetailsViewCard: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        onSendComment()
+                        if !accountViewModel.account.isAnonymous() && postViewModel.post.canReply {
+                            onSendComment()
+                        }
                     }
                     
                     Spacer()
@@ -311,6 +331,10 @@ struct PostDetailsViewCard: View {
             .padding(8)
         }
         .padding(.vertical, 0)
+        .contentShape(Rectangle())
+        .onLongPressGesture {
+            onLongPress()
+        }
     }
     
     private func goToSubredditDetails() {

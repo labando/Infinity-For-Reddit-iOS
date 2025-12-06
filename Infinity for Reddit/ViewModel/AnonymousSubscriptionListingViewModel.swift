@@ -237,20 +237,35 @@ public class AnonymousSubscriptionListingViewModel: ObservableObject {
     }
     
     func toggleFavoriteSubreddit(_ subscribedSubreddit: SubscribedSubredditData) {
-        if !anonymousSubscriptionListingRepository.toggleFavoriteSubreddit(subscribedSubreddit) {
-            // TODO handle error
+        Task {
+            do {
+                try await anonymousSubscriptionListingRepository.toggleFavoriteSubreddit(subscribedSubreddit)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
         }
     }
     
     func toggleFavoriteUser(_ subscribedUser: SubscribedUserData) {
-        if !anonymousSubscriptionListingRepository.toggleFavoriteUser(subscribedUser) {
-            // TODO handle error
+        Task {
+            do {
+                try await anonymousSubscriptionListingRepository.toggleFavoriteUser(subscribedUser)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
         }
     }
     
     func toggleFavoriteCustomFeed(_ myCustomFeed: MyCustomFeed) {
-        if !anonymousSubscriptionListingRepository.toggleFavoriteCustomFeed(myCustomFeed) {
-            // TODO handle error
+        Task {
+            do {
+                try await anonymousSubscriptionListingRepository.toggleFavoriteCustomFeed(myCustomFeed)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
         }
     }
     

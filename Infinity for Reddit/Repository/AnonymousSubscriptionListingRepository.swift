@@ -21,45 +21,27 @@ class AnonymousSubscriptionListingRepository: AnonymousSubscriptionListingReposi
         self.myCustomFeedDao = MyCustomFeedDao(dbPool: resolvedDBPool)
     }
     
-    func toggleFavoriteSubreddit(_ subscribedSubreddit: SubscribedSubredditData) -> Bool {
-        do {
-            try subscribedSubredditDao.insert(subscribedSubredditData: subscribedSubreddit)
-            return true
-        } catch {
-            print("Failed to toggle favorite subreddit: \(error)")
-            return false
-        }
+    func toggleFavoriteSubreddit(_ subscribedSubreddit: SubscribedSubredditData) async throws {
+        try await subscribedSubredditDao.insert(subscribedSubredditData: subscribedSubreddit)
     }
     
-    func toggleFavoriteUser(_ subscribedUser: SubscribedUserData) -> Bool {
-        do {
-            try subscribedUserDao.insert(subscribedUserData: subscribedUser)
-            return true
-        } catch {
-            print("Failed to toggle favorite user: \(error)")
-            return false
-        }
+    func toggleFavoriteUser(_ subscribedUser: SubscribedUserData) async throws {
+        try await subscribedUserDao.insert(subscribedUserData: subscribedUser)
     }
     
-    func toggleFavoriteCustomFeed(_ myCustomFeed: MyCustomFeed) -> Bool {
-        do {
-            try myCustomFeedDao.insert(myCustomFeed: myCustomFeed)
-            return true
-        } catch {
-            print("Failed to toggle favorite custom feed: \(error)")
-            return false
-        }
+    func toggleFavoriteCustomFeed(_ myCustomFeed: MyCustomFeed) async throws {
+        try await myCustomFeedDao.insert(myCustomFeed: myCustomFeed)
     }
     
     func unsubscribeFromSubreddit(_ subscribedSubreddit: SubscribedSubredditData) async throws {
-        try subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subscribedSubreddit.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
+        try await subscribedSubredditDao.deleteSubscribedSubreddit(subredditName: subscribedSubreddit.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
     }
     
     func unfollowUser(_ subscribedUser: SubscribedUserData) async throws {
-        try subscribedUserDao.deleteSubscribedUser(name: subscribedUser.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
+        try await subscribedUserDao.deleteSubscribedUser(name: subscribedUser.name, accountName: Account.ANONYMOUS_ACCOUNT.username)
     }
     
     func deleteCustomFeed(_ myCustomFeed: MyCustomFeed) async throws {
-        try myCustomFeedDao.deleteMyCustomFeed(path: myCustomFeed.path, username: Account.ANONYMOUS_ACCOUNT.username)
+        try await myCustomFeedDao.deleteMyCustomFeed(path: myCustomFeed.path, username: Account.ANONYMOUS_ACCOUNT.username)
     }
 }

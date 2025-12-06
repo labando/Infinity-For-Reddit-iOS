@@ -17,13 +17,7 @@ public class CommentFilterRepository: CommentFilterRepositoryProtocol {
         self.commentFilterDao = CommentFilterDao(dbPool: resolvedDBPool)
     }
     
-    public func deleteCommentFilter(id: Int) -> Bool {
-        do {
-            try commentFilterDao.deleteCommentFilter(id: id)
-            return true
-        } catch {
-            print("Error deleting \(id): \(error)")
-            return false
-        }
+    public func deleteCommentFilter(id: Int) async throws {
+        try await commentFilterDao.deleteCommentFilter(id: id)
     }
 }

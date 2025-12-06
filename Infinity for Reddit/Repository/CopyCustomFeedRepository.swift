@@ -84,7 +84,7 @@ class CopyCustomFeedRepository: CopyCustomFeedRepositoryProtocol {
             
             let copiedMyCustomFeed = try CustomFeed(fromJson: json["data"]).toMyCustomFeed()
             
-            try? myCustomFeedDao.insert(myCustomFeed: copiedMyCustomFeed)
+            try? await myCustomFeedDao.insert(myCustomFeed: copiedMyCustomFeed)
             
             return copiedMyCustomFeed
         } else {
@@ -109,11 +109,11 @@ class CopyCustomFeedRepository: CopyCustomFeedRepositoryProtocol {
             isSubscriber: false,
             isFavorite: false
         )
-        guard try myCustomFeedDao.getMyCustomFeed(path: myCustomFeed.path, username: Account.ANONYMOUS_ACCOUNT.username) == nil else {
+        guard try await myCustomFeedDao.getMyCustomFeed(path: myCustomFeed.path, username: Account.ANONYMOUS_ACCOUNT.username) == nil else {
             throw CopyCustomFeedRepositoryError.duplicateAnonymousCustomFeed
         }
         
-        try myCustomFeedDao.insert(myCustomFeed: myCustomFeed)
+        try await myCustomFeedDao.insert(myCustomFeed: myCustomFeed)
         
         let anonymousCustomFeedSubreddits: [AnonymousCustomFeedSubreddit] = subredditsAndUsersInCustomFeed.map {
             AnonymousCustomFeedSubreddit(
@@ -124,11 +124,11 @@ class CopyCustomFeedRepository: CopyCustomFeedRepositoryProtocol {
         }
         
         do {
-            try anonymousCustomFeedSubredditDao.insertAll(anonymousMultiredditSubreddits: anonymousCustomFeedSubreddits)
+            try await anonymousCustomFeedSubredditDao.insertAll(anonymousMultiredditSubreddits: anonymousCustomFeedSubreddits)
         } catch {
             // Ugly
             print(error)
-            try myCustomFeedDao.anonymousDeleteMyCustomFeed(path: myCustomFeed.path)
+            try await myCustomFeedDao.anonymousDeleteMyCustomFeed(path: myCustomFeed.path)
         }
         
         return myCustomFeed

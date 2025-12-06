@@ -29,6 +29,7 @@ struct SubmitTextPostView: View {
     @State private var showCamera: Bool = false
     @State private var showPhotoPicker: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
+    @State private var showNoSubredditAlert: Bool = false
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -55,6 +56,8 @@ struct SubmitTextPostView: View {
                                 
                                 PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
                                     postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                } onShowNoSubredditAlert: {
+                                    showNoSubredditAlert = true
                                 }
                                 
                                 Divider()
@@ -216,11 +219,15 @@ struct SubmitTextPostView: View {
                 navigationManager.replaceCurrentScreen(AppNavigation.postDetailsWithId(postId: id))
             }
         }
-        .onReceive(submitTextPostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(submitTextPostViewModel.$error)
+        .overlay(
+            CustomAlert<EmptyView>(
+                title: "No Subreddit Selected",
+                confirmButtonText: "OK",
+                showDismissButton: false,
+                isPresented: $showNoSubredditAlert
+            )
+        )
     }
     
     private enum FieldType: Hashable {

@@ -31,6 +31,7 @@ struct SubmitGalleryPostView: View {
     @State private var caption: String = ""
     @State private var outboundUrlString: String = ""
     @State private var selectedImageIndex: Int? = nil
+    @State private var showNoSubredditAlert: Bool = false
     
     init() {
         _postSubmissionContextViewModel = StateObject(
@@ -57,6 +58,8 @@ struct SubmitGalleryPostView: View {
                                 
                                 PostSubmissionSubredditChooserView(postSubmissionContextViewModel: postSubmissionContextViewModel) { subscribedSubredditData in
                                     postSubmissionContextViewModel.selectedSubreddit = subscribedSubredditData
+                                } onShowNoSubredditAlert: {
+                                    showNoSubredditAlert = true
                                 }
                                 
                                 Divider()
@@ -191,11 +194,7 @@ struct SubmitGalleryPostView: View {
                 navigationManager.replaceCurrentScreen(urlString)
             }
         }
-        .onReceive(submitGalleryPostViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(submitGalleryPostViewModel.$error)
         .fullScreenCover(isPresented: $showCamera) {
             if Utils.checkCameraAvailability() {
                 MCamera()
@@ -255,6 +254,14 @@ struct SubmitGalleryPostView: View {
                     )
                 }
             }
+        )
+        .overlay(
+            CustomAlert<EmptyView>(
+                title: "No Subreddit Selected",
+                confirmButtonText: "OK",
+                showDismissButton: false,
+                isPresented: $showNoSubredditAlert
+            )
         )
     }
     

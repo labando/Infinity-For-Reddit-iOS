@@ -12,17 +12,21 @@ struct PostSubmissionSubredditChooserView: View {
     
     @ObservedObject var postSubmissionContextViewModel: PostSubmissionContextViewModel
     
-    @State private var showNoSubredditAlert = false
     @State private var showRulesSheet = false
     @State private var showSubredditSelectionSheet = false
 
     var onSubredditSelected: (SubscribedSubredditData) -> Void
+    var onShowNoSubredditAlert: () -> Void
     
     private let iconSize: CGFloat = 24
     
-    init(postSubmissionContextViewModel: PostSubmissionContextViewModel, onSubredditSelected: @escaping (SubscribedSubredditData) -> Void) {
+    init(postSubmissionContextViewModel: PostSubmissionContextViewModel,
+         onSubredditSelected: @escaping (SubscribedSubredditData) -> Void,
+         onShowNoSubredditAlert: @escaping () -> Void
+    ) {
         self.postSubmissionContextViewModel = postSubmissionContextViewModel
         self.onSubredditSelected = onSubredditSelected
+        self.onShowNoSubredditAlert = onShowNoSubredditAlert
     }
     
     var body: some View {
@@ -54,12 +58,9 @@ struct PostSubmissionSubredditChooserView: View {
                 
                 Button("Rules") {
                     if postSubmissionContextViewModel.selectedSubreddit == nil {
-                        showNoSubredditAlert = true
+                        onShowNoSubredditAlert()
                     } else {
                         showRulesSheet = true
-                        Task {
-                            await postSubmissionContextViewModel.fetchRules()
-                        }
                     }
                 }
                 .filledButton()
@@ -69,13 +70,8 @@ struct PostSubmissionSubredditChooserView: View {
             .padding(16)
             .contentShape(Rectangle())
         }
-        .alert("No Subreddit Selected",
-               isPresented: $showNoSubredditAlert,
-               actions: { Button("OK", role: .cancel) { } },
-               message: { Text("Please select a subreddit first") }
-        )
-        .wrapContentSheet(isPresented: $showRulesSheet) {
-            SubredditRulesView()
+        .sheet(isPresented: $showRulesSheet) {
+            SubredditRulesSheet()
                 .environmentObject(postSubmissionContextViewModel)
         }
         .sheet(isPresented: $showSubredditSelectionSheet) {

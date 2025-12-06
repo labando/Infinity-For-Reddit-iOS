@@ -15,6 +15,8 @@ struct SubmitCommentView: View {
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
     @EnvironmentObject private var navigationManager: NavigationManager
+    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
     @Environment(\.dismiss) var dismiss
     
     @StateObject private var submitCommentViewModel: SubmitCommentViewModel
@@ -60,7 +62,7 @@ struct SubmitCommentView: View {
                             
                             if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
                                 Markdown(bodyProcessedMarkdown)
-                                    .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
+                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
                                     .padding(.horizontal, 16)
                                     .padding(.top, 8)
                                     .padding(.bottom, 16)
@@ -70,7 +72,7 @@ struct SubmitCommentView: View {
                                     }
                             } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
                                 Markdown(body)
-                                    .markdownImageProvider(WebImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata))
+                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
                                     .padding(.horizontal, 16)
                                     .padding(.top, 8)
                                     .padding(.bottom, 16)
@@ -244,11 +246,7 @@ struct SubmitCommentView: View {
                 dismiss()
             }
         }
-        .onReceive(submitCommentViewModel.$error) { newValue in
-            if let error = newValue {
-                snackbarManager.showSnackbar(.error(error))
-            }
-        }
+        .showErrorUsingSnackbar(submitCommentViewModel.$error)
     }
 }
 

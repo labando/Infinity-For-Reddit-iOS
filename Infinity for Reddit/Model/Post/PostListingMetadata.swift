@@ -46,6 +46,26 @@ public enum PostListingType: Codable, Hashable {
     case customFeed(path: String)
     case anonymousFrontPage(concatenatedSubscriptions: String?)
     case anonymousCustomFeed(myCustomFeed: MyCustomFeed, concatenatedSubscriptions: String?)
+    
+    var isFrontPage: Bool {
+        switch self {
+        case .frontPage:
+            return true
+        case .anonymousFrontPage:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var isPopularOrAll: Bool {
+        switch self {
+        case .subreddit(let subredditName):
+            return subredditName == "popular" || subredditName == "all"
+        default:
+            return false
+        }
+    }
 }
 
 public enum UserWhere: String, Codable {

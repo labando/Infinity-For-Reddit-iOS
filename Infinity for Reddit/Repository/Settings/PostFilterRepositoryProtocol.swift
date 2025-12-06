@@ -6,5 +6,5 @@
 //
 
 public protocol PostFilterRepositoryProtocol {
-    func deletePostFilter(id: Int)
+    func deletePostFilter(id: Int) async throws
 }

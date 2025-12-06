@@ -187,6 +187,10 @@ struct SubredditDetailsView: View {
                     navigationManager.append(AppNavigation.sendChatMessage(recipient: "r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)"))
                 },
                 
+                NavigationBarMenuItem(title: "Wiki") {
+                    navigationManager.append(AppNavigation.wiki(subredditName: subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName))
+                },
+                
                 NavigationBarMenuItem(title: "Report") {
                     navigationManager.openLink("https://www.reddit.com/report")
                 }

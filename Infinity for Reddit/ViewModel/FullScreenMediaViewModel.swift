@@ -8,8 +8,8 @@
 import Foundation
 
 enum FullScreenMediaType {
-    case image(urlString: String, aspectRatio: CGSize? = nil, post: Post? = nil, matchedGeometryEffectId: String? = nil)
-    case gif(urlString: String, post: Post? = nil)
+    case image(urlString: String, aspectRatio: CGSize? = nil, post: Post? = nil, fileName: String, matchedGeometryEffectId: String? = nil)
+    case gif(urlString: String, post: Post? = nil, fileName: String)
     case video(urlString: String, post: Post? = nil, videoType: VideoType = .reddit)
     case gallery(currentUrlString: String, post: Post? = nil, items: [GalleryItem], galleryScrollState: GalleryScrollState)
     case imgurGallery(imgurId: String, post: Post? = nil)
@@ -97,8 +97,15 @@ enum FullScreenMediaType {
 //    }
 }
 
-enum DownloadMediaTypeError: Error {
+enum DownloadMediaTypeError: LocalizedError {
     case getDownloadMediaTypeFailed
+    
+    var errorDescription: String? {
+        switch self {
+        case .getDownloadMediaTypeFailed:
+            return "Failed to get download media type."
+        }
+    }
 }
 
 enum VideoType {
@@ -126,7 +133,7 @@ class FullScreenMediaViewModel: ObservableObject {
         isTransitioning = true
         self.media = media
         switch media {
-        case .image(_, _, _, let matchedGeometryEffectId):
+        case .image(_, _, _, _, let matchedGeometryEffectId):
             self.matchedGeometryEffectId = matchedGeometryEffectId
         case .gif:
             break

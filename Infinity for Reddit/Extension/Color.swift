@@ -86,6 +86,30 @@ extension Color {
         return (alpha << 24) | (r << 16) | (g << 8) | b
     }
     
+    func toHexString(includeAlpha: Bool = true) -> String? {
+        let uic = UIColor(self)
+        
+        guard let components = uic.cgColor.components, components.count >= 3 else {
+            return nil // Failed to get RGB components
+        }
+        
+        let r = components[0]
+        let g = components[1]
+        let b = components[2]
+        let a = components.count >= 4 ? components[3] : 1.0
+        
+        let red = Int(round(r * 255))
+        let green = Int(round(g * 255))
+        let blue = Int(round(b * 255))
+        let alpha = Int(round(a * 255))
+        
+        if includeAlpha || a < 1.0 {
+            return String(format: "#%02X%02X%02X%02X", red, green, blue, alpha)
+        } else {
+            return String(format: "#%02X%02X%02X", red, green, blue)
+        }
+    }
+    
     static func deriveContrastingColor(hex argb: Int) -> Color {
         let originalColor = Color(hex: argb)
         let originalUIColor = UIColor(originalColor)

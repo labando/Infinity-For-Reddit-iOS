@@ -10,9 +10,19 @@ import Swinject
 import GRDB
 
 struct MiscellaneousSettingsView: View {
-    @Environment(\.dependencyManager) private var dependencyManager: Container
+    @AppStorage(MiscellaneousUserDefaultsUtils.saveLastSeenPostInFrontPageKey, store: .miscellaneous) private var saveLastSeenPostInFrontPage: Bool = false
+    
+    private let notificationSettingsViewModel = NotificationSettingsViewModel()
     
     var body: some View {
-        Text("Miscellaneous")
+        RootView {
+            List {
+                TogglePreference(isEnabled: $saveLastSeenPostInFrontPage, title: "Save Last Seen Post in Front Page")
+                    .listPlainItemNoInsets()
+            }
+            .themedList()
+        }
+        .themedNavigationBar()
+        .addTitleToInlineNavigationBar("Miscellaneous")
     }
 }

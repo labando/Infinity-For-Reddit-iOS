@@ -12,7 +12,7 @@ public protocol PostDetailsRepositoryProtocol {
     func fetchComments(postId: String, queries: [String: String]) async throws -> PostDetailsRootClass
     func fetchCommentsSingleThread(postId: String, commentId: String, queries: [String: String]) async throws -> PostDetailsRootClass
     func fetchMoreCommentsForCommentMore(params: [String: String]) async throws -> MoreChildren
-    func fetchCommentFilter(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) -> CommentFilter
+    func fetchCommentFilter(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) async -> CommentFilter
     func loadPostIcon(post: Post, isFromSubredditPostListing: Bool) async throws
     func deleteComment(_ comment: Comment) async throws
     func deletePost(_ post: Post) async throws

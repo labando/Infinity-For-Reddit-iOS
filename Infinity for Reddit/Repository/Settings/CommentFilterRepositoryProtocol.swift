@@ -6,5 +6,5 @@
 //
 
 public protocol CommentFilterRepositoryProtocol {
-    func deleteCommentFilter(id: Int) -> Bool
+    func deleteCommentFilter(id: Int) async throws
 }

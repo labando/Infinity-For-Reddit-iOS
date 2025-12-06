@@ -41,6 +41,9 @@ public class PostListingViewModel: ObservableObject {
     @Published var appearedPosts: [Post] = []
     @Published var lazyModeScrolledPost: Post?
     
+    @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
+    @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
+    
     var itemsWithLoadingIndicator: [PostListItem] {
         if hasMorePages {
             return posts.map { .post($0) } + [.loading]
@@ -55,6 +58,7 @@ public class PostListingViewModel: ObservableObject {
     private var lastLoadedSortType: SortType? = nil
     private var allPostIds = Set<String>()
     private var after: String? = nil
+    private var lastSeenFrontPagePost: Post? = nil
     
     // UserDefaults
     private var sensitiveContent: Bool
@@ -63,6 +67,7 @@ public class PostListingViewModel: ObservableObject {
     
     private let postListingRepository: PostListingRepositoryProtocol
     private let historyPostsRepository: HistoryPostsRepositoryProtocol
+    private let thingModerationRepository: ThingModerationRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
@@ -75,13 +80,15 @@ public class PostListingViewModel: ObservableObject {
         postListingMetadata: PostListingMetadata,
         externalPostFilter: PostFilter?,
         postListingRepository: PostListingRepositoryProtocol,
-        historyPostsRepository: HistoryPostsRepositoryProtocol
+        historyPostsRepository: HistoryPostsRepositoryProtocol,
+        thingModerationRepository: ThingModerationRepositoryProtocol
     ) {
         self.sortType = postListingMetadata.postListingType.savedSortType
         self.postListingMetadata = postListingMetadata
         self.externalPostFilter = externalPostFilter
         self.postListingRepository = postListingRepository
         self.historyPostsRepository = historyPostsRepository
+        self.thingModerationRepository = thingModerationRepository
         
         self.sensitiveContent = ContentSensitivityFilterUserDetailsUtils.sensitiveContent
         self.spoilerContent = ContentSensitivityFilterUserDetailsUtils.spoilerContent
@@ -106,13 +113,17 @@ public class PostListingViewModel: ObservableObject {
     
     // MARK: - Methods
     
-    public func initialLoadPosts() async {
+    public func initialLoadPosts(saveLastSeenPostInFrontPage: Bool) async {
         if sortType != lastLoadedSortType {
             await resetPostLoadingState()
         }
         
         guard isInitialLoad else {
             return
+        }
+        
+        if saveLastSeenPostInFrontPage && postListingMetadata.postListingType.isFrontPage {
+            self.after = MiscellaneousUserDefaultsUtils.getLastSeenPostInFrontPage(account: AccountViewModel.shared.account)
         }
         
         await loadPosts(isRefreshWithContinuation: refreshPostsContinuation != nil)
@@ -161,7 +172,7 @@ public class PostListingViewModel: ObservableObject {
                         postListingMetadata.pathComponents = ["subreddit": subscriptions]
                     }
                 } else {
-                    let fetchedSubscriptions = postListingRepository.getAnonymousSubscriptionsConcatenated()
+                    let fetchedSubscriptions = await postListingRepository.getAnonymousSubscriptionsConcatenated()
                     postListingMetadata.postListingType = .anonymousFrontPage(concatenatedSubscriptions: fetchedSubscriptions)
                     if fetchedSubscriptions.isEmpty {
                         // No anonymous subscriptions
@@ -191,7 +202,7 @@ public class PostListingViewModel: ObservableObject {
                     
                     postListingMetadata.pathComponents = ["subreddit": subscriptions]
                 } else {
-                    let fetchedSubscriptions = postListingRepository.getAnonymousCustomThemeSubredditsConcatenated(myCustomFeed: myCustomFeed)
+                    let fetchedSubscriptions = await postListingRepository.getAnonymousCustomThemeSubredditsConcatenated(myCustomFeed: myCustomFeed)
                     postListingMetadata.postListingType = .anonymousCustomFeed(myCustomFeed: myCustomFeed, concatenatedSubscriptions: fetchedSubscriptions)
                     guard !fetchedSubscriptions.isEmpty else {
                         // No subreddits, abort
@@ -255,10 +266,10 @@ public class PostListingViewModel: ObservableObject {
             try Task.checkCancellation()
             
             if postFilter == nil {
-                fetchPostFilter()
+                await fetchPostFilter()
             }
             
-            let processedPosts = self.postProcessPosts(postListing.posts)
+            let processedPosts = await self.postProcessPosts(postListing.posts)
             
             try Task.checkCancellation()
             
@@ -353,28 +364,28 @@ public class PostListingViewModel: ObservableObject {
         refreshPostsContinuation = nil
     }
     
-    func postProcessPosts(_ posts: [Post]) -> [Post] {
-        let readPostIds = historyPostsRepository.getReadPostsIdsByIds(
+    func postProcessPosts(_ posts: [Post]) async -> [Post] {
+        let readPostIds = await historyPostsRepository.getReadPostsIdsByIds(
             readPostEnabled: readPostEnabled,
             account: AccountViewModel.shared.account,
             postIds: posts.map { $0.id }
         )
-        let upvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+        let upvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? await historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
             account: AccountViewModel.shared.account,
             postIds: posts.map { $0.id },
             postHistoryType: .upvoted
         ) : Set<String>()
-        let downvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+        let downvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? await historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
             account: AccountViewModel.shared.account,
             postIds: posts.map { $0.id },
             postHistoryType: .downvoted
         ) : Set<String>()
-        let hiddenPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+        let hiddenPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? await historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
             account: AccountViewModel.shared.account,
             postIds: posts.map { $0.id },
             postHistoryType: .hidden
         ) : Set<String>()
-        let savedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+        let savedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? await historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
             account: AccountViewModel.shared.account,
             postIds: posts.map { $0.id },
             postHistoryType: .saved
@@ -408,8 +419,8 @@ public class PostListingViewModel: ObservableObject {
         MarkdownUtils.parseRedditImagesBlock(post)
     }
     
-    func fetchPostFilter() {
-        self.postFilter = postListingRepository.getPostFilter(
+    func fetchPostFilter() async {
+        self.postFilter = await postListingRepository.getPostFilter(
             postListingType: postListingMetadata.postListingType,
             externalPostFilter: externalPostFilter
         )
@@ -417,13 +428,27 @@ public class PostListingViewModel: ObservableObject {
         self.postFilter?.allowSpoiler = spoilerContent
     }
     
-    func loadIcon(post: Post, displaySubredditIcon: Bool) async {
+    func loadIcon(post: Post, displaySubredditIcon: Bool) {
         guard post.subredditOrUserIcon == nil else { return }
         
-        do {
-            try await postListingRepository.loadIcon(post: post, displaySubredditIcon: displaySubredditIcon)
-        } catch {
-            print("Load icon failed")
+        Task {
+            do {
+                if displaySubredditIcon {
+                    try await postListingRepository.loadIcon(post: post)
+                } else {
+                    let startIndex = posts.index(id: post.id) ?? 0
+                    let postBatch = Array(
+                        posts[startIndex..<min(posts.count, startIndex + UserProfileImageBatchLoader.batchSize)]
+                    )
+
+                    let iconUrl = await UserProfileImageBatchLoader.shared.loadIcons(posts: postBatch)
+                    await MainActor.run {
+                        post.subredditOrUserIcon = iconUrl
+                    }
+                }
+            } catch {
+                print("Load icon failed")
+            }
         }
     }
     
@@ -477,7 +502,7 @@ public class PostListingViewModel: ObservableObject {
         }
     }
     
-    func insertIntoAppearedPosts(_ post: Post) {
+    func insertIntoAppearedPosts(_ post: Post, saveLastSeenPostInFrontPage: Bool) {
         self.appearedPosts.removeAll {
             $0.id == post.id
         }
@@ -501,6 +526,221 @@ public class PostListingViewModel: ObservableObject {
             }
         } else {
             appearedPosts.append(post)
+        }
+        
+        if saveLastSeenPostInFrontPage && postListingMetadata.postListingType.isFrontPage {
+            if let lastSeenPost = lastSeenFrontPagePost {
+                if let index = self.posts.index(id: lastSeenPost.id) {
+                    if index < self.posts.index(id: post.id) ?? self.posts.endIndex {
+                        self.lastSeenFrontPagePost = post
+                    }
+                } else {
+                    self.lastSeenFrontPagePost = post
+                }
+            } else {
+                self.lastSeenFrontPagePost = post
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleHidePost(_ post: Post) {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            toggleHidePostAnonymous(post)
+            return
+        }
+        
+        let previousHiddenState = post.hidden ?? false
+        
+        Task {
+            do {
+                try await postListingRepository.toggleHidePost(post)
+                
+                post.hidden = !previousHiddenState
+            } catch {
+                post.hidden = previousHiddenState
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    private func toggleHidePostAnonymous(_ post: Post) {
+        Task {
+            try? await postListingRepository.toggleHidePostAnonymous(post)
+            post.hidden.toggle()
+        }
+    }
+    
+    @MainActor
+    func approvePost(_ post: Post) {
+        Task {
+            do {
+                try await thingModerationRepository.approveThing(thingFullname: post.name)
+                
+                post.approved = true
+                post.approvedBy = AccountViewModel.shared.account.username
+                post.approvedAtUtc = Utils.getCurrentTimeEpoch()
+                post.removed = false
+                post.removedBy = ""
+                post.removedByCategory = ""
+                post.spam = false
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func removePost(_ post: Post, isSpam: Bool) {
+        Task {
+            do {
+                try await thingModerationRepository.removeThing(thingFullname: post.name, isSpam: isSpam)
+                
+                post.approved = false
+                post.approvedBy = ""
+                post.approvedAtUtc = 0
+                post.removed = true
+                post.removedBy = AccountViewModel.shared.account.username
+                post.removedByCategory = "moderator"
+                post.spam = isSpam
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleSticky(_ post: Post) {
+        Task {
+            do {
+                try await thingModerationRepository.toggleSticky(post: post)
+                
+                post.stickied.toggle()
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleLockPost(_ post: Post) {
+        Task {
+            do {
+                try await thingModerationRepository.toggleLock(thingFullname: post.name, lock: !post.locked)
+                
+                post.locked.toggle()
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleSensitive(_ post: Post) {
+        Task {
+            do {
+                try await thingModerationRepository.toggleSensitive(post: post)
+                post.over18.toggle()
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleSpoiler(_ post: Post) {
+        Task {
+            do {
+                try await thingModerationRepository.toggleSpoiler(post: post)
+                post.spoiler.toggle()
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleDistinguishAsMod(_ post: Post) {
+        Task {
+            do {
+                try await thingModerationRepository.toggleDistinguishAsMod(post: post)
+                
+                post.distinguished = post.distinguished == "moderator" ? "" : "moderator"
+            } catch {
+                self.error = error
+                print(error)
+            }
+        }
+    }
+    
+    func downloadMedia(_ post: Post) {
+        guard let downloadMediaType = post.getDownloadMediaType() else {
+            return
+        }
+        
+        Task {
+            do {
+                try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, progress in
+                    
+                })
+                
+                await MainActor.run {
+                    self.showMediaDownloadFinishedMessageTrigger.toggle()
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                    print(error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func downloadAllGalleryMedia(post: Post) {
+        guard let items = post.galleryData?.items else {
+            return
+        }
+        
+        Task {
+            await withTaskGroup(of: Void.self) { group in
+                for item in items {
+                    group.addTask { [weak self] in
+                        await self?.downloadGalleryOrImgurItemMediaAsync(downloadMediaType: item.toDownloadMediaType(post: post))
+                    }
+                }
+                
+                for await _ in group {
+                    
+                }
+                
+                await MainActor.run {
+                    self.showAllGalleryMediaDownloadFinishedMessageTrigger.toggle()
+                }
+            }
+        }
+    }
+    
+    private func downloadGalleryOrImgurItemMediaAsync(downloadMediaType: DownloadMediaType) async {
+        do {
+            try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, _ in })
+        } catch {
+            await MainActor.run {
+                self.error = error
+            }
+        }
+    }
+    
+    func saveLastSeenFrontPagePost() {
+        if postListingMetadata.postListingType.isFrontPage, let lastSeenFrontPagePost {
+            MiscellaneousUserDefaultsUtils.saveLastSeenPostInFrontPage(post: lastSeenFrontPagePost, account: AccountViewModel.shared.account)
         }
     }
 }

@@ -16,22 +16,22 @@ struct PostFilterDao {
         self.dbPool = dbPool
     }
     
-    func insert(postFilter: PostFilter) throws {
-        try dbPool.write { db in
+    func insert(postFilter: PostFilter) async throws {
+        try await dbPool.write { db in
             try postFilter.insert(db, onConflict: .replace)
         }
     }
     
-    func insertAll(postFilterList: [PostFilter]) throws {
-        try dbPool.write { db in
+    func insertAll(postFilterList: [PostFilter]) async throws {
+        try await dbPool.write { db in
             for data in postFilterList {
                 try data.insert(db, onConflict: .replace)
             }
         }
     }
     
-    func updatePostFilter(updatedPostFilter: PostFilter) throws {
-        try dbPool.write { db in
+    func updatePostFilter(updatedPostFilter: PostFilter) async throws {
+        try await dbPool.write { db in
             if var existingPostFilter = try PostFilter.filter(Column("id") == updatedPostFilter.id).fetchOne(db) {
                 existingPostFilter = updatedPostFilter
                 try existingPostFilter.update(db)
@@ -41,32 +41,31 @@ struct PostFilterDao {
         }
     }
     
-    func deleteAllPostFilters() throws {
-        try dbPool.write { db in
+    func deleteAllPostFilters() async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM post_filter")
         }
     }
     
-    func deletePostFilter(postFilter: PostFilter) throws {
-        try dbPool.write { db in
+    func deletePostFilter(postFilter: PostFilter) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM post_filter WHERE name = ?", arguments: [postFilter.name])
         }
     }
     
-    func deletePostFilter(id: Int) throws {
-        try dbPool.write { db in
+    func deletePostFilter(id: Int) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM post_filter WHERE id = ?", arguments: [id])
         }
     }
     
-    func getPostFilter(name: String) throws -> PostFilter? {
-        try dbPool.read { db in
+    func getPostFilter(name: String) async throws -> PostFilter? {
+        try await dbPool.read { db in
             try PostFilter.fetchOne(db, sql: "SELECT * FROM post_filter WHERE name = ? LIMIT 1", arguments: [name])
         }
     }
     
     func getAllPostFiltersLiveData() -> AnyPublisher<[PostFilter], Error> {
-        
         let observation = ValueObservation
             .tracking { db in
                 try PostFilter.fetchAll(db, sql: "SELECT * FROM post_filter ORDER BY name")
@@ -76,14 +75,14 @@ struct PostFilterDao {
         return observation.eraseToAnyPublisher()
     }
     
-    func getAllPostFilters() throws -> [PostFilter] {
-        try dbPool.read { db in
+    func getAllPostFilters() async throws -> [PostFilter] {
+        try await dbPool.read { db in
             try PostFilter.fetchAll(db, sql: "SELECT * FROM post_filter ORDER BY name")
         }
     }
     
-    func getValidPostFilters(usage: Int, nameOfUsage: String) throws -> [PostFilter] {
-        try dbPool.read { db in
+    func getValidPostFilters(usage: Int, nameOfUsage: String) async throws -> [PostFilter] {
+        try await dbPool.read { db in
             let sql = """
                 SELECT * FROM post_filter 
                 WHERE post_filter.id IN 

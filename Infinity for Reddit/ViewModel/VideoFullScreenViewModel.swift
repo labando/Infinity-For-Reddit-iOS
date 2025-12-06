@@ -37,8 +37,15 @@ class VideoFullScreenViewModel: ObservableObject {
     private var audioTrackObserver: NSKeyValueObservation?
     private var timer: Timer?
     
-    enum VideoPlayerError: Error {
+    enum VideoPlayerError: LocalizedError {
         case invalidURL
+        
+        var errorDescription: String? {
+            switch self {
+            case .invalidURL:
+                return "Invalid URL."
+            }
+        }
     }
     
     func loadAndPlay(urlString: String, videoType: VideoType) async {
@@ -212,10 +219,14 @@ class VideoFullScreenViewModel: ObservableObject {
     private func downloadMediaAsync(urlString: String, post: Post?) async {
         do {
             let downloadMediaType: DownloadMediaType
-            if let post = post, case .redditVideo = post.postType {
-                downloadMediaType = .redditVideo(post: post)
+            if let post {
+                if case .redditVideo = post.postType {
+                    downloadMediaType = .redditVideo(post: post)
+                } else {
+                    downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(post.fileNameWithoutExtension).mp4")
+                }
             } else {
-                downloadMediaType = .video(downloadUrlString: urlString, fileName: "test.mp4")
+                downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(Utils.randomString()).mp4")
             }
             
             try await MediaDownloader.shared.download(

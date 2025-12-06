@@ -32,6 +32,13 @@ struct InboxListingView: View {
                 ZStack {
                     if inboxListingViewModel.isInitialLoading || inboxListingViewModel.isInitialLoad {
                         ProgressIndicator()
+                    } else if inboxListingViewModel.isInitialLoad, let error = inboxListingViewModel.error {
+                        Text("Unable to load inbox. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                inboxListingViewModel.refreshInboxes()
+                            }
                     } else {
                         Text("No items")
                     }
@@ -64,6 +71,7 @@ struct InboxListingView: View {
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .themedList()
+                .showErrorUsingSnackbar(inboxListingViewModel.$error)
             }
         }
         .task(id: inboxListingViewModel.loadInboxFlag) {

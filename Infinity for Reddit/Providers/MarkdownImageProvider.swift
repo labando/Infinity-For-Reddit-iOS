@@ -11,11 +11,13 @@ import SwiftUI
 
 // MARK: - WebImageProvider
 
-struct WebImageProvider: ImageProvider {
-    var mediaMetadata: [String: MediaMetadata]?
+struct MarkdownImageProvider: ImageProvider {
+    let mediaMetadata: [String: MediaMetadata]?
+    let fullScreenMediaViewModel: FullScreenMediaViewModel
     
-    init(mediaMetadata: [String: MediaMetadata]?) {
+    init(mediaMetadata: [String: MediaMetadata]?, fullScreenMediaViewModel: FullScreenMediaViewModel) {
         self.mediaMetadata = mediaMetadata
+        self.fullScreenMediaViewModel = fullScreenMediaViewModel
     }
     
     func makeImage(url: URL?) -> some View {
@@ -25,36 +27,33 @@ struct WebImageProvider: ImageProvider {
                     CustomWebImage(
                         media.s.gif,
                         width: 140,
-                        aspectRatio: media.s.aspectRatio
+                        aspectRatio: media.s.aspectRatio,
+                        handleImageTapGesture: false
                     )
-                    .onTapGesture{
-                        if let url = url {
-                            handleImageTap(url: url)
-                        }
-                    }
+                    .highPriorityGesture(TapGesture().onEnded {
+                        onMediaTap(urlString: media.s.gif, fileName: "\(Utils.randomString()).gif", isGif: true)
+                    })
                     
                     if media.caption != nil {
-                        // TODO make sure the text style is correct
                         Text(media.caption!)
-                            .font(.system(size: 18))
+                            .secondaryText(.f15)
                     }
                 }
             } else if media.e == MediaMetadata.imageType {
                 VStack {
                     CustomWebImage(
                         media.s.u,
-                        aspectRatio: media.s.aspectRatio
+                        aspectRatio: media.s.aspectRatio,
+                        handleImageTapGesture: false
                     )
-                    .onTapGesture{
-                        if let url = url {
-                            handleImageTap(url: url)
-                        }
-                    }
+                    .highPriorityGesture(TapGesture().onEnded {
+                        onMediaTap(urlString: media.s.u, fileName: "\(Utils.randomString()).jpg", isGif: false)
+                    })
                     
                     if media.caption != nil {
                         // TODO make sure the text style is correct
                         Text(media.caption!)
-                            .font(.system(size: 18))
+                            .secondaryText(.f15)
                     }
                 }
             } else if media.e == MediaMetadata.redditVideoType {
@@ -67,7 +66,7 @@ struct WebImageProvider: ImageProvider {
                     if media.caption != nil {
                         // TODO make sure the text style is correct
                         Text(media.caption!)
-                            .font(.system(size: 18))
+                            .secondaryText(.f15)
                     }
                 }
             } else {
@@ -79,7 +78,13 @@ struct WebImageProvider: ImageProvider {
         }
     }
     
-    private func handleImageTap(url: URL) {
-        print("Image tapped: \(url)")
+    private func onMediaTap(urlString: String?, fileName: String, isGif: Bool) {
+        if let urlString {
+            if isGif {
+                fullScreenMediaViewModel.show(.gif(urlString: urlString, fileName: fileName))
+            } else {
+                fullScreenMediaViewModel.show(.image(urlString: urlString, fileName: fileName))
+            }
+        }
     }
 }

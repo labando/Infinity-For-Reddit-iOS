@@ -15,14 +15,14 @@ struct PostFilterUsageDao {
         self.dbPool = dbPool
     }
     
-    func insert(postFilterUsage: PostFilterUsage) throws {
-        try dbPool.write { db in
+    func insert(postFilterUsage: PostFilterUsage) async throws {
+        try await dbPool.write { db in
             try postFilterUsage.insert(db, onConflict: .replace)
         }
     }
 
-    func insertAll(postFilterUsageList: [PostFilterUsage]) throws {
-        try dbPool.write { db in
+    func insertAll(postFilterUsageList: [PostFilterUsage]) async throws {
+        try await dbPool.write { db in
             for data in postFilterUsageList {
                 try data.insert(db, onConflict: .replace)
             }
@@ -38,20 +38,20 @@ struct PostFilterUsageDao {
             .eraseToAnyPublisher()
     }
     
-    func getAllPostFilterUsage(postFilterId: Int) throws -> [PostFilterUsage] {
-        try dbPool.read { db in
+    func getAllPostFilterUsage(postFilterId: Int) async throws -> [PostFilterUsage] {
+        try await dbPool.read { db in
             try PostFilterUsage.fetchAll(db, sql: "SELECT * FROM post_filter_usage WHERE postFilterId = ?", arguments: [postFilterId])
         }
     }
 
-    func getAllPostFilterUsageForBackup() throws -> [PostFilterUsage] {
-        try dbPool.read { db in
+    func getAllPostFilterUsageForBackup() async throws -> [PostFilterUsage] {
+        try await dbPool.read { db in
             try PostFilterUsage.fetchAll(db)
         }
     }
 
-    func deletePostFilterUsage(postFilterUsage: PostFilterUsage) throws {
-        try dbPool.write { db in
+    func deletePostFilterUsage(postFilterUsage: PostFilterUsage) async throws {
+        try await dbPool.write { db in
             try db.execute(sql: "DELETE FROM post_filter_usage WHERE post_filter_id = ? AND usage_type = ? AND name_of_usage = ?", arguments: [postFilterUsage.postFilterId, postFilterUsage.usageType.rawValue, postFilterUsage.nameOfUsage])
         }
     }

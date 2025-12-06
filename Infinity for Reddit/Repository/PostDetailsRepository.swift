@@ -128,9 +128,9 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         return moreChildren
     }
     
-    public func fetchCommentFilter(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) -> CommentFilter {
+    public func fetchCommentFilter(usageType: CommentFilterUsage.UsageType, nameOfUsage: String) async -> CommentFilter {
         do {
-            let commentFilters = try commentFilterDao.getValidCommentFilters(usageType: usageType, nameOfUsage: nameOfUsage)
+            let commentFilters = try await commentFilterDao.getValidCommentFilters(usageType: usageType, nameOfUsage: nameOfUsage)
             return CommentFilter.mergeCommentFilter(commentFilters)
         } catch {
             return CommentFilter()
@@ -156,7 +156,7 @@ public class PostDetailsRepository: PostDetailsRepositoryProtocol {
         guard post.subredditOrUserIconInPostDetails == nil else { return }
         
         do {
-            let subredditData = try subredditDao.getSubredditDataByName(subredditName: post.subreddit)
+            let subredditData = try await subredditDao.getSubredditDataByName(subredditName: post.subreddit)
             if let subredditData {
                 await MainActor.run {
                     post.subredditOrUserIconInPostDetails = subredditData.iconUrl ?? ""
