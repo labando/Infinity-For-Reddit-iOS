@@ -29,8 +29,8 @@ extension View {
         self.modifier(SecondaryTextViewModifier(fontSize: fontSize))
     }
     
-    func buttonText() -> some View {
-        self.modifier(ButtonTextViewModifier())
+    func buttonText(_ fontSize: AppFontSize = .f17) -> some View {
+        self.modifier(ButtonTextViewModifier(fontSize: fontSize))
     }
     
     func navigationBarPrimaryText() -> some View {

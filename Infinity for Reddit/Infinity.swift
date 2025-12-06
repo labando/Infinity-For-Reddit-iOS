@@ -66,7 +66,6 @@ struct Infinity: App {
                     .id(accountViewModel.account.username)
                     .environment(\.dependencyManager, DependencyManager.shared.container)
                     .environmentObject(accountViewModel)
-                    .environmentObject(customThemeViewModel)
                     .environmentObject(fullScreenMediaViewModel)
                     .environmentObject(networkManager)
                     .environment(\.defaultMinListRowHeight, 0)
@@ -100,17 +99,46 @@ struct Infinity: App {
                     }
                 
                 if showAppLockScreen {
-                    VStack {
-                        Color.blue
+                    GeometryReader { geo in
+                        ZStack {
+                            VStack(spacing: 24) {
+                                RowText("Let’s make sure you’re really you!")
+                                    .primaryText(.f56)
+                                
+                                RowText("We will use Face ID to verify your identity.")
+                                    .secondaryText(.f24)
+                                
+                                Spacer()
+                            }
+                            
+                            VStack(spacing: 0) {
+                                Spacer()
+                                    .frame(height: geo.size.height / 3 * 2)
+                                
+                                Button {
+                                    authenticate()
+                                } label: {
+                                    Text("Yep, That’s Me!")
+                                        .buttonText(.f24)
+                                }
+                                .filledButton()
+                                
+                                Spacer()
+                            }
+                        }
+                        .zIndex(1)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(32)
+                        .background(.ultraThinMaterial)
                     }
-                    .zIndex(1)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .transition(.opacity)
                     .task {
                         try? await Task.sleep(for: .seconds(1))
                         authenticate()
                     }
                 }
             }
+            .environmentObject(customThemeViewModel)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .background  {
