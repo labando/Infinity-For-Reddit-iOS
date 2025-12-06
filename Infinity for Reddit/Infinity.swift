@@ -145,7 +145,7 @@ struct Infinity: App {
                 if NotificationUserDefaultsUtils.enableNotification {
                     PullNotificationBackgroundTaskManager.shared.scheduleBackgroundTask()
                 }
-                if appLock && !showAppLockScreen{
+                if appLock && !showAppLockScreen {
                     SecurityUserDefaultsUtils.saveLastForegroundTime()
                 }
             } else if newPhase == .active {
@@ -154,6 +154,8 @@ struct Infinity: App {
                         if authenticationSuccess {
                             withAnimation {
                                 showAppLockScreen = false
+                            } completion: {
+                                authenticationSuccess = false
                             }
                         }
                     } else {
