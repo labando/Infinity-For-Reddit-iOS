@@ -295,15 +295,6 @@ struct HomeView: View {
         }, onAppEntersBackground: {
             homeViewModel.stopInboxCountPolling()
         })
-        .onReceive(NotificationCenter.default.publisher(for: .urlDeepLink)) { note in
-            if let url = (note.userInfo?[AppDeepLink.urlKey] as? URL) {
-                Task {
-                    await MainActor.run {
-                        currentNavigationManager.openLink(url)
-                    }
-                }
-            }
-        }
         .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
             let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
             let viewMessage = (note.userInfo?[AppDeepLink.viewMessageKey] as? Bool) ?? false

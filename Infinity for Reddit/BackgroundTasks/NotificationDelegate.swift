@@ -60,12 +60,13 @@ class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
         let userInfo = response.notification.request.content.userInfo
         
         guard let accountName = userInfo[AppDeepLink.accountNameKey] as? String,
-              let inboxKind = userInfo[AppDeepLink.kindKey] as? Inbox.InboxKind else {
+              let kind = userInfo[AppDeepLink.kindKey] as? String else {
             completion()
             return
         }
         
         let fullname = userInfo[AppDeepLink.fullnameKey] as? String
+        let inboxKind = Inbox.InboxKind(rawValue: kind) ?? .unknown
         
         var deepLinkUrl: URL?
         

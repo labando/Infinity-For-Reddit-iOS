@@ -15,7 +15,6 @@ struct AppDeepLink {
     static let contextKey = "context"
     static let kindKey = "kind"
     static let viewMessageKey = "viewMessage"
-    static let urlKey = "url"
     
     static func getInboxURL(account: String, viewMessage: Bool, fullname: String?) -> URL? {
         var components = URLComponents()

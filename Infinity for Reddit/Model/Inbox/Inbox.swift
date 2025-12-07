@@ -10,7 +10,7 @@ import SwiftyJSON
 
 public class Inbox: NSObject {
     
-    var kind: String!
+    var kind: String
     
     var associatedAwardingId : String!
     var author : String
@@ -40,26 +40,17 @@ public class Inbox: NSObject {
     var wasComment : Bool!
     
     enum InboxKind: String {
-        case comment, account, link, message, subreddit, award, unknown
+        case comment = "t1"
+        case account = "t2"
+        case link = "t3"
+        case message = "t4"
+        case subreddit = "t5"
+        case award = "t6"
+        case unknown
     }
     
     var inboxKind: InboxKind {
-        switch kind {
-        case "t1":
-            return .comment
-        case "t2":
-            return .account
-        case "t3":
-            return .link
-        case "t4":
-            return .message
-        case "t5":
-            return .subreddit
-        case "t6":
-            return .award
-        default:
-            return .unknown
-        }
+        return Inbox.InboxKind(rawValue: kind) ?? .unknown
     }
 
     init(fromJson json: JSON!, kind: String!, messageWhere: MessageWhere?) throws {

@@ -28,7 +28,7 @@ class HomeViewModel: ObservableObject {
     }
     
     func fetchInboxCount() async {
-        guard !hasFetchedInboxCount else {
+        guard !hasFetchedInboxCount && !AccountViewModel.shared.account.isAnonymous() else {
             return
         }
         

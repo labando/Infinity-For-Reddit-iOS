@@ -152,7 +152,6 @@ public class PostListingViewModel: ObservableObject {
             if posts.isEmpty {
                 isInitialLoading = true
             } else {
-                print("isloadingmore is true")
                 isLoadingMore = true
             }
             
@@ -322,8 +321,6 @@ public class PostListingViewModel: ObservableObject {
                 isInitialLoading = false
                 isLoadingMore = false
             }
-            
-            print("Error fetching posts: \(error)")
         }
     }
     
@@ -392,7 +389,6 @@ public class PostListingViewModel: ObservableObject {
         ) : Set<String>()
         
         return posts.filter { post in
-            print(PostFilter.isPostAllowed(post: post, postFilter: postFilter))
             return PostFilter.isPostAllowed(post: post, postFilter: postFilter) && !hiddenPostIdsAnonymous.contains(post.id)
         }.map {
             if !$0.selftext.isEmpty {
@@ -560,7 +556,6 @@ public class PostListingViewModel: ObservableObject {
             } catch {
                 post.hidden = previousHiddenState
                 self.error = error
-                print(error)
             }
         }
     }
@@ -588,7 +583,6 @@ public class PostListingViewModel: ObservableObject {
                 post.spam = false
             } catch {
                 self.error = error
-                print(error)
             }
         }
     }
@@ -608,7 +602,6 @@ public class PostListingViewModel: ObservableObject {
                 post.spam = isSpam
             } catch {
                 self.error = error
-                print(error)
             }
         }
     }
@@ -622,7 +615,6 @@ public class PostListingViewModel: ObservableObject {
                 post.stickied.toggle()
             } catch {
                 self.error = error
-                print(error)
             }
         }
     }
@@ -636,7 +628,6 @@ public class PostListingViewModel: ObservableObject {
                 post.locked.toggle()
             } catch {
                 self.error = error
-                print(error)
             }
         }
     }
@@ -649,7 +640,6 @@ public class PostListingViewModel: ObservableObject {
                 post.over18.toggle()
             } catch {
                 self.error = error
-                print(error)
             }
         }
     }
@@ -662,7 +652,6 @@ public class PostListingViewModel: ObservableObject {
                 post.spoiler.toggle()
             } catch {
                 self.error = error
-                print(error)
             }
         }
     }
@@ -676,7 +665,6 @@ public class PostListingViewModel: ObservableObject {
                 post.distinguished = post.distinguished == "moderator" ? "" : "moderator"
             } catch {
                 self.error = error
-                print(error)
             }
         }
     }
@@ -698,7 +686,6 @@ public class PostListingViewModel: ObservableObject {
             } catch {
                 await MainActor.run {
                     self.error = error
-                    print(error.localizedDescription)
                 }
             }
         }
