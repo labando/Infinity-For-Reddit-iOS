@@ -215,7 +215,6 @@ struct PostDetailsView: View {
                                                 }
                                             }
                                         }
-                                        .transition(.slide)
 //                                        .onAppear {
 //                                            postDetailsViewModel.insertIntoAppearedComments(commentItem)
 //                                            
@@ -634,27 +633,27 @@ struct PostDetailsView: View {
                 content: item.title ?? item.content
             )
         }
-//        .overlay(
-//            CustomAlert(
-//                title: activeAlert?.title ?? "",
-//                confirmButtonText: activeAlert?.confirmButtonText ?? "",
-//                buttonStyle: activeAlert?.buttonStyle ?? .info,
-//                isPresented: Binding(
-//                    get: { activeAlert != nil },
-//                    set: { newValue in
-//                        if !newValue {
-//                            activeAlert = nil
-//                        }
-//                    }
-//                )) {} onConfirm: {
-//                    if let alert = activeAlert {
-//                        switch alert {
-//                        case .deletePost:
-//                            postDetailsViewModel.deletePost()
-//                        }
-//                    }
-//                }
-//        )
+        .overlay(
+            CustomAlert(
+                title: activeAlert?.title ?? "",
+                confirmButtonText: activeAlert?.confirmButtonText ?? "",
+                buttonStyle: activeAlert?.buttonStyle ?? .info,
+                isPresented: Binding(
+                    get: { activeAlert != nil },
+                    set: { newValue in
+                        if !newValue {
+                            activeAlert = nil
+                        }
+                    }
+                )) {} onConfirm: {
+                    if let alert = activeAlert {
+                        switch alert {
+                        case .deletePost:
+                            postDetailsViewModel.deletePost()
+                        }
+                    }
+                }
+        )
     }
     
     private func setUpMenu() {

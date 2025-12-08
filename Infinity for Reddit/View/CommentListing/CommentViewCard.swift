@@ -79,7 +79,7 @@ struct CommentViewCard: View {
             CommentIndentationView(depth: commentViewModel.comment.depth)
             
             VStack(alignment: .leading, spacing: 0) {
-                HStack {
+                HStack(spacing: 8) {
                     if isInPostDetails && showAuthorAvatar {
                         CustomWebImage(
                             commentViewModel.comment.authorIconUrlString,
@@ -365,11 +365,11 @@ struct CommentViewCard: View {
         }
         .contentShape(Rectangle())
         .background(backgroundColor)
-        .applyIf(isInPostDetails) {
-            $0.onTapGesture {
-                isToolbarHidden.toggle()
-            }
-        }
+//        .applyIf(isInPostDetails) {
+//            $0.onTapGesture {
+//                isToolbarHidden.toggle()
+//            }
+//        }
     }
     
     private var backgroundColor: Color {
