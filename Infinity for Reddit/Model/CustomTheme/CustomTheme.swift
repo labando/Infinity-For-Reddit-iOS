@@ -47,9 +47,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
     @objc var toolbarPrimaryTextAndIconColor: Int
     @objc var mediaIndicatorIconColor: Int
     @objc var mediaIndicatorBackgroundColor: Int
-    @objc var tabLayoutWithExpandedCollapsingToolbarTabBackground: Int
-    @objc var tabLayoutWithExpandedCollapsingToolbarTextColor: Int
-    @objc var tabLayoutWithExpandedCollapsingToolbarTabIndicator: Int
+    @objc var pickerItemTextColor: Int
+    @objc var pickerSelectedItemTextColor: Int
+    @objc var pickerSelectedItemBackgroundColor: Int
     @objc var upvoted: Int
     @objc var downvoted: Int
     @objc var postTypeBackgroundColor: Int
@@ -86,7 +86,6 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
     @objc var commentVerticalBarColor5: Int
     @objc var commentVerticalBarColor6: Int
     @objc var commentVerticalBarColor7: Int
-    @objc var isLightStatusBar: Bool
     
     
     static var databaseTableName: String {
@@ -123,9 +122,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         toolbarPrimaryTextAndIconColor: Int,
         mediaIndicatorIconColor: Int,
         mediaIndicatorBackgroundColor: Int,
-        tabLayoutWithExpandedCollapsingToolbarTabBackground: Int,
-        tabLayoutWithExpandedCollapsingToolbarTextColor: Int,
-        tabLayoutWithExpandedCollapsingToolbarTabIndicator: Int,
+        pickerItemTextColor: Int,
+        pickerSelectedItemTextColor: Int,
+        pickerSelectedItemBackgroundColor: Int,
         upvoted: Int,
         downvoted: Int,
         postTypeBackgroundColor: Int,
@@ -169,8 +168,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         receivedMessageBackgroundColor: Int,
         sentMessageBackgroundColor: Int,
         sendMessageIconColor: Int,
-        fullyCollapsedCommentBackgroundColor: Int,
-        isLightStatusBar: Bool
+        fullyCollapsedCommentBackgroundColor: Int
     ) {
         self.name = name
         self.username = username
@@ -202,9 +200,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         self.toolbarPrimaryTextAndIconColor = toolbarPrimaryTextAndIconColor
         self.mediaIndicatorIconColor = mediaIndicatorIconColor
         self.mediaIndicatorBackgroundColor = mediaIndicatorBackgroundColor
-        self.tabLayoutWithExpandedCollapsingToolbarTabBackground = tabLayoutWithExpandedCollapsingToolbarTabBackground
-        self.tabLayoutWithExpandedCollapsingToolbarTextColor = tabLayoutWithExpandedCollapsingToolbarTextColor
-        self.tabLayoutWithExpandedCollapsingToolbarTabIndicator = tabLayoutWithExpandedCollapsingToolbarTabIndicator
+        self.pickerItemTextColor = pickerItemTextColor
+        self.pickerSelectedItemTextColor = pickerSelectedItemTextColor
+        self.pickerSelectedItemBackgroundColor = pickerSelectedItemBackgroundColor
         self.upvoted = upvoted
         self.downvoted = downvoted
         self.postTypeBackgroundColor = postTypeBackgroundColor
@@ -248,73 +246,6 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         self.sentMessageBackgroundColor = sentMessageBackgroundColor
         self.sendMessageIconColor = sendMessageIconColor
         self.fullyCollapsedCommentBackgroundColor = fullyCollapsedCommentBackgroundColor
-        self.isLightStatusBar = isLightStatusBar
-    }
-    
-    func fieldToKeyPath(fieldName: String) -> AnyKeyPath? {
-        switch fieldName {
-        case "name":
-            return \CustomTheme.name
-        case "isLightTheme":
-            return \CustomTheme.isLightTheme
-        case "isDarkTheme":
-            return \CustomTheme.isDarkTheme
-        case "isAmoledTheme":
-            return \CustomTheme.isAmoledTheme
-        case "colorPrimary":
-            return \CustomTheme.colorPrimary
-        case "colorAccent":
-            return \CustomTheme.colorAccent
-        case "colorPrimaryLightTheme":
-            return \CustomTheme.colorPrimaryLightTheme
-        case "primaryTextColor":
-            return \CustomTheme.primaryTextColor
-        case "secondaryTextColor":
-            return \CustomTheme.secondaryTextColor
-        case "postTitleColor":
-            return \CustomTheme.postTitleColor
-        case "postContentColor":
-            return \CustomTheme.postContentColor
-        case "readPostTitleColor":
-            return \CustomTheme.readPostTitleColor
-        case "readPostContentColor":
-            return \CustomTheme.readPostContentColor
-        case "commentColor":
-            return \CustomTheme.commentColor
-        case "buttonTextColor":
-            return \CustomTheme.buttonTextColor
-        case "backgroundColor":
-            return \CustomTheme.backgroundColor
-        case "cardViewBackgroundColor":
-            return \CustomTheme.cardViewBackgroundColor
-        case "readPostCardViewBackgroundColor":
-            return \CustomTheme.readPostCardViewBackgroundColor
-        case "filledCardViewBackgroundColor":
-            return \CustomTheme.filledCardViewBackgroundColor
-        case "readPostFilledCardViewBackgroundColor":
-            return \CustomTheme.readPostFilledCardViewBackgroundColor
-        case "commentBackgroundColor":
-            return \CustomTheme.commentBackgroundColor
-        case "bottomAppBarBackgroundColor":
-            return \CustomTheme.bottomAppBarBackgroundColor
-        case "primaryIconColor":
-            return \CustomTheme.primaryIconColor
-        case "bottomAppBarIconColor":
-            return \CustomTheme.bottomAppBarIconColor
-        case "postIconAndInfoColor":
-            return \CustomTheme.postIconAndInfoColor
-        case "commentIconAndInfoColor":
-            return \CustomTheme.commentIconAndInfoColor
-        case "toolbarPrimaryTextAndIconColor":
-            return \CustomTheme.toolbarPrimaryTextAndIconColor
-        case "mediaIndicatorIconColor":
-            return \CustomTheme.mediaIndicatorIconColor
-        case "mediaIndicatorBackgroundColor":
-            return \CustomTheme.mediaIndicatorBackgroundColor
-        // Add more cases here for each field
-        default:
-            return nil
-        }
     }
     
     func getProperties(customThemeFields: inout [String], customThemeFieldsBoolType: inout Set<String>) {
@@ -343,8 +274,6 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             if let value = value as? Bool { isDarkTheme = value }
         case "isAmoledTheme":
             if let value = value as? Bool { isAmoledTheme = value }
-        case "isLightStatusBar":
-            if let value = value as? Bool { isLightStatusBar = value }
         default:
             if let value = value as? Int {
                 let mirror = Mirror(reflecting: self)
@@ -386,9 +315,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             toolbarPrimaryTextAndIconColor: 0xFFFFFF,
             mediaIndicatorIconColor: 0xFFFFFF,
             mediaIndicatorBackgroundColor: 0x000000,
-            tabLayoutWithExpandedCollapsingToolbarTabBackground: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTextColor: 0x0336FF,
-            tabLayoutWithExpandedCollapsingToolbarTabIndicator: 0x0336FF,
+            pickerItemTextColor: 0x0336FF,
+            pickerSelectedItemTextColor: 0xFFFFFF,
+            pickerSelectedItemBackgroundColor: 0x0336FF,
             upvoted: 0xFF1868,
             downvoted: 0x007DDE,
             postTypeBackgroundColor: 0x002BF0,
@@ -432,8 +361,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             receivedMessageBackgroundColor: 0x4185F4,
             sentMessageBackgroundColor: 0x31BF7D,
             sendMessageIconColor: 0x4185F4,
-            fullyCollapsedCommentBackgroundColor: 0x8EDFBA,
-            isLightStatusBar: false
+            fullyCollapsedCommentBackgroundColor: 0x8EDFBA
         )
         return customTheme
     }
@@ -469,9 +397,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             toolbarPrimaryTextAndIconColor: 0xFFFFFF,
             mediaIndicatorIconColor: 0x000000,
             mediaIndicatorBackgroundColor: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTabBackground: 0x242424,
-            tabLayoutWithExpandedCollapsingToolbarTextColor: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTabIndicator: 0xFFFFFF,
+            pickerItemTextColor: 0xFFFFFF,
+            pickerSelectedItemTextColor: 0x242424,
+            pickerSelectedItemBackgroundColor: 0xFFFFFF,
             upvoted: 0xFF1868,
             downvoted: 0x007DDE,
             postTypeBackgroundColor: 0x0336FF,
@@ -515,8 +443,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             receivedMessageBackgroundColor: 0x4185F4,
             sentMessageBackgroundColor: 0x31BF7D,
             sendMessageIconColor: 0x4185F4,
-            fullyCollapsedCommentBackgroundColor: 0x21C561,
-            isLightStatusBar: false
+            fullyCollapsedCommentBackgroundColor: 0x21C561
         )
         return customTheme
     }
@@ -552,9 +479,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             toolbarPrimaryTextAndIconColor: 0xFFFFFF,
             mediaIndicatorIconColor: 0x000000,
             mediaIndicatorBackgroundColor: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTabBackground: 0x000000,
-            tabLayoutWithExpandedCollapsingToolbarTextColor: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTabIndicator: 0xFFFFFF,
+            pickerItemTextColor: 0xFFFFFF,
+            pickerSelectedItemTextColor: 0x000000,
+            pickerSelectedItemBackgroundColor: 0xFFFFFF,
             upvoted: 0xFF1868,
             downvoted: 0x007DDE,
             postTypeBackgroundColor: 0x0336FF,
@@ -598,8 +525,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             receivedMessageBackgroundColor: 0x4185F4,
             sentMessageBackgroundColor: 0x31BF7D,
             sendMessageIconColor: 0x4185F4,
-            fullyCollapsedCommentBackgroundColor: 0x21C561,
-            isLightStatusBar: false
+            fullyCollapsedCommentBackgroundColor: 0x21C561
         )
     }
     
@@ -634,9 +560,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             toolbarPrimaryTextAndIconColor: 0x3C4043,
             mediaIndicatorIconColor: 0xFFFFFF,
             mediaIndicatorBackgroundColor: 0x000000,
-            tabLayoutWithExpandedCollapsingToolbarTabBackground: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTextColor: 0x3C4043,
-            tabLayoutWithExpandedCollapsingToolbarTabIndicator: 0x3C4043,
+            pickerItemTextColor: 0x3C4043,
+            pickerSelectedItemTextColor: 0xFFFFFF,
+            pickerSelectedItemBackgroundColor: 0x3C4043,
             upvoted: 0xFF1868,
             downvoted: 0x007DDE,
             postTypeBackgroundColor: 0x002BF0,
@@ -680,8 +606,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             receivedMessageBackgroundColor: 0x4185F4,
             sentMessageBackgroundColor: 0x31BF7D,
             sendMessageIconColor: 0x4185F4,
-            fullyCollapsedCommentBackgroundColor: 0x8EDFBA,
-            isLightStatusBar: true
+            fullyCollapsedCommentBackgroundColor: 0x8EDFBA
         )
     }
     
@@ -716,9 +641,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             toolbarPrimaryTextAndIconColor: 0xFFFFFF,
             mediaIndicatorIconColor: 0x000000,
             mediaIndicatorBackgroundColor: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTabBackground: 0x242424,
-            tabLayoutWithExpandedCollapsingToolbarTextColor: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTabIndicator: 0xFFFFFF,
+            pickerItemTextColor: 0xFFFFFF,
+            pickerSelectedItemTextColor: 0x242424,
+            pickerSelectedItemBackgroundColor: 0xFFFFFF,
             upvoted: 0xFF1868,
             downvoted: 0x007DDE,
             postTypeBackgroundColor: 0x0336FF,
@@ -762,8 +687,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             receivedMessageBackgroundColor: 0x4185F4,
             sentMessageBackgroundColor: 0x31BF7D,
             sendMessageIconColor: 0x4185F4,
-            fullyCollapsedCommentBackgroundColor: 0x21C561,
-            isLightStatusBar: false
+            fullyCollapsedCommentBackgroundColor: 0x21C561
         )
     }
     
@@ -798,9 +722,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             toolbarPrimaryTextAndIconColor: 0xFFFFFF,
             mediaIndicatorIconColor: 0x000000,
             mediaIndicatorBackgroundColor: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTabBackground: 0x000000,
-            tabLayoutWithExpandedCollapsingToolbarTextColor: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTabIndicator: 0xFFFFFF,
+            pickerItemTextColor: 0xFFFFFF,
+            pickerSelectedItemTextColor: 0x000000,
+            pickerSelectedItemBackgroundColor: 0xFFFFFF,
             upvoted: 0xFF1868,
             downvoted: 0x007DDE,
             postTypeBackgroundColor: 0x0336FF,
@@ -844,8 +768,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             receivedMessageBackgroundColor: 0x4185F4,
             sentMessageBackgroundColor: 0x31BF7D,
             sendMessageIconColor: 0x4185F4,
-            fullyCollapsedCommentBackgroundColor: 0x21C561,
-            isLightStatusBar: false
+            fullyCollapsedCommentBackgroundColor: 0x21C561
         )
         
         return customTheme
@@ -882,9 +805,9 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             toolbarPrimaryTextAndIconColor: 0xFFFFFF,
             mediaIndicatorIconColor: 0xFFFFFF,
             mediaIndicatorBackgroundColor: 0x000000,
-            tabLayoutWithExpandedCollapsingToolbarTabBackground: 0xFFFFFF,
-            tabLayoutWithExpandedCollapsingToolbarTextColor: 0xEE0270,
-            tabLayoutWithExpandedCollapsingToolbarTabIndicator: 0xEE0270,
+            pickerItemTextColor: 0xEE0270,
+            pickerSelectedItemTextColor: 0xFFFFFF,
+            pickerSelectedItemBackgroundColor: 0xEE0270,
             upvoted: 0xFF1868,
             downvoted: 0x007DDE,
             postTypeBackgroundColor: 0x002BF0,
@@ -928,8 +851,7 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
             receivedMessageBackgroundColor: 0x4185F4,
             sentMessageBackgroundColor: 0x31BF7D,
             sendMessageIconColor: 0x4185F4,
-            fullyCollapsedCommentBackgroundColor: 0x8EDFBA,
-            isLightStatusBar: false
+            fullyCollapsedCommentBackgroundColor: 0x8EDFBA
         )
         
         return customTheme

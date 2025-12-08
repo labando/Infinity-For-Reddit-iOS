@@ -198,7 +198,6 @@ struct RedditGRDBDatabase {
                 t.column("isLightTheme", .boolean).notNull()
                 t.column("isDarkTheme", .boolean).notNull()
                 t.column("isAmoledTheme", .boolean).notNull()
-                t.column("isLightStatusBar", .boolean).notNull()
                 
                 // Integer color properties
                 let colorColumns = [
@@ -210,8 +209,7 @@ struct RedditGRDBDatabase {
                     "commentBackgroundColor", "bottomAppBarBackgroundColor", "primaryIconColor",
                     "bottomAppBarIconColor", "postIconAndInfoColor", "commentIconAndInfoColor",
                     "toolbarPrimaryTextAndIconColor", "mediaIndicatorIconColor", "mediaIndicatorBackgroundColor",
-                    "tabLayoutWithExpandedCollapsingToolbarTabBackground", "tabLayoutWithExpandedCollapsingToolbarTextColor",
-                    "tabLayoutWithExpandedCollapsingToolbarTabIndicator",
+                    "pickerItemTextColor", "pickerSelectedItemTextColor", "pickerSelectedItemBackgroundColor",
                     "upvoted", "downvoted", "postTypeBackgroundColor", "postTypeTextColor",
                     "spoilerBackgroundColor", "spoilerTextColor", "nsfwBackgroundColor", "nsfwTextColor",
                     "flairBackgroundColor", "flairTextColor",

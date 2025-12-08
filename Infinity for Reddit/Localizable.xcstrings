@@ -436,66 +436,6 @@
         }
       }
     },
-    "theme_item_awarded_comment_background_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Awarded Comment Background Color"
-          }
-        }
-      }
-    },
-    "theme_item_awarded_comment_background_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Background of awarded comments"
-          }
-        }
-      }
-    },
-    "theme_item_awards_background_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Awards Background Color"
-          }
-        }
-      }
-    },
-    "theme_item_awards_background_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Background of the awards tag"
-          }
-        }
-      }
-    },
-    "theme_item_awards_text_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Awards Text Color"
-          }
-        }
-      }
-    },
-    "theme_item_awards_text_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Text color of the awards tag"
-          }
-        }
-      }
-    },
     "theme_item_background_color" : {
       "localizations" : {
         "en" : {
@@ -596,56 +536,6 @@
         }
       }
     },
-    "theme_item_change_status_bar_icon_color_after_toolbar_collapsed_in_immersive_interface" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Change Status Bar Icon Color After Toolbar Collapsed In Immersive Interface"
-          }
-        }
-      }
-    },
-    "theme_item_chip_text_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chip Text Color"
-          }
-        }
-      }
-    },
-    "theme_item_chip_text_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Subscribe Button"
-          }
-        }
-      }
-    },
-    "theme_item_circular_progress_bar_background_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Circular Progress Bar Background Color"
-          }
-        }
-      }
-    },
-    "theme_item_circular_progress_bar_background_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Background of Circular progress bar"
-          }
-        }
-      }
-    },
     "theme_item_color_accent" : {
       "localizations" : {
         "en" : {
@@ -672,26 +562,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Color Primary"
-          }
-        }
-      }
-    },
-    "theme_item_color_primary_dark" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Color Primary Dark"
-          }
-        }
-      }
-    },
-    "theme_item_color_primary_dark_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Status Bar"
           }
         }
       }
@@ -1136,26 +1006,6 @@
         }
       }
     },
-    "theme_item_light_nav_bar" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dark Navigation Bar Icon Color"
-          }
-        }
-      }
-    },
-    "theme_item_light_status_bar" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dark Status Bar Icon Color"
-          }
-        }
-      }
-    },
     "theme_item_link_color" : {
       "localizations" : {
         "en" : {
@@ -1256,26 +1106,6 @@
         }
       }
     },
-    "theme_item_nav_bar_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Navigation Bar Color"
-          }
-        }
-      }
-    },
-    "theme_item_nav_bar_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Navigation bar"
-          }
-        }
-      }
-    },
     "theme_item_no_preview_post_type_background_color" : {
       "localizations" : {
         "en" : {
@@ -1352,6 +1182,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Applied to: Text color of the sensitive tag"
+          }
+        }
+      }
+    },
+    "theme_item_picker_item_text_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Color of Picker Item"
+          }
+        }
+      }
+    },
+    "theme_item_picker_item_text_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Picker Item"
+          }
+        }
+      }
+    },
+    "theme_item_picker_selected_item_background_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Color of Selected Picker Item"
+          }
+        }
+      }
+    },
+    "theme_item_picker_selected_item_background_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Selected Picker Item"
+          }
+        }
+      }
+    },
+    "theme_item_picker_selected_item_text_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Color of Selected Picker Item"
+          }
+        }
+      }
+    },
+    "theme_item_picker_selected_item_text_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applied to: Selected Picker Item"
           }
         }
       }
@@ -1836,126 +1726,6 @@
         }
       }
     },
-    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Background Color of Tab Layout in Collapsed Toolbar"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Tab layout background (collapsed toolbar)"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tab Indicator Color of Tab Layout in Collapsed Toolbar"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Tab indicator color in tab layout (collapsed toolbar)"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text Color of Tab Layout in Collapsed Toolbar"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Tab layout text color (collapsed toolbar)"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Background Color of Tab Layout in Expanded Toolbar"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Tab layout background (expanded toolbar)"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tab Indicator Color of Tab Layout in Expanded Toolbar"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Tab indicator color in tab layout (expanded toolbar)"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text Color of Tab Layout in Expanded Toolbar"
-          }
-        }
-      }
-    },
-    "theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Tab layout text color (expanded toolbar)"
-          }
-        }
-      }
-    },
     "theme_item_toolbar_primary_text_and_icon_color" : {
       "localizations" : {
         "en" : {
@@ -1972,26 +1742,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Applied to: Primary texts and icons in toolbars"
-          }
-        }
-      }
-    },
-    "theme_item_toolbar_secondary_text_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toolbar Secondary Text Color"
-          }
-        }
-      }
-    },
-    "theme_item_toolbar_secondary_text_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Secondary texts in toolbars"
           }
         }
       }
@@ -2112,17 +1862,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Applied to: Vote and reply buttons (Unavailable)"
-          }
-        }
-      }
-    },
-    "theme_name_description" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap to change the name of this theme."
           }
         }
       }

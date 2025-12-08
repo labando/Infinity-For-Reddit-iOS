@@ -175,8 +175,6 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.isDarkTheme
         case "isAmoledTheme":
             return $customizeCustomThemeViewModel.customTheme.isAmoledTheme
-        case "isLightStatusBar":
-            return $customizeCustomThemeViewModel.customTheme.isLightStatusBar
         default:
             return nil
         }
@@ -248,12 +246,12 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.mediaIndicatorIconColor
         case "mediaIndicatorBackgroundColor":
             return $customizeCustomThemeViewModel.customTheme.mediaIndicatorBackgroundColor
-        case "tabLayoutWithExpandedCollapsingToolbarTabBackground":
-            return $customizeCustomThemeViewModel.customTheme.tabLayoutWithExpandedCollapsingToolbarTabBackground
-        case "tabLayoutWithExpandedCollapsingToolbarTextColor":
-            return $customizeCustomThemeViewModel.customTheme.tabLayoutWithExpandedCollapsingToolbarTextColor
-        case "tabLayoutWithExpandedCollapsingToolbarTabIndicator":
-            return $customizeCustomThemeViewModel.customTheme.tabLayoutWithExpandedCollapsingToolbarTabIndicator
+        case "pickerItemTextColor":
+            return $customizeCustomThemeViewModel.customTheme.pickerItemTextColor
+        case "pickerSelectedItemTextColor":
+            return $customizeCustomThemeViewModel.customTheme.pickerSelectedItemTextColor
+        case "pickerSelectedItemBackgroundColor":
+            return $customizeCustomThemeViewModel.customTheme.pickerSelectedItemBackgroundColor
         case "upvoted":
             return $customizeCustomThemeViewModel.customTheme.upvoted
         case "downvoted":
