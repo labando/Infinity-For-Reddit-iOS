@@ -54,7 +54,7 @@ struct SendChatMessageView: View {
                         .contentShape(Rectangle())
                         .padding(16)
                         
-                        Divider()
+                        CustomDivider()
                         
                         MarkdownTextField(
                             hint: "Message",

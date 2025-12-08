@@ -27,7 +27,7 @@ struct CustomizeCustomThemeView: View {
                         CustomTextField("Name", text: $customizeCustomThemeViewModel.customTheme.name, singleLine: true, fieldType: FieldType.name, focusedField: $focusedField)
                             .padding(16)
                         
-                        Divider()
+                        CustomDivider()
                     }
                     .listPlainItemNoInsets()
                     
@@ -115,7 +115,7 @@ struct CustomizeCustomThemeView: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                Divider()
+                CustomDivider()
             }
         }
     }
@@ -152,7 +152,7 @@ struct CustomizeCustomThemeView: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                Divider()
+                CustomDivider()
             }
         }
     }

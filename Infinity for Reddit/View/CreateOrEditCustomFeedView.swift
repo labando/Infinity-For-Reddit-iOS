@@ -96,7 +96,7 @@ struct CreateOrEditCustomFeedView: View {
                                 }
                             }
                             
-                            Divider()
+                            CustomDivider()
                             
                             ForEach(createOrEditCustomFeedViewModel.subredditsAndUsersInCustomFeed, id: \.id) { item in
                                 SubredditAndUserInCustomFeedItemView(

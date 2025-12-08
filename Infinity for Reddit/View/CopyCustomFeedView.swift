@@ -80,7 +80,7 @@ struct CopyCustomFeedView: View {
                             .contentShape(Rectangle())
                             .padding(16)
                             
-                            Divider()
+                            CustomDivider()
                             
                             ForEach(copyCustomFeedViewModel.subredditsAndUsersInCustomFeed, id: \.id) { item in
                                 SubredditAndUserInCustomFeedItemView(

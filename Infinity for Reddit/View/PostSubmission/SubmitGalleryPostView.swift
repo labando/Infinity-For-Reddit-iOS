@@ -62,11 +62,11 @@ struct SubmitGalleryPostView: View {
                                     showNoSubredditAlert = true
                                 }
                                 
-                                Divider()
+                                CustomDivider()
                                 
                                 PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
                                 
-                                Divider()
+                                CustomDivider()
                                 
                                 CustomTextField(
                                     "Title",

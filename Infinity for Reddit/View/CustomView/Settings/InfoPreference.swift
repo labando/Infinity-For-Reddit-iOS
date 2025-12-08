@@ -31,7 +31,7 @@ struct InfoPreference: View {
             }
             .padding(16)
             
-            Divider()
+            CustomDivider()
         }
     }
 }

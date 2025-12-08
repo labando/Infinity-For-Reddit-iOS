@@ -375,9 +375,6 @@ struct PostDetailsView: View {
                                     }
                                 }
                             
-                            CustomDivider()
-                                .frame(width: 2, height: 32)
-                            
                             SwiftUI.Image(systemName: "magnifyingglass")
                                 .resizable()
                                 .scaledToFit()
@@ -390,9 +387,6 @@ struct PostDetailsView: View {
                                         showSearchBar = true
                                     }
                                 }
-                            
-                            CustomDivider()
-                                .frame(width: 2, height: 32)
                             
                             SwiftUI.Image(systemName: "chevron.down")
                                 .resizable()

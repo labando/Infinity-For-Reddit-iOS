@@ -359,7 +359,7 @@ struct CommentViewCard: View {
                 }
                 
                 if showCommentDivider {
-                    Divider()
+                    CustomDivider()
                 }
             }
         }

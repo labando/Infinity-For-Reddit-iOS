@@ -85,7 +85,7 @@ struct SubmitCommentView: View {
                                     .frame(height: 8)
                             }
                             
-                            Divider()
+                            CustomDivider()
                             
                             UserPicker {
                                 submitCommentViewModel.selectedAccount = $0

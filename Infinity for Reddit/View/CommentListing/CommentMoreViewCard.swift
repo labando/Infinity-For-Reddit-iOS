@@ -24,7 +24,7 @@ struct CommentMoreViewCard: View {
                     .padding(.vertical, 12)
                 
                 if showCommentDivider {
-                    Divider()
+                    CustomDivider()
                 }
             }
             .frame(maxWidth: .infinity)

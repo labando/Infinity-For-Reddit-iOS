@@ -141,7 +141,7 @@ struct InboxMessageItemView: View {
                 .background(isNew && !hasReadAllMessages ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
             }
             
-            Divider()
+            CustomDivider()
         }
         .listPlainItemNoInsets()
     }
@@ -228,7 +228,7 @@ struct InboxNotificationItemView: View {
                 .background(inbox.isNew && !hasReadAllMessages ? Color(hex: customThemeViewModel.currentCustomTheme.unreadMessageBackgroundColor) : .clear)
             }
             
-            Divider()
+            CustomDivider()
         }
         .listPlainItemNoInsets()
     }

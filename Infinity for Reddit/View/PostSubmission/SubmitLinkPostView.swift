@@ -51,11 +51,11 @@ struct SubmitLinkPostView: View {
                                     showNoSubredditAlert = true
                                 }
                                 
-                                Divider()
+                                CustomDivider()
                                 
                                 PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
                                 
-                                Divider()
+                                CustomDivider()
                                 
                                 HStack {
                                     CustomTextField(

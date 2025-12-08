@@ -61,11 +61,11 @@ struct SubmitPollPostView: View {
                                     showNoSubredditAlert = true
                                 }
                                 
-                                Divider()
+                                CustomDivider()
                                 
                                 PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
                                 
-                                Divider()
+                                CustomDivider()
                                 
                                 CustomTextField(
                                     "Title",
@@ -83,7 +83,7 @@ struct SubmitPollPostView: View {
                                     .contentShape(Rectangle())
                                     .padding(16)
                                 
-                                Divider()
+                                CustomDivider()
                                 
                                 Menu {
                                     ForEach(1..<8, id: \.self) { index in

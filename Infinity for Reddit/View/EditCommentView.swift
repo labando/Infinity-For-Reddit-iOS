@@ -70,7 +70,7 @@ struct EditCommentView: View {
                                     .frame(height: 8)
                             }
                             
-                            Divider()
+                            CustomDivider()
                             
                             MarkdownTextField(hint: "Your new interesting thoughts here", text: $editCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
                                 .contentShape(Rectangle())
