@@ -11,6 +11,7 @@ import Foundation
 
 final class RedditAccessTokenInterceptor: RequestInterceptor {
     private let lock = NSLock()
+    private let refreshTokenSession: Session = ProxyUtils.makeSession()
     
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         guard let url = urlRequest.url else {
@@ -83,7 +84,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
     }
     
     // MARK: - Refresh the access token
-    func refreshAccessToken(completion: @escaping (Result<(String, String?), Error>) -> Void) {
+    private func refreshAccessToken(completion: @escaping (Result<(String, String?), Error>) -> Void) {
         guard let refreshToken = AccountViewModel.shared.account.refreshToken else {
             completion(.failure(NSError(domain: "TokenManager", code: 1001, userInfo: [NSLocalizedDescriptionKey: "No refresh token found"])))
             return
@@ -91,7 +92,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
         
         let parameters: [String: String] = ["grant_type": "refresh_token", "refresh_token": refreshToken]
         
-        ProxyUtils.makeSession().request("https://www.reddit.com/api/v1/access_token", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: APIUtils.getHttpBasicAuthHeader())
+        refreshTokenSession.request("https://www.reddit.com/api/v1/access_token", method: .post, parameters: parameters, encoding: URLEncoding.default, headers: APIUtils.getHttpBasicAuthHeader())
             .validate()
             .responseDecodable(of: AccessTokenResponse.self) { response in
                 switch response.result {
