@@ -263,7 +263,7 @@ struct CommentViewCard: View {
                                 .padding(8)
                                 .contentShape(Rectangle())
                                 
-                                if isInPostDetails {
+                                if isInPostDetails && !AccountViewModel.shared.account.isAnonymous() {
                                     Button(action: {
                                         if commentViewModel.comment.locked {
                                             snackbarManager.showSnackbar(.info("This comment is locked."))
@@ -307,7 +307,7 @@ struct CommentViewCard: View {
                                         onCopy()
                                     }
                                     
-                                    if isInPostDetails {
+                                    if isInPostDetails && !AccountViewModel.shared.account.isAnonymous() {
                                         Button("Reply") {
                                             if commentViewModel.comment.locked {
                                                 snackbarManager.showSnackbar(.info("This comment is locked."))
