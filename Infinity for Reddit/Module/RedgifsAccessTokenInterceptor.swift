@@ -11,6 +11,7 @@ import Foundation
 
 final class RedgifsAccessTokenInterceptor: RequestInterceptor {
     private let lock = NSLock()
+    private let refreshTokenSession: Session = ProxyUtils.makeSession()
     
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         guard var url = urlRequest.url else {
@@ -68,8 +69,7 @@ final class RedgifsAccessTokenInterceptor: RequestInterceptor {
     func refreshAccessToken(completion: @escaping (Result<String, Error>) -> Void) {
         let headers: HTTPHeaders = ["User-Agent": APIUtils.USER_AGENT]
         
-        let session = ProxyUtils.makeSession()
-        session.request("https://api.redgifs.com/v2/auth/temporary", method: .get, encoding: URLEncoding.default, headers: headers)
+        refreshTokenSession.request("https://api.redgifs.com/v2/auth/temporary", method: .get, encoding: URLEncoding.default, headers: headers)
             .validate()
             .responseDecodable(of: AccessTokenResponse.self) { response in
                 switch response.result {

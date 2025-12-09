@@ -10,6 +10,15 @@ import SwiftyJSON
 import GiphyUISDK
 
 class SubmitCommentRepository: SubmitCommentRepositoryProtocol {
+    private let session: Session
+    
+    init() {
+        guard let resolvedSession = DependencyManager.shared.container.resolve(Session.self, name: "plain") else {
+            fatalError("Failed to resolve plain Session in SubmitCommentRepositoryProtocol")
+        }
+        self.session = resolvedSession
+    }
+    
     enum SubmitCommentRepositoryError: LocalizedError {
         case sendCommentError(String)
         
@@ -21,8 +30,8 @@ class SubmitCommentRepository: SubmitCommentRepositoryProtocol {
         }
     }
     
-    func submitComment(accout: Account, content: String, parentFullname: String, depth: Int, embeddedImages: [UploadedImage], giphyGif: GPHMedia?) async throws -> Comment {
-        guard !accout.isAnonymous() else {
+    func submitComment(account: Account, content: String, parentFullname: String, depth: Int, embeddedImages: [UploadedImage], giphyGif: GPHMedia?) async throws -> Comment {
+        guard !account.isAnonymous() else {
             throw SubmitCommentRepositoryError.sendCommentError("Please choose an account to submit as.")
         }
         
@@ -30,7 +39,6 @@ class SubmitCommentRepository: SubmitCommentRepositoryProtocol {
             throw SubmitCommentRepositoryError.sendCommentError("Where are your interesting thoughts?")
         }
         
-        let session = SessionProvider.getAccountSpecificSession(account: accout)
         let params: [String : String]
         if embeddedImages.isEmpty && giphyGif == nil {
             params = ["api_type": "json", "return_rtjson": "true", "text": content, "thing_id": parentFullname]
@@ -41,7 +49,8 @@ class SubmitCommentRepository: SubmitCommentRepositoryProtocol {
         
         try Task.checkCancellation()
         
-        let data = try await session.request(RedditOAuthAPI.sendCommentOrReplyToMessage(params: params))
+        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let data = try await session.request(RedditOAuthAPI.sendCommentOrReplyToMessage(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
             .value

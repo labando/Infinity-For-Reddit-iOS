@@ -8,5 +8,5 @@
 import GiphyUISDK
 
 protocol SubmitCommentRepositoryProtocol {
-    func submitComment(accout: Account, content: String,  parentFullname: String, depth: Int, embeddedImages: [UploadedImage], giphyGif: GPHMedia?) async throws -> Comment
+    func submitComment(account: Account, content: String,  parentFullname: String, depth: Int, embeddedImages: [UploadedImage], giphyGif: GPHMedia?) async throws -> Comment
 }

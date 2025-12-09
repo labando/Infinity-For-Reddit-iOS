@@ -61,7 +61,7 @@ class SubmitCommentViewModel: ObservableObject {
         submitCommentTask = Task {
             do {
                 submittedComment = try await submitCommentRepository.submitComment(
-                    accout: selectedAccount,
+                    account: selectedAccount,
                     content: text,
                     parentFullname: commentParent.parentFullname ?? "",
                     depth: commentParent.childCommentDepth,
