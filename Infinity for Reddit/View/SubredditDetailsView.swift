@@ -124,9 +124,20 @@ struct SubredditDetailsView: View {
                 }
                 .edgesIgnoringSafeArea(.top)
                 .overlay(alignment: .top) {
-                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(
+                                    colors: [
+                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary),
+                                        isSubredditInfoVisible ? .clear : Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                    ]
+                                ),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                         .frame(height: proxy.safeAreaInsets.top)
-                        .opacity(isSubredditInfoVisible ? 0 : 1)
                         .ignoresSafeArea()
                 }
             }

@@ -179,9 +179,20 @@ struct UserDetailsView: View {
                     .animation(.bouncy, value: navigationManager.rootTabLabelVisibility)
                 }
                 .overlay(alignment: .top) {
-                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(
+                                    colors: [
+                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary),
+                                        isUserInfoVisible ? .clear : Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                    ]
+                                ),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                         .frame(height: proxy.safeAreaInsets.top)
-                        .opacity(isUserInfoVisible ? 0 : 1)
                         .ignoresSafeArea()
                 }
                 .edgesIgnoringSafeArea(.top)
