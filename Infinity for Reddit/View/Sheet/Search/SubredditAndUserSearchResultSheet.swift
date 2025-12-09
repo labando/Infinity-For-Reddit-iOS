@@ -40,39 +40,41 @@ struct SubredditAndUserSearchResultSheet: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users"])
-                .padding(4)
-            
-            TabView(selection: $selectedOption) {
-                SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
-                    .tag(0)
+        SheetRootView {
+            VStack(spacing: 0) {
+                SegmentedPicker(selectedValue: $selectedOption, values: ["Subreddits", "Users"])
+                    .padding(4)
                 
-                UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
-                    .tag(1)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            
-            if case .subredditAndUserMultiSelection(_, let onSelectMultipleSubscriptions) = thingSelectionMode {
-                Button {
-                    var selectedThings: [Thing] = []
-                    for subreddit in subredditListingViewModel.selectedSubreddits {
-                        selectedThings.append(.subreddit(subreddit.toSubredditData()))
-                    }
-                    for user in userListingViewModel.selectedUsers {
-                        selectedThings.append(.user(user.toUserData()))
-                    }
+                TabView(selection: $selectedOption) {
+                    SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
+                        .tag(0)
                     
-                    onSelectMultipleSubscriptions(selectedThings)
-                    dismiss()
-                } label: {
-                    HStack {
-                        Text("Done")
-                    }
-                    .frame(maxWidth: .infinity)
+                    UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
+                        .tag(1)
                 }
-                .padding(16)
-                .filledButton()
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                
+                if case .subredditAndUserMultiSelection(_, let onSelectMultipleSubscriptions) = thingSelectionMode {
+                    Button {
+                        var selectedThings: [Thing] = []
+                        for subreddit in subredditListingViewModel.selectedSubreddits {
+                            selectedThings.append(.subreddit(subreddit.toSubredditData()))
+                        }
+                        for user in userListingViewModel.selectedUsers {
+                            selectedThings.append(.user(user.toUserData()))
+                        }
+                        
+                        onSelectMultipleSubscriptions(selectedThings)
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text("Done")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(16)
+                    .filledButton()
+                }
             }
         }
         .id(accountViewModel.account.username)

@@ -14,24 +14,27 @@ struct PostLayoutSheet: View {
     private let availablePostLayouts: [PostLayout] = [.card, .compact]
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                Text("Select Post Layout")
-                    .padding(.bottom, 16)
-                
-                ForEach(availablePostLayouts, id: \.self) { postLayout in
-                    IconTextButton(
-                        startIconUrl: postLayout.icon,
-                        endIconUrl: postLayout == currentPostLayout ? "checkmark.seal" : nil,
-                        text: postLayout.fullName
-                    ) {
-                        onSelectPostLayout(postLayout)
-                        dismiss()
+        SheetRootView {
+            ScrollView {
+                VStack(spacing: 0) {
+                    Text("Select Post Layout")
+                        .primaryText()
+                        .padding(.bottom, 16)
+                    
+                    ForEach(availablePostLayouts, id: \.self) { postLayout in
+                        IconTextButton(
+                            startIconUrl: postLayout.icon,
+                            endIconUrl: postLayout == currentPostLayout ? "checkmark.seal" : nil,
+                            text: postLayout.fullName
+                        ) {
+                            onSelectPostLayout(postLayout)
+                            dismiss()
+                        }
+                        .listPlainItemNoInsets()
                     }
-                    .listPlainItemNoInsets()
                 }
+                .padding(.top, 24)
             }
-            .padding(.top, 24)
         }
     }
 }

@@ -14,7 +14,7 @@ struct FlairChooserSheet: View {
     let onFlairSelected: (Flair) -> Void
     
     var body: some View {
-        Group {
+        SheetRootView {
             if postSubmissionContextViewModel.flairs.isEmpty {
                 ZStack {
                     if postSubmissionContextViewModel.isLoadingFlairs {

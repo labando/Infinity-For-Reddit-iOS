@@ -14,22 +14,24 @@ struct GalleryOrImgurDescriptionSheet: View {
     let link: String?
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                if let title, !title.isEmpty {
-                    RowText(title)
-                        .font(.system(size: 24, weight: .bold))
+        SheetRootView {
+            ScrollView {
+                VStack(spacing: 16) {
+                    if let title, !title.isEmpty {
+                        RowText(title)
+                            .font(.system(size: 24, weight: .bold))
+                    }
+                    
+                    if !description.isEmpty {
+                        DescriptionOrLinkMarkdown(content: description)
+                    }
+                    
+                    if let link, !link.isEmpty {
+                        DescriptionOrLinkMarkdown(content: link)
+                    }
                 }
-                
-                if !description.isEmpty {
-                    DescriptionOrLinkMarkdown(content: description)
-                }
-                
-                if let link, !link.isEmpty {
-                    DescriptionOrLinkMarkdown(content: link)
-                }
+                .padding(16)
             }
-            .padding(16)
         }
     }
 }

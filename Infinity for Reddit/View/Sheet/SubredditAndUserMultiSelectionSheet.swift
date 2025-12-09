@@ -18,7 +18,7 @@ struct SubredditAndUserMultiSelectionSheet: View {
     var subscriptionSelectionMode: ThingSelectionMode
     
     var body: some View {
-        ZStack {
+        SheetRootView {
             if accountViewModel.account.isAnonymous() {
                 AnonymousSubscriptionsView(subscriptionSelectionMode: subscriptionSelectionMode)
             } else {

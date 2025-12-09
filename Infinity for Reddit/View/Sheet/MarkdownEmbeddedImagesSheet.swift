@@ -21,61 +21,63 @@ struct MarkdownEmbeddedImagesSheet: View {
     let onInsertImage: (UploadedImage, String) -> Void
     
     var body: some View {
-        VStack(spacing: 0) {
-            RowText("Choose an image to insert into your post content.")
-                .primaryText()
-                .padding(16)
-                .font(.system(size: 24, weight: .bold))
-            
-            ScrollView(showsIndicators: false) {
-                LazyVGrid(
-                    columns: [
-                        GridItem(.flexible(maximum: .infinity)),
-                        GridItem(.flexible(maximum: .infinity))
-                    ],
-                    alignment: .leading,
-                    spacing: 16
-                ) {
-                    ForEach(embeddedImages, id: \.id) { embeddedImage in
-                        UploadedImageView(uploadedImage: embeddedImage, onImageTapped: {
-                            caption = ""
-                            selectedImage = embeddedImage
-                            withAnimation(.linear(duration: 0.2)) {
-                                showCaptionAlert = true
-                            }
-                        })
+        SheetRootView {
+            VStack(spacing: 0) {
+                RowText("Choose an image to insert into your post content.")
+                    .primaryText()
+                    .padding(16)
+                    .font(.system(size: 24, weight: .bold))
+                
+                ScrollView(showsIndicators: false) {
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.flexible(maximum: .infinity)),
+                            GridItem(.flexible(maximum: .infinity))
+                        ],
+                        alignment: .leading,
+                        spacing: 16
+                    ) {
+                        ForEach(embeddedImages, id: \.id) { embeddedImage in
+                            UploadedImageView(uploadedImage: embeddedImage, onImageTapped: {
+                                caption = ""
+                                selectedImage = embeddedImage
+                                withAnimation(.linear(duration: 0.2)) {
+                                    showCaptionAlert = true
+                                }
+                            })
+                        }
                     }
                 }
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
-            
-            Spacer()
-            
-            HStack(spacing: 16) {
-                Button {
-                    onCaptureImage()
-                } label: {
-                    Text("Capture")
-                        .buttonText()
-                        .frame(maxWidth: .infinity)
-                }
-                .frame(maxWidth: .infinity)
-                .filledButton()
-                .excludeFromTouchRipple()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
                 
-                Button {
-                    onSelectImage()
-                } label: {
-                    Text("Select an Image")
-                        .buttonText()
-                        .frame(maxWidth: .infinity)
+                Spacer()
+                
+                HStack(spacing: 16) {
+                    Button {
+                        onCaptureImage()
+                    } label: {
+                        Text("Capture")
+                            .buttonText()
+                            .frame(maxWidth: .infinity)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .filledButton()
+                    .excludeFromTouchRipple()
+                    
+                    Button {
+                        onSelectImage()
+                    } label: {
+                        Text("Select an Image")
+                            .buttonText()
+                            .frame(maxWidth: .infinity)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .filledButton()
+                    .excludeFromTouchRipple()
                 }
-                .frame(maxWidth: .infinity)
-                .filledButton()
-                .excludeFromTouchRipple()
+                .padding(.horizontal, 32)
             }
-            .padding(.horizontal, 32)
         }
         .overlay(
             CustomAlert(title: "Set Caption", isPresented: $showCaptionAlert) {

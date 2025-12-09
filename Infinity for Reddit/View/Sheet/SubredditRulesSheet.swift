@@ -11,7 +11,7 @@ struct SubredditRulesSheet: View {
     @EnvironmentObject private var postSubmissionContextViewModel: PostSubmissionContextViewModel
     
     var body: some View {
-        Group {
+        SheetRootView {
             if postSubmissionContextViewModel.rules.isEmpty {
                 ZStack {
                     if postSubmissionContextViewModel.isLoadingRules {
