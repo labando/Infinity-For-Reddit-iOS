@@ -60,12 +60,6 @@ struct AdvancedSettingsView: View {
                 }
                 
                 CustomListSection("Preferences") {
-                    PreferenceEntry(title: "Delete All Legacy Settings", icon: "clock.arrow.circlepath") {
-                        showConfirmation(for: .deleteLegacySettings)
-                    }
-                    .listPlainItemNoInsets()
-                    .disabled(isPerformingAction)
-                    
                     PreferenceEntry(title: "Reset All Settings", icon: "arrow.counterclockwise") {
                         showConfirmation(for: .resetAllSettings)
                     }
@@ -135,27 +129,41 @@ struct AdvancedSettingsView: View {
     private func handleAdvancedAction(_ action: AdvancedAction) {
         switch action {
         case .deleteSubreddits:
-            runDatabaseAction {
+            runAction {
                 try await advancedSettingsViewModel.deleteAllSubreddits()
             }
         case .deleteUsers:
-            runDatabaseAction {
+            runAction {
                 try await advancedSettingsViewModel.deleteAllUsers()
             }
+        case .deleteSortTypes:
+            runAction {
+                await advancedSettingsViewModel.deleteAllSortTypes()
+            }
+        case .deletePostLayouts:
+            runAction {
+                await advancedSettingsViewModel.deleteAllPostLayouts()
+            }
         case .deleteThemes:
-            runDatabaseAction {
+            runAction {
                 try await advancedSettingsViewModel.deleteAllThemes()
             }
+        case .deleteFrontPagePositions:
+            runAction {
+                await advancedSettingsViewModel.deleteFrontPagePositions()
+            }
         case .deleteReadPosts:
-            runDatabaseAction {
+            runAction {
                 try await advancedSettingsViewModel.deleteReadPosts()
             }
-        default:
-            break
+        case .resetAllSettings:
+            runAction {
+                await advancedSettingsViewModel.resetAllSettings()
+            }
         }
     }
     
-    private func runDatabaseAction(_ action: @escaping () async throws -> Void) {
+    private func runAction(_ action: @escaping () async throws -> Void) {
         isPerformingAction = true
         Task {
             do {
@@ -176,6 +184,5 @@ private enum AdvancedAction {
     case deleteThemes
     case deleteFrontPagePositions
     case deleteReadPosts
-    case deleteLegacySettings
     case resetAllSettings
 }

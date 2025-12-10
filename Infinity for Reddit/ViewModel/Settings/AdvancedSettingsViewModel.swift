@@ -39,11 +39,28 @@ final class AdvancedSettingsViewModel: ObservableObject {
     }
     
     func deleteAllSortTypes() async {
+        guard let sortTypeDefaults = UserDefaults.sortType else {
+            return
+        }
         
+        SortTypeUserDetailsUtils.getAllKeys.forEach {
+            sortTypeDefaults.removeObject(forKey: $0)
+        }
+        
+        SortTypeSettingsUserDefaultsUtils.getAllKeys.forEach {
+            UserDefaults.sortTypeSettings.removeObject(forKey: $0)
+        }
     }
     
     func deleteAllPostLayouts() async {
+        if let postLayoutDefaults = UserDefaults.postLayout {
+            PostLayoutUserDefaultsUtils.getAllKeys().forEach {
+                postLayoutDefaults.removeObject(forKey: $0)
+            }
+        }
         
+        UserDefaults.interfacePost.removeObject(forKey: InterfacePostUserDefaultsUtils.defaultPostLayoutKey)
+        UserDefaults.interfacePost.removeObject(forKey: InterfacePostUserDefaultsUtils.defaultLinkPostLayoutKey)
     }
     
     func deleteAllThemes() async throws {
@@ -51,19 +68,29 @@ final class AdvancedSettingsViewModel: ObservableObject {
     }
     
     func deleteFrontPagePositions() async {
-        
+        MiscellaneousUserDefaultsUtils.frontPagePositionKeys().forEach {
+            UserDefaults.miscellaneous.removeObject(forKey: $0)
+        }
     }
     
     func deleteReadPosts() async throws {
         try await postHistoryDao.deleteAllReadPosts()
     }
     
-    func deleteLegacySettings() async {
-        
-    }
-    
     func resetAllSettings() async {
+        let disableSensitiveContentForever = ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForever
         
+        for defaults in UserDefaultsResetTargets.stores {
+            defaults.dictionaryRepresentation().keys.forEach {
+                defaults.removeObject(forKey: $0)
+            }
+        }
+        
+        if disableSensitiveContentForever {
+            UserDefaults.contentSensitivityFilter.set(
+                true,
+                forKey: ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForeverKey)
+        }
     }
     
     func backupSettings() async throws {

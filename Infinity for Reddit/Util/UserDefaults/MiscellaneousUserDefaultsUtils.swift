@@ -20,4 +20,9 @@ class MiscellaneousUserDefaultsUtils {
     static func getLastSeenPostInFrontPage(account: Account) -> String? {
         return UserDefaults.miscellaneous.string(forKey: frontPageBase + account.username)
     }
+    
+    static func frontPagePositionKeys() -> [String] {
+        UserDefaults.miscellaneous.dictionaryRepresentation().keys
+            .filter { $0.hasPrefix(frontPageBase) }
+    }
 }

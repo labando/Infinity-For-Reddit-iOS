@@ -46,3 +46,13 @@ extension UserDefaults {
         object(forKey: key) == nil ? defaultValue : string(forKey: key) ?? ""
     }
 }
+
+enum UserDefaultsResetTargets {
+    static var stores: [UserDefaults] {
+        [
+            UserDefaults.standard,
+            UserDefaults.contentSensitivityFilter,
+            UserDefaults.miscellaneous
+        ]
+    }
+}
