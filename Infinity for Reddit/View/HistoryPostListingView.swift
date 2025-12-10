@@ -330,6 +330,7 @@ struct HistoryPostListingView: View {
             
             NavigationBarMenuItem(title: lazyModeState == .stopped ? "Start Lazy Mode" : "Stop Lazy Mode") {
                 if lazyModeState == .stopped {
+                    snackbarManager.showSnackbar(.info("Content will auto-scroll in \(lazyModeInterval) \(lazyModeInterval == 1 ? "second" : "seconds")."))
                     startLazyMode()
                 } else {
                     stopLazyMode()
