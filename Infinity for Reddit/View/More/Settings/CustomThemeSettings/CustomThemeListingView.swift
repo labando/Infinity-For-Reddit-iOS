@@ -45,30 +45,6 @@ struct CustomThemeListingView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Manage Themes")
-    }
-    
-    struct ThemeListItem: View {
-        let themeName: String
-        let primaryColor: Color
-        let onTap: () -> Void
-        
-        var body: some View {
-            TouchRipple(action: onTap) {
-                HStack(spacing: 0) {
-                    Circle()
-                        .fill(primaryColor)
-                        .frame(width: 24, height: 24)
-                    
-                    Spacer()
-                        .frame(width: 24)
-                    
-                    Text(themeName)
-                    
-                    Spacer()
-                }
-                .padding(16)
-                .contentShape(Rectangle())
-            }
-        }
+        .showErrorUsingSnackbar(customThemeListingViewModel.$error)
     }
 }

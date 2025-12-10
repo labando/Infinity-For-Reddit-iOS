@@ -87,10 +87,19 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
     @objc var commentVerticalBarColor6: Int
     @objc var commentVerticalBarColor7: Int
     
-    
     static var databaseTableName: String {
         return "custom_themes"
     }
+    
+    static let predefinedCustomThemes: [CustomTheme] = [
+        getIndigo(),
+        getIndigoDark(),
+        getIndigoAmoled(),
+        getWhite(),
+        getWhiteDark(),
+        getWhiteAmoled(),
+        getRed()
+    ]
     
     init(
         name: String,

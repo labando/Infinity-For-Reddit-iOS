@@ -70,6 +70,15 @@ struct CustomThemeSettingsView: View {
                     }
                     .listPlainItemNoInsets()
                 }
+                
+                CustomListSection("Predefined Themes") {
+                    ForEach(CustomTheme.predefinedCustomThemes, id: \.self.name) { customTheme in
+                        ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary)) {
+                            navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customTheme))
+                        }
+                        .listPlainItemNoInsets()
+                    }
+                }
             }
             .themedList()
         }
