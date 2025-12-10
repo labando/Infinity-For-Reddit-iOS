@@ -10,30 +10,63 @@ import GRDB
 
 @MainActor
 class CustomizeCustomThemeViewModel: ObservableObject {
-    @Published var customTheme: CustomTheme
+    @Published var backingCustomTheme: CustomTheme?
+    @Published var loadState: LoadState = .idle
     @Published var error: Error?
+    
+    var customTheme: CustomTheme {
+        get {
+            backingCustomTheme ?? CustomTheme.getIndigo()
+        }
+        set {
+            backingCustomTheme = newValue
+        }
+    }
     
     var customThemeFields: [String] = []
     var customThemeFieldsBoolType: Set<String> = []
     var customThemeSettingsItems: [String: CustomThemeSettingsItem] = [:]
     
+    private let customThemeId: Int?
+    private let predefindCustomThemeName: String?
+    private let customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol
     private let customThemeDao: CustomThemeDao
     
-    init(customTheme: CustomTheme) {
+    init(customThemeId: Int?, predefindCustomThemeName: String?, customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol) {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Could not resolve DatabasePool")
         }
-        
+        self.customThemeId = customThemeId
+        self.predefindCustomThemeName = predefindCustomThemeName
+        self.customizeCustomThemeRepository = customizeCustomThemeRepository
         self.customThemeDao = CustomThemeDao(dbPool: resolvedDatabasePool)
+    }
+    
+    func getAndSetCustomTheme() async {
+        guard loadState.canLoad else {
+            return
+        }
         
-        self.customTheme = customTheme
+        loadState = .loading
         
-        customTheme.getProperties(customThemeFields: &customThemeFields, customThemeFieldsBoolType: &customThemeFieldsBoolType)
-        
-        initializeCustomThemeSettingsItems(customThemeSettingsItems: &customThemeSettingsItems)
+        do {
+            if let loadedTheme = try await customizeCustomThemeRepository.getCustomTheme(customThemeId: customThemeId, predefindCustomThemeName: predefindCustomThemeName) {
+                loadedTheme.getProperties(customThemeFields: &customThemeFields, customThemeFieldsBoolType: &customThemeFieldsBoolType)
+                initializeCustomThemeSettingsItems(customThemeSettingsItems: &customThemeSettingsItems)
+                self.customTheme = loadedTheme
+            }
+            loadState = .loaded
+        } catch {
+            print(error)
+            loadState = .failed(error)
+        }
     }
     
     func saveCustomTheme() {
+        guard let customTheme = backingCustomTheme else {
+            return
+        }
+        
         Task {
             do {
                 if customTheme.isLightTheme {

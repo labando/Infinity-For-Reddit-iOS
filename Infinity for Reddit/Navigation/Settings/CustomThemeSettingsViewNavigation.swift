@@ -6,6 +6,6 @@
 //
 
 enum CustomThemeSettingsViewNavigation: Hashable {
-    case customizeCustomTheme(customTheme: CustomTheme)
+    case customizeCustomTheme(customThemeId: Int? = nil, predefindCustomThemeName: String? = nil)
     case customThemeListing
 }

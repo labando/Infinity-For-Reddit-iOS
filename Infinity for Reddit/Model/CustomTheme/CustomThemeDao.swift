@@ -50,7 +50,7 @@ class CustomThemeDao {
 
     // MARK: - Fetch Single Themes by ID
 
-    func getCustomTheme(id: Int64) async throws -> CustomTheme? {
+    func getCustomTheme(id: Int) async throws -> CustomTheme? {
         try await dbPool.read { db in
             try CustomTheme
                 .filter(Column("id") == id)
@@ -58,7 +58,7 @@ class CustomThemeDao {
         }
     }
 
-    func getCustomThemePublisher(id: Int64) -> AnyPublisher<CustomTheme?, Error> {
+    func getCustomThemePublisher(id: Int) -> AnyPublisher<CustomTheme?, Error> {
         ValueObservation
             .tracking { db in
                 try CustomTheme
@@ -125,7 +125,7 @@ class CustomThemeDao {
         }
     }
 
-    func updateThemeName(id: Int64, newName: String) async throws {
+    func updateThemeName(id: Int, newName: String) async throws {
         try await dbPool.write { db in
             try db.execute(sql: "UPDATE custom_themes SET name = ? WHERE id = ?", arguments: [newName, id])
         }

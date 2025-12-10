@@ -293,6 +293,27 @@ class CustomTheme: NSObject, Codable, FetchableRecord, PersistableRecord {
         }
     }
     
+    static func getPredefinedTheme(name: String) -> CustomTheme {
+        switch name {
+        case "Indigo":
+            return getIndigo()
+        case "Indigo Dark":
+            return getIndigoDark()
+        case "Indigo Amoled":
+            return getIndigoAmoled()
+        case "White":
+            return getWhite()
+        case "White Dark":
+            return getWhite()
+        case "White Amoled":
+            return getWhiteAmoled()
+        case "Red":
+            return getRed()
+        default:
+            return getIndigo()
+        }
+    }
+    
     static func getIndigo() -> CustomTheme {
         let customTheme = CustomTheme(
             name: "Indigo",

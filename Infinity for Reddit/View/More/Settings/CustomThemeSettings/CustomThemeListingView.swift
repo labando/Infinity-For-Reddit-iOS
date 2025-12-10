@@ -27,7 +27,7 @@ struct CustomThemeListingView: View {
             List {
                 ForEach(customThemeListingViewModel.customThemes, id: \.self.id) { customTheme in
                     ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary)) {
-                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customTheme))
+                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customTheme.id))
                     }
                     .listPlainItemNoInsets()
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {

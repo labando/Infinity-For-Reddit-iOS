@@ -1905,6 +1905,9 @@
     "Unable to load subscribed users. Tap to retry. Error: %@" : {
 
     },
+    "Unable to load theme. Error: %@" : {
+
+    },
     "Unable to load users. Tap to retry. Error: %@" : {
 
     },

@@ -15,74 +15,100 @@ struct CustomizeCustomThemeView: View {
     @State var showColorPicker: Bool = false
     @FocusState private var focusedField: FieldType?
     
-    init(customTheme: CustomTheme) {
-        _customizeCustomThemeViewModel = StateObject(wrappedValue: CustomizeCustomThemeViewModel(customTheme: customTheme))
+    init(customThemeId: Int?, predefindCustomThemeName: String?) {
+        _customizeCustomThemeViewModel = StateObject(
+            wrappedValue: CustomizeCustomThemeViewModel(
+                customThemeId: customThemeId,
+                predefindCustomThemeName: predefindCustomThemeName,
+                customizeCustomThemeRepository: CustomizeCustomThemeRepository()
+            )
+        )
     }
     
     var body: some View {
         RootView {
-            VStack {
-                List {
-                    VStack(alignment: .leading, spacing: 0) {
-                        CustomTextField(
-                            "Name",
-                            text: $customizeCustomThemeViewModel.customTheme.name,
-                            singleLine: true,
-                            fieldType: FieldType.name,
-                            focusedField: $focusedField
-                        )
-                        .submitLabel(.done)
-                        .padding(16)
-                        
-                        CustomDivider()
+            if customizeCustomThemeViewModel.backingCustomTheme == nil {
+                ZStack {
+                    switch customizeCustomThemeViewModel.loadState {
+                    case .failed(let error):
+                        Text("Unable to load theme. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                    default:
+                        ProgressIndicator()
                     }
-                    .listPlainItemNoInsets()
-                    
-                    ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
-                        if customizeCustomThemeViewModel.customThemeFieldsBoolType.contains(fieldName) {
-                            if let binding = getBooleanBinding(for: fieldName) {
-                                BooleanEntry(
-                                    fieldName: fieldName,
-                                    title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                    // Notice we use the same string as the title
-                                    description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                    isEnabled: binding
-                                )
-                                .listPlainItemNoInsets()
-                            }
-                        } else {
-                            if let colorBinding = getIntBinding(for: fieldName) {
-                                ColorEntry(
-                                    fieldName: fieldName,
-                                    title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                    description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? "",
-                                    color: getWrappedBinding(for: colorBinding)
-                                )
-                                .listPlainItemNoInsets()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack {
+                    List {
+                        VStack(alignment: .leading, spacing: 0) {
+                            CustomTextField(
+                                "Name",
+                                text: $customizeCustomThemeViewModel.customTheme.name,
+                                singleLine: true,
+                                fieldType: FieldType.name,
+                                focusedField: $focusedField
+                            )
+                            .submitLabel(.done)
+                            .padding(16)
+                            
+                            CustomDivider()
+                        }
+                        .listPlainItemNoInsets()
+                        
+                        ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
+                            if customizeCustomThemeViewModel.customThemeFieldsBoolType.contains(fieldName) {
+                                if let binding = getBooleanBinding(for: fieldName) {
+                                    BooleanEntry(
+                                        fieldName: fieldName,
+                                        title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
+                                        // Notice we use the same string as the title
+                                        description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
+                                        isEnabled: binding
+                                    )
+                                    .listPlainItemNoInsets()
+                                }
+                            } else {
+                                if let colorBinding = getIntBinding(for: fieldName) {
+                                    ColorEntry(
+                                        fieldName: fieldName,
+                                        title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
+                                        description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? "",
+                                        color: getWrappedBinding(for: colorBinding)
+                                    )
+                                    .listPlainItemNoInsets()
+                                }
                             }
                         }
                     }
-                }
-                .themedList()
-                
-                KeyboardToolbar {
-                    focusedField = nil
+                    .themedList()
+                    
+                    KeyboardToolbar {
+                        focusedField = nil
+                    }
                 }
             }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    customizeCustomThemeViewModel.saveCustomTheme()
-                    dismiss()
-                }) {
-                    SwiftUI.Image(systemName: "tray.and.arrow.down")
-                        .navigationBarImage()
+                if customizeCustomThemeViewModel.backingCustomTheme != nil {
+                    Button(action: {
+                        customizeCustomThemeViewModel.saveCustomTheme()
+                        dismiss()
+                    }) {
+                        SwiftUI.Image(systemName: "tray.and.arrow.down")
+                            .navigationBarImage()
+                    }
                 }
             }
         }
         .themedNavigationBar()
-        .addTitleToInlineNavigationBar("Customize", 1.0)
+        .addTitleToInlineNavigationBar("Customize")
+        .showErrorUsingSnackbar(customizeCustomThemeViewModel.$error)
+        .task {
+            await customizeCustomThemeViewModel.getAndSetCustomTheme()
+        }
     }
     
     private struct ColorEntry: View {
