@@ -99,20 +99,13 @@ public class PostListingViewModel: ObservableObject {
                 guard let self else {
                     return
                 }
-                let sensitiveContent = UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey)
-                let spoilerContent = UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.spoilerContentKey)
-                self.setSensitiveContent(sensitiveContent)
-                self.setSpoilerContent(spoilerContent)
+                self.setSensitiveContent(UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey))
+                self.setSpoilerContent(UserDefaults.contentSensitivityFilter.bool(forKey: ContentSensitivityFilterUserDetailsUtils.spoilerContentKey))
                 
                 let postLayout = postListingMetadata.postListingType.savedPostLayout
-                let sortType = postListingMetadata.postListingType.savedSortType
                 Task { @MainActor in
                     if self.postLayout != postLayout {
                         self.postLayout = postLayout
-                    }
-                    if self.sortType != sortType {
-                        self.sortType = sortType
-                        self.refreshPosts()
                     }
                 }
             }

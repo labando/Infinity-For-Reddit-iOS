@@ -93,16 +93,7 @@ public class PostDetailsViewModel: ObservableObject {
         
         NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
             .sink { [weak self] _ in
-                guard let self else {
-                    return
-                }
-                self.showTopLevelCommentsFirst = UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirstKey)
-                
-                let sortType = SortTypeUserDetailsUtils.postComment
-                if self.sortTypeKind != sortType {
-                    self.sortTypeKind = sortType
-                    self.refreshPostAndComments()
-                }
+                self?.showTopLevelCommentsFirst = UserDefaults.interfaceComment.bool(forKey: InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirstKey)
             }
             .store(in: &cancellables)
     }
