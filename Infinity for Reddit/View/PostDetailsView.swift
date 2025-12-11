@@ -67,6 +67,7 @@ struct PostDetailsView: View {
                 historyPostsRepository: HistoryPostsRepository(),
                 flairRepository: FlairRepository(),
                 thingModerationRepository: thingModerationRepository,
+                commentRepository: CommentRepository(),
                 isContinueThread: isContinueThread
             )
         )
@@ -153,6 +154,15 @@ struct PostDetailsView: View {
                                             isInPostDetails: true,
                                             highlightComment: postDetailsViewModel.postDetailsInput.getHighlightCommentId == comment.id || postDetailsViewModel.searchedComment?.id == comment.id,
                                             thingModerationRepository: thingModerationRepository,
+                                            onUpvote: {
+                                                postDetailsViewModel.voteComment(comment, vote: 1)
+                                            },
+                                            onDownvote: {
+                                                postDetailsViewModel.voteComment(comment, vote: -1)
+                                            },
+                                            onToggleSave: {
+                                                postDetailsViewModel.toggleSaveComment(comment, save: !comment.saved)
+                                            },
                                             onToggleExpand: {
                                                 if fullyCollapseComment {
                                                     if comment.isCollasped {
@@ -224,6 +234,24 @@ struct PostDetailsView: View {
                                         }
                                         .onDisappear {
                                             postDetailsViewModel.appearedComments.remove(id: commentItem.id)
+                                        }
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                            Button {
+                                                postDetailsViewModel.voteComment(comment, vote: 1)
+                                            } label: {
+                                                SwiftUI.Image(systemName: "arrowshape.up")
+                                                    .foregroundStyle(.white)
+                                            }
+                                            .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
+                                        }
+                                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                            Button {
+                                                postDetailsViewModel.voteComment(comment, vote: -1)
+                                            } label: {
+                                                SwiftUI.Image(systemName: "arrowshape.down")
+                                                    .foregroundStyle(.white)
+                                            }
+                                            .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                                         }
                                     } else if case let .more(commentMore) = commentItem {
                                         CommentMoreViewCard(commentMore: commentMore)

@@ -39,6 +39,9 @@ struct CommentViewCard: View {
     private let isInPostDetails: Bool
     private let userIconSize: CGFloat = 24
     let highlightComment: Bool
+    let onUpvote: () -> Void
+    let onDownvote: () -> Void
+    let onToggleSave: () -> Void
     let onToggleExpand: (() -> Void)?
     let onReply: (() -> Void)?
     let onEdit: () -> Void
@@ -53,6 +56,9 @@ struct CommentViewCard: View {
         isInPostDetails: Bool,
         highlightComment: Bool = false,
         thingModerationRepository: ThingModerationRepositoryProtocol,
+        onUpvote: @escaping () -> Void,
+        onDownvote: @escaping () -> Void,
+        onToggleSave: @escaping () -> Void,
         onToggleExpand: (() -> Void)? = nil,
         onReply: (() -> Void)? = nil,
         onEdit: @escaping () -> Void,
@@ -63,6 +69,9 @@ struct CommentViewCard: View {
     ) {
         self.isInPostDetails = isInPostDetails
         self.highlightComment = highlightComment
+        self.onUpvote = onUpvote
+        self.onDownvote = onDownvote
+        self.onToggleSave = onToggleSave
         self.onToggleExpand = onToggleExpand
         self.onReply = onReply
         self.onEdit = onEdit
@@ -151,10 +160,7 @@ struct CommentViewCard: View {
                         HStack(spacing: 0) {
                             HStack(spacing: 0) {
                                 Button(action: {
-                                    voteTask?.cancel()
-                                    voteTask = Task {
-                                        await commentViewModel.voteComment(vote: 1)
-                                    }
+                                    onUpvote()
                                 }) {
                                     SwiftUI.Image(systemName: commentViewModel.comment.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                                         .commentIconTemplateRendering()
@@ -171,10 +177,7 @@ struct CommentViewCard: View {
                                     .onTapGesture {}
                                 
                                 Button(action: {
-                                    voteTask?.cancel()
-                                    voteTask = Task {
-                                        await commentViewModel.voteComment(vote: -1)
-                                    }
+                                    onDownvote()
                                 }) {
                                     SwiftUI.Image(systemName: commentViewModel.comment.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                                         .commentIconTemplateRendering()
@@ -251,10 +254,7 @@ struct CommentViewCard: View {
                                 
                                 if !AccountViewModel.shared.account.isAnonymous() {
                                     Button(action: {
-                                        saveTask?.cancel()
-                                        saveTask = Task {
-                                            await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
-                                        }
+                                        onToggleSave()
                                     }) {
                                         SwiftUI.Image(systemName: commentViewModel.comment.saved ? "bookmark.fill" : "bookmark")
                                             .commentIconTemplateRendering()
@@ -296,10 +296,7 @@ struct CommentViewCard: View {
                                     
                                     if !AccountViewModel.shared.account.isAnonymous() {
                                         Button(commentViewModel.comment.saved ? "Unsave" : "Save") {
-                                            saveTask?.cancel()
-                                            saveTask = Task {
-                                                await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
-                                            }
+                                            onToggleSave()
                                         }
                                     }
                                     

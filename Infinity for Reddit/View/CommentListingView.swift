@@ -43,7 +43,8 @@ struct CommentListingView: View {
             wrappedValue: CommentListingViewModel(
                 commentListingMetadata: commentListingMetadata,
                 commentListingRepository: CommentListingRepository(),
-                thingModerationRepository: ThingModerationRepository()
+                thingModerationRepository: ThingModerationRepository(),
+                commentRepository: CommentRepository()
             )
         )
     }
@@ -80,6 +81,15 @@ struct CommentListingView: View {
                                 comment: comment,
                                 isInPostDetails: false,
                                 thingModerationRepository: thingModerationRepository,
+                                onUpvote: {
+                                    commentListingViewModel.voteComment(comment, vote: 1)
+                                },
+                                onDownvote: {
+                                    commentListingViewModel.voteComment(comment, vote: -1)
+                                },
+                                onToggleSave: {
+                                    commentListingViewModel.toggleSaveComment(comment, save: !comment.saved)
+                                },
                                 onEdit: {
                                     self.commentToBeEdited = comment
                                     navigationManager.append(AppNavigation.editComment(commentToBeEdited: comment))
