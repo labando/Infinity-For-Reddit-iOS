@@ -28,6 +28,7 @@ public class CommentListingViewModel: ObservableObject {
     private var lastLoadedSortType: SortType? = nil
     
     private var refreshCommentsContinuation: CheckedContinuation<Void, Never>?
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initializer
     init(commentListingMetadata: CommentListingMetadata,
@@ -37,6 +38,21 @@ public class CommentListingViewModel: ObservableObject {
         self.commentListingMetadata = commentListingMetadata
         self.commentListingRepository = commentListingRepository
         self.thingModerationRepository = thingModerationRepository
+        
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .sink { [weak self] _ in
+                guard let self else {
+                    return
+                }
+                let sortType = commentListingMetadata.commentListingType.savedSortType
+                Task { @MainActor in
+                    if self.sortType != sortType {
+                        self.sortType = sortType
+                        self.refreshComments()
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Methods
