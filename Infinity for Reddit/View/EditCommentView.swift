@@ -44,63 +44,65 @@ struct EditCommentView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            if let bodyProcessedMarkdown = editCommentViewModel.commentToBeEdited.bodyProcessedMarkdown {
-                                Markdown(bodyProcessedMarkdown)
-                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+        RootView {
+            VStack(spacing: 0) {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                if let bodyProcessedMarkdown = editCommentViewModel.commentToBeEdited.bodyProcessedMarkdown {
+                                    Markdown(bodyProcessedMarkdown)
+                                        .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                        .padding(16)
+                                        .themedPostCommentMarkdown()
+                                        .markdownLinkHandler { url in
+                                            navigationManager.openLink(url)
+                                        }
+                                } else if let body = editCommentViewModel.commentToBeEdited.body, !body.isEmpty {
+                                    Markdown(body)
+                                        .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                        .padding(16)
+                                        .themedPostCommentMarkdown()
+                                        .markdownLinkHandler { url in
+                                            navigationManager.openLink(url)
+                                        }
+                                } else {
+                                    Spacer()
+                                        .frame(height: 8)
+                                }
+                                
+                                CustomDivider()
+                                
+                                MarkdownTextField(hint: "Your new interesting thoughts here", text: $editCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
+                                    .contentShape(Rectangle())
                                     .padding(16)
-                                    .themedPostCommentMarkdown()
-                                    .markdownLinkHandler { url in
-                                        navigationManager.openLink(url)
-                                    }
-                            } else if let body = editCommentViewModel.commentToBeEdited.body, !body.isEmpty {
-                                Markdown(body)
-                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
-                                    .padding(16)
-                                    .themedPostCommentMarkdown()
-                                    .markdownLinkHandler { url in
-                                        navigationManager.openLink(url)
-                                    }
-                            } else {
-                                Spacer()
-                                    .frame(height: 8)
                             }
-                            
-                            Divider()
-                            
-                            MarkdownTextField(hint: "Your new interesting thoughts here", text: $editCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
-                                .contentShape(Rectangle())
-                                .padding(16)
                         }
+                        
+                        Spacer()
+                            .frame(height: toolbarHeight)
                     }
                     
-                    Spacer()
-                        .frame(height: toolbarHeight)
+                    MarkdownToolbar(
+                        text: $editCommentViewModel.text,
+                        selectedRange: $selectedRange,
+                        toolbarHeight: $toolbarHeight,
+                        focusedField: $markdownFocusedField,
+                        enableImageUpload: true,
+                        enableGifChooser: true,
+                        onImageUpload: {
+                            showEmbeddedImagesSheet = true
+                        },
+                        onChooseGif: {
+                            showGiphyGifSheet = true
+                        }
+                    )
                 }
                 
-                MarkdownToolbar(
-                    text: $editCommentViewModel.text,
-                    selectedRange: $selectedRange,
-                    toolbarHeight: $toolbarHeight,
-                    focusedField: $markdownFocusedField,
-                    enableImageUpload: true,
-                    enableGifChooser: true,
-                    onImageUpload: {
-                        showEmbeddedImagesSheet = true
-                    },
-                    onChooseGif: {
-                        showGiphyGifSheet = true
-                    }
-                )
-            }
-            
-            KeyboardToolbar {
-                textViewCanFocus = false
-                markdownFocusedField = nil
+                KeyboardToolbar {
+                    textViewCanFocus = false
+                    markdownFocusedField = nil
+                }
             }
         }
         .frame(maxHeight: .infinity)

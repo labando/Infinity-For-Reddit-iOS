@@ -52,8 +52,12 @@ struct TimeText: View {
     var body: some View {
         if showElapsedTime || forceShowElapsedTime {
             Text(elapsedTime)
+                .secondaryText()
+                .fixedSize(horizontal: false, vertical: true)
         } else {
             Text(formattedFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(timeUTCInSeconds))))
+                .secondaryText()
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

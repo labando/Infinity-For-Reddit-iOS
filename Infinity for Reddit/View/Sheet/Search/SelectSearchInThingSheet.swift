@@ -17,7 +17,7 @@ struct SelectSearchInThingSheet: View {
     let onSelectThing: (Thing) -> Void
     
     var body: some View {
-        ZStack {
+        SheetRootView {
             if accountViewModel.account.isAnonymous() {
                 AnonymousSubscriptionsView(subscriptionSelectionMode: .thingSelection(onSelectThing: { thing in
                     onSelectThing(thing)

@@ -17,8 +17,10 @@ struct SearchSubredditsAndUsersSheet: View {
     var thingSelectionMode: ThingSelectionMode
     
     var body: some View {
-        SearchView { query in
-            queryItem = Item(query: query)
+        SheetRootView {
+            SearchView { query in
+                queryItem = Item(query: query)
+            }
         }
         .id(accountViewModel.account.username)
         .addTitleToInlineNavigationBar("Search Subreddits and Users")

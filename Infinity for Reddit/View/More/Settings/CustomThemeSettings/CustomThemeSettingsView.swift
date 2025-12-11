@@ -40,7 +40,7 @@ struct CustomThemeSettingsView: View {
                         subtitle: customThemeViewModel.currentLightCustomTheme?.name ?? "Indigo",
                         icon: "sun.max"
                     ) {
-                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentLightCustomTheme ?? CustomTheme.getIndigo()))
+                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentLightCustomTheme?.id, predefindCustomThemeName: "Indigo"))
                     }
                     .listPlainItemNoInsets()
                     
@@ -49,7 +49,7 @@ struct CustomThemeSettingsView: View {
                         subtitle: customThemeViewModel.currentDarkCustomTheme?.name ?? "Indigo Dark",
                         icon: "moon"
                     ) {
-                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentDarkCustomTheme ?? CustomTheme.getIndigoDark()))
+                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentDarkCustomTheme?.id, predefindCustomThemeName: "Indigo Dark"))
                     }
                     .listPlainItemNoInsets()
                     
@@ -58,7 +58,7 @@ struct CustomThemeSettingsView: View {
                         subtitle: customThemeViewModel.currentAmoledCustomTheme?.name ?? "Indigo Amoled",
                         icon: "moon"
                     ) {
-                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customThemeViewModel.currentAmoledCustomTheme ?? CustomTheme.getIndigoAmoled()))
+                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customThemeViewModel.currentAmoledCustomTheme?.id, predefindCustomThemeName: "Indigo Amoled"))
                     }
                     .listPlainItemNoInsets()
                     
@@ -69,6 +69,15 @@ struct CustomThemeSettingsView: View {
                         navigationManager.append(CustomThemeSettingsViewNavigation.customThemeListing)
                     }
                     .listPlainItemNoInsets()
+                }
+                
+                CustomListSection("Predefined Themes") {
+                    ForEach(CustomTheme.predefinedCustomThemes, id: \.self.name) { customTheme in
+                        ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary)) {
+                            navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(predefindCustomThemeName: customTheme.name))
+                        }
+                        .listPlainItemNoInsets()
+                    }
                 }
             }
             .themedList()

@@ -61,10 +61,6 @@ extension View {
         self.modifier(TabViewCustomThemeViewModifier())
     }
     
-    func themedTabViewGroup() -> some View {
-        self.modifier(TabViewGroupViewModifier())
-    }
-    
     func listSectionHeader() -> some View {
         self.modifier(ListSectionHeaderViewModifier())
     }
@@ -245,10 +241,12 @@ extension View {
     
     func appForegroundBackgroundListener(
         onAppEntersForeground: (() -> Void)? = nil,
+        onAppEntersInactive: (() -> Void)? = nil,
         onAppEntersBackground: (() -> Void)? = nil
     ) -> some View {
         self.modifier(AppForegroundBackgroundViewModifier(
             onAppEntersForeground: onAppEntersForeground,
+            onAppEntersInactive: onAppEntersInactive,
             onAppEntersBackground: onAppEntersBackground
         ))
     }
@@ -299,6 +297,10 @@ extension View {
         self.modifier(FilledButtonViewModifier())
     }
     
+    func subscribeButton(isSubscribed: Bool) -> some View {
+        self.modifier(SubscribeButtonViewModifier(isSubscribed: isSubscribed))
+    }
+    
     func urlTextField() -> some View {
         self.modifier(URLTextFieldViewModifier())
     }
@@ -325,8 +327,9 @@ extension View {
     }
     
     func showErrorUsingSnackbar<P: Publisher>(
-        _ errorPublisher: P
+        _ errorPublisher: P,
+        showTaskCancelledError: Bool = false
     ) -> some View where P.Output == Error?, P.Failure == Never {
-        self.modifier(SnackbarErrorViewModifier(errorPublisher: errorPublisher))
+        self.modifier(SnackbarErrorViewModifier(errorPublisher: errorPublisher, showTaskCancelledError: showTaskCancelledError))
     }
 }

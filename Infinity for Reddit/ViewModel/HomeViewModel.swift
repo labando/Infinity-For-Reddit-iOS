@@ -15,9 +15,9 @@ class HomeViewModel: ObservableObject {
     @Published var inboxCount: Int = 0
     
     private let homeRepository: HomeRepositoryProtocol
-    private var inboxCountPollingTask: Task<Void, Never>?
+    @Published private var inboxCountPollingTask: Task<Void, Never>?
     private var hasFetchedInboxCount: Bool = false
-    private var lastInboxCountPollingTime: TimeInterval = 0
+    @Published private var lastInboxCountPollingTime: Int = 0
     
     struct InboxNavigationTarget: Equatable {
         let viewMessage: Bool
@@ -28,7 +28,7 @@ class HomeViewModel: ObservableObject {
     }
     
     func fetchInboxCount() async {
-        guard !hasFetchedInboxCount else {
+        guard !hasFetchedInboxCount && !AccountViewModel.shared.account.isAnonymous() else {
             return
         }
         
@@ -36,8 +36,11 @@ class HomeViewModel: ObservableObject {
         hasFetchedInboxCount = true
     }
     
-    func startInboxCountPolling() {
+    func startInboxCountPolling(resetPollingTime: Bool = false) {
         inboxCountPollingTask?.cancel()
+        if resetPollingTime {
+            lastInboxCountPollingTime = 0
+        }
         
         guard !AccountViewModel.shared.account.isAnonymous() else {
             return
@@ -45,9 +48,9 @@ class HomeViewModel: ObservableObject {
         
         inboxCountPollingTask = Task {
             var skipFirstWait: Bool = false
-            let currentTime = Date().timeIntervalSince1970
-            if currentTime - lastInboxCountPollingTime < TimeInterval(NotificationUserDefaultsUtils.notificationInterval * 60) {
-                try? await Task.sleep(for: .seconds(lastInboxCountPollingTime + TimeInterval(NotificationUserDefaultsUtils.notificationInterval * 60) - currentTime))
+            let currentTime = Utils.getCurrentTimeEpochInSecond()
+            if currentTime - lastInboxCountPollingTime < NotificationUserDefaultsUtils.notificationInterval * 60 {
+                try? await Task.sleep(for: .seconds(lastInboxCountPollingTime + NotificationUserDefaultsUtils.notificationInterval * 60 - currentTime))
                 skipFirstWait = true
             }
             repeat {
@@ -59,7 +62,7 @@ class HomeViewModel: ObservableObject {
                 if !Task.isCancelled {
                     inboxCount = (try? await homeRepository.fetchInboxCount()) ?? 0
                 }
-                lastInboxCountPollingTime = Date().timeIntervalSince1970
+                lastInboxCountPollingTime = Utils.getCurrentTimeEpochInSecond()
             } while !Task.isCancelled
         }
     }

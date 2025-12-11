@@ -26,21 +26,24 @@ struct SubredditListingView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if subredditListingViewModel.subreddits.isEmpty {
-                if subredditListingViewModel.isInitialLoading {
-                    ProgressIndicator()
-                } else if subredditListingViewModel.isInitialLoad, let error = subredditListingViewModel.error {
-                    Text("Unable to load subreddits. Tap to retry. Error: \(error.localizedDescription)")
-                        .primaryText()
-                        .padding(16)
-                        .onTapGesture {
-                            subredditListingViewModel.refreshSubreddits()
-                        }
-                } else {
-                    Text("No subreddits")
-                        .primaryText()
+                ZStack {
+                    if subredditListingViewModel.isInitialLoading {
+                        ProgressIndicator()
+                    } else if subredditListingViewModel.isInitialLoad, let error = subredditListingViewModel.error {
+                        Text("Unable to load subreddits. Tap to retry. Error: \(error.localizedDescription)")
+                            .primaryText()
+                            .padding(16)
+                            .onTapGesture {
+                                subredditListingViewModel.refreshSubreddits()
+                            }
+                    } else {
+                        Text("No subreddits")
+                            .primaryText()
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
                     ForEach(subredditListingViewModel.subreddits, id: \.id) { subreddit in

@@ -119,10 +119,13 @@ struct AnonymousSubscriptionsView: View {
         @ObservedObject var anonymousSubscriptionListingViewModel: AnonymousSubscriptionListingViewModel
         
         var body: some View {
-            Group {
+            RootView {
                 if anonymousSubscriptionListingViewModel.myCustomFeeds.isEmpty {
-                    Text("No custom feeds")
-                        .primaryText()
+                    ZStack {
+                        Text("No custom feeds")
+                            .primaryText()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     List {
                         if !anonymousSubscriptionListingViewModel.favoriteMyCustomFeeds.isEmpty {

@@ -16,13 +16,9 @@ struct DataSavingModeSettingsView: View {
         RootView {
             ScrollView {
                 VStack(spacing: 0) {
-                    PreferenceEntry(
-                        title: "",
-                        subtitle: "In data saving mode:\nPreview images are in lower resolution.\nVideo autoplay is disabled.",
-                        icon: "exclamationmark.circle"
-                    ) {
-                        // Empty action
-                    }
+                    InfoPreference(title: "In data saving mode:\nPreview images are in lower resolution.\nVideo autoplay is disabled.",
+                                   icon: "info.circle"
+                    )
                     
                     BarebonePickerPreference(
                         selected: $dataSavingMode,

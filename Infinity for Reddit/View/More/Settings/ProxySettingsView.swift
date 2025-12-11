@@ -25,10 +25,14 @@ struct ProxySettingsView: View {
         RootView {
             ScrollView {
                 VStack(spacing: 0) {
+                    InfoPreference(
+                        title: "Restart the app to see the changes",
+                        icon: "info.circle"
+                    )
+                    
                     TogglePreference(
                         isEnabled: $enableProxy,
-                        title: "Proxy Enabled",
-                        subtitle: "Restart the app to see the changes"
+                        title: "Proxy"
                     )
                     .transition(.opacity)
                     
@@ -65,7 +69,7 @@ struct ProxySettingsView: View {
             .themedList()
         }
         .overlay(
-            CustomAlert(title: activeAlert?.title ?? "", isPresented: Binding(
+            CustomAlert(title: activeAlert?.title ?? "", confirmButtonText: "OK", isPresented: Binding(
                 get: {
                     activeAlert != nil
                 },
@@ -84,6 +88,10 @@ struct ProxySettingsView: View {
                         fieldType: .hostname,
                         focusedField: $focusedField
                     )
+                    .submitLabel(.done)
+                    .onSubmit {
+                        activeAlert = nil
+                    }
                 case .port:
                     CustomTextField(
                         "Port",
@@ -93,6 +101,10 @@ struct ProxySettingsView: View {
                         fieldType: .port,
                         focusedField: $focusedField
                     )
+                    .submitLabel(.done)
+                    .onSubmit {
+                        activeAlert = nil
+                    }
                 case nil:
                     EmptyView()
                 }

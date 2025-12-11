@@ -34,12 +34,14 @@ struct SubredditSelectionSheet: View {
     }
 
     var body: some View {
-        SubscribedSubredditListingView(
-            showCurrentAccountSubreddit: showCurrentAccountSubreddit,
-            subscriptionListingViewModel: subscriptionListingViewModel
-        ) { subscribedSubredditData in
-            onThingSelected(.subscribedSubreddit(subscribedSubredditData))
-            dismiss()
+        SheetRootView {
+            SubscribedSubredditListingView(
+                showCurrentAccountSubreddit: showCurrentAccountSubreddit,
+                subscriptionListingViewModel: subscriptionListingViewModel
+            ) { subscribedSubredditData in
+                onThingSelected(.subscribedSubreddit(subscribedSubredditData))
+                dismiss()
+            }
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Select a Subreddit")

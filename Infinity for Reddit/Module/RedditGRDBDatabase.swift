@@ -198,27 +198,21 @@ struct RedditGRDBDatabase {
                 t.column("isLightTheme", .boolean).notNull()
                 t.column("isDarkTheme", .boolean).notNull()
                 t.column("isAmoledTheme", .boolean).notNull()
-                t.column("isLightStatusBar", .boolean).notNull()
-                t.column("isLightNavBar", .boolean).notNull()
-                t.column("isChangeStatusBarIconColorAfterToolbarCollapsedInImmersiveInterface", .boolean).notNull()
                 
                 // Integer color properties
                 let colorColumns = [
-                    "colorPrimary", "colorPrimaryDark", "colorAccent", "colorPrimaryLightTheme",
+                    "colorPrimary", "colorAccent", "colorPrimaryLightTheme",
                     "primaryTextColor", "secondaryTextColor", "postTitleColor", "postContentColor",
                     "readPostTitleColor", "readPostContentColor", "commentColor", "buttonTextColor",
                     "backgroundColor", "cardViewBackgroundColor", "readPostCardViewBackgroundColor",
                     "filledCardViewBackgroundColor", "readPostFilledCardViewBackgroundColor",
                     "commentBackgroundColor", "bottomAppBarBackgroundColor", "primaryIconColor",
                     "bottomAppBarIconColor", "postIconAndInfoColor", "commentIconAndInfoColor",
-                    "toolbarPrimaryTextAndIconColor", "toolbarSecondaryTextColor",
-                    "circularProgressBarBackground", "mediaIndicatorIconColor", "mediaIndicatorBackgroundColor",
-                    "tabLayoutWithExpandedCollapsingToolbarTabBackground", "tabLayoutWithExpandedCollapsingToolbarTextColor",
-                    "tabLayoutWithExpandedCollapsingToolbarTabIndicator", "tabLayoutWithCollapsedCollapsingToolbarTabBackground",
-                    "tabLayoutWithCollapsedCollapsingToolbarTextColor", "tabLayoutWithCollapsedCollapsingToolbarTabIndicator",
-                    "navBarColor", "upvoted", "downvoted", "postTypeBackgroundColor", "postTypeTextColor",
+                    "toolbarPrimaryTextAndIconColor", "mediaIndicatorIconColor", "mediaIndicatorBackgroundColor",
+                    "pickerItemTextColor", "pickerSelectedItemTextColor", "pickerSelectedItemBackgroundColor",
+                    "upvoted", "downvoted", "postTypeBackgroundColor", "postTypeTextColor",
                     "spoilerBackgroundColor", "spoilerTextColor", "nsfwBackgroundColor", "nsfwTextColor",
-                    "flairBackgroundColor", "flairTextColor", "awardsBackgroundColor", "awardsTextColor",
+                    "flairBackgroundColor", "flairTextColor",
                     "archivedTint", "lockedIconTint", "crosspostIconTint", "upvoteRatioIconTint",
                     "stickiedPostIconTint", "noPreviewPostTypeIconTint", "subscribed", "unsubscribed",
                     "subreddit", "authorFlairTextColor", "submitter", "moderator", "currentUser",
@@ -226,10 +220,9 @@ struct RedditGRDBDatabase {
                     "noPreviewPostTypeBackgroundColor", "voteAndReplyUnavailableButtonColor",
                     "commentVerticalBarColor1", "commentVerticalBarColor2", "commentVerticalBarColor3",
                     "commentVerticalBarColor4", "commentVerticalBarColor5", "commentVerticalBarColor6",
-                    "commentVerticalBarColor7", "fabIconColor", "chipTextColor", "linkColor",
+                    "commentVerticalBarColor7", "fabIconColor", "linkColor",
                     "receivedMessageTextColor", "sentMessageTextColor", "receivedMessageBackgroundColor",
-                    "sentMessageBackgroundColor", "sendMessageIconColor", "fullyCollapsedCommentBackgroundColor",
-                    "awardedCommentBackgroundColor"
+                    "sentMessageBackgroundColor", "sendMessageIconColor", "fullyCollapsedCommentBackgroundColor"
                 ]
                 colorColumns.forEach { columnName in
                     t.column(columnName, .integer).notNull()

@@ -42,6 +42,7 @@ struct SendChatMessageView: View {
                             fieldType: .recipient,
                             focusedField: $focusedField
                         )
+                        .submitLabel(.done)
                         .padding(.horizontal, 16)
                         .padding(.top, 16)
                         
@@ -54,7 +55,7 @@ struct SendChatMessageView: View {
                         .contentShape(Rectangle())
                         .padding(16)
                         
-                        Divider()
+                        CustomDivider()
                         
                         MarkdownTextField(
                             hint: "Message",

@@ -15,22 +15,24 @@ struct SortTypeKindSheet: View {
     let onSelectSortTypeKind: (SortType.Kind) -> Void
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                Text("Select Sort Type")
-                    .primaryText()
-                
-                Spacer()
-                    .frame(height: 16)
-                
-                ForEach(sortTypeKindSource.availableSortTypeKinds, id: \.self) { sortType in
-                    IconTextButton(startIconUrl: sortType.icon, startIconType: .icon, endIconUrl: sortType == currentSortTypeKind ? "checkmark.seal" : nil, text: sortType.fullName) {
-                        onSelectSortTypeKind(sortType)
-                        dismiss()
+        SheetRootView {
+            ScrollView {
+                VStack(spacing: 0) {
+                    Text("Select Sort Type")
+                        .primaryText()
+                    
+                    Spacer()
+                        .frame(height: 16)
+                    
+                    ForEach(sortTypeKindSource.availableSortTypeKinds, id: \.self) { sortType in
+                        IconTextButton(startIconUrl: sortType.icon, startIconType: .icon, endIconUrl: sortType == currentSortTypeKind ? "checkmark.seal" : nil, text: sortType.fullName) {
+                            onSelectSortTypeKind(sortType)
+                            dismiss()
+                        }
                     }
                 }
+                .padding(.top, 24)
             }
-            .padding(.top, 24)
         }
     }
 }

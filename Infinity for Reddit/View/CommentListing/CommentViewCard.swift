@@ -39,6 +39,9 @@ struct CommentViewCard: View {
     private let isInPostDetails: Bool
     private let userIconSize: CGFloat = 24
     let highlightComment: Bool
+    let onUpvote: () -> Void
+    let onDownvote: () -> Void
+    let onToggleSave: () -> Void
     let onToggleExpand: (() -> Void)?
     let onReply: (() -> Void)?
     let onEdit: () -> Void
@@ -53,6 +56,9 @@ struct CommentViewCard: View {
         isInPostDetails: Bool,
         highlightComment: Bool = false,
         thingModerationRepository: ThingModerationRepositoryProtocol,
+        onUpvote: @escaping () -> Void,
+        onDownvote: @escaping () -> Void,
+        onToggleSave: @escaping () -> Void,
         onToggleExpand: (() -> Void)? = nil,
         onReply: (() -> Void)? = nil,
         onEdit: @escaping () -> Void,
@@ -63,6 +69,9 @@ struct CommentViewCard: View {
     ) {
         self.isInPostDetails = isInPostDetails
         self.highlightComment = highlightComment
+        self.onUpvote = onUpvote
+        self.onDownvote = onDownvote
+        self.onToggleSave = onToggleSave
         self.onToggleExpand = onToggleExpand
         self.onReply = onReply
         self.onEdit = onEdit
@@ -79,7 +88,7 @@ struct CommentViewCard: View {
             CommentIndentationView(depth: commentViewModel.comment.depth)
             
             VStack(alignment: .leading, spacing: 0) {
-                HStack {
+                HStack(spacing: 8) {
                     if isInPostDetails && showAuthorAvatar {
                         CustomWebImage(
                             commentViewModel.comment.authorIconUrlString,
@@ -151,10 +160,7 @@ struct CommentViewCard: View {
                         HStack(spacing: 0) {
                             HStack(spacing: 0) {
                                 Button(action: {
-                                    voteTask?.cancel()
-                                    voteTask = Task {
-                                        await commentViewModel.voteComment(vote: 1)
-                                    }
+                                    onUpvote()
                                 }) {
                                     SwiftUI.Image(systemName: commentViewModel.comment.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                                         .commentIconTemplateRendering()
@@ -171,10 +177,7 @@ struct CommentViewCard: View {
                                     .onTapGesture {}
                                 
                                 Button(action: {
-                                    voteTask?.cancel()
-                                    voteTask = Task {
-                                        await commentViewModel.voteComment(vote: -1)
-                                    }
+                                    onDownvote()
                                 }) {
                                     SwiftUI.Image(systemName: commentViewModel.comment.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                                         .commentIconTemplateRendering()
@@ -249,21 +252,20 @@ struct CommentViewCard: View {
                                     .contentShape(Rectangle())
                                 }
                                 
-                                Button(action: {
-                                    saveTask?.cancel()
-                                    saveTask = Task {
-                                        await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
+                                if !AccountViewModel.shared.account.isAnonymous() {
+                                    Button(action: {
+                                        onToggleSave()
+                                    }) {
+                                        SwiftUI.Image(systemName: commentViewModel.comment.saved ? "bookmark.fill" : "bookmark")
+                                            .commentIconTemplateRendering()
+                                            .commentIcon()
                                     }
-                                }) {
-                                    SwiftUI.Image(systemName: commentViewModel.comment.saved ? "bookmark.fill" : "bookmark")
-                                        .commentIconTemplateRendering()
-                                        .commentIcon()
+                                    .buttonStyle(.borderless)
+                                    .padding(8)
+                                    .contentShape(Rectangle())
                                 }
-                                .buttonStyle(.borderless)
-                                .padding(8)
-                                .contentShape(Rectangle())
                                 
-                                if isInPostDetails {
+                                if isInPostDetails && !AccountViewModel.shared.account.isAnonymous() {
                                     Button(action: {
                                         if commentViewModel.comment.locked {
                                             snackbarManager.showSnackbar(.info("This comment is locked."))
@@ -292,10 +294,9 @@ struct CommentViewCard: View {
                                         }
                                     }
                                     
-                                    Button(commentViewModel.comment.saved ? "Unsave" : "Save") {
-                                        saveTask?.cancel()
-                                        saveTask = Task {
-                                            await commentViewModel.saveComment(save: !commentViewModel.comment.saved)
+                                    if !AccountViewModel.shared.account.isAnonymous() {
+                                        Button(commentViewModel.comment.saved ? "Unsave" : "Save") {
+                                            onToggleSave()
                                         }
                                     }
                                     
@@ -307,7 +308,7 @@ struct CommentViewCard: View {
                                         onCopy()
                                     }
                                     
-                                    if isInPostDetails {
+                                    if isInPostDetails && !AccountViewModel.shared.account.isAnonymous() {
                                         Button("Reply") {
                                             if commentViewModel.comment.locked {
                                                 snackbarManager.showSnackbar(.info("This comment is locked."))
@@ -359,17 +360,17 @@ struct CommentViewCard: View {
                 }
                 
                 if showCommentDivider {
-                    Divider()
+                    CustomDivider()
+                }
+            }
+            .applyIf(isInPostDetails) {
+                $0.onTapGesture {
+                    isToolbarHidden.toggle()
                 }
             }
         }
         .contentShape(Rectangle())
         .background(backgroundColor)
-        .applyIf(isInPostDetails) {
-            $0.onTapGesture {
-                isToolbarHidden.toggle()
-            }
-        }
     }
     
     private var backgroundColor: Color {

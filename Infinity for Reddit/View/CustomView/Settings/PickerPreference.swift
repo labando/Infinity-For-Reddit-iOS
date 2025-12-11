@@ -38,13 +38,10 @@ struct PickerPreference: View {
                         .primaryIcon()
                         .frame(width: 24, height: 24, alignment: .leading)
                         .padding(0)
-                } else {
+                    
                     Spacer()
-                        .frame(width: 24)
+                        .frame(width: 16)
                 }
-                
-                Spacer()
-                    .frame(width: 24)
                 
                 VStack(spacing: 4) {
                     RowText(title)
@@ -53,14 +50,12 @@ struct PickerPreference: View {
                     RowText(selectedItem)
                         .secondaryText()
                 }
-                
-                Spacer()
+                .padding(.trailing, 16)
                 
                 SwiftUI.Image(systemName: "chevron.down")
                     .primaryIcon()
             }
+            .padding(16)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
     }
 }

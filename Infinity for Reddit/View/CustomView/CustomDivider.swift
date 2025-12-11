@@ -11,7 +11,7 @@ struct CustomDivider: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     var body: some View {
-        Rectangle()
-            .fill(Color(hex: customThemeViewModel.currentCustomTheme.dividerColor))
+        Divider()
+            .overlay(Color(hex: customThemeViewModel.currentCustomTheme.dividerColor))
     }
 }

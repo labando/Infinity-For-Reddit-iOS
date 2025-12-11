@@ -35,10 +35,12 @@ struct CopyContentSheet: View {
     }
     
     var body: some View {
-        HTMLStringView(
-            content: html,
-            tintColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
-        )
+        SheetRootView {
+            HTMLStringView(
+                content: html,
+                tintColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimary))
+            )
+        }
         .padding(16)
     }
 }
@@ -50,6 +52,7 @@ struct HTMLStringView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let wv = WKWebView()
         wv.tintColor = tintColor
+        wv.isOpaque = false
         return wv
     }
 

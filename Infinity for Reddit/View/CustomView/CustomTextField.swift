@@ -66,9 +66,8 @@ struct CustomTextField<FieldType: Hashable>: View {
                 )
         }
         .applyIf(showBackground) {
-            $0.padding(.vertical, 16)
-                .padding(.horizontal, 16)
-                .background(Color(.systemGray5))
+            $0.padding(16)
+                .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
                 .cornerRadius(10)
         }
         .focused($focusedField, equals: fieldType)
@@ -100,7 +99,7 @@ enum CustomTextFieldScheme {
     func getTintColor(currentCustomTheme: CustomTheme) -> Color {
         switch self {
         case .normal:
-            return Color(hex: currentCustomTheme.colorPrimary)
+            return Color(hex: currentCustomTheme.colorPrimaryLightTheme)
         case .fab:
             return Color(hex: currentCustomTheme.fabIconColor)
         }

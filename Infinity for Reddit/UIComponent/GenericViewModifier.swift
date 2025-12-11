@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import Alamofire
 
 struct NoPreviewPostTypeIndicatorBackgroundViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
@@ -208,14 +209,17 @@ struct AppForegroundBackgroundViewModifier: ViewModifier {
     @Environment(\.scenePhase) private var scenePhase
     
     let onAppEntersForeground: (() -> Void)?
+    let onAppEntersInactive: (() -> Void)?
     let onAppEntersBackground: (() -> Void)?
     
     func body(content: Content) -> some View {
         content
             .onChange(of: scenePhase) { oldPhase, newPhase in
                 switch newPhase {
-                case .background, .inactive:
+                case .background:
                     onAppEntersBackground?()
+                case .inactive:
+                    onAppEntersInactive?()
                 case .active:
                     onAppEntersForeground?()
                 @unknown default: break
@@ -285,11 +289,19 @@ struct SnackbarErrorViewModifier<P: Publisher>: ViewModifier where P.Output == E
     @EnvironmentObject private var snackbarManager: SnackbarManager
     
     let errorPublisher: P
+    let showTaskCancelledError: Bool
     
     func body(content: Content) -> some View {
         content
             .onReceive(errorPublisher) { newValue in
                 if let newValue {
+                    if !showTaskCancelledError {
+                        if let afError = newValue as? AFError, case .explicitlyCancelled = afError {
+                            return
+                        } else if newValue is CancellationError {
+                            return
+                        }
+                    }
                     snackbarManager.showSnackbar(.error(newValue))
                 } else {
                     snackbarManager.dismiss()

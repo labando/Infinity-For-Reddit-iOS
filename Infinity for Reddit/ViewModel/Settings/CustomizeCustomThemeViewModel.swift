@@ -10,30 +10,63 @@ import GRDB
 
 @MainActor
 class CustomizeCustomThemeViewModel: ObservableObject {
-    @Published var customTheme: CustomTheme
+    @Published var backingCustomTheme: CustomTheme?
+    @Published var loadState: LoadState = .idle
     @Published var error: Error?
+    
+    var customTheme: CustomTheme {
+        get {
+            backingCustomTheme ?? CustomTheme.getIndigo()
+        }
+        set {
+            backingCustomTheme = newValue
+        }
+    }
     
     var customThemeFields: [String] = []
     var customThemeFieldsBoolType: Set<String> = []
     var customThemeSettingsItems: [String: CustomThemeSettingsItem] = [:]
     
+    private let customThemeId: Int?
+    private let predefindCustomThemeName: String?
+    private let customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol
     private let customThemeDao: CustomThemeDao
     
-    init(customTheme: CustomTheme) {
+    init(customThemeId: Int?, predefindCustomThemeName: String?, customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol) {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Could not resolve DatabasePool")
         }
-        
+        self.customThemeId = customThemeId
+        self.predefindCustomThemeName = predefindCustomThemeName
+        self.customizeCustomThemeRepository = customizeCustomThemeRepository
         self.customThemeDao = CustomThemeDao(dbPool: resolvedDatabasePool)
+    }
+    
+    func getAndSetCustomTheme() async {
+        guard loadState.canLoad else {
+            return
+        }
         
-        self.customTheme = customTheme
+        loadState = .loading
         
-        customTheme.getProperties(customThemeFields: &customThemeFields, customThemeFieldsBoolType: &customThemeFieldsBoolType)
-        
-        initializeCustomThemeSettingsItems(customThemeSettingsItems: &customThemeSettingsItems)
+        do {
+            if let loadedTheme = try await customizeCustomThemeRepository.getCustomTheme(customThemeId: customThemeId, predefindCustomThemeName: predefindCustomThemeName) {
+                loadedTheme.getProperties(customThemeFields: &customThemeFields, customThemeFieldsBoolType: &customThemeFieldsBoolType)
+                initializeCustomThemeSettingsItems(customThemeSettingsItems: &customThemeSettingsItems)
+                self.customTheme = loadedTheme
+            }
+            loadState = .loaded
+        } catch {
+            print(error)
+            loadState = .failed(error)
+        }
     }
     
     func saveCustomTheme() {
+        guard let customTheme = backingCustomTheme else {
+            return
+        }
+        
         Task {
             do {
                 if customTheme.isLightTheme {
@@ -81,11 +114,6 @@ class CustomizeCustomThemeViewModel: ObservableObject {
         customThemeSettingsItems["colorPrimary"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_color_primary", comment: ""),
             description: NSLocalizedString("theme_item_color_primary_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["colorPrimaryDark"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_color_primary_dark", comment: ""),
-            description: NSLocalizedString("theme_item_color_primary_dark_detail", comment: "")
         )
         
         customThemeSettingsItems["colorAccent"] = CustomThemeSettingsItem(
@@ -138,11 +166,6 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_button_text_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["chipTextColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_chip_text_color", comment: ""),
-            description: NSLocalizedString("theme_item_chip_text_color_detail", comment: "")
-        )
-        
         customThemeSettingsItems["linkColor"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_link_color", comment: ""),
             description: NSLocalizedString("theme_item_link_color_detail", comment: "")
@@ -191,11 +214,6 @@ class CustomizeCustomThemeViewModel: ObservableObject {
         customThemeSettingsItems["fullyCollapsedCommentBackgroundColor"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_fully_collapsed_comment_background_color", comment: ""),
             description: NSLocalizedString("theme_item_fully_collapsed_comment_background_color_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["awardedCommentBackgroundColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_awarded_comment_background_color", comment: ""),
-            description: NSLocalizedString("theme_item_awarded_comment_background_color_detail", comment: "")
         )
         
         customThemeSettingsItems["receivedMessageBackgroundColor"] = CustomThemeSettingsItem(
@@ -248,16 +266,6 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_toolbar_primary_text_and_icon_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["toolbarSecondaryTextColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_toolbar_secondary_text_color", comment: ""),
-            description: NSLocalizedString("theme_item_toolbar_secondary_text_color_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["circularProgressBarBackground"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_circular_progress_bar_background_color", comment: ""),
-            description: NSLocalizedString("theme_item_circular_progress_bar_background_color_detail", comment: "")
-        )
-        
         customThemeSettingsItems["mediaIndicatorIconColor"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_media_indicator_icon_color", comment: ""),
             description: NSLocalizedString("theme_item_media_indicator_icon_color_detail", comment: "")
@@ -268,34 +276,19 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_media_indicator_background_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["tabLayoutWithExpandedCollapsingToolbarTabBackground"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background", comment: ""),
-            description: NSLocalizedString("theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background_detail", comment: "")
+        customThemeSettingsItems["pickerItemTextColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_picker_item_text_color", comment: ""),
+            description: NSLocalizedString("theme_item_picker_item_text_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["tabLayoutWithExpandedCollapsingToolbarTextColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color", comment: ""),
-            description: NSLocalizedString("theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color_detail", comment: "")
+        customThemeSettingsItems["pickerSelectedItemTextColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_picker_selected_item_text_color", comment: ""),
+            description: NSLocalizedString("theme_item_picker_selected_item_text_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["tabLayoutWithExpandedCollapsingToolbarTabIndicator"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator", comment: ""),
-            description: NSLocalizedString("theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["tabLayoutWithCollapsedCollapsingToolbarTabBackground"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background", comment: ""),
-            description: NSLocalizedString("theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["tabLayoutWithCollapsedCollapsingToolbarTextColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color", comment: ""),
-            description: NSLocalizedString("theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["tabLayoutWithCollapsedCollapsingToolbarTabIndicator"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator", comment: ""),
-            description: NSLocalizedString("theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator_detail", comment: "")
+        customThemeSettingsItems["pickerSelectedItemBackgroundColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_picker_selected_item_background_color", comment: ""),
+            description: NSLocalizedString("theme_item_picker_selected_item_background_color_detail", comment: "")
         )
         
         customThemeSettingsItems["upvoted"] = CustomThemeSettingsItem(
@@ -346,16 +339,6 @@ class CustomizeCustomThemeViewModel: ObservableObject {
         customThemeSettingsItems["flairTextColor"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_flair_text_color", comment: ""),
             description: NSLocalizedString("theme_item_flair_text_color_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["awardsBackgroundColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_awards_background_color", comment: ""),
-            description: NSLocalizedString("theme_item_awards_background_color_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["awardsTextColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_awards_text_color", comment: ""),
-            description: NSLocalizedString("theme_item_awards_text_color_detail", comment: "")
         )
         
         customThemeSettingsItems["archivedTint"] = CustomThemeSettingsItem(
@@ -488,23 +471,5 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             title: NSLocalizedString("theme_item_comment_vertical_bar_color_7", comment: ""),
             description: NSLocalizedString("theme_item_comment_vertical_bar_color_7_detail", comment: "")
         )
-        
-        customThemeSettingsItems["navBarColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_nav_bar_color", comment: ""),
-            description: NSLocalizedString("theme_item_nav_bar_color_detail", comment: "")
-        )
-        
-        customThemeSettingsItems["isLightStatusBar"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_light_status_bar", comment: "")
-        )
-        
-        customThemeSettingsItems["isLightNavBar"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_light_nav_bar", comment: "")
-        )
-        
-        customThemeSettingsItems["isChangeStatusBarIconColorAfterToolbarCollapsedInImmersiveInterface"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_change_status_bar_icon_color_after_toolbar_collapsed_in_immersive_interface", comment: "")
-        )
     }
-    
 }

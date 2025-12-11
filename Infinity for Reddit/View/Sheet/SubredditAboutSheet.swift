@@ -13,20 +13,22 @@ struct SubredditAboutSheet: View {
     let subredditData: SubredditData?
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                RowText("Cakeday: \(Utils.getFormattedCakeDay(subredditData?.createdUTC))")
-                    .primaryText()
-                
-                if let description = subredditData?.description, !description.isEmpty {
-                    Markdown(description)
-                        .themedMarkdown()
-                        .markdownLinkHandler { url in
-                            navigationManager.openLink(url)
-                        }
+        SheetRootView {
+            ScrollView {
+                VStack(spacing: 16) {
+                    RowText("Cakeday: \(Utils.getFormattedCakeDay(subredditData?.createdUTC))")
+                        .primaryText()
+                    
+                    if let description = subredditData?.description, !description.isEmpty {
+                        Markdown(description)
+                            .themedMarkdown()
+                            .markdownLinkHandler { url in
+                                navigationManager.openLink(url)
+                            }
+                    }
                 }
+                .padding(16)
             }
-            .padding(16)
         }
     }
 }

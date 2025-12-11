@@ -35,9 +35,7 @@ struct PostFilterSettingsView: View {
         RootView {
             if postFilterViewModel.postFilters.isEmpty {
                 VStack(spacing: 0) {
-                    InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")
-                    
-                    Divider()
+                    InfoPreference(title: "Restart the app to see the changes", icon: "info.circle")
                     
                     VStack(alignment: .center, spacing: 8) {
                         Spacer()
@@ -64,10 +62,7 @@ struct PostFilterSettingsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
-                    InfoPreference(title: "Restart the app to see the changes", iconUrl: "info.circle")
-                        .listPlainItemNoInsets()
-                    
-                    Divider()
+                    InfoPreference(title: "Restart the app to see the changes", icon: "info.circle")
                         .listPlainItemNoInsets()
                     
                     ForEach(postFilterViewModel.postFilters, id: \.identityForView) { postFilter in

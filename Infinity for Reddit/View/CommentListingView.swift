@@ -16,6 +16,7 @@ struct CommentListingView: View {
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject private var commentSubmissionShareableViewModel: CommentSubmissionShareableViewModel
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     
     @StateObject var commentListingViewModel: CommentListingViewModel
     @State private var showSortTypeKindSheet: Bool = false
@@ -42,7 +43,8 @@ struct CommentListingView: View {
             wrappedValue: CommentListingViewModel(
                 commentListingMetadata: commentListingMetadata,
                 commentListingRepository: CommentListingRepository(),
-                thingModerationRepository: ThingModerationRepository()
+                thingModerationRepository: ThingModerationRepository(),
+                commentRepository: CommentRepository()
             )
         )
     }
@@ -79,6 +81,15 @@ struct CommentListingView: View {
                                 comment: comment,
                                 isInPostDetails: false,
                                 thingModerationRepository: thingModerationRepository,
+                                onUpvote: {
+                                    commentListingViewModel.voteComment(comment, vote: 1)
+                                },
+                                onDownvote: {
+                                    commentListingViewModel.voteComment(comment, vote: -1)
+                                },
+                                onToggleSave: {
+                                    commentListingViewModel.toggleSaveComment(comment, save: !comment.saved)
+                                },
                                 onEdit: {
                                     self.commentToBeEdited = comment
                                     navigationManager.append(AppNavigation.editComment(commentToBeEdited: comment))
@@ -217,6 +228,9 @@ struct CommentListingView: View {
             CopyContentOptionsSheet(
                 markdown: markdownToBeCopied,
                 plainText: plainTextToBeCopied,
+                onCopyEntireMarkdown: {
+                    snackbarManager.showSnackbar(.info("Copied"))
+                },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
                     showCopyContentSheet = true

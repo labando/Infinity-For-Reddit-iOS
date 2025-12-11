@@ -162,9 +162,7 @@ struct PostListingView: View {
                                 }
                             }
                             .onDisappear {
-                                postListingViewModel.appearedPosts.removeAll {
-                                    $0.id == post.id
-                                }
+                                postListingViewModel.appearedPosts.remove(id: post.id)
                             }
                         }
                         if postListingViewModel.hasMorePages {
@@ -177,6 +175,7 @@ struct PostListingView: View {
                     }
                     .scrollBounceBehavior(.basedOnSize)
                     .themedList()
+                    .scrollIndicators(.hidden)
                     .refreshable {
                         await postListingViewModel.refreshPostsWithContinuation()
                     }
@@ -387,9 +386,15 @@ struct PostListingView: View {
                 title: titleToBeCopied,
                 markdown: markdownToBeCopied,
                 plainText: plainTextToBeCopied,
+                onCopyEntireTitle: {
+                    snackbarManager.showSnackbar(.info("Copied"))
+                },
                 onCopyTitle: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(title: titleToBeCopied)
                     showCopyContentSheet = true
+                },
+                onCopyEntireMarkdown: {
+                    snackbarManager.showSnackbar(.info("Copied"))
                 },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
@@ -428,6 +433,7 @@ struct PostListingView: View {
             
             NavigationBarMenuItem(title: lazyModeState == .stopped ? "Start Lazy Mode" : "Stop Lazy Mode") {
                 if lazyModeState == .stopped {
+                    snackbarManager.showSnackbar(.info("Content will auto-scroll in \(lazyModeInterval) \(lazyModeInterval == 1 ? "second" : "seconds")."))
                     startLazyMode()
                 } else {
                     stopLazyMode()
@@ -487,6 +493,7 @@ struct PostListingView: View {
         
         if postListingViewModel.lazyModeScrolledPost == nil {
             if !postListingViewModel.appearedPosts.isEmpty {
+                postListingViewModel.sortAppearedPosts()
                 postListingViewModel.lazyModeScrolledPost = postListingViewModel.appearedPosts[0]
             } else if !postListingViewModel.posts.isEmpty {
                 postListingViewModel.lazyModeScrolledPost = postListingViewModel.posts[0]
@@ -513,6 +520,7 @@ struct PostListingView: View {
                             } else {
                                 postListingViewModel.lazyModeScrolledPost = nil
                                 if !postListingViewModel.appearedPosts.isEmpty {
+                                    postListingViewModel.sortAppearedPosts()
                                     postListingViewModel.lazyModeScrolledPost = postListingViewModel.appearedPosts[postListingViewModel.appearedPosts.count - 1]
                                     for appearedPost in postListingViewModel.appearedPosts.reversed() {
                                         if let index = postListingViewModel.posts.index(id: appearedPost.id) {
@@ -534,6 +542,7 @@ struct PostListingView: View {
                             }
                         } else {
                             if !postListingViewModel.appearedPosts.isEmpty {
+                                postListingViewModel.sortAppearedPosts()
                                 postListingViewModel.lazyModeScrolledPost = postListingViewModel.appearedPosts[postListingViewModel.appearedPosts.count - 1]
                                 for appearedPost in postListingViewModel.appearedPosts.reversed() {
                                     if let index = postListingViewModel.posts.index(id: appearedPost.id) {

@@ -24,13 +24,10 @@ struct SliderPreference: View {
                     .primaryIcon()
                     .frame(width: 24, height: 24, alignment: .leading)
                     .padding(0)
-            } else {
+                
                 Spacer()
-                    .frame(width: 24)
+                    .frame(width: 16)
             }
-            
-            Spacer()
-                .frame(width: 24)
             
             VStack(spacing: 4) {
                 RowText(title)

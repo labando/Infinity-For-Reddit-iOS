@@ -11,8 +11,6 @@ import GRDB
 import SwiftUI
 
 public class CustomThemeViewModel: ObservableObject {
-    // The default theme is Indigo
-    //@Published private(set) var currentCustomTheme: CustomTheme = CustomTheme.getIndigo()
     @Published var allCustomThemes: [CustomTheme] = []
     @Published var currentLightCustomTheme: CustomTheme?
     @Published var currentDarkCustomTheme: CustomTheme?

@@ -24,6 +24,7 @@ public class CommentListingViewModel: ObservableObject {
     private var after: String? = nil
     public let commentListingRepository: CommentListingRepositoryProtocol
     private let thingModerationRepository: ThingModerationRepositoryProtocol
+    private let commentRepository: CommentRepositoryProtocol
     private let commentListingMetadata: CommentListingMetadata
     private var lastLoadedSortType: SortType? = nil
     
@@ -32,11 +33,13 @@ public class CommentListingViewModel: ObservableObject {
     // MARK: - Initializer
     init(commentListingMetadata: CommentListingMetadata,
          commentListingRepository: CommentListingRepositoryProtocol,
-         thingModerationRepository: ThingModerationRepositoryProtocol) {
+         thingModerationRepository: ThingModerationRepositoryProtocol,
+         commentRepository: CommentRepositoryProtocol) {
         self.sortType = commentListingMetadata.commentListingType.savedSortType
         self.commentListingMetadata = commentListingMetadata
         self.commentListingRepository = commentListingRepository
         self.thingModerationRepository = thingModerationRepository
+        self.commentRepository = commentRepository
     }
     
     // MARK: - Methods
@@ -190,6 +193,66 @@ public class CommentListingViewModel: ObservableObject {
             self.sortType = sortType
             loadCommentsTaskId = UUID()
             commentListingMetadata.commentListingType.saveSortType(sortType: sortType)
+        }
+    }
+    
+    @MainActor
+    func voteComment(_ comment: Comment, vote: Int) {
+        guard !AccountViewModel.shared.account.isAnonymous(), let _ = comment.name else { return }
+        
+        Task {
+            let previousVote = comment.likes
+            
+            var point: String
+            let finalVote: Int
+            if vote == comment.likes {
+                point = "0"
+                finalVote = 0
+                comment.likes = 0
+            } else {
+                point = String(vote)
+                finalVote = vote
+                comment.likes = vote
+            }
+            self.objectWillChange.send()
+            
+            defer {
+                self.objectWillChange.send()
+            }
+            
+            do {
+                try await commentRepository.voteComment(comment: comment, point: point)
+                comment.likes = finalVote
+            } catch {
+                comment.likes = previousVote
+                self.error = error
+                print("Error voting comment: \(error)")
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleSaveComment(_ comment: Comment, save: Bool) {
+        guard !AccountViewModel.shared.account.isAnonymous(), let _ = comment.name else { return }
+        
+        Task {
+            let previousSaved = comment.saved
+            
+            comment.saved = save
+            
+            self.objectWillChange.send()
+            
+            defer {
+                self.objectWillChange.send()
+            }
+            
+            do {
+                try await commentRepository.saveComment(comment: comment, save: save)
+            } catch {
+                comment.saved = previousSaved
+                self.error = error
+                print("Error (un)saving comment: \(error)")
+            }
         }
     }
     

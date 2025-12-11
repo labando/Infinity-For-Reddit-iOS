@@ -22,10 +22,13 @@ struct AnonymousSubscribedUserListingView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if anonymousSubscriptionListingViewModel.userSubscriptions.isEmpty {
-                Text("No subscribed users")
-                    .primaryText()
+                ZStack {
+                    Text("No subscribed users")
+                        .primaryText()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
                     if !anonymousSubscriptionListingViewModel.favoriteUserSubscriptions.isEmpty {

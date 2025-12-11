@@ -24,69 +24,71 @@ struct PostOptionsSheet: View {
     var onModeration: () -> Void
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                if !AccountViewModel.shared.account.isAnonymous() && post.canReply {
-                    IconTextButton(startIconUrl: "text.bubble", text: "Comment") {
-                        onComment()
+        SheetRootView {
+            ScrollView {
+                VStack(spacing: 0) {
+                    if !AccountViewModel.shared.account.isAnonymous() && post.canReply {
+                        IconTextButton(startIconUrl: "text.bubble", text: "Comment") {
+                            onComment()
+                            dismiss()
+                        }
+                    }
+                    
+                    IconTextButton(startIconUrl: "square.and.arrow.up", text: "Share") {
+                        onShare()
                         dismiss()
                     }
-                }
-                
-                IconTextButton(startIconUrl: "square.and.arrow.up", text: "Share") {
-                    onShare()
-                    dismiss()
-                }
-                
-                IconTextButton(startIconUrl: "square.and.arrow.up", text: "Copy") {
-                    onCopy()
-                    dismiss()
-                }
-                
-                IconTextButton(startIconUrl: "line.3.horizontal.decrease.circle", text: "Add to Post Filter") {
-                    onAddToPostFilter()
-                    dismiss()
-                }
+                    
+                    IconTextButton(startIconUrl: "square.and.arrow.up", text: "Copy") {
+                        onCopy()
+                        dismiss()
+                    }
+                    
+                    IconTextButton(startIconUrl: "line.3.horizontal.decrease.circle", text: "Add to Post Filter") {
+                        onAddToPostFilter()
+                        dismiss()
+                    }
 
-                IconTextButton(startIconUrl: post.hidden ? "eye" :"eye.slash", text: post.hidden ? "Unhide" : "Hide") {
-                    onToggleHidePost()
-                    dismiss()
-                }
-                
-                if post.isCrosspostable {
-                    IconTextButton(startIconUrl: "arrow.2.squarepath", text: "Crosspost") {
-                        onCrosspost()
+                    IconTextButton(startIconUrl: post.hidden ? "eye" :"eye.slash", text: post.hidden ? "Unhide" : "Hide") {
+                        onToggleHidePost()
                         dismiss()
                     }
-                }
-                
-                if let downloadText = post.postType.downloadText {
-                    IconTextButton(startIconUrl: "square.and.arrow.down", text: downloadText) {
-                        onDownloadMedia()
+                    
+                    if post.isCrosspostable {
+                        IconTextButton(startIconUrl: "arrow.2.squarepath", text: "Crosspost") {
+                            onCrosspost()
+                            dismiss()
+                        }
+                    }
+                    
+                    if let downloadText = post.postType.downloadText {
+                        IconTextButton(startIconUrl: "square.and.arrow.down", text: downloadText) {
+                            onDownloadMedia()
+                            dismiss()
+                        }
+                    }
+                    
+                    if post.postType == .gallery {
+                        IconTextButton(startIconUrl: "square.and.arrow.down.on.square", text: "Download All Gallery Media") {
+                            onDownloadAllGalleryMedia()
+                            dismiss()
+                        }
+                    }
+                    
+                    IconTextButton(startIconUrl: "flag", text: "Report") {
+                        onReport()
                         dismiss()
                     }
-                }
-                
-                if post.postType == .gallery {
-                    IconTextButton(startIconUrl: "square.and.arrow.down.on.square", text: "Download All Gallery Media") {
-                        onDownloadAllGalleryMedia()
-                        dismiss()
+                    
+                    if post.canModPost {
+                        IconTextButton(startIconUrl: "checkmark.shield.fill", text: "Moderate") {
+                            onModeration()
+                            dismiss()
+                        }
                     }
                 }
-                
-                IconTextButton(startIconUrl: "flag", text: "Report") {
-                    onReport()
-                    dismiss()
-                }
-                
-                if post.canModPost {
-                    IconTextButton(startIconUrl: "checkmark.shield.fill", text: "Moderate") {
-                        onModeration()
-                        dismiss()
-                    }
-                }
+                .padding(.top, 24)
             }
-            .padding(.top, 24)
         }
     }
 }

@@ -30,13 +30,10 @@ struct GenericPickerPreference: View {
                         .primaryIcon()
                         .frame(width: 24, height: 24, alignment: .leading)
                         .padding(0)
-                } else {
+                    
                     Spacer()
-                        .frame(width: 24)
+                        .frame(width: 16)
                 }
-                
-                Spacer()
-                    .frame(width: 24)
                 
                 VStack(spacing: 4) {
                     RowText(title)
@@ -45,14 +42,14 @@ struct GenericPickerPreference: View {
                     RowText(selected)
                         .secondaryText()
                 }
+                .padding(.trailing, 16)
                 
                 Spacer()
                 
                 SwiftUI.Image(systemName: "chevron.down")
                     .primaryIcon()
             }
+            .padding(16)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
     }
 }

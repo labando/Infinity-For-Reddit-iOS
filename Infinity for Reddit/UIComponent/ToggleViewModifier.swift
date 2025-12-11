@@ -12,6 +12,6 @@ struct ToggleCustomThemeViewModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .toggleStyle(SwitchToggleStyle(tint: Color(hex: themeViewModel.currentCustomTheme.colorPrimary)))
+            .toggleStyle(SwitchToggleStyle(tint: Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme)))
     }
 }

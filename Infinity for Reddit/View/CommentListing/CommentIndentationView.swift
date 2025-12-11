@@ -14,7 +14,8 @@ struct CommentIndentationView: View {
     private var showOnlyOneCommentLevelIndicator: Bool = false
     
     let depth: Int
-    
+
+    // TODO optimize this please
     var depthColors: [Color] {
         [
             Color(hex: themeViewModel.currentCustomTheme.commentVerticalBarColor1),

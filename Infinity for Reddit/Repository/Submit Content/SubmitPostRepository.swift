@@ -52,7 +52,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
             params["flair_id"] = flair.id
         }
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -102,7 +102,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
             params["flair_id"] = flair.id
         }
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -147,7 +147,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
             params["flair_id"] = flair.id
         }
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -191,7 +191,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
             params["flair_id"] = flair.id
         }
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -240,7 +240,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         let payloadJSON = try JSONEncoder().encode(redditGalleryPayload)
         let payloadString = String(data: payloadJSON, encoding: .utf8)!
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitGalleryPost(body: payloadString), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -292,7 +292,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
             params["flair_id"] = flair.id
         }
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -370,7 +370,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
         
         print(payloadString)
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitPollPost(body: payloadString), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -416,7 +416,7 @@ class SubmitPostRepository: SubmitPostRepositoryProtocol {
             params["flair_id"] = flair.id
         }
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let data = try await self.session.request(RedditOAuthAPI.submitPost(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)

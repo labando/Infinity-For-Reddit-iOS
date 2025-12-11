@@ -15,20 +15,22 @@ struct SortTypeTimeSheet: View {
     let onSelectSortType: (SortType.Time) -> Void
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                Text("Select Sort Time")
-                    .padding(.bottom, 16)
-                
-                ForEach(sortTypeTimeSource.availableSortTypeTimes, id: \.self) { sortTime in
-                    IconTextButton(endIconUrl: sortTime == currentSortTypeTime ? "checkmark.seal" : nil, text: sortTime.fullName) {
-                        onSelectSortType(sortTime)
-                        dismiss()
+        SheetRootView {
+            ScrollView {
+                VStack(spacing: 0) {
+                    Text("Select Sort Time")
+                        .padding(.bottom, 16)
+                    
+                    ForEach(sortTypeTimeSource.availableSortTypeTimes, id: \.self) { sortTime in
+                        IconTextButton(endIconUrl: sortTime == currentSortTypeTime ? "checkmark.seal" : nil, text: sortTime.fullName) {
+                            onSelectSortType(sortTime)
+                            dismiss()
+                        }
+                        .listPlainItemNoInsets()
                     }
-                    .listPlainItemNoInsets()
                 }
+                .padding(.top, 24)
             }
-            .padding(.top, 24)
         }
     }
 }

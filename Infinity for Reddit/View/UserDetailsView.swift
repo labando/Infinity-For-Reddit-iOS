@@ -72,7 +72,7 @@ struct UserDetailsView: View {
                                     Button(userDetailsViewModel.userData?.isSubscribed ?? false ? "Followed" : "Follow") {
                                         userDetailsViewModel.toggleFollowUser()
                                     }
-                                    .filledButton()
+                                    .subscribeButton(isSubscribed: userDetailsViewModel.userData?.isSubscribed ?? false)
                                 }
                                 .padding(.horizontal, 16)
                                 
@@ -164,25 +164,35 @@ struct UserDetailsView: View {
                             }
                             .tag(1)
                         }
-                        .themedTabViewGroup()
                         .toolbar(tabBarVisibility, for: .tabBar)
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                tabBarVisibility = .visible
-                            }
-                        }
-                        .onDisappear {
-                            tabBarVisibility = .hidden
-                        }
-                        .animation(.easeInOut(duration: 0.2), value: tabBarVisibility)
                     }
                     .themedTabView()
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                            tabBarVisibility = .visible
+                        }
+                    }
+                    .onDisappear {
+                        tabBarVisibility = .hidden
+                    }
+                    .animation(.easeInOut(duration: 0.2), value: tabBarVisibility)
                     .animation(.bouncy, value: navigationManager.rootTabLabelVisibility)
                 }
                 .overlay(alignment: .top) {
-                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(
+                                    colors: [
+                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary),
+                                        isUserInfoVisible ? .clear : Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                    ]
+                                ),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                         .frame(height: proxy.safeAreaInsets.top)
-                        .opacity(isUserInfoVisible ? 0 : 1)
                         .ignoresSafeArea()
                 }
                 .edgesIgnoringSafeArea(.top)

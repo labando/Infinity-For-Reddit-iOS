@@ -18,7 +18,7 @@ struct SortTypeSettingsView: View {
     var body: some View {
         RootView {
             ScrollView {
-                VStack {
+                VStack(spacing: 0) {
                     TogglePreference(isEnabled: $saveSortType, title: "Save Sort Type")
                     
                     GenericPickerPreference(

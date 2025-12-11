@@ -1,5 +1,5 @@
 //
-// TokenCenter.swift
+// RedditAccessTokenProvider.swift
 // Infinity for Reddit
 //
 // Created by joeylr2042 on 2025-08-14
@@ -8,8 +8,8 @@ import Foundation
 import Alamofire
 import GRDB
 
-public actor TokenCenter: TokenProvider {
-    public static let shared = TokenCenter()
+public actor RedditAccessTokenProvider: RedditAccessTokenProviderProtocol {
+    public static let shared = RedditAccessTokenProvider()
     
     private let dbPool: DatabasePool
     private var inFlight: [String: Task<String, Error>] = [:]
@@ -23,7 +23,7 @@ public actor TokenCenter: TokenProvider {
     
     public func currentAccessToken(for username: String) async -> String? {
         let accountDao = AccountDao(dbPool: dbPool)
-        return try? await accountDao.getAccount(username: username)?.accessToken
+        return try? accountDao.getAccount(username: username)?.accessToken
     }
     
     @discardableResult

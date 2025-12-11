@@ -16,7 +16,7 @@ public class PostDetailsViewModel: ObservableObject {
     @Published var post: Post?
     @Published var visibleComments: IdentifiedArrayOf<CommentItem> = []
     var allComments: IdentifiedArrayOf<CommentItem> = []
-    @Published var appearedComments: [CommentItem] = []
+    var appearedComments: IdentifiedArrayOf<CommentItem> = []
     @Published var isSingleThread: Bool =  false
     @Published var isInitialLoad: Bool = true
     @Published var isInitialLoading: Bool = false
@@ -47,6 +47,8 @@ public class PostDetailsViewModel: ObservableObject {
     private let historyPostsRepository: HistoryPostsRepositoryProtocol
     private let flairRepository: FlairRepositoryProtocol
     private let thingModerationRepository: ThingModerationRepositoryProtocol
+    private let postRepository: PostRepositoryProtocol
+    private let commentRepository: CommentRepositoryProtocol
     
     private var refreshPostsContinuation: CheckedContinuation<Void, Never>?
     
@@ -77,6 +79,8 @@ public class PostDetailsViewModel: ObservableObject {
         historyPostsRepository: HistoryPostsRepositoryProtocol,
         flairRepository: FlairRepositoryProtocol,
         thingModerationRepository: ThingModerationRepositoryProtocol,
+        postRepository: PostRepositoryProtocol,
+        commentRepository: CommentRepositoryProtocol,
         isContinueThread: Bool = false
     ) {
         self.account = account
@@ -86,6 +90,8 @@ public class PostDetailsViewModel: ObservableObject {
         self.historyPostsRepository = historyPostsRepository
         self.flairRepository = flairRepository
         self.thingModerationRepository = thingModerationRepository
+        self.postRepository = postRepository
+        self.commentRepository = commentRepository
         self.showTopLevelCommentsFirst = InterfaceCommentUserDefaultsUtils.showTopLevelCommentsFirst
         if isContinueThread {
             self.singleThreadContext = 0
@@ -223,6 +229,7 @@ public class PostDetailsViewModel: ObservableObject {
                 if isRefreshWithContinuation {
                     self.visibleComments.removeAll()
                     self.allComments.removeAll()
+                    self.appearedComments.removeAll()
                 }
                 self.visibleComments.append(contentsOf: commentsToBeAppendedToVisibleComments)
                 self.allComments.append(contentsOf: processedComments)
@@ -417,6 +424,7 @@ public class PostDetailsViewModel: ObservableObject {
             if refreshPostsContinuation == nil {
                 visibleComments.removeAll()
                 allComments.removeAll()
+                appearedComments.removeAll()
             }
         }
     }
@@ -662,10 +670,8 @@ public class PostDetailsViewModel: ObservableObject {
                         }
                     } else {
                         self.allComments.remove(at: allIndex)
-                        guard let visibleIndex = self.visibleComments.index(id: comment.id) else {
-                            return
-                        }
-                        self.visibleComments.remove(at: visibleIndex)
+                        self.visibleComments.remove(id: comment.id)
+                        self.appearedComments.remove(id: comment.id)
                     }
                 }
             } catch {
@@ -872,34 +878,200 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    func insertIntoAppearedComments(_ commentItem: CommentItem) {
-        self.appearedComments.removeAll {
-            $0.id == commentItem.id
-        }
-        
-        guard !self.appearedComments.isEmpty else {
-            appearedComments.append(commentItem)
-            return
-        }
-        
-        if let index = self.allComments.index(id: commentItem.id) {
-            var inserted: Bool = false
-            for (i, comment) in self.appearedComments.enumerated() {
-                if let appearedCommentIndex = self.allComments.index(id: comment.id), index < appearedCommentIndex {
-                    self.appearedComments.insert(commentItem, at: i)
-                    inserted = true
-                    break
-                }
+    @MainActor
+    func votePost(vote: Int) {
+        Task {
+            guard !account.isAnonymous(), let post else {
+                await votePostAnonymous(vote: vote)
+                return
             }
-            if !inserted {
-                self.appearedComments.append(commentItem)
+            
+            let previousVote = post.likes
+            
+            var point: String
+            let finalVote: Int
+            if vote == post.likes {
+                point = "0"
+                finalVote = 0
+                post.likes = 0
+            } else {
+                point = String(vote)
+                finalVote = vote
+                post.likes = vote
             }
-        } else {
-            appearedComments.append(commentItem)
+            self.objectWillChange.send()
+            
+            defer {
+                self.objectWillChange.send()
+            }
+            
+            do {
+                try await postRepository.votePost(post: post, point: point)
+                self.post?.likes = finalVote
+            } catch {
+                self.post?.likes = previousVote
+                self.error = error
+                print("Error voting post: \(error)")
+            }
         }
     }
     
+    @MainActor
+    private func votePostAnonymous(vote: Int) async {
+        guard let post else {
+            return
+        }
+        
+        let finalVote: Int
+        if vote == post.likes {
+            finalVote = 0
+            self.post?.likes = 0
+        } else {
+            finalVote = vote
+            self.post?.likes = vote
+        }
+        try? await postRepository.votePostAnonymous(post: post, vote: finalVote)
+    }
+    
+    @MainActor
+    func toggleSavePost(save: Bool) {
+        Task {
+            guard !account.isAnonymous(), let post else {
+                await toggleSavePostAnonymous(save: save)
+                return
+            }
+            
+            let previousSaved = post.saved
+            
+            post.saved = save
+            
+            self.objectWillChange.send()
+            
+            defer {
+                self.objectWillChange.send()
+            }
+            
+            do {
+                try await postRepository.savePost(post: post, save: save)
+            } catch {
+                self.post?.saved = previousSaved
+                self.error = error
+                print("Error (un)saving post: \(error)")
+            }
+        }
+    }
+    
+    @MainActor
+    private func toggleSavePostAnonymous(save: Bool) async {
+        guard let post else {
+            return
+        }
+        
+        post.saved = save
+        try? await postRepository.savePostAnonymous(post: post, save: save)
+    }
+    
+    @MainActor
+    func readPost(markPostsAsRead: Bool, limitReadPosts: Bool, readPostsLimit: Int) {
+        guard let post, !post.isRead, markPostsAsRead else {
+            return
+        }
+        
+        Task {
+            do {
+                try await postRepository.readPost(
+                    post: post,
+                    account: AccountViewModel.shared.account,
+                    limitReadPosts: limitReadPosts,
+                    readPostsLimit: readPostsLimit
+                )
+                
+                await MainActor.run {
+                    post.isRead = true
+                }
+            } catch {
+                print("Mark post as read failed with error: \(error)")
+            }
+        }
+    }
+    
+    @MainActor
+    func voteComment(_ comment: Comment, vote: Int) {
+        guard !AccountViewModel.shared.account.isAnonymous(), let _ = comment.name else { return }
+        
+        Task {
+            let previousVote = comment.likes
+            
+            var point: String
+            let finalVote: Int
+            if vote == comment.likes {
+                point = "0"
+                finalVote = 0
+                comment.likes = 0
+            } else {
+                point = String(vote)
+                finalVote = vote
+                comment.likes = vote
+            }
+            self.objectWillChange.send()
+            
+            defer {
+                self.objectWillChange.send()
+            }
+            
+            do {
+                try await commentRepository.voteComment(comment: comment, point: point)
+                comment.likes = finalVote
+            } catch {
+                comment.likes = previousVote
+                self.error = error
+                print("Error voting comment: \(error)")
+            }
+        }
+    }
+    
+    @MainActor
+    func toggleSaveComment(_ comment: Comment, save: Bool) {
+        guard !AccountViewModel.shared.account.isAnonymous(), let _ = comment.name else { return }
+        
+        Task {
+            let previousSaved = comment.saved
+            
+            comment.saved = save
+            
+            self.objectWillChange.send()
+            
+            defer {
+                self.objectWillChange.send()
+            }
+            
+            do {
+                try await commentRepository.saveComment(comment: comment, save: save)
+            } catch {
+                comment.saved = previousSaved
+                self.error = error
+                print("Error (un)saving comment: \(error)")
+            }
+        }
+    }
+    
+    func insertIntoAppearedComments(_ commentItem: CommentItem) {
+        if appearedComments.index(id: commentItem.id) != nil {
+            return
+        }
+        
+        appearedComments.append(commentItem)
+    }
+    
+    func sortAppearedComments() {
+        appearedComments.sort(by: { c1, c2 in
+            (self.allComments.index(id: c1.id) ?? allComments.count) < (self.allComments.index(id: c2.id) ?? allComments.count)
+        })
+    }
+    
     func getNextParentComment() -> CommentItem? {
+        sortAppearedComments()
+        
         for i in appearedComments.indices.reversed() {
             if appearedComments[i].depth == 0 && i >= 2 {
                 return appearedComments[i]
@@ -925,6 +1097,7 @@ public class PostDetailsViewModel: ObservableObject {
         if appearedComments.isEmpty {
             return nil
         } else {
+            sortAppearedComments()
             if let firstIndex = visibleComments.index(id: appearedComments[0].id) {
                 for i in (0..<firstIndex).reversed() {
                     if visibleComments[i].depth == 0 && visibleComments[i].isComment {
@@ -957,6 +1130,8 @@ public class PostDetailsViewModel: ObservableObject {
                 }
             }
         } else {
+            sortAppearedComments()
+            
             for i in appearedComments.indices.reversed() {
                 if appearedComments[i].containsSearchQuery(searchQuery) {
                     setSearchedComment(appearedComments[i])
@@ -989,11 +1164,15 @@ public class PostDetailsViewModel: ObservableObject {
             }
         }
         
-        if !appearedComments.isEmpty, let firstIndex = visibleComments.index(id: appearedComments[0].id) {
-            for i in (0..<firstIndex).reversed() {
-                if visibleComments[i].containsSearchQuery(searchQuery) {
-                    setSearchedComment(visibleComments[i])
-                    return visibleComments[i]
+        
+        if !appearedComments.isEmpty {
+            sortAppearedComments()
+            if let firstIndex = visibleComments.index(id: appearedComments[0].id) {
+                for i in (0..<firstIndex).reversed() {
+                    if visibleComments[i].containsSearchQuery(searchQuery) {
+                        setSearchedComment(visibleComments[i])
+                        return visibleComments[i]
+                    }
                 }
             }
         }

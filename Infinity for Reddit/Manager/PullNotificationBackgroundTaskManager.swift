@@ -20,7 +20,7 @@ class PullNotificationBackgroundTaskManager {
     
     private init() {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError("Failed to resolve DatabasePool")
+            fatalError("Failed to resolve DatabasePool in PullNotificationBackgroundTaskManager")
         }
         self.accountDao = AccountDao(dbPool: resolvedDatabasePool)
         self.inboxListingRepository = InboxListingRepository(sessionName: "plain")
@@ -78,6 +78,7 @@ class PullNotificationBackgroundTaskManager {
     }
 
     func pullNotificationsForAllAccounts() async -> Bool {
+        print("pullNotificationsForAllAccounts()")
         guard let accounts = await getAllAccounts(), !accounts.isEmpty else {
             return false
         }
@@ -88,7 +89,7 @@ class PullNotificationBackgroundTaskManager {
         var newTime = lastTime
         
         for account in accounts {
-            let perAccountAccessTokenInterceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+            let perAccountAccessTokenInterceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
             
             guard let unreadListing = try? await fetchInboxListing(account, interceptor: perAccountAccessTokenInterceptor) else {
                 successful = false
@@ -115,7 +116,7 @@ class PullNotificationBackgroundTaskManager {
                 
                 var info: [String: Any] = [
                     AppDeepLink.accountNameKey: account.username,
-                    AppDeepLink.kindKey: inbox.inboxKind
+                    AppDeepLink.kindKey: inbox.kind
                 ]
                 if let fullname = inbox.name {
                     info[AppDeepLink.fullnameKey] = fullname

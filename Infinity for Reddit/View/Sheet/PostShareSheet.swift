@@ -14,38 +14,40 @@ struct PostShareSheet: View {
     let post: Post
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                RowText(post.postUrlString)
-                    .secondaryText(.f13)
-                    .padding(16)
-                
-                ShareLinkEntry(urlString: post.postUrlString, text: "Share Post Link")
-                
-                IconTextButton(startIconUrl: "document.on.document", text: "Copy Post Link") {
-                    Utils.copyText(post.postUrlString)
-                    dismiss()
-                }
-                
-//                IconTextButton(startIconUrl: "text.bubble", text: "Share as Image") {
-//                    onComment()
-//                    dismiss()
-//                }
-                
-                if let mediaShareUrlString = post.getMediaShareUrlString() {
-                    RowText(mediaShareUrlString)
+        SheetRootView {
+            ScrollView {
+                VStack(spacing: 0) {
+                    RowText(post.postUrlString)
                         .secondaryText(.f13)
                         .padding(16)
                     
-                    ShareLinkEntry(urlString: mediaShareUrlString, text: "Share Media Link")
+                    ShareLinkEntry(urlString: post.postUrlString, text: "Share Post Link")
                     
-                    IconTextButton(startIconUrl: "document.on.document", text: "Copy Media Link") {
-                        Utils.copyText(mediaShareUrlString)
+                    IconTextButton(startIconUrl: "document.on.document", text: "Copy Post Link") {
+                        Utils.copyText(post.postUrlString)
                         dismiss()
                     }
+                    
+    //                IconTextButton(startIconUrl: "text.bubble", text: "Share as Image") {
+    //                    onComment()
+    //                    dismiss()
+    //                }
+                    
+                    if let mediaShareUrlString = post.getMediaShareUrlString() {
+                        RowText(mediaShareUrlString)
+                            .secondaryText(.f13)
+                            .padding(16)
+                        
+                        ShareLinkEntry(urlString: mediaShareUrlString, text: "Share Media Link")
+                        
+                        IconTextButton(startIconUrl: "document.on.document", text: "Copy Media Link") {
+                            Utils.copyText(mediaShareUrlString)
+                            dismiss()
+                        }
+                    }
                 }
+                .padding(.top, 24)
             }
-            .padding(.top, 24)
         }
     }
     

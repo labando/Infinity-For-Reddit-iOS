@@ -31,32 +31,30 @@ struct TogglePreference: View {
                         .primaryIcon()
                         .frame(width: 24, height: 24, alignment: .leading)
                         .padding(0)
-                } else {
+                    
                     Spacer()
-                        .frame(width: 24)
+                        .frame(width: 16)
                 }
                 
-                Spacer()
-                    .frame(width: 16)
-                
-                VStack {
+                VStack(spacing: 4) {
                     RowText(title)
                         .primaryText()
                     
-                    if let subtitle = subtitle {
+                    if let subtitle {
                         RowText(subtitle)
                             .secondaryText()
                     }
                 }
-                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .padding(.trailing, 16)
                 
-                Toggle(isOn: $isEnabled) {}
+                Toggle("", isOn: $isEnabled)
                     .themedToggle()
+                    .labelsHidden()
                     .excludeFromTouchRipple()
             }
             .contentShape(Rectangle())
             .padding(.horizontal, 16)
-            .padding(.vertical, subtitle == nil ? 12 : 8)
         }
     }
 }

@@ -41,31 +41,33 @@ struct SearchResultsView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            SegmentedPicker(selectedValue: $selectedOption, values: ["Posts", "Subreddits", "Users"])
-                .padding(4)
-            
-            TabView(selection: $selectedOption) {
-                PostListingView(postListingMetadata: PostListingMetadata(
-                    postListingType: PostListingType.search(
-                        query: searchResultsViewModel.query,
-                        searchInSubredditOrUserName: searchResultsViewModel.searchInSubredditOrUserName,
-                        searchInMultiReddit: searchResultsViewModel.searchInMultiReddit,
-                        searchInThingType: searchResultsViewModel.searchInThingType
-                    ),
-                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
-                    queries: ["q": searchResultsViewModel.query, "type": "link"],
-                    params: nil
-                ), handleToolbarMenu: false)
-                .tag(0)
+        RootView {
+            VStack(spacing: 0) {
+                SegmentedPicker(selectedValue: $selectedOption, values: ["Posts", "Subreddits", "Users"])
+                    .padding(4)
                 
-                SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
-                    .tag(1)
-                
-                UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
-                    .tag(2)
+                TabView(selection: $selectedOption) {
+                    PostListingView(postListingMetadata: PostListingMetadata(
+                        postListingType: PostListingType.search(
+                            query: searchResultsViewModel.query,
+                            searchInSubredditOrUserName: searchResultsViewModel.searchInSubredditOrUserName,
+                            searchInMultiReddit: searchResultsViewModel.searchInMultiReddit,
+                            searchInThingType: searchResultsViewModel.searchInThingType
+                        ),
+                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
+                        queries: ["q": searchResultsViewModel.query, "type": "link"],
+                        params: nil
+                    ), handleToolbarMenu: false)
+                    .tag(0)
+                    
+                    SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
+                        .tag(1)
+                    
+                    UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
+                        .tag(2)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar(searchResultsViewModel.query)

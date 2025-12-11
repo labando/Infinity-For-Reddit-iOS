@@ -18,39 +18,41 @@ struct CommentModerationSheet: View {
     let onToggleLock: () -> Void
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                Text("Moderate")
-                    .primaryText()
-                
-                Spacer()
-                    .frame(height: 16)
-                
-                if !comment.approved {
-                    IconTextButton(startIconUrl: "checkmark.shield.fill", text: "Approve") {
-                        onApprove()
-                        dismiss()
-                    }
-                }
-                
-                if !comment.removed {
-                    IconTextButton(startIconUrl: "xmark", text: "Remove") {
-                        onRemove()
-                        dismiss()
+        SheetRootView {
+            ScrollView {
+                VStack(spacing: 0) {
+                    Text("Moderate")
+                        .primaryText()
+                    
+                    Spacer()
+                        .frame(height: 16)
+                    
+                    if !comment.approved {
+                        IconTextButton(startIconUrl: "checkmark.shield.fill", text: "Approve") {
+                            onApprove()
+                            dismiss()
+                        }
                     }
                     
-                    IconTextButton(startIconUrl: "trash", text: "Mark as spam") {
-                        onMarkAsSpam()
+                    if !comment.removed {
+                        IconTextButton(startIconUrl: "xmark", text: "Remove") {
+                            onRemove()
+                            dismiss()
+                        }
+                        
+                        IconTextButton(startIconUrl: "trash", text: "Mark as spam") {
+                            onMarkAsSpam()
+                            dismiss()
+                        }
+                    }
+                    
+                    IconTextButton(startIconUrl: comment.locked ? "lock.open.fill" : "lock.fill", text: comment.locked ? "Unlock" : "Lock") {
+                        onToggleLock()
                         dismiss()
                     }
                 }
-                
-                IconTextButton(startIconUrl: comment.locked ? "lock.open.fill" : "lock.fill", text: comment.locked ? "Unlock" : "Lock") {
-                    onToggleLock()
-                    dismiss()
-                }
+                .padding(.top, 24)
             }
-            .padding(.top, 24)
         }
     }
 }

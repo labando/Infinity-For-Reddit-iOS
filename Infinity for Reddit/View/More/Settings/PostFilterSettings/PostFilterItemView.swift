@@ -28,13 +28,10 @@ struct PostFilterItemView: View {
                 ForEach(postFilterItemViewModel.postFilterUsages.prefix(5), id: \.self) { postFilterUsage in
                     RowText(postFilterUsage.description)
                         .secondaryText()
-                        .padding(.leading, 32)
                 }
             }
             .contentShape(Rectangle())
-            .padding(.leading, 72)
-            .padding(.trailing, 16)
-            .padding(.vertical, 16)
+            .padding(16)
         }
     }
 }

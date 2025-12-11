@@ -12,11 +12,13 @@ import GRDB
 struct CustomThemeListingView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
-    @StateObject private var customThemeListingViewModel = CustomThemeListingViewModel()
+    @StateObject private var customThemeListingViewModel: CustomThemeListingViewModel
     
     init() {
         _customThemeListingViewModel = StateObject(
-            wrappedValue: CustomThemeListingViewModel()
+            wrappedValue: CustomThemeListingViewModel(
+                customThemeListingRepository: CustomThemeListingRepository()
+            )
         )
     }
     
@@ -25,39 +27,24 @@ struct CustomThemeListingView: View {
             List {
                 ForEach(customThemeListingViewModel.customThemes, id: \.self.id) { customTheme in
                     ThemeListItem(themeName: customTheme.name, primaryColor: Color(hex: customTheme.colorPrimary)) {
-                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customTheme: customTheme))
+                        navigationManager.append(CustomThemeSettingsViewNavigation.customizeCustomTheme(customThemeId: customTheme.id))
                     }
                     .listPlainItemNoInsets()
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            customThemeListingViewModel.deleteTheme(customTheme)
+                        } label: {
+                            Text("Delete")
+                                .foregroundStyle(.white)
+                        }
+                        .tint(.red)
+                    }
                 }
             }
             .themedList()
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Manage Themes")
-    }
-    
-    struct ThemeListItem: View {
-        let themeName: String
-        let primaryColor: Color
-        let onTap: () -> Void
-        
-        var body: some View {
-            TouchRipple(action: onTap) {
-                HStack(spacing: 0) {
-                    Circle()
-                        .fill(primaryColor)
-                        .frame(width: 24, height: 24)
-                    
-                    Spacer()
-                        .frame(width: 24)
-                    
-                    Text(themeName)
-                    
-                    Spacer()
-                }
-                .padding(16)
-                .contentShape(Rectangle())
-            }
-        }
+        .showErrorUsingSnackbar(customThemeListingViewModel.$error)
     }
 }

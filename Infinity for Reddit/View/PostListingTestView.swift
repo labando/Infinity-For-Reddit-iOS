@@ -119,9 +119,6 @@ struct PostListingTestView: View {
                 }
             }
         }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
-        }
         .task(id: postListingViewModel.loadPostsTaskId) {
             await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: false)
         }

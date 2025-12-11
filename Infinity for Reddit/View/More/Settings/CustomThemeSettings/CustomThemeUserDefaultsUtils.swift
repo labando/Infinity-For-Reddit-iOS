@@ -10,7 +10,7 @@ import Foundation
 class CustomThemeUserDefaultsUtils {
     static let themeKey = "theme"
     static var theme: Int {
-        return UserDefaults.theme.integer(forKey: themeKey)
+        return UserDefaults.theme.integer(forKey: themeKey, themeDeviceDefault)
     }
     static let themeOptions: [String] = ["Light Theme", "Dark Theme", "Device Default"]
     static let themeLight: Int = 0

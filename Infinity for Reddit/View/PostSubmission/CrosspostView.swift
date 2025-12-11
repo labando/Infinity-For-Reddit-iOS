@@ -48,21 +48,21 @@ struct CrosspostView: View {
                             showNoSubredditAlert = true
                         }
                         
-                        Divider()
+                        CustomDivider()
                         
                         PostSubmissionContextView(postSubmissionContextViewModel: postSubmissionContextViewModel)
                         
-                        Divider()
+                        CustomDivider()
                         
                         CustomTextField(
                             "Title",
                             text: $crosspostViewModel.title,
-                            singleLine: true,
                             keyboardType: .default,
                             showBorder: false,
                             fieldType: .title,
                             focusedField: $focusedField
                         )
+                        .lineLimit(1...5)
                         .padding(16)
                         
                         if crosspostViewModel.postToBeCrossposted.postType == .noPreviewLink || crosspostViewModel.postToBeCrossposted.postType == .link {

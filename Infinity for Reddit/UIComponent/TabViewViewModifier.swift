@@ -8,51 +8,23 @@
 import SwiftUI
 
 struct TabViewCustomThemeViewModifier: ViewModifier {
-    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     
     func body(content: Content) -> some View {
         content
-            .tint(Color(hex: themeViewModel.currentCustomTheme.colorPrimary))
-    }
-}
+            .introspect(.tabView, on: .iOS(.v13, .v14, .v15, .v16, .v17, .v18, .v26)) { tabBarController in
+                let appearance = UITabBarAppearance()
+                
+                appearance.configureWithOpaqueBackground()
+                appearance.backgroundColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.bottomAppBarBackgroundColor))
+                appearance.stackedLayoutAppearance.normal.iconColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.bottomAppBarIconColor))
+                appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+                appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.bottomAppBarIconColor))]
+                appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(Color(hex: customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))]
 
-struct TabViewGroupViewModifier: ViewModifier {
-    @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    
-    func body(content: Content) -> some View {
-        content
-            .background(TabBarAccessor { tabBar in
-                tabBar.barTintColor = UIColor(Color(hex: themeViewModel.currentCustomTheme.bottomAppBarBackgroundColor))
-                tabBar.backgroundColor = UIColor(Color(hex: themeViewModel.currentCustomTheme.bottomAppBarBackgroundColor))
-                tabBar.layer.borderColor = UIColor(Color(hex: themeViewModel.currentCustomTheme.bottomAppBarBackgroundColor)).cgColor
-                tabBar.unselectedItemTintColor = UIColor(Color(hex: themeViewModel.currentCustomTheme.bottomAppBarIconColor))
-            })
-    }
-}
-
-struct TabBarAccessor: UIViewControllerRepresentable {
-    var callback: (UITabBar) -> Void
-    private let proxyController = ViewController()
-
-    func makeUIViewController(context: UIViewControllerRepresentableContext<TabBarAccessor>) ->
-                              UIViewController {
-        proxyController.callback = callback
-        return proxyController
-    }
-    
-    func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<TabBarAccessor>) {
-    }
-    
-    typealias UIViewControllerType = UIViewController
-
-    private class ViewController: UIViewController {
-        var callback: (UITabBar) -> Void = { _ in }
-
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            if let tabBar = self.tabBarController {
-                self.callback(tabBar.tabBar)
+                tabBarController.tabBar.standardAppearance = appearance
+                tabBarController.tabBar.scrollEdgeAppearance = appearance
+                tabBarController.view.backgroundColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.bottomAppBarBackgroundColor))
             }
-        }
     }
 }

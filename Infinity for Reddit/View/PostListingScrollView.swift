@@ -107,9 +107,6 @@ struct PostListingScrollView: View {
                 }
             }
         }
-        .onChange(of: colorScheme) {
-            //print(colorScheme == .dark)
-        }
         .task {
             await postListingViewModel.initialLoadPosts(saveLastSeenPostInFrontPage: false)
         }

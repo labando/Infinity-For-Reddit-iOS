@@ -272,7 +272,7 @@ struct PostViewCompact: View {
             .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
             .padding(.horizontal, 8)
             
-            Divider()
+            CustomDivider()
         }
         .background {
             TouchRipple(backgroundShape: Rectangle()) {

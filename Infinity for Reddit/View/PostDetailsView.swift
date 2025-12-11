@@ -44,6 +44,12 @@ struct PostDetailsView: View {
     @State private var listProxy: ScrollViewProxy?
     @State private var commentToBeModerated: Comment?
     
+    @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadKey, store: .postHistory)
+    private var markPostsAsRead: Bool = true
+    @AppStorage(PostHistoryUserDefaultsUtils.limitReadPostsKey, store: .postHistory)
+    private var limitReadPosts: Bool = true
+    @AppStorage(PostHistoryUserDefaultsUtils.readPostsLimitKey, store: .postHistory)
+    private var readPostsLimit: Int = 500
     @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceComment)
     private var fullyCollapseComment: Bool = false
     @AppStorage(InterfaceCommentUserDefaultsUtils.showAuthorAvatarKey, store: .interfaceComment)
@@ -67,6 +73,8 @@ struct PostDetailsView: View {
                 historyPostsRepository: HistoryPostsRepository(),
                 flairRepository: FlairRepository(),
                 thingModerationRepository: thingModerationRepository,
+                postRepository: PostRepository(),
+                commentRepository: CommentRepository(),
                 isContinueThread: isContinueThread
             )
         )
@@ -82,6 +90,22 @@ struct PostDetailsView: View {
                                 account: account,
                                 post: post,
                                 isFromSubredditPostListing: isFromSubredditPostListing,
+                                onUpvote: {
+                                    postDetailsViewModel.votePost(vote: 1)
+                                },
+                                onDownvote: {
+                                    postDetailsViewModel.votePost(vote: -1)
+                                },
+                                onToggleSave: {
+                                    postDetailsViewModel.toggleSavePost(save: !post.saved)
+                                },
+                                onReadPost: {
+                                    postDetailsViewModel.readPost(
+                                        markPostsAsRead: markPostsAsRead,
+                                        limitReadPosts: limitReadPosts,
+                                        readPostsLimit: readPostsLimit
+                                    )
+                                },
                                 onSendComment: {
                                     sendComment()
                                 },
@@ -103,6 +127,24 @@ struct PostDetailsView: View {
                                         await postDetailsViewModel.loadPostIcon(isFromSubredditPostListing: isFromSubredditPostListing)
                                     }
                                 }
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button {
+                                    postDetailsViewModel.votePost(vote: 1)
+                                } label: {
+                                    SwiftUI.Image(systemName: "arrowshape.up")
+                                        .foregroundStyle(.white)
+                                }
+                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                Button {
+                                    postDetailsViewModel.votePost(vote: -1)
+                                } label: {
+                                    SwiftUI.Image(systemName: "arrowshape.down")
+                                        .foregroundStyle(.white)
+                                }
+                                .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                             }
                             
                             if case .postAndCommentId(_, let commentId) = postDetailsViewModel.postDetailsInput, commentId != nil {
@@ -153,6 +195,15 @@ struct PostDetailsView: View {
                                             isInPostDetails: true,
                                             highlightComment: postDetailsViewModel.postDetailsInput.getHighlightCommentId == comment.id || postDetailsViewModel.searchedComment?.id == comment.id,
                                             thingModerationRepository: thingModerationRepository,
+                                            onUpvote: {
+                                                postDetailsViewModel.voteComment(comment, vote: 1)
+                                            },
+                                            onDownvote: {
+                                                postDetailsViewModel.voteComment(comment, vote: -1)
+                                            },
+                                            onToggleSave: {
+                                                postDetailsViewModel.toggleSaveComment(comment, save: !comment.saved)
+                                            },
                                             onToggleExpand: {
                                                 if fullyCollapseComment {
                                                     if comment.isCollasped {
@@ -215,7 +266,6 @@ struct PostDetailsView: View {
                                                 }
                                             }
                                         }
-                                        .transition(.slide)
                                         .onAppear {
                                             postDetailsViewModel.insertIntoAppearedComments(commentItem)
                                             
@@ -224,9 +274,25 @@ struct PostDetailsView: View {
                                             }
                                         }
                                         .onDisappear {
-                                            postDetailsViewModel.appearedComments.removeAll {
-                                                $0.id == commentItem.id
+                                            postDetailsViewModel.appearedComments.remove(id: commentItem.id)
+                                        }
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                            Button {
+                                                postDetailsViewModel.voteComment(comment, vote: 1)
+                                            } label: {
+                                                SwiftUI.Image(systemName: "arrowshape.up")
+                                                    .foregroundStyle(.white)
                                             }
+                                            .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
+                                        }
+                                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                            Button {
+                                                postDetailsViewModel.voteComment(comment, vote: -1)
+                                            } label: {
+                                                SwiftUI.Image(systemName: "arrowshape.down")
+                                                    .foregroundStyle(.white)
+                                            }
+                                            .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                                         }
                                     } else if case let .more(commentMore) = commentItem {
                                         CommentMoreViewCard(commentMore: commentMore)
@@ -261,8 +327,13 @@ struct PostDetailsView: View {
                                         .listPlainItem()
                                 }
                             }
+                            
+                            Spacer()
+                                .frame(height: 150)
+                                .listPlainItemNoInsets()
                         }
                         .themedList()
+                        .scrollIndicators(.hidden)
                         .scrollBounceBehavior(.basedOnSize)
                         .onAppear {
                             self.listProxy = proxy
@@ -273,12 +344,16 @@ struct PostDetailsView: View {
                         .onScrollPhaseChange { _, phase in
                             switch phase {
                             case .idle:
-                                withAnimation {
-                                    showActionBar = true
+                                if !showActionBar {
+                                    withAnimation {
+                                        showActionBar = true
+                                    }
                                 }
                             case .interacting:
-                                withAnimation {
-                                    showActionBar = false
+                                if showActionBar {
+                                    withAnimation {
+                                        showActionBar = false
+                                    }
                                 }
                             default:
                                 break
@@ -291,7 +366,7 @@ struct PostDetailsView: View {
                             CustomTextField(
                                 "Search",
                                 text: $postDetailsViewModel.searchQuery,
-                                singleLine: false,
+                                singleLine: true,
                                 keyboardType: .default,
                                 autocapitalization: .never,
                                 customTextFieldScheme: .fab,
@@ -300,6 +375,7 @@ struct PostDetailsView: View {
                                 fieldType: .search,
                                 focusedField: $focusedField
                             )
+                            .submitLabel(.search)
                             .onSubmit {
                                 if let listProxy, let commentItem = postDetailsViewModel.getNextSearchedComment() {
                                     scrollToComment(listProxy: listProxy, commentItem: commentItem)
@@ -375,9 +451,6 @@ struct PostDetailsView: View {
                                     }
                                 }
                             
-                            CustomDivider()
-                                .frame(width: 2, height: 32)
-                            
                             SwiftUI.Image(systemName: "magnifyingglass")
                                 .resizable()
                                 .scaledToFit()
@@ -390,9 +463,6 @@ struct PostDetailsView: View {
                                         showSearchBar = true
                                     }
                                 }
-                            
-                            CustomDivider()
-                                .frame(width: 2, height: 32)
                             
                             SwiftUI.Image(systemName: "chevron.down")
                                 .resizable()
@@ -616,9 +686,15 @@ struct PostDetailsView: View {
                 title: titleToBeCopied,
                 markdown: markdownToBeCopied,
                 plainText: plainTextToBeCopied,
+                onCopyEntireTitle: {
+                    snackbarManager.showSnackbar(.info("Copied"))
+                },
                 onCopyTitle: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(title: titleToBeCopied)
                     showCopyContentSheet = true
+                },
+                onCopyEntireMarkdown: {
+                    snackbarManager.showSnackbar(.info("Copied"))
                 },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)

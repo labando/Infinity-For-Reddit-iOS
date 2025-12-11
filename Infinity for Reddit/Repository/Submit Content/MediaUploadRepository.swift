@@ -55,7 +55,7 @@ class MediaUploadRepository: MediaUploadRepositoryProtocol {
             "mimetype": "image/jpeg"
         ]
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let metadataResponseData = try await self.session.request(RedditOAuthAPI.uploadMediaMetadata(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -109,7 +109,7 @@ class MediaUploadRepository: MediaUploadRepositoryProtocol {
             "mimetype": "image/gif"
         ]
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let metadataResponseData = try await self.session.request(RedditOAuthAPI.uploadMediaMetadata(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)
@@ -161,7 +161,7 @@ class MediaUploadRepository: MediaUploadRepositoryProtocol {
         }
         params["filepath"] = fileName
         
-        let interceptor = await TokenCenter.shared.getRedditPerAccountInterceptor(account: account)
+        let interceptor = await RedditAccessTokenProvider.shared.getRedditPerAccountInterceptor(account: account)
         let metadataResponseData = try await self.session.request(RedditOAuthAPI.uploadMediaMetadata(params: params), interceptor: interceptor)
             .validate()
             .serializingData(automaticallyCancelling: true)

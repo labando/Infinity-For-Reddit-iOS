@@ -9,14 +9,13 @@ import SwiftUI
 
 struct SegmentedPicker: View {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace var pickerAnimation
     
     var selectedValue: Binding<Int>
     let values: [String]
     
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             ForEach(values.indices, id: \.self) { index in
                 let isSelected = index == selectedValue.wrappedValue
                 
@@ -26,19 +25,15 @@ struct SegmentedPicker: View {
                     }
                 }) {
                     Text(values[index])
+                        .customFont(fontSize: .f13)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .foregroundStyle(Color(hex: themeViewModel.currentCustomTheme.tabLayoutWithExpandedCollapsingToolbarTextColor))
+                        .foregroundStyle(Color(hex: isSelected ? themeViewModel.currentCustomTheme.pickerSelectedItemTextColor : themeViewModel.currentCustomTheme.pickerItemTextColor))
                         .background {
                             if isSelected {
-                                VStack {
-                                    Spacer()
-                                    
-                                    RoundedRectangle(cornerRadius: 2)
-                                        .frame(width: 24, height: 2)
-                                        .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.tabLayoutWithExpandedCollapsingToolbarTabIndicator))
-                                }
-                                .matchedGeometryEffect(id: "background", in: pickerAnimation)
+                                Capsule()
+                                    .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.pickerSelectedItemBackgroundColor))
+                                    .matchedGeometryEffect(id: "background", in: pickerAnimation)
                             }
                         }
                 }
@@ -46,11 +41,6 @@ struct SegmentedPicker: View {
                 .contentShape(Rectangle())
             }
         }
-        .tint(.white)
         .padding(4)
-//        .background(
-//            RoundedRectangle(cornerRadius: 50)
-//                .fill(.ultraThinMaterial)
-//        )
     }
 }

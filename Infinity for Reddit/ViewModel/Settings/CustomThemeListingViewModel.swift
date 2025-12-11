@@ -9,28 +9,29 @@ import Foundation
 import Combine
 import GRDB
 
+@MainActor
 class CustomThemeListingViewModel: ObservableObject {
-    // MARK: - Published Properties
     @Published var customThemes: [CustomTheme] = []
+    @Published var error: Error?
     
-    // MARK: - Dependencies
-    private var customThemeDao: CustomThemeDao
+    private let customThemeDao: CustomThemeDao
+    private let customThemeListingRepository: CustomThemeListingRepositoryProtocol
     private var cancellables: Set<AnyCancellable> = []
     
-    // MARK: - Initializer
-    init() {
+    init(customThemeListingRepository: CustomThemeListingRepositoryProtocol) {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError("Could not resolve DatabasePool")
+            fatalError("Could not resolve DatabasePool in CustomThemeListingViewModel")
         }
         
         self.customThemeDao = CustomThemeDao(dbPool: resolvedDatabasePool)
+        self.customThemeListingRepository = customThemeListingRepository
         
         subscribeToThemes()
     }
     
     func subscribeToThemes() {
         customThemeDao.getAllCustomThemesPublisher()
-            .receive(on: DispatchQueue.main) // Ensure updates happen on the main thread
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 if case .failure(let error) = completion {
                     print("Error fetching themes: \(error)")
@@ -39,5 +40,16 @@ class CustomThemeListingViewModel: ObservableObject {
                 self?.customThemes = themes
             })
             .store(in: &cancellables)
+    }
+    
+    func deleteTheme(_ customTheme: CustomTheme) {
+        Task {
+            do {
+                try await customThemeListingRepository.deleteTheme(customTheme)
+            } catch {
+                print(error)
+                self.error = error
+            }
+        }
     }
 }

@@ -14,26 +14,28 @@ struct SelectPostFlairSheet: View {
     let onFlairSelected: (Flair) -> Void
     
     var body: some View {
-        ScrollView {
-            if let flairs {
-                VStack(spacing: 0) {
-                    if !flairs.isEmpty {
-                        ForEach(flairs, id: \.id) { flair in
-                            TouchRipple(action: {
-                                onFlairSelected(flair)
-                                dismiss()
-                            }) {
-                                FlairRowView(flair: flair)
+        SheetRootView {
+            ScrollView {
+                if let flairs {
+                    VStack(spacing: 0) {
+                        if !flairs.isEmpty {
+                            ForEach(flairs, id: \.id) { flair in
+                                TouchRipple(action: {
+                                    onFlairSelected(flair)
+                                    dismiss()
+                                }) {
+                                    FlairRowView(flair: flair)
+                                }
                             }
+                        } else {
+                            Text("No flairs available")
+                                .secondaryText()
                         }
-                    } else {
-                        Text("No flairs available")
-                            .secondaryText()
                     }
+                    .padding(.top, 20)
+                } else {
+                    ProgressIndicator()
                 }
-                .padding(.top, 20)
-            } else {
-                ProgressIndicator()
             }
         }
     }

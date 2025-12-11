@@ -15,26 +15,28 @@ struct PostOrCommentFilterOptionSheet: View {
     var onDeleteSelected: () -> Void
     
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
-                .frame(height: 16)
-            
-            IconTextButton(startIconUrl: "pencil", text: "Edit") {
-                onEditSelected()
-                dismiss()
+        SheetRootView {
+            VStack(spacing: 0) {
+                Spacer()
+                    .frame(height: 16)
+                
+                IconTextButton(startIconUrl: "pencil", text: "Edit") {
+                    onEditSelected()
+                    dismiss()
+                }
+                
+                IconTextButton(startIconUrl: "text.badge.plus", text: "Apply to") {
+                    onApplyToSelected()
+                    dismiss()
+                }
+                
+                IconTextButton(startIconUrl: "trash", text: "Delete") {
+                    onDeleteSelected()
+                    dismiss()
+                }
+                
+                Spacer()
             }
-            
-            IconTextButton(startIconUrl: "text.badge.plus", text: "Apply to") {
-                onApplyToSelected()
-                dismiss()
-            }
-            
-            IconTextButton(startIconUrl: "trash", text: "Delete") {
-                onDeleteSelected()
-                dismiss()
-            }
-            
-            Spacer()
         }
     }
 }

@@ -278,7 +278,6 @@ public class Post : NSObject, ObservableObject, Identifiable {
         }
         let galleryDataJson = json["gallery_data"]
         if !galleryDataJson.isEmpty {
-            print(json["title"].stringValue)
             galleryData = try? GalleryData(fromJson: galleryDataJson, mediaMetadataDictionary: mediaMetadata)
         }
         

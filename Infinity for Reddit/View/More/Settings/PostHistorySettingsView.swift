@@ -53,8 +53,7 @@ struct PostHistorySettingsView: View {
                                 fieldType: .readPostsLimit,
                                 focusedField: $focusedField
                             )
-                            .padding(.leading, 60)
-                            .padding(.trailing, 16)
+                            .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .listPlainItemNoInsets()
                             .transition(.move(edge: .trailing).combined(with: .opacity))

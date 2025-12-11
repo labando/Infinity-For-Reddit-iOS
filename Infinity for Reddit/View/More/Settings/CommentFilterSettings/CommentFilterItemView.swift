@@ -28,19 +28,15 @@ struct CommentFilterItemView: View {
                 if commentFilterItemViewModel.commentFilterUsages.isEmpty {
                     RowText("Applied to all subreddits")
                         .secondaryText()
-                        .padding(.leading, 32)
                 } else {
                     ForEach(commentFilterItemViewModel.commentFilterUsages.prefix(5), id: \.self) { commentFilterUsage in
                         RowText(commentFilterUsage.description)
                             .secondaryText()
-                            .padding(.leading, 32)
                     }
                 }
             }
             .contentShape(Rectangle())
-            .padding(.leading, 72)
-            .padding(.trailing, 16)
-            .padding(.vertical, 16)
+            .padding(16)
         }
     }
 }

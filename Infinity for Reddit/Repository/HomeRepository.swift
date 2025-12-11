@@ -41,6 +41,10 @@ class HomeRepository: HomeRepositoryProtocol {
     }
     
     func fetchInboxCount() async throws -> Int {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            return 0
+        }
+        
         let data = try await self.session.request(
             RedditOAuthAPI.getUserData(username: AccountViewModel.shared.account.username)
         )

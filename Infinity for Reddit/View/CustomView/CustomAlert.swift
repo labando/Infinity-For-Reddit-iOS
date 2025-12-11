@@ -82,7 +82,7 @@ struct CustomAlert<Content: View>: View {
                             .padding(.bottom, 20)
                     }
                     
-                    Divider()
+                    CustomDivider()
                     
                     HStack(spacing: 0) {
                         if showDismissButton {
@@ -102,7 +102,7 @@ struct CustomAlert<Content: View>: View {
                                 Color.clear.preference(key: MaxHeightKey.self, value: geo.size.height)
                             })
                             
-                            Divider()
+                            CustomDivider()
                         }
                         
                         TouchRipple(action: {

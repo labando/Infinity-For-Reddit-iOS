@@ -44,82 +44,84 @@ struct SubmitCommentView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            if let title = submitCommentViewModel.commentParent.title {
-                                RowText(title)
-                                    .primaryText()
-                                    .padding(.horizontal, 16)
-                                    .padding(.top, 16)
-                                    .padding(.bottom, 8)
-                            } else {
-                                Spacer()
-                                    .frame(height: 8)
+        RootView {
+            VStack(spacing: 0) {
+                ZStack {
+                    VStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                if let title = submitCommentViewModel.commentParent.title {
+                                    RowText(title)
+                                        .primaryText()
+                                        .padding(.horizontal, 16)
+                                        .padding(.top, 16)
+                                        .padding(.bottom, 8)
+                                } else {
+                                    Spacer()
+                                        .frame(height: 8)
+                                }
+                                
+                                if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
+                                    Markdown(bodyProcessedMarkdown)
+                                        .markdownImageProvider(MarkdownImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                        .padding(.horizontal, 16)
+                                        .padding(.top, 8)
+                                        .padding(.bottom, 16)
+                                        .themedPostCommentMarkdown()
+                                        .markdownLinkHandler { url in
+                                            navigationManager.openLink(url)
+                                        }
+                                } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
+                                    Markdown(body)
+                                        .markdownImageProvider(MarkdownImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                        .padding(.horizontal, 16)
+                                        .padding(.top, 8)
+                                        .padding(.bottom, 16)
+                                        .themedPostCommentMarkdown()
+                                        .markdownLinkHandler { url in
+                                            navigationManager.openLink(url)
+                                        }
+                                } else {
+                                    Spacer()
+                                        .frame(height: 8)
+                                }
+                                
+                                CustomDivider()
+                                
+                                UserPicker {
+                                    submitCommentViewModel.selectedAccount = $0
+                                }
+                                
+                                MarkdownTextField(hint: "Your interesting thoughts here", text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
+                                    .contentShape(Rectangle())
+                                    .padding(16)
                             }
-                            
-                            if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
-                                Markdown(bodyProcessedMarkdown)
-                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
-                                    .padding(.horizontal, 16)
-                                    .padding(.top, 8)
-                                    .padding(.bottom, 16)
-                                    .themedPostCommentMarkdown()
-                                    .markdownLinkHandler { url in
-                                        navigationManager.openLink(url)
-                                    }
-                            } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
-                                Markdown(body)
-                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
-                                    .padding(.horizontal, 16)
-                                    .padding(.top, 8)
-                                    .padding(.bottom, 16)
-                                    .themedPostCommentMarkdown()
-                                    .markdownLinkHandler { url in
-                                        navigationManager.openLink(url)
-                                    }
-                            } else {
-                                Spacer()
-                                    .frame(height: 8)
-                            }
-                            
-                            Divider()
-                            
-                            UserPicker {
-                                submitCommentViewModel.selectedAccount = $0
-                            }
-                            
-                            MarkdownTextField(hint: "Your interesting thoughts here", text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus)
-                                .contentShape(Rectangle())
-                                .padding(16)
                         }
+                        
+                        Spacer()
+                            .frame(height: toolbarHeight)
                     }
                     
-                    Spacer()
-                        .frame(height: toolbarHeight)
+                    MarkdownToolbar(
+                        text: $submitCommentViewModel.text,
+                        selectedRange: $selectedRange,
+                        toolbarHeight: $toolbarHeight,
+                        focusedField: $markdownFocusedField,
+                        enableImageUpload: true,
+                        enableGifChooser: true,
+                        onImageUpload: {
+                            showEmbeddedImagesSheet = true
+                        },
+                        onChooseGif: {
+                            showGiphyGifSheet = true
+                        }
+                    )
                 }
                 
-                MarkdownToolbar(
-                    text: $submitCommentViewModel.text,
-                    selectedRange: $selectedRange,
-                    toolbarHeight: $toolbarHeight,
-                    focusedField: $markdownFocusedField,
-                    enableImageUpload: true,
-                    enableGifChooser: true,
-                    onImageUpload: {
-                        showEmbeddedImagesSheet = true
-                    },
-                    onChooseGif: {
-                        showGiphyGifSheet = true
-                    }
-                )
-            }
-            
-            KeyboardToolbar {
-                textViewCanFocus = false
-                markdownFocusedField = nil
+                KeyboardToolbar {
+                    textViewCanFocus = false
+                    markdownFocusedField = nil
+                }
             }
         }
         .frame(maxHeight: .infinity)

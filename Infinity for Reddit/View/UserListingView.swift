@@ -26,7 +26,7 @@ struct UserListingView: View {
     }
     
     var body: some View {
-        Group {
+        RootView {
             if userListingViewModel.users.isEmpty {
                 ZStack {
                     if userListingViewModel.isInitialLoading {

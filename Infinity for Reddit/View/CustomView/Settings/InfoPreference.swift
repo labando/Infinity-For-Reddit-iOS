@@ -9,28 +9,29 @@ import SwiftUI
 
 struct InfoPreference: View {
     var title: String
-    var iconUrl: String? = nil
+    var icon: String? = nil
     
     var body: some View {
-        HStack(spacing: 0) {
-            if let iconUrl = iconUrl {
-                SwiftUI.Image(systemName: iconUrl)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                    .secondaryIcon()
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                if let icon {
+                    SwiftUI.Image(systemName: icon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                        .secondaryIcon()
+                    
+                    Spacer()
+                        .frame(width: 16)
+                }
                 
-                Spacer()
-                    .frame(width: 32)
-            } else {
-                Spacer()
-                    .frame(width: 56)
+                Text(title)
+                    .secondaryText()
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .padding(16)
             
-            Text(title)
-                .secondaryText()
-                .frame(maxWidth: .infinity, alignment: .leading)
+            CustomDivider()
         }
-        .padding(16)
     }
 }
