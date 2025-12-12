@@ -879,40 +879,38 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     @MainActor
-    func votePost(vote: Int) {
-        Task {
-            guard !account.isAnonymous(), let post else {
-                await votePostAnonymous(vote: vote)
-                return
-            }
-            
-            let previousVote = post.likes
-            
-            var point: String
-            let finalVote: Int
-            if vote == post.likes {
-                point = "0"
-                finalVote = 0
-                post.likes = 0
-            } else {
-                point = String(vote)
-                finalVote = vote
-                post.likes = vote
-            }
+    func votePost(vote: Int) async {
+        guard !account.isAnonymous(), let post else {
+            await votePostAnonymous(vote: vote)
+            return
+        }
+        
+        let previousVote = post.likes
+        
+        var point: String
+        let finalVote: Int
+        if vote == post.likes {
+            point = "0"
+            finalVote = 0
+            post.likes = 0
+        } else {
+            point = String(vote)
+            finalVote = vote
+            post.likes = vote
+        }
+        self.objectWillChange.send()
+        
+        defer {
             self.objectWillChange.send()
-            
-            defer {
-                self.objectWillChange.send()
-            }
-            
-            do {
-                try await postRepository.votePost(post: post, point: point)
-                self.post?.likes = finalVote
-            } catch {
-                self.post?.likes = previousVote
-                self.error = error
-                print("Error voting post: \(error)")
-            }
+        }
+        
+        do {
+            try await postRepository.votePost(post: post, point: point)
+            self.post?.likes = finalVote
+        } catch {
+            self.post?.likes = previousVote
+            self.error = error
+            print("Error voting post: \(error)")
         }
     }
     
@@ -934,30 +932,28 @@ public class PostDetailsViewModel: ObservableObject {
     }
     
     @MainActor
-    func toggleSavePost(save: Bool) {
-        Task {
-            guard !account.isAnonymous(), let post else {
-                await toggleSavePostAnonymous(save: save)
-                return
-            }
-            
-            let previousSaved = post.saved
-            
-            post.saved = save
-            
+    func toggleSavePost(save: Bool) async {
+        guard !account.isAnonymous(), let post else {
+            await toggleSavePostAnonymous(save: save)
+            return
+        }
+        
+        let previousSaved = post.saved
+        
+        post.saved = save
+        
+        self.objectWillChange.send()
+        
+        defer {
             self.objectWillChange.send()
-            
-            defer {
-                self.objectWillChange.send()
-            }
-            
-            do {
-                try await postRepository.savePost(post: post, save: save)
-            } catch {
-                self.post?.saved = previousSaved
-                self.error = error
-                print("Error (un)saving post: \(error)")
-            }
+        }
+        
+        do {
+            try await postRepository.savePost(post: post, save: save)
+        } catch {
+            self.post?.saved = previousSaved
+            self.error = error
+            print("Error (un)saving post: \(error)")
         }
     }
     

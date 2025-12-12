@@ -43,6 +43,7 @@ struct PostDetailsView: View {
     @State private var showSearchBar: Bool = false
     @State private var listProxy: ScrollViewProxy?
     @State private var commentToBeModerated: Comment?
+    @State private var voteTask: Task<Void, Never>?
     
     @AppStorage(PostHistoryUserDefaultsUtils.markPostsAsReadKey, store: .postHistory)
     private var markPostsAsRead: Bool = true
@@ -91,20 +92,13 @@ struct PostDetailsView: View {
                                 post: post,
                                 isFromSubredditPostListing: isFromSubredditPostListing,
                                 onUpvote: {
-                                    postDetailsViewModel.votePost(vote: 1)
+                                    await postDetailsViewModel.votePost(vote: 1)
                                 },
                                 onDownvote: {
-                                    postDetailsViewModel.votePost(vote: -1)
+                                    await postDetailsViewModel.votePost(vote: -1)
                                 },
                                 onToggleSave: {
-                                    postDetailsViewModel.toggleSavePost(save: !post.saved)
-                                },
-                                onReadPost: {
-                                    postDetailsViewModel.readPost(
-                                        markPostsAsRead: markPostsAsRead,
-                                        limitReadPosts: limitReadPosts,
-                                        readPostsLimit: readPostsLimit
-                                    )
+                                    await postDetailsViewModel.toggleSavePost(save: !post.saved)
                                 },
                                 onSendComment: {
                                     sendComment()
@@ -128,18 +122,24 @@ struct PostDetailsView: View {
                                     }
                                 }
                             }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button {
-                                    postDetailsViewModel.votePost(vote: 1)
+                                    voteTask?.cancel()
+                                    voteTask = Task {
+                                        await postDetailsViewModel.votePost(vote: 1)
+                                    }
                                 } label: {
                                     SwiftUI.Image(systemName: "arrowshape.up")
                                         .foregroundStyle(.white)
                                 }
                                 .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
                             }
-                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
                                 Button {
-                                    postDetailsViewModel.votePost(vote: -1)
+                                    voteTask?.cancel()
+                                    voteTask = Task {
+                                        await postDetailsViewModel.votePost(vote: -1)
+                                    }
                                 } label: {
                                     SwiftUI.Image(systemName: "arrowshape.down")
                                         .foregroundStyle(.white)
@@ -276,7 +276,7 @@ struct PostDetailsView: View {
                                         .onDisappear {
                                             postDetailsViewModel.appearedComments.remove(id: commentItem.id)
                                         }
-                                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                             Button {
                                                 postDetailsViewModel.voteComment(comment, vote: 1)
                                             } label: {
@@ -285,7 +285,7 @@ struct PostDetailsView: View {
                                             }
                                             .tint(Color(hex: customThemeViewModel.currentCustomTheme.upvoted))
                                         }
-                                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
                                             Button {
                                                 postDetailsViewModel.voteComment(comment, vote: -1)
                                             } label: {

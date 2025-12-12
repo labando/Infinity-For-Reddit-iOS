@@ -32,10 +32,9 @@ struct PostDetailsViewCard: View {
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
 
     let isFromSubredditPostListing: Bool
-    let onUpvote: () -> Void
-    let onDownvote: () -> Void
-    let onToggleSave: () -> Void
-    let onReadPost: () -> Void
+    let onUpvote: () async -> Void
+    let onDownvote: () async -> Void
+    let onToggleSave: () async -> Void
     let onSendComment: () -> Void
     let onLongPress: () -> Void
     let onLongPressOnContent: () -> Void
@@ -46,10 +45,9 @@ struct PostDetailsViewCard: View {
         account: Account,
         post: Post,
         isFromSubredditPostListing: Bool,
-        onUpvote: @escaping () -> Void,
-        onDownvote: @escaping () -> Void,
-        onToggleSave: @escaping () -> Void,
-        onReadPost: @escaping () -> Void,
+        onUpvote: @escaping () async -> Void,
+        onDownvote: @escaping () async -> Void,
+        onToggleSave: @escaping () async -> Void,
         onSendComment: @escaping () -> Void,
         onLongPress: @escaping () -> Void,
         onLongPressOnContent: @escaping () -> Void
@@ -58,7 +56,6 @@ struct PostDetailsViewCard: View {
         self.onUpvote = onUpvote
         self.onDownvote = onDownvote
         self.onToggleSave = onToggleSave
-        self.onReadPost = onReadPost
         self.onSendComment = onSendComment
         self.onLongPress = onLongPress
         self.onLongPressOnContent = onLongPressOnContent
@@ -260,7 +257,10 @@ struct PostDetailsViewCard: View {
             HStack(spacing: 0) {
                 HStack(spacing: 0) {
                     Button(action: {
-                        onUpvote()
+                        voteTask?.cancel()
+                        voteTask = Task {
+                            await onUpvote()
+                        }
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                             .postIconTemplateRendering()
@@ -275,7 +275,10 @@ struct PostDetailsViewCard: View {
                         .postInfo()
                     
                     Button(action: {
-                        onDownvote()
+                        voteTask?.cancel()
+                        voteTask = Task {
+                            await onDownvote()
+                        }
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                             .postIconTemplateRendering()
@@ -311,7 +314,10 @@ struct PostDetailsViewCard: View {
                 .environment(\.layoutDirection, .leftToRight)
                 
                 Button(action: {
-                    onToggleSave()
+                    saveTask?.cancel()
+                    saveTask = Task {
+                        await onToggleSave()
+                    }
                 }) {
                     SwiftUI.Image(systemName: postViewModel.post.saved ? "bookmark.fill" : "bookmark")
                         .postIconTemplateRendering()
