@@ -30,6 +30,7 @@ struct CommentViewCard: View {
     private var showFewerToolbarOptionsThreshold: Int = 5
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface)
     private var voteButtonsOnTheRight: Bool = false
+    @AppStorage(InterfacePostDetailsUserDefaultsUtils.markdownEmbeddedMediaTypeKey, store: .interfacePostDetails) private var markdownEmbeddedMediaType: Int = 15
     
     @StateObject var commentViewModel: CommentViewModel
     @State private var voteTask: Task<Void, Never>? = nil
@@ -136,7 +137,13 @@ struct CommentViewCard: View {
                     Group {
                         if let processedMarkdown = commentViewModel.comment.bodyProcessedMarkdown {
                             Markdown(processedMarkdown)
-                                .markdownImageProvider(MarkdownImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                .markdownImageProvider(
+                                    MarkdownImageProvider(
+                                        mediaMetadata: commentViewModel.comment.mediaMetadata,
+                                        markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                                        fullScreenMediaViewModel: fullScreenMediaViewModel
+                                    )
+                                )
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 12)
                                 .themedCommentMarkdown()
@@ -145,7 +152,13 @@ struct CommentViewCard: View {
                                 }
                         } else {
                             Markdown(commentViewModel.comment.body)
-                                .markdownImageProvider(MarkdownImageProvider(mediaMetadata: commentViewModel.comment.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                .markdownImageProvider(
+                                    MarkdownImageProvider(
+                                        mediaMetadata: commentViewModel.comment.mediaMetadata,
+                                        markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                                        fullScreenMediaViewModel: fullScreenMediaViewModel
+                                    )
+                                )
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 12)
                                 .themedCommentMarkdown()

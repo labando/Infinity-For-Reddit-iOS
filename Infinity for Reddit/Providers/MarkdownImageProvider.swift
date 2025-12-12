@@ -13,10 +13,12 @@ import SwiftUI
 
 struct MarkdownImageProvider: ImageProvider {
     let mediaMetadata: [String: MediaMetadata]?
+    let markdownEmbeddedMediaType: MarkdownEmbeddedMediaType
     let fullScreenMediaViewModel: FullScreenMediaViewModel
     
-    init(mediaMetadata: [String: MediaMetadata]?, fullScreenMediaViewModel: FullScreenMediaViewModel) {
+    init(mediaMetadata: [String: MediaMetadata]?, markdownEmbeddedMediaType: Int = MarkdownEmbeddedMediaType.all.rawValue, fullScreenMediaViewModel: FullScreenMediaViewModel) {
         self.mediaMetadata = mediaMetadata
+        self.markdownEmbeddedMediaType = MarkdownEmbeddedMediaType(rawValue: markdownEmbeddedMediaType) ?? .all
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
     }
     
@@ -51,7 +53,6 @@ struct MarkdownImageProvider: ImageProvider {
                     })
                     
                     if media.caption != nil {
-                        // TODO make sure the text style is correct
                         Text(media.caption!)
                             .secondaryText(.f15)
                     }
@@ -64,7 +65,6 @@ struct MarkdownImageProvider: ImageProvider {
                     }
                     
                     if media.caption != nil {
-                        // TODO make sure the text style is correct
                         Text(media.caption!)
                             .secondaryText(.f15)
                     }

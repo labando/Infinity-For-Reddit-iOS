@@ -238,7 +238,13 @@ struct PostDetailsViewCard: View {
             
             if let selftext = postViewModel.post.selftextProcessedMarkdown {
                 Markdown(selftext)
-                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: postViewModel.post.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                    .markdownImageProvider(
+                        MarkdownImageProvider(
+                            mediaMetadata: postViewModel.post.mediaMetadata,
+                            markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                            fullScreenMediaViewModel: fullScreenMediaViewModel
+                        )
+                    )
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
                     .themedPostCommentMarkdown()
