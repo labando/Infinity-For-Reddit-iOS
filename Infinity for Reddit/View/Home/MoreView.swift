@@ -129,6 +129,7 @@ struct MoreView: View {
                         "URL",
                         text: $handleLinkUrlString,
                         singleLine: true,
+                        autocapitalization: .never,
                         fieldType: .handleLink,
                         focusedField: $focusedField
                     )
@@ -143,7 +144,7 @@ struct MoreView: View {
                         "Subreddit name",
                         text: $subredditName,
                         singleLine: true,
-                        autocapitalization: .none,
+                        autocapitalization: .never,
                         fieldType: .subredditName,
                         focusedField: $focusedField
                     )
@@ -166,7 +167,7 @@ struct MoreView: View {
                         "Username",
                         text: $username,
                         singleLine: true,
-                        autocapitalization: .none,
+                        autocapitalization: .never,
                         fieldType: .username,
                         focusedField: $focusedField
                     )

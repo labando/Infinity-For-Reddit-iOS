@@ -175,7 +175,7 @@ struct MarkdownToolbar: View {
                         CustomTextField("Text",
                                         text: $linkText,
                                         singleLine: true,
-                                        autocapitalization: .none,
+                                        autocapitalization: .never,
                                         fieldType: .urlText,
                                         focusedField: $focusedField)
                         .submitLabel(.done)
