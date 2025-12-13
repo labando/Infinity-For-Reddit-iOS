@@ -38,36 +38,38 @@ struct PostHistorySettingsView: View {
                         TogglePreference(isEnabled: $markPostsAsRead, title: "Mark Posts as Read")
                             .listPlainItemNoInsets()
                         
-                        TogglePreference(isEnabled: $limitReadPosts, title: "Limit Read Posts")
-                            .listPlainItemNoInsets()
-                        
-                        if limitReadPosts {
-                            CustomTextField(
-                                "Read Posts Limit",
-                                text: Binding(
-                                    get: { String(self.readPostsLimit) },
-                                    set: { self.readPostsLimit = Int($0) ?? 500 }
-                                ),
-                                singleLine: true,
-                                keyboardType: .numberPad,
-                                fieldType: .readPostsLimit,
-                                focusedField: $focusedField
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .listPlainItemNoInsets()
-                            .transition(.move(edge: .trailing).combined(with: .opacity))
-                            .id(FieldType.readPostsLimit)
+                        if markPostsAsRead {
+                            TogglePreference(isEnabled: $limitReadPosts, title: "Limit Read Posts")
+                                .listPlainItemNoInsets()
+                            
+                            if limitReadPosts {
+                                CustomTextField(
+                                    "Read Posts Limit",
+                                    text: Binding(
+                                        get: { String(self.readPostsLimit) },
+                                        set: { self.readPostsLimit = Int($0) ?? 500 }
+                                    ),
+                                    singleLine: true,
+                                    keyboardType: .numberPad,
+                                    fieldType: .readPostsLimit,
+                                    focusedField: $focusedField
+                                )
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .listPlainItemNoInsets()
+                                .transition(.move(edge: .trailing).combined(with: .opacity))
+                                .id(FieldType.readPostsLimit)
+                            }
+
+                            TogglePreference(isEnabled: $markPostsAsReadAfterVoting, title: "Mark Posts as Read After Voting")
+                                .listPlainItemNoInsets()
+
+                            TogglePreference(isEnabled: $markPostsAsReadOnScroll, title: "Mark Posts As Read on Scroll")
+                                .listPlainItemNoInsets()
+
+                            TogglePreference(isEnabled: $hideReadPosts, title: "Hide Read Posts")
+                                .listPlainItemNoInsets()
                         }
-
-                        TogglePreference(isEnabled: $markPostsAsReadAfterVoting, title: "Mark Posts as Read After Voting")
-                            .listPlainItemNoInsets()
-
-                        TogglePreference(isEnabled: $markPostsAsReadOnScroll, title: "Mark Posts As Read on Scroll")
-                            .listPlainItemNoInsets()
-
-                        TogglePreference(isEnabled: $hideReadPosts, title: "Hide Read Posts")
-                            .listPlainItemNoInsets()
                     }
                     .themedList()
                     .onChange(of: focusedField) { oldField, newField in
@@ -79,6 +81,7 @@ struct PostHistorySettingsView: View {
                         }
                     }
                 }
+                .animation(.easeInOut, value: markPostsAsRead)
                 
                 KeyboardToolbar {
                     focusedField = nil
