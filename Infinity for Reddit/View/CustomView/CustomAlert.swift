@@ -61,8 +61,8 @@ struct CustomAlert<Content: View>: View {
                 
                 VStack(spacing: 0) {
                     Text(title)
-                        .primaryText()
-                        .font(.system(size: 20, weight: .bold))
+                        .primaryText(.f20)
+                        .fontWeight(.bold)
                         .padding(.top, 16)
                         .padding(.horizontal, 16)
                     
