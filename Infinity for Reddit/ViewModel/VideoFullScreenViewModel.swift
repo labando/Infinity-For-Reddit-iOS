@@ -88,6 +88,7 @@ class VideoFullScreenViewModel: ObservableObject {
                     isLoaded = true
                     isLoading = false
                     
+                    isMuted = VideoUserDefaultsUtils.muteVideo
                     play()
                     
                     observeCurrentItem()
