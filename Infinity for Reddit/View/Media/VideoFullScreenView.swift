@@ -28,6 +28,7 @@ struct VideoFullScreenView<Content: View>: View {
     let hasDescription: Bool
     // This is for wrapper view to control if the video can be played
     let canPlay: Bool
+    let muteVideo: Bool
     let downloadAllMediaMessageView: () -> Content
     let onShowDescription: (() -> Void)?
     let onDownloadAllMedia: (() -> Void)?
@@ -40,6 +41,7 @@ struct VideoFullScreenView<Content: View>: View {
         videoFullScreenViewModel: VideoFullScreenViewModel,
         hasDescription: Bool = false,
         canPlay: Bool = true,
+        muteVideo: Bool,
         @ViewBuilder downloadAllMediaMessageView: @escaping () -> Content = { EmptyView() },
         onShowDescription: (() -> Void)? = nil,
         onDownloadAllMedia: (() -> Void)? = nil,
@@ -51,6 +53,7 @@ struct VideoFullScreenView<Content: View>: View {
         self.videoFullScreenViewModel = videoFullScreenViewModel
         self.hasDescription = hasDescription
         self.canPlay = canPlay
+        self.muteVideo = muteVideo
         self.downloadAllMediaMessageView = downloadAllMediaMessageView
         self.onShowDescription = onShowDescription
         self.onDownloadAllMedia = onDownloadAllMedia
@@ -164,7 +167,7 @@ struct VideoFullScreenView<Content: View>: View {
             videoFullScreenViewModel.player.rate = Float(newValue)
         }
         .task {
-            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType)
+            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo)
         }
         .simultaneousGesture(
             DragGesture()

@@ -14,6 +14,7 @@ import SwiftUI
 struct MarkdownImageProvider: ImageProvider {
     let mediaMetadata: [String: MediaMetadata]?
     let markdownEmbeddedMediaType: MarkdownEmbeddedMediaType
+    let isSensitive: Bool
     let fontSize: AppFontSize
     let linkColor: Color
     let fullScreenMediaViewModel: FullScreenMediaViewModel
@@ -22,6 +23,7 @@ struct MarkdownImageProvider: ImageProvider {
     init(
         mediaMetadata: [String: MediaMetadata]?,
         markdownEmbeddedMediaType: Int = MarkdownEmbeddedMediaType.all.rawValue,
+        isSensitive: Bool,
         fontSize: AppFontSize = .f17,
         // We don't care about the linkColor if it is not passed in
         linkColor: Color = .black,
@@ -29,6 +31,7 @@ struct MarkdownImageProvider: ImageProvider {
     ) {
         self.mediaMetadata = mediaMetadata
         self.markdownEmbeddedMediaType = MarkdownEmbeddedMediaType(rawValue: markdownEmbeddedMediaType) ?? .all
+        self.isSensitive = isSensitive
         self.fontSize = fontSize
         self.linkColor = linkColor
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
@@ -105,7 +108,7 @@ struct MarkdownImageProvider: ImageProvider {
                     if markdownEmbeddedMediaType.allowVideo {
                         VStack {
                             if let url = URL(string: media.hlsUrl) {
-                                InlineVideoPlayer(videoURL: url, aspectRatio: CGSize(width: media.x, height: media.y))
+                                InlineVideoPlayer(videoURL: url, aspectRatio: CGSize(width: media.x, height: media.y), isSensitive: isSensitive)
                                     .id(url)
                             }
                             

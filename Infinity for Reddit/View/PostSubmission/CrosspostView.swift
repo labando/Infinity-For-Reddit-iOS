@@ -89,7 +89,13 @@ struct CrosspostView: View {
                         
                         if let selftext = crosspostViewModel.postToBeCrossposted.selftextProcessedMarkdown {
                             Markdown(selftext)
-                                .markdownImageProvider(MarkdownImageProvider(mediaMetadata: crosspostViewModel.postToBeCrossposted.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                .markdownImageProvider(
+                                    MarkdownImageProvider(
+                                        mediaMetadata: crosspostViewModel.postToBeCrossposted.mediaMetadata,
+                                        isSensitive: crosspostViewModel.postToBeCrossposted.over18,
+                                        fullScreenMediaViewModel: fullScreenMediaViewModel
+                                    )
+                                )
                                 .font(.system(size: 24))
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 16)

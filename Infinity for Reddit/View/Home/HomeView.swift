@@ -238,7 +238,13 @@ struct HomeView: View {
                     }
                     .id(currentUrlString)
                 } else if case let .video(urlString, post, videoType) = media {
-                    VideoFullScreenView(urlString: urlString, post: post, videoType: videoType, videoFullScreenViewModel: videoFullScreenViewModel) {
+                    VideoFullScreenView(
+                        urlString: urlString,
+                        post: post,
+                        videoType: videoType,
+                        videoFullScreenViewModel: videoFullScreenViewModel,
+                        muteVideo: VideoUserDefaultsUtils.muteVideo || ((post?.over18 ?? false) && VideoUserDefaultsUtils.muteSensitiveVideo)
+                    ) {
                         fullScreenMediaViewModel.dismiss()
                         videoFullScreenViewModel.resetState()
                     }

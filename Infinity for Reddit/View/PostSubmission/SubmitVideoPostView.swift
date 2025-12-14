@@ -92,7 +92,7 @@ struct SubmitVideoPostView: View {
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         
-                                        InlineVideoPlayer(videoURL: videoURL, aspectRatio: nil, muteVideo: true)
+                                        InlineVideoPlayer(videoURL: videoURL, aspectRatio: nil, muteVideo: true, isSensitive: false)
                                             .frame(maxWidth: .infinity)
                                             .frame(height: 400)
                                             .cornerRadius(8)

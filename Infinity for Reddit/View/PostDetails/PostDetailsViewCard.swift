@@ -245,6 +245,7 @@ struct PostDetailsViewCard: View {
                         MarkdownImageProvider(
                             mediaMetadata: postViewModel.post.mediaMetadata,
                             markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                            isSensitive: postViewModel.post.over18,
                             linkColor: Color(hex: customThemeViewModel.currentCustomTheme.linkColor),
                             fullScreenMediaViewModel: fullScreenMediaViewModel
                         ) { url in

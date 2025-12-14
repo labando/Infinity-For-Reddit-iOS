@@ -64,6 +64,7 @@ struct TabVideoView: View {
             videoFullScreenViewModel: videoFullScreenViewModel,
             hasDescription: hasDescription,
             canPlay: isSelected,
+            muteVideo: VideoUserDefaultsUtils.muteVideo || ((post?.over18 ?? false) && VideoUserDefaultsUtils.muteSensitiveVideo),
             downloadAllMediaMessageView: {
                 ZStack {
                     VStack {

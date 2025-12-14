@@ -141,6 +141,7 @@ struct CommentViewCard: View {
                                     MarkdownImageProvider(
                                         mediaMetadata: commentViewModel.comment.mediaMetadata,
                                         markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                                        isSensitive: commentViewModel.comment.over18,
                                         fontSize: .f15,
                                         linkColor: Color(hex: customThemeViewModel.currentCustomTheme.linkColor),
                                         fullScreenMediaViewModel: fullScreenMediaViewModel
@@ -160,6 +161,7 @@ struct CommentViewCard: View {
                                     MarkdownImageProvider(
                                         mediaMetadata: commentViewModel.comment.mediaMetadata,
                                         markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                                        isSensitive: commentViewModel.comment.over18,
                                         fontSize: .f15,
                                         linkColor: Color(hex: customThemeViewModel.currentCustomTheme.linkColor),
                                         fullScreenMediaViewModel: fullScreenMediaViewModel

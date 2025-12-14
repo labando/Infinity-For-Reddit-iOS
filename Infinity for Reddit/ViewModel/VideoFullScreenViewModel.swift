@@ -48,7 +48,7 @@ class VideoFullScreenViewModel: ObservableObject {
         }
     }
     
-    func loadAndPlay(urlString: String, videoType: VideoType) async {
+    func loadAndPlay(urlString: String, videoType: VideoType, muteVideo: Bool) async {
         guard !isLoaded, !isLoading else {
             if player.currentItem != nil {
                 play()
@@ -88,7 +88,7 @@ class VideoFullScreenViewModel: ObservableObject {
                     isLoaded = true
                     isLoading = false
                     
-                    isMuted = VideoUserDefaultsUtils.muteVideo
+                    isMuted = muteVideo
                     play()
                     
                     observeCurrentItem()

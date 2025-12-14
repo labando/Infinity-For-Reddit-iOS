@@ -63,7 +63,13 @@ struct SubmitCommentView: View {
                                 
                                 if let bodyProcessedMarkdown = submitCommentViewModel.commentParent.bodyProcessedMarkdown {
                                     Markdown(bodyProcessedMarkdown)
-                                        .markdownImageProvider(MarkdownImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                        .markdownImageProvider(
+                                            MarkdownImageProvider(
+                                                mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata,
+                                                isSensitive: submitCommentViewModel.commentParent.isSensitive,
+                                                fullScreenMediaViewModel: fullScreenMediaViewModel
+                                            )
+                                        )
                                         .padding(.horizontal, 16)
                                         .padding(.top, 8)
                                         .padding(.bottom, 16)
@@ -73,7 +79,13 @@ struct SubmitCommentView: View {
                                         }
                                 } else if let body = submitCommentViewModel.commentParent.body, !body.isEmpty {
                                     Markdown(body)
-                                        .markdownImageProvider(MarkdownImageProvider(mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                        .markdownImageProvider(
+                                            MarkdownImageProvider(
+                                                mediaMetadata: submitCommentViewModel.commentParent.mediaMetadata,
+                                                isSensitive: submitCommentViewModel.commentParent.isSensitive,
+                                                fullScreenMediaViewModel: fullScreenMediaViewModel
+                                            )
+                                        )
                                         .padding(.horizontal, 16)
                                         .padding(.top, 8)
                                         .padding(.bottom, 16)
@@ -307,6 +319,15 @@ enum CommentParent: Hashable {
             return parentPost.mediaMetadata
         case .comment(let parentComment):
             return parentComment.mediaMetadata
+        }
+    }
+    
+    var isSensitive: Bool {
+        switch self {
+        case .post(let parentPost):
+            return parentPost.over18
+        case .comment(let parentComment):
+            return parentComment.over18
         }
     }
 }

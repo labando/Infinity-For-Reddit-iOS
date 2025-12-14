@@ -9,53 +9,65 @@ import SwiftUI
 import AVKit
 
 struct InlineVideoPlayer: View {
-    @State private var showPlayer = false
+    @EnvironmentObject private var networkManager: NetworkManager
+    
+    @State private var showPlayer: Bool?
+    
+    @AppStorage(VideoUserDefaultsUtils.videoAutoplayKey, store: .video) private var videoAutoplay: Int = 0
+    @AppStorage(VideoUserDefaultsUtils.autoplaySensitiveVideoKey, store: .video) private var autoplaySensitiveVideo: Bool = true
+    @AppStorage(DataSavingModeUserDefaultsUtils.dataSavingModeKey, store: .dataSavingMode) private var dataSavingMode: Int = 0
     
     let videoURL: URL
     let player: AVPlayer
     private let aspectRatio: CGSize?
     private let muteVideo: Bool
     private let canPlay: Bool
+    private let isSensitive: Bool
     
-    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true) {
+    init(videoURL: URL, aspectRatio: CGSize?, muteVideo: Bool = false, canPlay: Bool = true, isSensitive: Bool) {
         self.videoURL = videoURL
         self.player = AVPlayer(url: ProxyManager.shared.proxyURL(videoURL))
         self.aspectRatio = aspectRatio
         self.muteVideo = muteVideo
         self.canPlay = canPlay
+        self.isSensitive = isSensitive
+        self.showPlayer = false
     }
 
     var body: some View {
-        ZStack {
-            if showPlayer {
+        Group {
+            if showPlayer == true {
                 InlineVideoPlayerWithControls(url: videoURL, aspectRatio: aspectRatio, muteVideo: muteVideo, canPlay: canPlay)
             } else {
-                // For future video autoplay setting
-//                VStack {
-//                    Spacer()
-//                    
-//                    SwiftUI.Image(systemName: "play.circle.fill")
-//                        .resizable()
-//                        .foregroundColor(.white)
-//                        .frame(width: 36, height: 36)
-//                    
-//                    Spacer()
-//                }
-//                .frame(maxWidth: .infinity)
-//                .background(Color.black)
-//                .onTapGesture {
-//                    showPlayer = true
-//                }
+                VStack {
+                    Spacer()
+                    
+                    SwiftUI.Image(systemName: "play.circle.fill")
+                        .resizable()
+                        .foregroundColor(.white)
+                        .frame(width: 36, height: 36)
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .background(Color.black)
+                .onTapGesture {
+                    showPlayer = true
+                }
             }
         }
         .applyIf(aspectRatio != nil) {
             $0.aspectRatio(aspectRatio!, contentMode: .fit)
         }
         .onAppear {
-            if (!showPlayer) {
-                showPlayer = true
+            if showPlayer == nil {
+                showPlayer = !isDataSavingModeActive && VideoUserDefaultsUtils.canAutoplayVideo(videoAutoplay: videoAutoplay, isWifiConnected: networkManager.isWifiConnected) && ((isSensitive && autoplaySensitiveVideo) || !isSensitive)
             }
         }
+    }
+    
+    private var isDataSavingModeActive: Bool {
+        return DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
     }
 }
 
