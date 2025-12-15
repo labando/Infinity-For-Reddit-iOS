@@ -227,19 +227,18 @@ class VideoFullScreenViewModel: ObservableObject {
     private func downloadMediaAsync(urlString: String, post: Post?, videoType: VideoType) async {
         do {
             let downloadMediaType: DownloadMediaType
-//            if let post {
-//                if case .redditVideo = post.postType {
-//                    downloadMediaType = .redditVideo(post: post)
-//                } else {
-//                    downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(post.fileNameWithoutExtension).mp4")
-//                }
-//            } else {
-//                downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(Utils.randomString()).mp4")
-//            }
             
             switch videoType {
             case .reddit:
-                downloadMediaType = post == nil ? .video(downloadUrlString: urlString, fileName: "\(Utils.randomString()).mp4") : .redditVideo(post: post!)
+                if let post {
+                    if post.postType == .gif {
+                        downloadMediaType = .gif(downloadUrlString: post.url, fileName: "\(post.fileNameWithoutExtension).gif")
+                    } else {
+                        downloadMediaType = .redditVideo(post: post)
+                    }
+                } else {
+                    downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(Utils.randomString()).mp4")
+                }
             case .direct:
                 downloadMediaType = .video(downloadUrlString: urlString, fileName: post == nil ? "\(Utils.randomString()).mp4" : "\(post!.fileNameWithoutExtension).mp4")
             case .vReddIt:
