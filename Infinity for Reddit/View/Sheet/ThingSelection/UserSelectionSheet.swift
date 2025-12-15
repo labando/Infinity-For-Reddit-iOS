@@ -21,7 +21,7 @@ struct UserSelectionSheet: View {
     
     let onThingSelected: (Thing) -> Void
     
-    init(showCurrentAccountSubreddit: Bool = false, onThingSelected: @escaping (Thing) -> Void) {
+    init(onThingSelected: @escaping (Thing) -> Void) {
         _subscriptionListingViewModel = StateObject(
             wrappedValue: SubscriptionListingViewModel(
                 // We don't care about the selection mode here cuz we are not using SubscriptionsView

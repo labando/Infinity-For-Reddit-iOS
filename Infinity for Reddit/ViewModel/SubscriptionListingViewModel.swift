@@ -25,6 +25,7 @@ public class SubscriptionListingViewModel: ObservableObject {
     @Published var selectedSubredditsInCustomFeed: IdentifiedArrayOf<SubredditInCustomFeed> = []
     @Published var selectedSubscribedUsers: IdentifiedArrayOf<SubscribedUserData> = []
     @Published var selectedUsers: IdentifiedArrayOf<UserData> = []
+    @Published var selectedMyCustomFeeds: IdentifiedArrayOf<MyCustomFeed> = []
     
     @Published var subscriptionAndCustomFeedLoadingTaskFlag: Bool = false
     @Published var isLoadingSubscriptions: Bool = false
@@ -596,6 +597,16 @@ public class SubscriptionListingViewModel: ObservableObject {
         
         for subscribedUserData in selectedSubscribedUsers {
             result.append(.subscribedUser(subscribedUserData))
+        }
+        
+        return result
+    }
+    
+    func getSelectedMyCustomFeeds() -> [Thing] {
+        var result: [Thing] = []
+        
+        for myCustomFeed in selectedMyCustomFeeds {
+            result.append(.myCustomFeed(myCustomFeed))
         }
         
         return result

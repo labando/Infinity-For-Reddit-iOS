@@ -112,5 +112,10 @@ struct PostFilterUsageListingView: View {
                 }))
             }
         }
+        .sheet(isPresented: $showSelectCustomFeedsSheet) {
+            MyCustomFeedMultiSelectionSheet { things in
+                postFilterUsageViewModel.savePostFilterUsages(usageType: .customFeed, things: things)
+            }
+        }
     }
 }
