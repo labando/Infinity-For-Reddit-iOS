@@ -123,6 +123,44 @@ class VideoFetcher {
         return nil
     }
     
+    func fetchVReddItVideoDownloadType(url: URL) async throws -> DownloadMediaType? {
+        let response = await vReddItSession.request(VReddItAPI.getRedirectUrl(url: url))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .response
+        
+        if let redirectedUrl = response.response?.url {
+            print(redirectedUrl)
+            let redirectPath = redirectedUrl.path
+            
+            if redirectPath.range(of: #"^/r/\w+/comments/\w+/?\w+/?$"#, options: .regularExpression) != nil ||
+               redirectPath.range(of: #"^/user/\w+/comments/\w+/?\w+/?$"#, options: .regularExpression) != nil {
+                
+                let segments = redirectedUrl.pathComponents
+                if let commentsIndex = segments.lastIndex(of: "comments"), commentsIndex + 1 < segments.count {
+                    let postId = segments[commentsIndex + 1]
+                    print("Post id: \(postId)")
+                    if let post = try await fetchPost(postId: postId) {
+                        switch post.postType {
+                        case .redditVideo:
+                            return .redditVideo(post: post)
+                        case .video(_, let downloadUrlString):
+                            return .video(downloadUrlString: downloadUrlString, fileName: "\(post.fileNameWithoutExtension).mp4")
+                        case .redgifs(let redgifsId):
+                            return .redgifs(redgifsId: redgifsId, downloadUrlString: nil)
+                        case .streamable(let shortCode):
+                            return .streamable(shortCode: shortCode, downloadUrlString: nil)
+                        default:
+                            return nil
+                        }
+                    }
+                }
+            }
+        }
+        
+        return nil
+    }
+    
     private func fetchPost(postId: String) async throws -> Post? {
         let data = try await self.session.request(
             RedditAPI.getPostAndCommentsById(postId: postId, queries: [:])

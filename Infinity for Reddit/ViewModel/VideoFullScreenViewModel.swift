@@ -51,7 +51,9 @@ class VideoFullScreenViewModel: ObservableObject {
     func loadAndPlay(urlString: String, videoType: VideoType, muteVideo: Bool) async {
         guard !isLoaded, !isLoading else {
             if player.currentItem != nil {
-                play()
+                await MainActor.run {
+                    play()
+                }
             }
             return
         }
@@ -212,27 +214,40 @@ class VideoFullScreenViewModel: ObservableObject {
         }
     }
     
-    func downloadMedia(urlString: String, post: Post?) {
+    func downloadMedia(urlString: String, post: Post?, videoType: VideoType) {
         guard downloadTask == nil else {
             return
         }
         
         downloadTask = Task {
-            await self.downloadMediaAsync(urlString: urlString, post: post)
+            await self.downloadMediaAsync(urlString: urlString, post: post, videoType: videoType)
         }
     }
     
-    private func downloadMediaAsync(urlString: String, post: Post?) async {
+    private func downloadMediaAsync(urlString: String, post: Post?, videoType: VideoType) async {
         do {
             let downloadMediaType: DownloadMediaType
-            if let post {
-                if case .redditVideo = post.postType {
-                    downloadMediaType = .redditVideo(post: post)
-                } else {
-                    downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(post.fileNameWithoutExtension).mp4")
-                }
-            } else {
-                downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(Utils.randomString()).mp4")
+//            if let post {
+//                if case .redditVideo = post.postType {
+//                    downloadMediaType = .redditVideo(post: post)
+//                } else {
+//                    downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(post.fileNameWithoutExtension).mp4")
+//                }
+//            } else {
+//                downloadMediaType = .video(downloadUrlString: urlString, fileName: "\(Utils.randomString()).mp4")
+//            }
+            
+            switch videoType {
+            case .reddit:
+                downloadMediaType = post == nil ? .video(downloadUrlString: urlString, fileName: "\(Utils.randomString()).mp4") : .redditVideo(post: post!)
+            case .direct:
+                downloadMediaType = .video(downloadUrlString: urlString, fileName: post == nil ? "\(Utils.randomString()).mp4" : "\(post!.fileNameWithoutExtension).mp4")
+            case .vReddIt:
+                downloadMediaType = .vReddIt(urlString: urlString, downloadUrlString: nil)
+            case .redgifs(let id):
+                downloadMediaType = .redgifs(redgifsId: id, downloadUrlString: nil)
+            case .streamable(let shortCode):
+                downloadMediaType = .streamable(shortCode: shortCode, downloadUrlString: nil)
             }
             
             try await MediaDownloader.shared.download(

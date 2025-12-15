@@ -59,19 +59,30 @@ class MediaDownloader {
     }
     
     func download(downloadMediaType: DownloadMediaType, onProgressWithTitle: @escaping (String, Double) async -> Void) async throws {
+        var finalDownloadMediaType: DownloadMediaType = downloadMediaType
         if case .redditVideo(let post) = downloadMediaType {
             return try await downloadRedditVideo(post: post, fileName: downloadMediaType.fileName, onProgressWithTitle: onProgressWithTitle)
+        } else if case .vReddIt(let urlString, let downloadUrlString) = downloadMediaType {
+            if downloadUrlString == nil, let url = URL(string: urlString) {
+                if let newDownloadMediaType = try await VideoFetcher.shared.fetchVReddItVideoDownloadType(url: url) {
+                    finalDownloadMediaType = newDownloadMediaType
+                    
+                    if case .redditVideo(let post) = finalDownloadMediaType {
+                        return try await downloadRedditVideo(post: post, fileName: finalDownloadMediaType.fileName, onProgressWithTitle: onProgressWithTitle)
+                    }
+                }
+            }
         }
         
         let downloadedFileURL = try await downloadFile(
-            downloadURL: await downloadMediaType.getDownloadUrl(),
-            fileName: downloadMediaType.fileName,
+            downloadURL: await finalDownloadMediaType.getDownloadUrl(),
+            fileName: finalDownloadMediaType.fileName,
             onProgress: { progress in
                 await onProgressWithTitle("Downloading...", progress)
             }
         )
         
-        switch downloadMediaType {
+        switch finalDownloadMediaType {
         case .image, .gif:
             try await saveImageOrGifToPhotosLibrary(downloadedFileURL)
         case .redditVideo:

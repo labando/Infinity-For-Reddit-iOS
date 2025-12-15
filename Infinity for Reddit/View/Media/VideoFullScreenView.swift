@@ -112,7 +112,7 @@ struct VideoFullScreenView<Content: View>: View {
                         )
                     },
                     onDownload: {
-                        videoFullScreenViewModel.downloadMedia(urlString: urlString, post: post)
+                        videoFullScreenViewModel.downloadMedia(urlString: urlString, post: post, videoType: videoType)
                     },
                     downloadAllMediaMessageView: downloadAllMediaMessageView,
                     onResetControllerTimer: videoFullScreenViewModel.resetControllerTimer,
