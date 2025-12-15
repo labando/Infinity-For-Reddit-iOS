@@ -50,7 +50,7 @@ struct SendChatMessageView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .primaryIcon()
-                                .frame(width: 36)
+                                .frame(width: 28)
                                 .onTapGesture {
                                     showUserSelectionSheet = true
                                 }

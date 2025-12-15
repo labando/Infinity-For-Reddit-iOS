@@ -230,7 +230,7 @@ struct CustomizePostFilterView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .primaryIcon()
-                                            .frame(width: 36)
+                                            .frame(width: 28)
                                     }
                                     .padding(.leading, 16)
                                 }
@@ -255,7 +255,7 @@ struct CustomizePostFilterView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .primaryIcon()
-                                            .frame(width: 36)
+                                            .frame(width: 28)
                                     }
                                     .padding(.leading, 16)
                                 }
