@@ -53,6 +53,33 @@ class PostFilterUsageListingViewModel: ObservableObject {
         }
     }
     
+    func savePostFilterUsages(usageType: PostFilterUsage.UsageType, things: [Thing]) {
+        Task {
+            let postFilterUsages: [PostFilterUsage] = things.compactMap {
+                switch ($0, usageType) {
+                case (.subscribedSubreddit(let subscribedSubredditData), .subreddit):
+                    return PostFilterUsage(postFilterId: postFilterId, usageType: usageType, nameOfUsage: subscribedSubredditData.name)
+                case (.subreddit(let subredditData), .subreddit):
+                    return PostFilterUsage(postFilterId: postFilterId, usageType: usageType, nameOfUsage: subredditData.name)
+                case (.subscribedUser(let subscribedUserData), .user):
+                    return PostFilterUsage(postFilterId: postFilterId, usageType: usageType, nameOfUsage: subscribedUserData.name)
+                case (.user(let userData), .user):
+                    return PostFilterUsage(postFilterId: postFilterId, usageType: usageType, nameOfUsage: userData.name)
+                case (.myCustomFeed(let myCustomFeed), .customFeed):
+                    return PostFilterUsage(postFilterId: postFilterId, usageType: usageType, nameOfUsage: myCustomFeed.path)
+                default:
+                    return nil
+                }
+            }
+            do {
+                try await postFilterUsageRepository.savePostFilterUsages(postFilterUsages)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
+        }
+    }
+    
     func deletePostFilterUsage(_ postFilterUsage: PostFilterUsage) {
         Task {
             do {

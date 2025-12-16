@@ -7,5 +7,6 @@
 
 public protocol PostFilterUsageListingRepositoryProtocol {
     func savePostFilterUsage(_ postFilterUsage: PostFilterUsage) async throws
+    func savePostFilterUsages(_ postFilterUsages: [PostFilterUsage]) async throws
     func deletePostFilterUsage(_ postFilterUsage: PostFilterUsage) async throws
 }

@@ -69,15 +69,15 @@ struct SubscribedUserListingMultiSelectionView: View {
     
     func isUserSelected(_ subscription: SubscribedUserData) -> Bool {
         return subscriptionListingViewModel.selectedSubscribedUsers.index(id: subscription.id) != nil
-        || subscriptionListingViewModel.selectedUsers.index(id: subscription.name) != nil
+        || subscriptionListingViewModel.selectedUsers.index(id: subscription.id) != nil
         || subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: "u_\(subscription.name)") != nil
     }
     
     func toggleSelection(_ subscription: SubscribedUserData) {
         if subscriptionListingViewModel.selectedSubscribedUsers.index(id: subscription.id) != nil {
-            subscriptionListingViewModel.selectedSubscribedUsers.remove(subscription)
-        } else if subscriptionListingViewModel.selectedUsers.index(id: subscription.name) != nil {
-            subscriptionListingViewModel.selectedUsers.remove(id: subscription.name)
+            subscriptionListingViewModel.selectedSubscribedUsers.remove(id: subscription.id)
+        } else if subscriptionListingViewModel.selectedUsers.index(id: subscription.id) != nil {
+            subscriptionListingViewModel.selectedUsers.remove(id: subscription.id)
         } else if subscriptionListingViewModel.selectedSubredditsInCustomFeed.index(id: "u_\(subscription.name)") != nil {
             subscriptionListingViewModel.selectedSubredditsInCustomFeed.remove(id: "u_\(subscription.name)")
         } else {

@@ -7,5 +7,6 @@
 
 public protocol CommentFilterUsageListingRepositoryProtocol {
     func saveCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) async throws
+    func saveCommentFilterUsages(_ commentFilterUsages: [CommentFilterUsage]) async throws
     func deleteCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) async throws
 }

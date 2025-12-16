@@ -22,6 +22,7 @@ struct SendChatMessageView: View {
     @State private var messageCanFocus: Bool = true
     @State private var subjectSelectedRange: NSRange = NSRange(location: 0, length: 0)
     @State private var messageSelectedRange: NSRange = NSRange(location: 0, length: 0)
+    @State private var showUserSelectionSheet = false
     
     init(recipient: String?) {
         _sendChatMessageViewModel = StateObject(wrappedValue: SendChatMessageViewModel(recipient: recipient, sendChatMessageRepository: SendChatMessageRepository()))
@@ -32,17 +33,28 @@ struct SendChatMessageView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(spacing: 0) {
-                        CustomTextField(
-                            "Recipient",
-                            text: $sendChatMessageViewModel.recipient,
-                            singleLine: true,
-                            keyboardType: .default,
-                            autocapitalization: .never,
-                            showBorder: false,
-                            fieldType: .recipient,
-                            focusedField: $focusedField
-                        )
-                        .submitLabel(.done)
+                        HStack(spacing: 16) {
+                            CustomTextField(
+                                "Recipient",
+                                text: $sendChatMessageViewModel.recipient,
+                                singleLine: true,
+                                keyboardType: .default,
+                                autocapitalization: .never,
+                                showBorder: false,
+                                fieldType: .recipient,
+                                focusedField: $focusedField
+                            )
+                            .submitLabel(.done)
+                            
+                            SwiftUI.Image(systemName: "person.crop.circle.badge.plus")
+                                .resizable()
+                                .scaledToFit()
+                                .primaryIcon()
+                                .frame(width: 28)
+                                .onTapGesture {
+                                    showUserSelectionSheet = true
+                                }
+                        }
                         .padding(.horizontal, 16)
                         .padding(.top, 16)
                         
@@ -106,6 +118,20 @@ struct SendChatMessageView: View {
             }
         }
         .showErrorUsingSnackbar(sendChatMessageViewModel.$error)
+        .sheet(isPresented: $showUserSelectionSheet) {
+            NavigationStack {
+                UserSelectionSheet { thing in
+                    switch thing {
+                    case .subscribedUser(let subscribedUserData):
+                        sendChatMessageViewModel.recipient = subscribedUserData.name
+                    case .user(let userData):
+                        sendChatMessageViewModel.recipient = userData.name
+                    default:
+                        break
+                    }
+                }
+            }
+        }
     }
     
     private enum FieldType: Hashable {

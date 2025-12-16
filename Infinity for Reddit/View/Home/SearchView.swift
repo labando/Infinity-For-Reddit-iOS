@@ -40,6 +40,7 @@ struct SearchView: View {
                     CustomTextField("Search",
                                     text: $searchViewModel.query,
                                     singleLine: true,
+                                    autocapitalization: .never,
                                     showBorder: false,
                                     showBackground: false,
                                     fieldType: .search,

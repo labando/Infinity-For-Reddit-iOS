@@ -52,7 +52,13 @@ struct EditCommentView: View {
                             VStack(spacing: 0) {
                                 if let bodyProcessedMarkdown = editCommentViewModel.commentToBeEdited.bodyProcessedMarkdown {
                                     Markdown(bodyProcessedMarkdown)
-                                        .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                        .markdownImageProvider(
+                                            MarkdownImageProvider(
+                                                mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata,
+                                                isSensitive: editCommentViewModel.commentToBeEdited.over18,
+                                                fullScreenMediaViewModel: fullScreenMediaViewModel
+                                            )
+                                        )
                                         .padding(16)
                                         .themedPostCommentMarkdown()
                                         .markdownLinkHandler { url in
@@ -60,7 +66,13 @@ struct EditCommentView: View {
                                         }
                                 } else if let body = editCommentViewModel.commentToBeEdited.body, !body.isEmpty {
                                     Markdown(body)
-                                        .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                        .markdownImageProvider(
+                                            MarkdownImageProvider(
+                                                mediaMetadata: editCommentViewModel.commentToBeEdited.mediaMetadata,
+                                                isSensitive: editCommentViewModel.commentToBeEdited.over18,
+                                                fullScreenMediaViewModel: fullScreenMediaViewModel
+                                            )
+                                        )
                                         .padding(16)
                                         .themedPostCommentMarkdown()
                                         .markdownLinkHandler { url in

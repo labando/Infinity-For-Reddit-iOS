@@ -21,6 +21,10 @@ public class CommentFilterUsageListingRepository: CommentFilterUsageListingRepos
         try await commentFilterUsageDao.insert(commentFilterUsage: commentFilterUsage)
     }
     
+    public func saveCommentFilterUsages(_ commentFilterUsages: [CommentFilterUsage]) async throws {
+        try await commentFilterUsageDao.insertAll(commentFilterUsageList: commentFilterUsages)
+    }
+    
     public func deleteCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) async throws {
         try await commentFilterUsageDao.deleteCommentFilterUsage(commentFilterUsage: commentFilterUsage)
     }

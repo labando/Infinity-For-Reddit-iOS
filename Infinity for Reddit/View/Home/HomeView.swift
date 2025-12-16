@@ -10,6 +10,7 @@ import Swinject
 import GRDB
 import SDWebImageSwiftUI
 import SwiftUIIntrospect
+import Alamofire
 
 struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -237,8 +238,15 @@ struct HomeView: View {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(currentUrlString)
-                } else if case let .video(urlString, post, videoType) = media {
-                    VideoFullScreenView(urlString: urlString, post: post, videoType: videoType, videoFullScreenViewModel: videoFullScreenViewModel) {
+                } else if case let .video(urlString, post, videoType, canDownload) = media {
+                    VideoFullScreenView(
+                        urlString: urlString,
+                        post: post,
+                        videoType: videoType,
+                        videoFullScreenViewModel: videoFullScreenViewModel,
+                        muteVideo: VideoUserDefaultsUtils.muteVideo || ((post?.over18 ?? false) && VideoUserDefaultsUtils.muteSensitiveVideo),
+                        canDownload: canDownload
+                    ) {
                         fullScreenMediaViewModel.dismiss()
                         videoFullScreenViewModel.resetState()
                     }
@@ -336,6 +344,18 @@ struct HomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: .notificationIntervalChanged)) { _ in
             homeViewModel.startInboxCountPolling()
         }
+        .onReceive(accountViewModel.$error) { newValue in
+            if let newValue {
+                if let afError = newValue as? AFError, case .explicitlyCancelled = afError {
+                    return
+                } else if newValue is CancellationError {
+                    return
+                }
+                currentSnackbarManager.showSnackbar(.error(newValue))
+            } else {
+                currentSnackbarManager.dismiss()
+            }
+        }
     }
     
     enum Tab {
@@ -373,6 +393,23 @@ struct HomeView: View {
             return tab4NavigationManager
         case .more:
             return tab5NavigationManager
+        }
+    }
+    
+    private var currentSnackbarManager: SnackbarManager {
+        switch selectedTab {
+        case .home:
+            return tab1SnackbarManager
+        case .subscriptions:
+            return tab2SnackbarManager
+        case .newPost:
+            return tab3SnackbarManager
+        case .inbox:
+            return tab4SnackbarManager
+        case .search:
+            return tab4SnackbarManager
+        case .more:
+            return tab5SnackbarManager
         }
     }
 }

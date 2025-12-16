@@ -228,19 +228,20 @@ struct PostListingView: View {
                     .onAppear {
                         scrollProxy = proxy
                     }
-                    .simultaneousGesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                if lazyModeState == .started {
-                                    pauseLazyMode(resetScrolledPost: true)
-                                }
+                    .onScrollPhaseChange { _, phase in
+                        switch phase {
+                        case .idle:
+                            if lazyModeState == .paused {
+                                resumeLazyMode()
                             }
-                            .onEnded { value in
-                                if lazyModeState == .paused {
-                                    resumeLazyMode()
-                                }
+                        case .interacting:
+                            if lazyModeState == .started {
+                                pauseLazyMode(resetScrolledPost: true)
                             }
-                    )
+                        default:
+                            break
+                        }
+                    }
                     .applyIf(onScroll != nil) {
                         $0.onScrollPhaseChange { oldPhase, newPhase, context in
                             if newPhase == .interacting {

@@ -8,8 +8,12 @@
 import GRDB
 import Foundation
 
-public class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable {
+public class MyCustomFeed: Codable, FetchableRecord, PersistableRecord, Equatable, Hashable, Identifiable {
     public static let databaseTableName = "custom_feeds"
+    
+    public var id: String {
+        return path
+    }
     
     var path: String
     var displayName: String

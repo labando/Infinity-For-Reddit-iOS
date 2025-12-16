@@ -16,6 +16,7 @@ struct CommentFilterUsageSheet: View {
     @State private var nameOfUsage: String = ""
     
     var onCommentFilterUsageSelected: (CommentFilterUsage.UsageType, String) -> Void
+    var onSelectThing: (CommentFilterUsage.UsageType) -> Void
     
     var body: some View {
         SheetRootView {
@@ -62,12 +63,25 @@ struct CommentFilterUsageSheet: View {
                         .primaryText()
                         .padding(16)
                     
-                    CustomTextField(selectedType.textFieldPlaceholder,
-                                    text: $nameOfUsage,
-                                    singleLine: true,
-                                    fieldType: .nameOfUsage,
-                                    focusedField: $focusedField)
-                    .submitLabel(.done)
+                    HStack(spacing: 16) {
+                        CustomTextField(selectedType.textFieldPlaceholder,
+                                        text: $nameOfUsage,
+                                        singleLine: true,
+                                        fieldType: .nameOfUsage,
+                                        focusedField: $focusedField)
+                        .submitLabel(.done)
+                        
+                        Button(action: {
+                            onSelectThing(selectedType)
+                            dismiss()
+                        }) {
+                            SwiftUI.Image(systemName: "plus.bubble")
+                                .resizable()
+                                .scaledToFit()
+                                .primaryIcon()
+                                .frame(width: 28)
+                        }
+                    }
                     .padding(16)
                 }
             }

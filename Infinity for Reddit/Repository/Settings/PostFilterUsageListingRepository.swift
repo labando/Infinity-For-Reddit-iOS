@@ -21,6 +21,10 @@ public class PostFilterUsageListingRepository: PostFilterUsageListingRepositoryP
         try await postFilterUsageDao.insert(postFilterUsage: postFilterUsage)
     }
     
+    public func savePostFilterUsages(_ postFilterUsages: [PostFilterUsage]) async throws {
+        try await postFilterUsageDao.insertAll(postFilterUsageList: postFilterUsages)
+    }
+    
     public func deletePostFilterUsage(_ postFilterUsage: PostFilterUsage) async throws {
         try await postFilterUsageDao.deletePostFilterUsage(postFilterUsage: postFilterUsage)
     }

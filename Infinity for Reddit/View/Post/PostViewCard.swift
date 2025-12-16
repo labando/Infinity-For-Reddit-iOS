@@ -41,6 +41,7 @@ struct PostViewCard: View {
     let onOpenLink: (URL) -> Void
     let onShare: () -> Void
     let onReadPost: () async -> Void
+    let onLongPressPost: () -> Void
 
     private let iconSize: CGFloat = 24
 
@@ -59,7 +60,8 @@ struct PostViewCard: View {
         onSensitiveClicked: @escaping () -> Void,
         onOpenLink: @escaping (URL) -> Void,
         onShare: @escaping () -> Void,
-        onReadPost: @escaping () async -> Void
+        onReadPost: @escaping () async -> Void,
+        onLongPressPost: @escaping () -> Void
     ) {
         self.postViewModel = postViewModel
         self.isSubredditPostListing = isSubredditPostListing
@@ -76,6 +78,7 @@ struct PostViewCard: View {
         self.onOpenLink = onOpenLink
         self.onShare = onShare
         self.onReadPost = onReadPost
+        self.onLongPressPost = onLongPressPost
     }
 
     var body: some View {
@@ -121,11 +124,19 @@ struct PostViewCard: View {
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
+            .contentShape(Rectangle())
+            .onLongPressGesture {
+                onLongPressPost()
+            }
             
             Text(postViewModel.post.title)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
                 .postTitle()
+                .contentShape(Rectangle())
+                .onLongPressGesture {
+                    onLongPressPost()
+                }
             
             if hidePostType && !postViewModel.post.spoiler
                 && !postViewModel.post.over18 && hidePostFlair
@@ -180,29 +191,40 @@ struct PostViewCard: View {
                         EmptyView()
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
+                .contentShape(Rectangle())
+                .onLongPressGesture {
+                    onLongPressPost()
+                }
             }
             
-            switch postViewModel.post.postType {
-            case .noPreviewLink:
-                if let url = URL(string: postViewModel.post.url), let domain = url.host {
-                    NoPreviewLinkView(domain: domain) {
-                        onOpenLink(url)
-                        Task {
-                            await onReadPost()
+            Group {
+                switch postViewModel.post.postType {
+                case .noPreviewLink:
+                    if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                        NoPreviewLinkView(domain: domain) {
+                            onOpenLink(url)
+                            Task {
+                                await onReadPost()
+                            }
+                        }
+                    } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
+                        NoPreviewLinkView(domain: domain) {
+                            onOpenLink(url)
+                            Task {
+                                await onReadPost()
+                            }
                         }
                     }
-                } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
-                    NoPreviewLinkView(domain: domain) {
-                        onOpenLink(url)
-                        Task {
-                            await onReadPost()
-                        }
-                    }
+                default:
+                    EmptyView()
                 }
-            default:
-                EmptyView()
+            }
+            .contentShape(Rectangle())
+            .onLongPressGesture {
+                onLongPressPost()
             }
             
             if let galleryData = postViewModel.post.galleryData,
@@ -224,6 +246,10 @@ struct PostViewCard: View {
                 .applyIf(!limitMediaHeight && preview.s?.aspectRatio != nil) {
                     $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
                 }
+                .contentShape(Rectangle())
+                .onLongPressGesture {
+                    onLongPressPost()
+                }
             } else if !hideTextPostContent, case .text = postViewModel.post.postType, let selftextTruncated = postViewModel.post.selftextTruncated, !selftextTruncated.isEmpty {
                 Spacer()
                     .frame(height: 6)
@@ -231,6 +257,10 @@ struct PostViewCard: View {
                 Text(selftextTruncated)
                     .postContent()
                     .padding(.horizontal, 16)
+                    .contentShape(Rectangle())
+                    .onLongPressGesture {
+                        onLongPressPost()
+                    }
             } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
                 Spacer()
                     .frame(height: 10)
@@ -257,6 +287,10 @@ struct PostViewCard: View {
                     Task {
                         await onReadPost()
                     }
+                }
+                .contentShape(Rectangle())
+                .onLongPressGesture {
+                    onLongPressPost()
                 }
             }
             
@@ -361,6 +395,10 @@ struct PostViewCard: View {
             }
             .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
             .padding(.horizontal, 8)
+            .contentShape(Rectangle())
+            .onLongPressGesture {
+                onLongPressPost()
+            }
         }
         .background {
             TouchRipple(backgroundShape: RoundedRectangle(cornerRadius: 20)) {

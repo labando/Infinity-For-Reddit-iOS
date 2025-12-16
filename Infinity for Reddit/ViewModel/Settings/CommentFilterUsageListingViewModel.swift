@@ -54,6 +54,27 @@ class CommentFilterUsageListingViewModel: ObservableObject {
         }
     }
     
+    func saveCommentFilterUsages(usageType: CommentFilterUsage.UsageType, things: [Thing]) {
+        Task {
+            let commentFilterUsages: [CommentFilterUsage] = things.compactMap {
+                switch ($0, usageType) {
+                case (.subscribedSubreddit(let subscribedSubredditData), .subreddit):
+                    return CommentFilterUsage(commentFilterId: commentFilterId, usageType: usageType, nameOfUsage: subscribedSubredditData.name)
+                case (.subreddit(let subredditData), .subreddit):
+                    return CommentFilterUsage(commentFilterId: commentFilterId, usageType: usageType, nameOfUsage: subredditData.name)
+                default:
+                    return nil
+                }
+            }
+            do {
+                try await commentFilterUsageListingRepository.saveCommentFilterUsages(commentFilterUsages)
+            } catch {
+                print(error.localizedDescription)
+                self.error = error
+            }
+        }
+    }
+    
     func deleteCommentFilterUsage(_ commentFilterUsage: CommentFilterUsage) {
         Task {
             do {

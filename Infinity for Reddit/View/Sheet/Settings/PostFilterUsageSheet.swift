@@ -16,6 +16,7 @@ struct PostFilterUsageSheet: View {
     @State private var nameOfUsage: String = ""
     
     var onPostFilterUsageSelected: (PostFilterUsage.UsageType, String?) -> Void
+    var onSelectThing: (PostFilterUsage.UsageType) -> Void
     
     var body: some View {
         SheetRootView {
@@ -78,16 +79,29 @@ struct PostFilterUsageSheet: View {
                         .primaryText()
                         .padding(16)
                     
-                    CustomTextField(selectedType.textFieldPlaceholder,
-                                    text: $nameOfUsage,
-                                    singleLine: true,
-                                    fieldType: .nameOfUsage,
-                                    focusedField: $focusedField)
-                    .submitLabel(.done)
+                    HStack(spacing: 16) {
+                        CustomTextField(selectedType.textFieldPlaceholder,
+                                        text: $nameOfUsage,
+                                        singleLine: true,
+                                        fieldType: .nameOfUsage,
+                                        focusedField: $focusedField)
+                        .submitLabel(.done)
+                        
+                        if let searchIcon = selectedType.searchIcon {
+                            Button(action: {
+                                onSelectThing(selectedType)
+                                dismiss()
+                            }) {
+                                SwiftUI.Image(systemName: searchIcon)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .primaryIcon()
+                                    .frame(width: 28)
+                            }
+                        }
+                    }
                     .padding(16)
                 }
-                
-                Spacer()
             }
         }
     }
@@ -99,5 +113,20 @@ struct PostFilterUsageSheet: View {
     
     private enum FieldType: Hashable {
         case nameOfUsage
+    }
+}
+
+private extension PostFilterUsage.UsageType {
+    var searchIcon: String? {
+        switch self {
+        case .subreddit:
+            return "plus.bubble"
+        case .user:
+            return "person.crop.circle.badge.plus"
+        case .customFeed:
+            return "rectangle.stack.badge.plus"
+        default:
+            return nil
+        }
     }
 }

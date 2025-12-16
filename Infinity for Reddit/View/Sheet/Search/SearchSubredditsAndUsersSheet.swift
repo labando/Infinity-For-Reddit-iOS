@@ -23,7 +23,7 @@ struct SearchSubredditsAndUsersSheet: View {
             }
         }
         .id(accountViewModel.account.username)
-        .addTitleToInlineNavigationBar("Search Subreddits and Users")
+        .addTitleToInlineNavigationBar(navigationBarTitle)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
@@ -44,17 +44,38 @@ struct SearchSubredditsAndUsersSheet: View {
             switch thingSelectionMode {
             case .noSelection:
                 return thingSelectionMode
-            case .thingSelection(onSelectThing: let onSelectThing):
+            case .thingSelection(let onSelectThing):
                 return .thingSelection(onSelectThing: { thing in
                     onSelectThing(thing)
                     dismiss()
                 })
-            case .subredditAndUserMultiSelection(selectedSubredditsAndUsers: let selectedSubredditsAndUsers, onConfirmSelection: let onConfirmSelection):
+            case .subredditAndUserMultiSelection(let selectedSubredditsAndUsers, let onConfirmSelection):
                 return .subredditAndUserMultiSelection(selectedSubredditsAndUsers: selectedSubredditsAndUsers, onConfirmSelection: { things in
                     onConfirmSelection(things)
                     dismiss()
                 })
+            case .subredditMultiSelection(let selectedSubreddits, let onConfirmSelection):
+                return .subredditMultiSelection(selectedSubreddits: selectedSubreddits, onConfirmSelection: { things in
+                    onConfirmSelection(things)
+                    dismiss()
+                })
+            case .userMultiSelection(let selectedUsers, let onConfirmSelection):
+                return .userMultiSelection(selectedUsers: selectedUsers, onConfirmSelection: { things in
+                    onConfirmSelection(things)
+                    dismiss()
+                })
             }
+        }
+    }
+    
+    private var navigationBarTitle: String {
+        switch thingSelectionMode {
+        case .subredditMultiSelection(selectedSubreddits: let selectedSubreddits, onConfirmSelection: let onConfirmSelection):
+            return "Search Subreddits"
+        case .userMultiSelection(selectedUsers: let selectedUsers, onConfirmSelection: let onConfirmSelection):
+            return "Search Users"
+        default:
+            return "Search Subreddits and Users"
         }
     }
     

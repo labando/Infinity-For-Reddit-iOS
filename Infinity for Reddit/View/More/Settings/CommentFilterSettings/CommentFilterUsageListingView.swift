@@ -9,7 +9,9 @@ import SwiftUI
 
 struct CommentFilterUsageListingView: View {
     @StateObject private var commentFilterUsageListingViewModel: CommentFilterUsageListingViewModel
+    
     @State private var showCommentFilterUsageSheet: Bool = false
+    @State private var showSelectSubredditsSheet: Bool = false
     
     init(commentFilterId: Int) {
         _commentFilterUsageListingViewModel = StateObject(
@@ -77,9 +79,22 @@ struct CommentFilterUsageListingView: View {
                 showCommentFilterUsageSheet = true
             }
         }
+        .showErrorUsingSnackbar(commentFilterUsageListingViewModel.$error)
         .wrapContentSheet(isPresented: $showCommentFilterUsageSheet) {
             CommentFilterUsageSheet { usageType, nameOfUsage in
                 commentFilterUsageListingViewModel.saveCommentFilterUsage(usageType: usageType, nameOfUsage: nameOfUsage)
+            } onSelectThing: { usageType in
+                switch usageType {
+                case .subreddit:
+                    showSelectSubredditsSheet = true
+                }
+            }
+        }
+        .sheet(isPresented: $showSelectSubredditsSheet) {
+            NavigationStack {
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditMultiSelection(selectedSubreddits: nil, onConfirmSelection: { things in
+                    commentFilterUsageListingViewModel.saveCommentFilterUsages(usageType: .subreddit, things: things)
+                }))
             }
         }
     }

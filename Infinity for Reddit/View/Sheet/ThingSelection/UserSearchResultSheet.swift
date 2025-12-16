@@ -1,38 +1,39 @@
 //
-// SubredditSearchResultSheet.swift
-// Infinity for Reddit
+//  UserSearchResultSheet.swift
+//  Infinity for Reddit
 //
-// Created by joeylr2042 on 2025-09-06
-        
+//  Created by Docile Alligator on 2025-12-14.
+//
+
 import SwiftUI
 
-struct SubredditSearchResultSheet: View {
+struct UserSearchResultSheet: View {
     @Environment(\.dismiss) var dismiss
     
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var navigationManager: NavigationManager
     
-    @StateObject private var subredditListingViewModel: SubredditListingViewModel
+    @StateObject private var userListingViewModel: UserListingViewModel
     
     private let query: String
     
     init(query: String, onThingSelected: @escaping (Thing) -> Void) {
         self.query = query
-        _subredditListingViewModel = StateObject(
-            wrappedValue: SubredditListingViewModel(
+        _userListingViewModel = StateObject(
+            wrappedValue: UserListingViewModel(
                 query: query,
                 thingSelectionMode: .thingSelection(onSelectThing: { thing in
                     onThingSelected(thing)
                 }),
-                subredditListingRepository: SubredditListingRepository()
+                userListingRepository: UserListingRepository()
             )
         )
     }
     
     var body: some View {
-        SubredditListingView(account: accountViewModel.account, subredditListingViewModel: subredditListingViewModel)
+        UserListingView(account: accountViewModel.account, userListingViewModel: userListingViewModel)
             .themedNavigationBar()
-            .addTitleToInlineNavigationBar("Subreddits")
+            .addTitleToInlineNavigationBar("Users")
             .id(accountViewModel.account.username)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -50,4 +51,3 @@ struct SubredditSearchResultSheet: View {
             }
     }
 }
-

@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct SubscribedSubredditListingMultiSelectionView: View {
-    @EnvironmentObject var navigationManager: NavigationManager
-    
     @ObservedObject var subscriptionListingViewModel: SubscriptionListingViewModel
 
     var body: some View {

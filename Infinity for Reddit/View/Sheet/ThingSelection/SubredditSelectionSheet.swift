@@ -47,7 +47,6 @@ struct SubredditSelectionSheet: View {
         .addTitleToInlineNavigationBar("Select a Subreddit")
         .task {
             await subscriptionListingViewModel.loadSubscriptionsOnline()
-            await subscriptionListingViewModel.loadMyCustomFeedsOnline()
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -68,4 +67,3 @@ struct SubredditSelectionSheet: View {
         }
     }
 }
-

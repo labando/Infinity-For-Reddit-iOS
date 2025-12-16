@@ -111,11 +111,19 @@ struct PostDetailsViewCard: View {
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
+            .contentShape(Rectangle())
+            .onLongPressGesture {
+                onLongPress()
+            }
             
             Text(postViewModel.post.title)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
                 .postTitle()
+                .contentShape(Rectangle())
+                .onLongPressGesture {
+                    onLongPress()
+                }
             
             if hidePostType && !postViewModel.post.spoiler
                 && !postViewModel.post.over18 && hidePostFlair
@@ -191,23 +199,34 @@ struct PostDetailsViewCard: View {
                         EmptyView()
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
+                .contentShape(Rectangle())
+                .onLongPressGesture {
+                    onLongPress()
+                }
             }
             
-            switch postViewModel.post.postType {
-            case .noPreviewLink:
-                if let url = URL(string: postViewModel.post.url), let domain = url.host {
-                    NoPreviewLinkView(domain: domain) {
-                        navigationManager.openLink(url)
+            Group {
+                switch postViewModel.post.postType {
+                case .noPreviewLink:
+                    if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                        NoPreviewLinkView(domain: domain) {
+                            navigationManager.openLink(url)
+                        }
+                    } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
+                        NoPreviewLinkView(domain: domain) {
+                            navigationManager.openLink(url)
+                        }
                     }
-                } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
-                    NoPreviewLinkView(domain: domain) {
-                        navigationManager.openLink(url)
-                    }
+                default:
+                    EmptyView()
                 }
-            default:
-                EmptyView()
+            }
+            .contentShape(Rectangle())
+            .onLongPressGesture {
+                onLongPress()
             }
             
             if let galleryData = postViewModel.post.galleryData,
@@ -221,6 +240,10 @@ struct PostDetailsViewCard: View {
                 GalleryCarousel(post: postViewModel.post)
                     .applyIf(preview.s?.aspectRatio != nil) {
                         $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
+                    }
+                    .contentShape(Rectangle())
+                    .onLongPressGesture {
+                        onLongPress()
                     }
             } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
                 Spacer()
@@ -237,6 +260,10 @@ struct PostDetailsViewCard: View {
                     .frame(height: 10)
                 
                 PostPreviewView(post: postViewModel.post)
+                    .contentShape(Rectangle())
+                    .onLongPressGesture {
+                        onLongPress()
+                    }
             }
             
             if let selftext = postViewModel.post.selftextProcessedMarkdown {
@@ -245,10 +272,15 @@ struct PostDetailsViewCard: View {
                         MarkdownImageProvider(
                             mediaMetadata: postViewModel.post.mediaMetadata,
                             markdownEmbeddedMediaType: markdownEmbeddedMediaType,
+                            isSensitive: postViewModel.post.over18,
                             linkColor: Color(hex: customThemeViewModel.currentCustomTheme.linkColor),
                             fullScreenMediaViewModel: fullScreenMediaViewModel
                         ) { url in
                             navigationManager.openLink(url)
+                        } onFullScreenVideo: { videoUrlString in
+                            fullScreenMediaViewModel.show(
+                                .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                            )
                         }
                     )
                     .padding(.horizontal, 16)
@@ -349,12 +381,16 @@ struct PostDetailsViewCard: View {
             }
             .environment(\.layoutDirection, voteButtonsOnTheRight ? .rightToLeft : .leftToRight)
             .padding(8)
+            .contentShape(Rectangle())
+            .onLongPressGesture {
+                onLongPress()
+            }
         }
         .padding(.vertical, 0)
         .contentShape(Rectangle())
-        .onLongPressGesture {
-            onLongPress()
-        }
+//        .onLongPressGesture {
+//            onLongPress()
+//        }
     }
     
     private func goToSubredditDetails() {

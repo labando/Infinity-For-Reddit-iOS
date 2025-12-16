@@ -14,8 +14,6 @@ struct VideoFullScreenView<Content: View>: View {
     
     @ObservedObject private var videoFullScreenViewModel: VideoFullScreenViewModel
     
-    @AppStorage(VideoUserDefaultsUtils.defaultPlaybackSpeedKey, store: .video) private var defaultPlaybackSpeed: Double = 1.0
-    
     @State private var scale: CGFloat = 1.0
     @GestureState private var dragOffset: CGSize = .zero
     @State private var currentDragOffset = 0.0
@@ -28,6 +26,8 @@ struct VideoFullScreenView<Content: View>: View {
     let hasDescription: Bool
     // This is for wrapper view to control if the video can be played
     let canPlay: Bool
+    let muteVideo: Bool
+    let canDownload: Bool
     let downloadAllMediaMessageView: () -> Content
     let onShowDescription: (() -> Void)?
     let onDownloadAllMedia: (() -> Void)?
@@ -40,6 +40,8 @@ struct VideoFullScreenView<Content: View>: View {
         videoFullScreenViewModel: VideoFullScreenViewModel,
         hasDescription: Bool = false,
         canPlay: Bool = true,
+        muteVideo: Bool,
+        canDownload: Bool = true,
         @ViewBuilder downloadAllMediaMessageView: @escaping () -> Content = { EmptyView() },
         onShowDescription: (() -> Void)? = nil,
         onDownloadAllMedia: (() -> Void)? = nil,
@@ -51,6 +53,8 @@ struct VideoFullScreenView<Content: View>: View {
         self.videoFullScreenViewModel = videoFullScreenViewModel
         self.hasDescription = hasDescription
         self.canPlay = canPlay
+        self.muteVideo = muteVideo
+        self.canDownload = canDownload
         self.downloadAllMediaMessageView = downloadAllMediaMessageView
         self.onShowDescription = onShowDescription
         self.onDownloadAllMedia = onDownloadAllMedia
@@ -87,6 +91,7 @@ struct VideoFullScreenView<Content: View>: View {
                     downloadProgress: videoFullScreenViewModel.downloadProgress,
                     showDownloadFinishedMessage: videoFullScreenViewModel.showDownloadFinishedMessage,
                     hasDescription: hasDescription,
+                    canDownload: canDownload,
                     onTogglePlayPause: {
                         if videoFullScreenViewModel.isPlaying {
                             videoFullScreenViewModel.pause(userPaused: true)
@@ -107,7 +112,7 @@ struct VideoFullScreenView<Content: View>: View {
                         )
                     },
                     onDownload: {
-                        videoFullScreenViewModel.downloadMedia(urlString: urlString, post: post)
+                        videoFullScreenViewModel.downloadMedia(urlString: urlString, post: post, videoType: videoType)
                     },
                     downloadAllMediaMessageView: downloadAllMediaMessageView,
                     onResetControllerTimer: videoFullScreenViewModel.resetControllerTimer,
@@ -164,7 +169,7 @@ struct VideoFullScreenView<Content: View>: View {
             videoFullScreenViewModel.player.rate = Float(newValue)
         }
         .task {
-            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType)
+            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo)
         }
         .simultaneousGesture(
             DragGesture()
@@ -230,6 +235,7 @@ struct VideoController<Content: View>: View {
     let downloadProgress: Double
     let showDownloadFinishedMessage: Bool
     let hasDescription: Bool
+    let canDownload: Bool
     let onTogglePlayPause: () -> Void
     let onFastForward: () -> Void
     let onRewind: () -> Void
@@ -255,6 +261,7 @@ struct VideoController<Content: View>: View {
         downloadProgress: Double,
         showDownloadFinishedMessage: Bool,
         hasDescription: Bool,
+        canDownload: Bool,
         onTogglePlayPause: @escaping () -> Void,
         onFastForward: @escaping () -> Void,
         onRewind: @escaping () -> Void,
@@ -279,6 +286,7 @@ struct VideoController<Content: View>: View {
         self.downloadProgress = downloadProgress
         self.showDownloadFinishedMessage = showDownloadFinishedMessage
         self.hasDescription = hasDescription
+        self.canDownload = canDownload
         self.onTogglePlayPause = onTogglePlayPause
         self.onFastForward = onFastForward
         self.onRewind = onRewind
@@ -323,13 +331,15 @@ struct VideoController<Content: View>: View {
                         }
                     }
                     
-                    Button {
-                        onDownload()
-                        onResetControllerTimer()
-                    } label: {
-                        SwiftUI.Image(systemName: "arrow.down.square")
-                            .font(.system(size: 24))
-                            .foregroundStyle(.white)
+                    if canDownload {
+                        Button {
+                            onDownload()
+                            onResetControllerTimer()
+                        } label: {
+                            SwiftUI.Image(systemName: "arrow.down.square")
+                                .font(.system(size: 24))
+                                .foregroundStyle(.white)
+                        }
                     }
                     
                     Button {

@@ -15,6 +15,9 @@ struct CustomizePostFilterView: View {
     
     @StateObject private var customizePostFilterViewModel: CustomizePostFilterViewModel
     
+    @State private var subredditSelectionPurpose: SubredditSelectionSheetPurpose?
+    @State private var userSelectionPurpose: UserSelectionSheetPurpose?
+    
     @FocusState private var focusedField: FieldType?
     
     private let showInSheet: Bool
@@ -89,6 +92,7 @@ struct CustomizePostFilterView: View {
                                 CustomTextField("Post Filter Name",
                                                 text: $customizePostFilterViewModel.name,
                                                 singleLine: true,
+                                                showBackground: false,
                                                 fieldType: .postFilterName,
                                                 focusedField: $focusedField)
                                 .submitLabel(.done)
@@ -150,6 +154,7 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Title: excludes keywords (key1,key2)",
                                                 text: $customizePostFilterViewModel.excludesKeywords,
+                                                showBackground: false,
                                                 fieldType: .excludeKeywords,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -161,6 +166,7 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Title: contains keywords (key1,key2)",
                                                 text: $customizePostFilterViewModel.containsKeywords,
+                                                showBackground: false,
                                                 fieldType: .containKeywords,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -179,6 +185,7 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Title: excludes regex",
                                                 text: $customizePostFilterViewModel.excludesRegex,
+                                                showBackground: false,
                                                 fieldType: .titleExcludeRegex,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -190,6 +197,7 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Title: contains regex",
                                                 text: $customizePostFilterViewModel.containsRegex,
+                                                showBackground: false,
                                                 fieldType: .titleContainRegex,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -209,14 +217,20 @@ struct CustomizePostFilterView: View {
                                 HStack(spacing: 0) {
                                     CustomTextField("E.g. funny,AskReddit",
                                                     text: $customizePostFilterViewModel.excludeSubreddits,
+                                                    showBackground: false,
                                                     fieldType: .excludeSubreddits,
                                                     focusedField: $focusedField)
                                         .lineLimit(1...5)
                                         .id(FieldType.excludeSubreddits)
                                     
-                                    Button(action: {}) {
-                                        SwiftUI.Image(systemName: "plus")
+                                    Button(action: {
+                                        subredditSelectionPurpose = .excludeSubreddits
+                                    }) {
+                                        SwiftUI.Image(systemName: "plus.bubble")
+                                            .resizable()
+                                            .scaledToFit()
                                             .primaryIcon()
+                                            .frame(width: 28)
                                     }
                                     .padding(.leading, 16)
                                 }
@@ -228,14 +242,20 @@ struct CustomizePostFilterView: View {
                                 HStack {
                                     CustomTextField("E.g. Hostilenemy,random",
                                                     text: $customizePostFilterViewModel.excludeUsers,
+                                                    showBackground: false,
                                                     fieldType: .excludeUsers,
                                                     focusedField: $focusedField)
                                         .lineLimit(1...5)
                                         .id(FieldType.excludeUsers)
                                     
-                                    Button(action: {}) {
-                                        SwiftUI.Image(systemName: "plus")
+                                    Button(action: {
+                                        userSelectionPurpose = .excludeUsers
+                                    }) {
+                                        SwiftUI.Image(systemName: "person.crop.circle.badge.plus")
+                                            .resizable()
+                                            .scaledToFit()
                                             .primaryIcon()
+                                            .frame(width: 28)
                                     }
                                     .padding(.leading, 16)
                                 }
@@ -253,6 +273,7 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Exclude flairs (e.g., flair1,flair2)",
                                                 text: $customizePostFilterViewModel.excludeFlairs,
+                                                showBackground: false,
                                                 fieldType: .excludeFlairs,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -264,6 +285,7 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Contain flairs (e.g., flair1,flair2)",
                                                 text: $customizePostFilterViewModel.containFlairs,
+                                                showBackground: false,
                                                 fieldType: .containFlairs,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -282,6 +304,7 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Exclude domains",
                                                 text: $customizePostFilterViewModel.excludeDomains,
+                                                showBackground: false,
                                                 fieldType: .excludeDomains,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -293,6 +316,7 @@ struct CustomizePostFilterView: View {
                                 
                                 CustomTextField("Contain domains",
                                                 text: $customizePostFilterViewModel.containDomains,
+                                                showBackground: false,
                                                 fieldType: .containDomains,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -312,6 +336,7 @@ struct CustomizePostFilterView: View {
                                 CustomTextField("Min vote (-1: no restriction)",
                                                 text: $customizePostFilterViewModel.minVoteString,
                                                 singleLine: true,
+                                                showBackground: false,
                                                 fieldType: .minVotes,
                                                 focusedField: $focusedField)
                                 .submitLabel(.done)
@@ -344,6 +369,7 @@ struct CustomizePostFilterView: View {
                                 CustomTextField("Max vote (-1: no restriction)",
                                                 text: $customizePostFilterViewModel.maxVoteString,
                                                 singleLine: true,
+                                                showBackground: false,
                                                 fieldType: .maxVotes,
                                                 focusedField: $focusedField)
                                 .submitLabel(.done)
@@ -383,6 +409,7 @@ struct CustomizePostFilterView: View {
                                 CustomTextField("Min comments (-1: no restriction)",
                                                 text: $customizePostFilterViewModel.minCommentsString,
                                                 singleLine: true,
+                                                showBackground: false,
                                                 fieldType: .minComments,
                                                 focusedField: $focusedField)
                                 .submitLabel(.done)
@@ -415,6 +442,7 @@ struct CustomizePostFilterView: View {
                                 CustomTextField("Max comments (-1: no restriction)",
                                                 text: $customizePostFilterViewModel.maxCommentsString,
                                                 singleLine: true,
+                                                showBackground: false,
                                                 fieldType: .maxComments,
                                                 focusedField: $focusedField)
                                 .submitLabel(.done)
@@ -483,10 +511,90 @@ struct CustomizePostFilterView: View {
             onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
             dismiss()
         }
+        .sheet(item: $subredditSelectionPurpose) { item in
+            NavigationStack {
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditMultiSelection(selectedSubreddits: nil, onConfirmSelection: { things in
+                    if item == .excludeSubreddits {
+                        addSubredditsToExcludeSubreddits(things)
+                    }
+                }))
+            }
+        }
+        .sheet(item: $userSelectionPurpose) { item in
+            NavigationStack {
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .userMultiSelection(selectedUsers: nil, onConfirmSelection: { things in
+                    if item == .excludeUsers {
+                        addUsersToExcludeUsers(things)
+                    }
+                }))
+            }
+        }
+    }
+    
+    private func addSubredditsToExcludeSubreddits(_ things: [Thing]) {
+        for thing in things {
+            switch thing {
+            case .subscribedSubreddit(let subscribedSubredditData):
+                addSubredditToExcludeSubreddits(subscribedSubredditData.name)
+            case .subreddit(let subredditData):
+                addSubredditToExcludeSubreddits(subredditData.name)
+            default:
+                break
+            }
+        }
+    }
+    
+    private func addSubredditToExcludeSubreddits(_ subreddit: String) {
+        if customizePostFilterViewModel.excludeSubreddits.isEmpty {
+            customizePostFilterViewModel.excludeSubreddits = subreddit
+        } else if customizePostFilterViewModel.excludeSubreddits.last != "," {
+            customizePostFilterViewModel.excludeSubreddits += ",\(subreddit)"
+        } else {
+            customizePostFilterViewModel.excludeSubreddits += subreddit
+        }
+    }
+    
+    private func addUsersToExcludeUsers(_ things: [Thing]) {
+        for thing in things {
+            switch thing {
+            case .subscribedUser(let subscribedUserData):
+                addUserToExcludeUsers(subscribedUserData.name)
+            case .user(let userData):
+                addUserToExcludeUsers(userData.name)
+            default:
+                break
+            }
+        }
+    }
+    
+    private func addUserToExcludeUsers(_ username: String) {
+        if customizePostFilterViewModel.excludeUsers.isEmpty {
+            customizePostFilterViewModel.excludeUsers = username
+        } else if customizePostFilterViewModel.excludeUsers.last != "," {
+            customizePostFilterViewModel.excludeUsers += ",\(username)"
+        } else {
+            customizePostFilterViewModel.excludeUsers += username
+        }
     }
     
     private enum FieldType: Hashable {
         case postFilterName, excludeKeywords, containKeywords, titleExcludeRegex, titleContainRegex, excludeSubreddits, excludeUsers,
              excludeFlairs, containFlairs, excludeDomains, containDomains, minVotes, maxVotes, minComments, maxComments
+    }
+    
+    private enum SubredditSelectionSheetPurpose: Identifiable {
+        var id: Self {
+            self
+        }
+        
+        case excludeSubreddits, containSubreddits
+    }
+    
+    private enum UserSelectionSheetPurpose: Identifiable {
+        var id: Self {
+            self
+        }
+        
+        case excludeUsers, containUsers
     }
 }

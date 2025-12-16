@@ -49,7 +49,18 @@ struct EditPostView: View {
                         VStack(spacing: 0) {
                             if let bodyProcessedMarkdown = editPostViewModel.postToBeEdited.selftextProcessedMarkdown {
                                 Markdown(bodyProcessedMarkdown)
-                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                    .markdownImageProvider(
+                                        MarkdownImageProvider(
+                                            mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata,
+                                            isSensitive: editPostViewModel.postToBeEdited.over18,
+                                            fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                            onFullScreenVideo: { videoUrlString in
+                                                fullScreenMediaViewModel.show(
+                                                    .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                                )
+                                            }
+                                        )
+                                    )
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in
@@ -57,7 +68,18 @@ struct EditPostView: View {
                                     }
                             } else if let selftext = editPostViewModel.postToBeEdited.selftext, !selftext.isEmpty {
                                 Markdown(selftext)
-                                    .markdownImageProvider(MarkdownImageProvider(mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata, fullScreenMediaViewModel: fullScreenMediaViewModel))
+                                    .markdownImageProvider(
+                                        MarkdownImageProvider(
+                                            mediaMetadata: editPostViewModel.postToBeEdited.mediaMetadata,
+                                            isSensitive: editPostViewModel.postToBeEdited.over18,
+                                            fullScreenMediaViewModel: fullScreenMediaViewModel,
+                                            onFullScreenVideo: { videoUrlString in
+                                                fullScreenMediaViewModel.show(
+                                                    .video(urlString: videoUrlString, videoType: .direct, canDownload: false)
+                                                )
+                                            }
+                                        )
+                                    )
                                     .padding(16)
                                     .themedPostCommentMarkdown()
                                     .markdownLinkHandler { url in

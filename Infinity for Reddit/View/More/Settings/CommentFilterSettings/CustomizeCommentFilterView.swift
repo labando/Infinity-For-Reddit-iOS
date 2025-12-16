@@ -15,6 +15,8 @@ struct CustomizeCommentFilterView: View {
     
     @StateObject private var customizeCommentFilterViewModel: CustomizeCommentFilterViewModel
     
+    @State private var showUserSelectionSheet: Bool = false
+    
     @FocusState private var focusedField: FieldType?
     
     init(_ commentFilter: CommentFilter?, commentToBeAdded: Comment? = nil, selectedFieldsToAddToCommentFilter: [SelectedFieldToAddToCommentFilter]? = nil) {
@@ -42,6 +44,7 @@ struct CustomizeCommentFilterView: View {
                                 CustomTextField("Comment Filter Name",
                                                 text: $customizeCommentFilterViewModel.name,
                                                 singleLine: true,
+                                                showBackground: false,
                                                 fieldType: .commentFilterName,
                                                 focusedField: $focusedField)
                                 .submitLabel(.done)
@@ -83,6 +86,7 @@ struct CustomizeCommentFilterView: View {
                                 
                                 CustomTextField("Title: excludes keywords (key1,key2)",
                                                 text: $customizeCommentFilterViewModel.excludesKeywords,
+                                                showBackground: false,
                                                 fieldType: .excludeKeywords,
                                                 focusedField: $focusedField)
                                     .lineLimit(1...5)
@@ -102,14 +106,20 @@ struct CustomizeCommentFilterView: View {
                                 HStack {
                                     CustomTextField("E.g. Hostilenemy,random",
                                                     text: $customizeCommentFilterViewModel.excludeUsers,
+                                                    showBackground: false,
                                                     fieldType: .excludeUsers,
                                                     focusedField: $focusedField)
                                         .lineLimit(1...5)
                                         .id(FieldType.excludeUsers)
                                     
-                                    Button(action: {}) {
-                                        SwiftUI.Image(systemName: "plus")
+                                    Button(action: {
+                                        showUserSelectionSheet = true
+                                    }) {
+                                        SwiftUI.Image(systemName: "person.crop.circle.badge.plus")
+                                            .resizable()
+                                            .scaledToFit()
                                             .primaryIcon()
+                                            .frame(width: 28)
                                     }
                                     .padding(.leading, 16)
                                 }
@@ -128,6 +138,7 @@ struct CustomizeCommentFilterView: View {
                                 CustomTextField("Min vote (-1: no restriction)",
                                                 text: $customizeCommentFilterViewModel.minVoteString,
                                                 singleLine: true,
+                                                showBackground: false,
                                                 fieldType: .minVotes,
                                                 focusedField: $focusedField)
                                 .submitLabel(.done)
@@ -159,6 +170,7 @@ struct CustomizeCommentFilterView: View {
                                 CustomTextField("Max vote (-1: no restriction)",
                                                 text: $customizeCommentFilterViewModel.maxVoteString,
                                                 singleLine: true,
+                                                showBackground: false,
                                                 fieldType: .maxVotes,
                                                 focusedField: $focusedField)
                                 .submitLabel(.done)
@@ -212,6 +224,36 @@ struct CustomizeCommentFilterView: View {
         }
         .onChange(of: customizeCommentFilterViewModel.savedCommentFilterFlag) {
             dismiss()
+        }
+        .sheet(isPresented: $showUserSelectionSheet) {
+            NavigationStack {
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .userMultiSelection(selectedUsers: nil, onConfirmSelection: { things in
+                    addUsersToExcludeUsers(things)
+                }))
+            }
+        }
+    }
+    
+    private func addUsersToExcludeUsers(_ things: [Thing]) {
+        for thing in things {
+            switch thing {
+            case .subscribedUser(let subscribedUserData):
+                addUserToExcludeUsers(subscribedUserData.name)
+            case .user(let userData):
+                addUserToExcludeUsers(userData.name)
+            default:
+                break
+            }
+        }
+    }
+    
+    private func addUserToExcludeUsers(_ username: String) {
+        if customizeCommentFilterViewModel.excludeUsers.isEmpty {
+            customizeCommentFilterViewModel.excludeUsers = username
+        } else if customizeCommentFilterViewModel.excludeUsers.last != "," {
+            customizeCommentFilterViewModel.excludeUsers += ",\(username)"
+        } else {
+            customizeCommentFilterViewModel.excludeUsers += username
         }
     }
     

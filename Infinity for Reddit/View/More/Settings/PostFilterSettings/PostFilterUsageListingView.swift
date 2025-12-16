@@ -9,7 +9,11 @@ import SwiftUI
 
 struct PostFilterUsageListingView: View {
     @StateObject private var postFilterUsageViewModel: PostFilterUsageListingViewModel
+    
     @State private var showPostFilterUsageSheet: Bool = false
+    @State private var showSelectSubredditsSheet: Bool = false
+    @State private var showSelectUsersSheet: Bool = false
+    @State private var showSelectCustomFeedsSheet: Bool = false
     
     init(postFilterId: Int) {
         _postFilterUsageViewModel = StateObject(
@@ -77,9 +81,41 @@ struct PostFilterUsageListingView: View {
                 showPostFilterUsageSheet = true
             }
         }
+        .showErrorUsingSnackbar(postFilterUsageViewModel.$error)
         .wrapContentSheet(isPresented: $showPostFilterUsageSheet) {
             PostFilterUsageSheet { usageType, nameOfUsage in
                 postFilterUsageViewModel.savePostFilterUsage(usageType: usageType, nameOfUsage: nameOfUsage)
+            } onSelectThing: { usageType in
+                switch usageType {
+                case .subreddit:
+                    showSelectSubredditsSheet = true
+                case .user:
+                    showSelectUsersSheet = true
+                case .customFeed:
+                    showSelectCustomFeedsSheet = true
+                default:
+                    // Shouldn't happen
+                    break
+                }
+            }
+        }
+        .sheet(isPresented: $showSelectSubredditsSheet) {
+            NavigationStack {
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditMultiSelection(selectedSubreddits: nil, onConfirmSelection: { things in
+                    postFilterUsageViewModel.savePostFilterUsages(usageType: .subreddit, things: things)
+                }))
+            }
+        }
+        .sheet(isPresented: $showSelectUsersSheet) {
+            NavigationStack {
+                SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .userMultiSelection(selectedUsers: nil, onConfirmSelection: { things in
+                    postFilterUsageViewModel.savePostFilterUsages(usageType: .user, things: things)
+                }))
+            }
+        }
+        .sheet(isPresented: $showSelectCustomFeedsSheet) {
+            MyCustomFeedMultiSelectionSheet { things in
+                postFilterUsageViewModel.savePostFilterUsages(usageType: .customFeed, things: things)
             }
         }
     }
