@@ -90,7 +90,7 @@ struct CreateOrEditCustomFeedView: View {
                                         Toggle(isOn: $createOrEditCustomFeedViewModel.isPrivate) {}
                                             .labelsHidden()
                                             .themedToggle()
-                                            .excludeFromTouchRipple()
+//                                            .excludeFromTouchRipple()
                                     }
                                     .padding(16)
                                 }

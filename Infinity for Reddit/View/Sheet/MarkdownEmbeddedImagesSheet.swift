@@ -63,7 +63,7 @@ struct MarkdownEmbeddedImagesSheet: View {
                     }
                     .frame(maxWidth: .infinity)
                     .filledButton()
-                    .excludeFromTouchRipple()
+//                    .excludeFromTouchRipple()
                     
                     Button {
                         onSelectImage()
@@ -74,7 +74,7 @@ struct MarkdownEmbeddedImagesSheet: View {
                     }
                     .frame(maxWidth: .infinity)
                     .filledButton()
-                    .excludeFromTouchRipple()
+//                    .excludeFromTouchRipple()
                 }
                 .padding(.horizontal, 32)
             }

@@ -43,7 +43,7 @@ struct PostSubmissionContextView: View {
                     Toggle(isOn: $postSubmissionContextViewModel.receivePostReplyNotification) {}
                         .labelsHidden()
                         .themedToggle()
-                        .excludeFromTouchRipple()
+//                        .excludeFromTouchRipple()
                 }
                 .padding(16)
             }
