@@ -71,11 +71,7 @@ struct CommentListingView: View {
             } else {
                 List {
                     ForEach(commentListingViewModel.comments, id: \.id) { comment in
-                        TouchRipple(action: {
-                            navigationManager.append(
-                                AppNavigation.postDetailsWithId(postId: String(comment.linkId.dropFirst(3)), commentId: comment.id)
-                            )
-                        }) {
+                        TouchRipple {
                             CommentViewCard(
                                 comment: comment,
                                 isInPostDetails: false,
@@ -109,6 +105,11 @@ struct CommentListingView: View {
                                     showCopyContentOptionsSheet = true
                                 }
                             )
+                            .onTapGesture {
+                                navigationManager.append(
+                                    AppNavigation.postDetailsWithId(postId: String(comment.linkId.dropFirst(3)), commentId: comment.id)
+                                )
+                            }
                         }
                         .listPlainItemNoInsets()
                         .id(ObjectIdentifier(comment))
