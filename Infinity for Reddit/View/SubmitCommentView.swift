@@ -73,7 +73,7 @@ struct SubmitCommentView: View {
                                         .padding(.horizontal, 16)
                                         .padding(.top, 8)
                                         .padding(.bottom, 16)
-                                        .themedPostCommentMarkdown()
+                                        .themedPostContentMarkdown()
                                         .markdownLinkHandler { url in
                                             navigationManager.openLink(url)
                                         }
@@ -89,7 +89,7 @@ struct SubmitCommentView: View {
                                         .padding(.horizontal, 16)
                                         .padding(.top, 8)
                                         .padding(.bottom, 16)
-                                        .themedPostCommentMarkdown()
+                                        .themedPostContentMarkdown()
                                         .markdownLinkHandler { url in
                                             navigationManager.openLink(url)
                                         }

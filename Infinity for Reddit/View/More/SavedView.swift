@@ -31,6 +31,7 @@ struct SavedView: View {
                                 ),
                                 handleToolbarMenu: false
                             )
+                            .tag(0)
                         } else {
                             PostListingView(
                                 postListingMetadata: PostListingMetadata(
@@ -42,20 +43,21 @@ struct SavedView: View {
                                 ),
                                 handleToolbarMenu: false
                             )
+                            .tag(0)
+                        }
+                        
+                        if !accountViewModel.account.isAnonymous() {
+                            CommentListingView(
+                                commentListingMetadata: CommentListingMetadata(
+                                    commentListingType:.userSaved,
+                                    pathComponents: ["username": "\(accountViewModel.account.username)"],
+                                    queries: nil
+                                )
+                            )
+                            .tag(1)
                         }
                     }
-                    .tag(0)
-                    
-                    if !accountViewModel.account.isAnonymous() {
-                        CommentListingView(
-                            commentListingMetadata: CommentListingMetadata(
-                                commentListingType:.userSaved,
-                                pathComponents: ["username": "\(accountViewModel.account.username)"],
-                                queries: nil
-                            )
-                        )
-                        .tag(1)
-                    }
+                    .toolbar(.hidden, for: .tabBar)
                 }
             }
         }

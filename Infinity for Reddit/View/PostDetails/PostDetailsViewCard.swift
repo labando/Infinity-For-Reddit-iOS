@@ -285,7 +285,7 @@ struct PostDetailsViewCard: View {
                     )
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
-                    .themedPostCommentMarkdown()
+                    .themedPostContentMarkdown()
                     .markdownLinkHandler { url in
                         navigationManager.openLink(url)
                     }

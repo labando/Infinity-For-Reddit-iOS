@@ -104,7 +104,7 @@ struct CrosspostView: View {
                                 .font(.system(size: 24))
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 16)
-                                .themedPostCommentMarkdown()
+                                .themedPostContentMarkdown()
                                 .markdownLinkHandler { url in
                                     navigationManager.openLink(url)
                                 }

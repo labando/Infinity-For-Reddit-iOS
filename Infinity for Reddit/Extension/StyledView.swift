@@ -153,7 +153,7 @@ extension View {
         self.modifier(MarkdownViewModifier(fontSize: fontSize))
     }
     
-    func themedPostCommentMarkdown(_ fontSize: AppFontSize = .f15) -> some View {
+    func themedPostContentMarkdown(_ fontSize: AppFontSize = .f15) -> some View {
         self.modifier(PostContentMarkdownViewModifier(fontSize: fontSize))
     }
     
