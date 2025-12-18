@@ -9,16 +9,9 @@ import SwiftUI
 import AVKit
 
 struct VideoFullScreenView<Content: View>: View {
-    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject var namespaceManager: NamespaceManager
-    
     @ObservedObject private var videoFullScreenViewModel: VideoFullScreenViewModel
-    
-    @State private var scale: CGFloat = 1.0
-    @GestureState private var dragOffset: CGSize = .zero
-    @State private var currentDragOffset = 0.0
-    @State private var hasStartedDragging: Bool = false
-    @State private var isAnimatingBack: Bool = false
+
+    @State private var dismissStarted: Bool = false
     
     let urlString: String
     let post: Post?
@@ -63,19 +56,34 @@ struct VideoFullScreenView<Content: View>: View {
     
     var body: some View {
         ZStack {
-            Color.black
-                .opacity(opacityForBackground())
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                .edgesIgnoringSafeArea(.all)
-                .ignoresSafeArea()
-            
             PlayerView(player: videoFullScreenViewModel.player)
-                .offset(y: currentDragOffset)
                 .onTapGesture {
-                    withAnimation {
-                        videoFullScreenViewModel.toggleController()
+                    if !dismissStarted {
+                        withAnimation {
+                            videoFullScreenViewModel.toggleController()
+                        }
                     }
                 }
+                .mediaGesture(
+                    onDragEnded: { transform in
+                        if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
+                            return true
+                        }
+                        return false
+                    },
+                    onStartDismiss: {
+                        dismissStarted = true
+                        
+                        withAnimation {
+                            videoFullScreenViewModel.isShowingController = false
+                        }
+                    },
+                    onDismiss: {
+                        videoFullScreenViewModel.resetState()
+                        videoFullScreenViewModel.removeControllerTimer()
+                        onDismiss()
+                    }
+                )
             
             if videoFullScreenViewModel.isShowingController {
                 VideoController(
@@ -127,13 +135,17 @@ struct VideoFullScreenView<Content: View>: View {
                     }
                 )
                 .onTapGesture {
-                    withAnimation {
-                        videoFullScreenViewModel.toggleController()
+                    if !dismissStarted {
+                        withAnimation {
+                            videoFullScreenViewModel.toggleController()
+                        }
                     }
                 }
                 .zIndex(1)
             }
         }
+        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
         .appForegroundBackgroundListener(onAppEntersForeground: {
             videoFullScreenViewModel.play(respectUserPaused: true)
         }, onAppEntersBackground: {
@@ -171,51 +183,6 @@ struct VideoFullScreenView<Content: View>: View {
         .task {
             await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo)
         }
-        .simultaneousGesture(
-            DragGesture()
-                .updating($dragOffset) { value, state, _ in
-                    // Only allow vertical drag to trigger dismiss
-                    if !hasStartedDragging && abs(value.translation.height) > abs(value.translation.width) {
-                        hasStartedDragging = true
-                    }
-                    if hasStartedDragging {
-                        state = value.translation
-                    }
-                }
-                .onChanged { value in
-                    // Adjust the scale based on the drag distance
-                    currentDragOffset = value.translation.height
-                }
-                .onEnded { value in
-                    if hasStartedDragging && abs(value.translation.height) > 100 {
-                        videoFullScreenViewModel.resetState()
-                        withAnimation(.linear(duration: 0.25)) {
-                            videoFullScreenViewModel.removeControllerTimer()
-                            videoFullScreenViewModel.isShowingController = false
-                            if value.translation.height < 0 {
-                                // Dragged up
-                                currentDragOffset = -UIScreen.main.bounds.height
-                            } else {
-                                // Dragged down
-                                currentDragOffset = UIScreen.main.bounds.height
-                            }
-                        } completion: {
-                            onDismiss()
-                        }
-                    } else {
-                        withAnimation {
-                            currentDragOffset = 0.0
-                        }
-                    }
-                    hasStartedDragging = false
-                }
-        )
-    }
-    
-    private func opacityForBackground() -> Double {
-        let maxOffset: CGFloat = 300
-        let offset = min(abs(currentDragOffset), maxOffset)
-        return Double(1 - (offset / maxOffset))
     }
 }
 
