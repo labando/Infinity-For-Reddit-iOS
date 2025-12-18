@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 
 struct ImageFullScreenView: View {
     @State private var isToolbarVisible: Bool = true
+    @State private var dismissStarted: Bool = false
     
     let urlString: String
     let fileName: String
@@ -40,6 +41,7 @@ struct ImageFullScreenView: View {
                     return false
                 },
                 onStartDismiss: {
+                    dismissStarted = true
                     withAnimation {
                         isToolbarVisible = false
                     }
@@ -47,8 +49,10 @@ struct ImageFullScreenView: View {
                 onDismiss: onDismiss
             )
             .onTapGesture {
-                withAnimation {
-                    isToolbarVisible.toggle()
+                if !dismissStarted {
+                    withAnimation {
+                        isToolbarVisible.toggle()
+                    }
                 }
             }
             
