@@ -11,8 +11,13 @@ struct NavigationBarImageViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     func body(content: Content) -> some View {
-        content
-            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+        if #available(iOS 26.0, *) {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+        } else {
+            content
+                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+        }
     }
 }
 

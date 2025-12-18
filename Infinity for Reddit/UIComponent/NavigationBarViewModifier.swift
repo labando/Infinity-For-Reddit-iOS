@@ -13,9 +13,16 @@ struct NavigationBarViewModifier: ViewModifier {
     var opacity: Double = 1
     
     func body(content: Content) -> some View {
-        content
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(Color(hex: themeViewModel.currentCustomTheme.colorPrimary, opacity: opacity), for: .navigationBar)
+        if #available(iOS 26.0, *) {
+            content
+                .navigationBarTitleDisplayMode(.inline)
+                .tint(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
+        } else {
+            content
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(Color(hex: themeViewModel.currentCustomTheme.colorPrimary, opacity: opacity), for: .navigationBar)
+        }
     }
 }
 
@@ -26,15 +33,26 @@ struct InlineNavigationBarWithTitle: ViewModifier {
     var opacity: Double
 
     func body(content: Content) -> some View {
-        content
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(title)
-                        .navigationBarPrimaryText()
-                        .opacity(opacity)
+        if #available(iOS 26.0, *) {
+            content
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text(title)
+                            .navigationBarPrimaryText()
+                    }
                 }
-            }
-            .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.inline)
+        } else {
+            content
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text(title)
+                            .navigationBarPrimaryText()
+                            .opacity(opacity)
+                    }
+                }
+                .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 
