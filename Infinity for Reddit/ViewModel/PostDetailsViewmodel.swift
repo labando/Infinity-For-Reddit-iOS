@@ -212,7 +212,7 @@ public class PostDetailsViewModel: ObservableObject {
                 await postProcessPost(post)
                 
                 await MainActor.run {
-                    if !ContentSensitivityFilterUserDetailsUtils.sensitiveContent || ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForever {
+                    if post.over18 && (!ContentSensitivityFilterUserDetailsUtils.sensitiveContent || ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForever) {
                         self.showSensitiveContentWarningTrigger = true
                     }
                     
