@@ -214,14 +214,6 @@ struct HomeView: View {
                 }
             }
             .themedTabView()
-            .onAppear {
-                let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-                let docsDir = dirPaths[0]
-                
-                print(docsDir)
-                
-                customThemeViewModel.setAppColorScheme(colorScheme)
-            }
             .id(accountViewModel.account.username)
             
             if let media = fullScreenMediaViewModel.media {
@@ -277,6 +269,22 @@ struct HomeView: View {
                 }
             }
         }
+        .onAppear {
+            let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+            let docsDir = dirPaths[0]
+            
+            print(docsDir)
+            
+            customThemeViewModel.setAppColorScheme(colorScheme)
+            
+            if accountViewModel.pendingInboxTabAfterNotificationClicked {
+                selectedTab = .inbox
+                accountViewModel.pendingInboxTabAfterNotificationClicked = false
+            } else if let context = accountViewModel.pendingContextAfterNotificationClicked {
+                currentNavigationManager.openLink(context)
+                accountViewModel.pendingContextAfterNotificationClicked = nil
+            }
+        }
         .task {
             await homeViewModel.fetchInboxCount()
         }
@@ -305,12 +313,19 @@ struct HomeView: View {
             
             Task {
                 if !accountName.isEmpty {
-                    await accountViewModel.switchToAccountIfNeeded(accountName)
-                }
-                
-                await MainActor.run {
-                    homeViewModel.inboxNavigationTarget = .init(viewMessage: viewMessage)
-                    selectedTab = .inbox
+                    await MainActor.run {
+                        accountViewModel.inboxNavigationTarget = .init(viewMessage: viewMessage)
+                    }
+                    
+                    if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
+                        await MainActor.run {
+                            selectedTab = .inbox
+                        }
+                    } else {
+                        await MainActor.run {
+                            accountViewModel.pendingInboxTabAfterNotificationClicked = true
+                        }
+                    }
                 }
             }
         }
@@ -319,12 +334,18 @@ struct HomeView: View {
             
             Task {
                 if !accountName.isEmpty {
-                    await accountViewModel.switchToAccountIfNeeded(accountName)
-                }
-                
-                if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
-                    await MainActor.run {
-                        currentNavigationManager.openLink(context)
+                    if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
+                        if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                            await MainActor.run {
+                                currentNavigationManager.openLink(context)
+                            }
+                        }
+                    } else {
+                        if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                            await MainActor.run {
+                                accountViewModel.pendingContextAfterNotificationClicked = context
+                            }
+                        }
                     }
                 }
             }
