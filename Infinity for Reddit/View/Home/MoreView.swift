@@ -12,9 +12,9 @@ import GRDB
 struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var accountViewModel: AccountViewModel
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @State private var activeAlert: ActiveAlert? = nil
+    @State private var previouslyActiveAlertForAnimationCompletion: ActiveAlert? = nil
     @State private var handleLinkUrlString: String = ""
     @State private var subredditName: String = ""
     @State private var username: String = ""
@@ -46,6 +46,7 @@ struct MoreView: View {
                             handleLinkUrlString = ""
                             activeAlert = .handleLink
                         }
+                        //navigationManager.openLink("https://imgur.com/gallery/scattershot-2-first-monsoon-of-year-has-arrived-vE6YoyH#/t/album")
                     }
                     .listPlainItemNoInsets()
                     
@@ -136,8 +137,11 @@ struct MoreView: View {
                     .urlTextField()
                     .submitLabel(.go)
                     .onSubmit {
-                        navigationManager.openLink(handleLinkUrlString)
-                        activeAlert = nil
+                        withAnimation {
+                            activeAlert = nil
+                        } completion: {
+                            navigationManager.openLink(handleLinkUrlString)
+                        }
                     }
                 case .goToSubreddit:
                     CustomTextField(
@@ -183,11 +187,26 @@ struct MoreView: View {
                 if let alert = activeAlert {
                     switch alert {
                     case .handleLink:
-                        navigationManager.openLink(handleLinkUrlString)
+                        previouslyActiveAlertForAnimationCompletion = .handleLink
+                        focusedField = nil
                     case .goToSubreddit:
+                        previouslyActiveAlertForAnimationCompletion = nil
                         navigationManager.append(AppNavigation.subredditDetails(subredditName: subredditName))
                     case .goToUser:
+                        previouslyActiveAlertForAnimationCompletion = nil
                         navigationManager.append(AppNavigation.userDetails(username: username))
+                    }
+                }
+            } onConfirmAnimationCompleted: {
+                // This is only for .handleLink cuz when a full screen media view that contains a TabView shows, the navigation bar will have a weird top padding. Stupid.
+                if let alert = previouslyActiveAlertForAnimationCompletion {
+                    switch alert {
+                    case .handleLink:
+                        previouslyActiveAlertForAnimationCompletion = nil
+                        focusedField = nil
+                        navigationManager.openLink(handleLinkUrlString)
+                    default:
+                        break
                     }
                 }
             }

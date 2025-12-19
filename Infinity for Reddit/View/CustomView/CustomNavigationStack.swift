@@ -274,7 +274,6 @@ struct CustomNavigationStack<Content: View>: View {
                         InterfaceCommentSettingsView()
                     }
                 }
-                .environmentObject(navigationManager)
                 .navigationDestination(for: AboutSettingsViewNavigation.self) { destination in
                     switch destination {
                     case .acknowledgement:
@@ -288,6 +287,7 @@ struct CustomNavigationStack<Content: View>: View {
                         InterfaceFontFontPreviewSettingsView()
                     }
                 }
+                .environmentObject(navigationManager)
         }
         .themedNavigationBarBackButton()
         .onChange(of: navigationManager.path) { _, newValue in

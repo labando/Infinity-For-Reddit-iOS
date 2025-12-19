@@ -46,8 +46,6 @@ struct HomeView: View {
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
     
-    @Namespace private var animation
-    
     init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
         _tab1NavigationManager = StateObject(wrappedValue: NavigationManager(fullScreenMediaViewModel: fullScreenMediaViewModel,
@@ -264,7 +262,6 @@ struct HomeView: View {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(imgurId)
-                    .zIndex(1)
                 } else if case let .imgurGallery(imgurId, post) = media {
                     ImgurFullScreenView(imgurMediaType: .imgurGallery(imgurId: imgurId), post: post) {
                         fullScreenMediaViewModel.dismiss()
@@ -295,7 +292,6 @@ struct HomeView: View {
             
             homeViewModel.startInboxCountPolling(resetPollingTime: true)
         }
-        .environmentObject(NamespaceManager(animation))
         .appForegroundBackgroundListener(onAppEntersForeground: {
             if NotificationUserDefaultsUtils.enableNotification {
                 homeViewModel.startInboxCountPolling()

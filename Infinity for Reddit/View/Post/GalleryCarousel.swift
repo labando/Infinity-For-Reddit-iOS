@@ -9,7 +9,6 @@ import SwiftUI
 
 struct GalleryCarousel: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject private var namespaceManager: NamespaceManager
     @EnvironmentObject private var networkManager: NetworkManager
 
     @StateObject private var galleryScrollState = GalleryScrollState(scrollId: 0)

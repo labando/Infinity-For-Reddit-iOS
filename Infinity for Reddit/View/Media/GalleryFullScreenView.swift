@@ -9,7 +9,6 @@ import SwiftUI
 
 struct GalleryFullScreenView: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject private var namespaceManager: NamespaceManager
     
     @StateObject private var tabViewDismissalViewModel: TabViewDismissalViewModel
     

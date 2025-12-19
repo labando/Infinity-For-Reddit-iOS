@@ -23,6 +23,7 @@ struct CustomAlert<Content: View>: View {
     var canDismissByTapOutside: Bool = true
     var onDismiss: (() -> Void)?
     var onConfirm: (() -> Void)?
+    var onConfirmAnimationCompleted: (() -> Void)?
     
     init(
         title: String,
@@ -35,7 +36,8 @@ struct CustomAlert<Content: View>: View {
         isPresented: Binding<Bool>,
         @ViewBuilder content: () -> Content? = { nil },
         onDismiss: (() -> Void)? = nil,
-        onConfirm: (() -> Void)? = nil
+        onConfirm: (() -> Void)? = nil,
+        onConfirmAnimationCompleted: (() -> Void)? = nil
     ) {
         self.title = title
         self.subtitle = subtitle
@@ -48,6 +50,7 @@ struct CustomAlert<Content: View>: View {
         self.content = content()
         self.onDismiss = onDismiss
         self.onConfirm = onConfirm
+        self.onConfirmAnimationCompleted = onConfirmAnimationCompleted
     }
     
     var body: some View {
@@ -116,6 +119,8 @@ struct CustomAlert<Content: View>: View {
                                 onConfirm?()
                                 withAnimation(.linear(duration: 0.2)) {
                                     isPresented = false
+                                } completion: {
+                                    onConfirmAnimationCompleted?()
                                 }
                             }) {
                                 Text(confirmButtonText)

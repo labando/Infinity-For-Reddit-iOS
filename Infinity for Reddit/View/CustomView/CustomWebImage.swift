@@ -11,7 +11,6 @@ import Kingfisher
 struct CustomWebImage<Placeholder: View, Fallback: View>: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject private var namespaceManager: NamespaceManager
 
     @State private var shouldLoadFallbackImage = false
 
