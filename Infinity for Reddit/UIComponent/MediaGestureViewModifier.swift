@@ -353,9 +353,9 @@ struct TabItemMediaGestureViewModifier: ViewModifier {
         if #available(iOS 17, *) {
             endTranslation = predictedEndTranslation.normalized * dismissDistance
             let initialVelocity = velocity.magnitude / dismissDistance
-            animation = .interpolatingSpring(.smooth, initialVelocity: initialVelocity)
+            animation = .interpolatingSpring(duration: 0.2, bounce: 0, initialVelocity: initialVelocity)
         } else {
-            animation = .spring
+            animation = .spring(duration: 0.2)
             endTranslation = predictedEndTranslation.normalized * dismissDistance
         }
         
@@ -366,7 +366,10 @@ struct TabItemMediaGestureViewModifier: ViewModifier {
                 x: endTranslation.width,
                 y: endTranslation.height
             )
-        } completion: {
+        }
+        
+        Task {
+            try? await Task.sleep(for: .seconds(0.3))
             onDismiss()
             dismissStarted = false
             transform = .identity
