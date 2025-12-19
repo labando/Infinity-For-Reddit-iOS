@@ -364,6 +364,23 @@ struct ImgurImageToolbar: View {
                                 .fill(Color(hex: "#6B6B6B", opacity: 0.5))
                         )
                         .opacity(fullScreenMediaToolbarViewModel.showFinishedDownloadMessage ? 1 : 0)
+                        
+                        HStack {
+                            SwiftUI.Image(systemName: "xmark.seal")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
+                            
+                            Text("Download failed: \(fullScreenMediaToolbarViewModel.error?.localizedDescription ?? "Unknown error")")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.error != nil ? 1 : 0)
                     }
 
                     ZStack {

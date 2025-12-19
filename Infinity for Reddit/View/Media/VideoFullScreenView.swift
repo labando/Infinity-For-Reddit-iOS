@@ -439,7 +439,7 @@ struct VideoController<Content: View>: View {
                     .opacity(showDownloadFinishedMessage ? 1 : 0)
                     
                     HStack {
-                        SwiftUI.Image(systemName: "checkmark.seal")
+                        SwiftUI.Image(systemName: "xmark.seal")
                             .foregroundStyle(.white)
                             .customFont(fontSize: .f24)
                         
