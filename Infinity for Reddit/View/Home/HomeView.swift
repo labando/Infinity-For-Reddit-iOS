@@ -176,7 +176,6 @@ struct HomeView: View {
                         CustomNavigationStack(navigationManager: tab4NavigationManager) {
                             SearchView()
                                 .setUpHomeTabViewChildNavigationBar()
-                                .addTitleToInlineNavigationBar(selectedTab.navigationTitle)
                         }
                         
                         Snackbar()
