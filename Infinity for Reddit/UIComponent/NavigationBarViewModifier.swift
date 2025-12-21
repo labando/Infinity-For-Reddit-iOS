@@ -13,10 +13,9 @@ struct NavigationBarViewModifier: ViewModifier {
     var opacity: Double = 1
     
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
+        if Utils.isIOS26() {
             content
                 .navigationBarTitleDisplayMode(.inline)
-                .tint(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
         } else {
             content
                 .navigationBarTitleDisplayMode(.inline)
@@ -33,7 +32,7 @@ struct InlineNavigationBarWithTitle: ViewModifier {
     var opacity: Double
 
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
+        if Utils.isIOS26() {
             content
                 .toolbar {
                     ToolbarItem(placement: .principal) {
@@ -56,11 +55,13 @@ struct InlineNavigationBarWithTitle: ViewModifier {
     }
 }
 
-struct NavigationBarBackButtonViewModifier: ViewModifier {
+struct NavigationBarButtonViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     func body(content: Content) -> some View {
         content
-            .tint(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+            .applyIf(!Utils.isIOS26()) {
+                $0.tint(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
+            }
     }
 }

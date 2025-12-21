@@ -7,22 +7,6 @@
 
 import SwiftUI
 
-struct NavigationBarButtonViewModifier: ViewModifier {
-    @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            content
-                .customFont()
-                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.colorPrimaryLightTheme))
-        } else {
-            content
-                .customFont()
-                .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.toolbarPrimaryTextAndIconColor))
-        }
-    }
-}
-
 struct FilledButtonViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     

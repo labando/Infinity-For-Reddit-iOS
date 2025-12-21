@@ -289,7 +289,7 @@ struct CustomNavigationStack<Content: View>: View {
                     }
                 }
         }
-        .themedNavigationBarBackButton()
+        .themedNavigationBarButton()
         .onChange(of: navigationManager.path) { _, newValue in
             let newCount = newValue.count
             if navigationManager.viewShouldHideRootTabLabels.count > newCount {
