@@ -60,48 +60,51 @@ struct PostView: View {
     }
 
     var body: some View {
-        switch postLayout {
-        case .card:
-            PostViewCard(
-                postViewModel: postViewModel,
-                isSubredditPostListing: isSubredditPostListing,
-                onPostTap: onPostTap,
-                onIconTap: onIconTap,
-                onSubredditTap: onSubredditTap,
-                onUserTap: onUserTap,
-                onUpvote: onUpvote,
-                onDownvote: onDownvote,
-                onCommentsTap: onCommentsTap,
-                onToggleSave: onToggleSave,
-                onPostTypeClicked: onPostTypeTap,
-                onSensitiveClicked: onSensitiveTap,
-                onOpenLink: openLink,
-                onShare: onShare,
-                onReadPost: onReadPost,
-                onLongPressPost: onLongPressPost
-            )
-        case .compact:
-            PostViewCompact(
-                postViewModel: postViewModel,
-                isSubredditPostListing: isSubredditPostListing,
-                onPostTap: onPostTap,
-                onIconTap: onIconTap,
-                onSubredditTap: onSubredditTap,
-                onUserTap: onUserTap,
-                onUpvote: onUpvote,
-                onDownvote: onDownvote,
-                onCommentsTap: onCommentsTap,
-                onToggleSave: onToggleSave,
-                onPostTypeClicked: onPostTypeTap,
-                onSensitiveClicked: onSensitiveTap,
-                onOpenLink: openLink,
-                onShare: onShare,
-                onReadPost: onReadPost
-            )
-            .onLongPressGesture {
-                onLongPressPost()
+        Group {
+            switch postLayout {
+            case .card:
+                PostViewCard(
+                    postViewModel: postViewModel,
+                    isSubredditPostListing: isSubredditPostListing,
+                    onPostTap: onPostTap,
+                    onIconTap: onIconTap,
+                    onSubredditTap: onSubredditTap,
+                    onUserTap: onUserTap,
+                    onUpvote: onUpvote,
+                    onDownvote: onDownvote,
+                    onCommentsTap: onCommentsTap,
+                    onToggleSave: onToggleSave,
+                    onPostTypeClicked: onPostTypeTap,
+                    onSensitiveClicked: onSensitiveTap,
+                    onOpenLink: openLink,
+                    onShare: onShare,
+                    onReadPost: onReadPost,
+                    onLongPressPost: onLongPressPost
+                )
+            case .compact:
+                PostViewCompact(
+                    postViewModel: postViewModel,
+                    isSubredditPostListing: isSubredditPostListing,
+                    onPostTap: onPostTap,
+                    onIconTap: onIconTap,
+                    onSubredditTap: onSubredditTap,
+                    onUserTap: onUserTap,
+                    onUpvote: onUpvote,
+                    onDownvote: onDownvote,
+                    onCommentsTap: onCommentsTap,
+                    onToggleSave: onToggleSave,
+                    onPostTypeClicked: onPostTypeTap,
+                    onSensitiveClicked: onSensitiveTap,
+                    onOpenLink: openLink,
+                    onShare: onShare,
+                    onReadPost: onReadPost
+                )
+                .onLongPressGesture {
+                    onLongPressPost()
+                }
             }
         }
+        .frame(maxWidth: 500)
     }
     
     private func onPostTap() {

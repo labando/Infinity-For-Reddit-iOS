@@ -168,6 +168,7 @@ struct PostListingView: View {
                                     await postListingViewModel.readPost(post: post, markPostsAsRead: markPostsAsRead, limitReadPosts: limitReadPosts, readPostsLimit: readPostsLimit)
                                 }
                             )
+                            .frame(maxWidth: .infinity, alignment: .center)
                             .id(ObjectIdentifier(post))
                             .listPlainItemNoInsets()
                             .onAppear {
