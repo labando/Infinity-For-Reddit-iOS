@@ -98,6 +98,10 @@ struct PostDetailsView: View {
                                             showCopyContentOptionsSheet = true
                                         }
                                     )
+                                    
+                                    Spacer()
+                                        .frame(height: 150)
+                                        .listPlainItemNoInsets()
                                 }
                                 .themedList()
                                 .scrollIndicators(.hidden)
