@@ -229,11 +229,12 @@ struct HomeView: View {
                     }
                     .id(currentUrlString)
                     .zIndex(1)
-                } else if case let .video(urlString, post, videoType, canDownload) = media {
+                } else if case let .video(urlString, post, videoType, canDownload, playbackTime) = media {
                     VideoFullScreenView(
                         urlString: urlString,
                         post: post,
                         videoType: videoType,
+                        playbackTime: playbackTime,
                         videoFullScreenViewModel: videoFullScreenViewModel,
                         muteVideo: VideoUserDefaultsUtils.muteVideo || ((post?.over18 ?? false) && VideoUserDefaultsUtils.muteSensitiveVideo),
                         canDownload: canDownload

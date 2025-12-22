@@ -16,6 +16,7 @@ struct VideoFullScreenView<Content: View>: View {
     let urlString: String
     let post: Post?
     let videoType: VideoType
+    let playbackTimeToSeekToInitially: Double
     let hasDescription: Bool
     // This is for wrapper view to control if the video can be played
     let canPlay: Bool
@@ -30,6 +31,7 @@ struct VideoFullScreenView<Content: View>: View {
         urlString: String,
         post: Post?,
         videoType: VideoType,
+        playbackTime: Double,
         videoFullScreenViewModel: VideoFullScreenViewModel,
         hasDescription: Bool = false,
         canPlay: Bool = true,
@@ -43,6 +45,7 @@ struct VideoFullScreenView<Content: View>: View {
         self.urlString = urlString
         self.post = post
         self.videoType = videoType
+        self.playbackTimeToSeekToInitially = playbackTime
         self.videoFullScreenViewModel = videoFullScreenViewModel
         self.hasDescription = hasDescription
         self.canPlay = canPlay
@@ -199,7 +202,7 @@ struct VideoFullScreenView<Content: View>: View {
             videoFullScreenViewModel.player.rate = Float(newValue)
         }
         .task {
-            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo)
+            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo, playbackTime: playbackTimeToSeekToInitially)
         }
     }
 }

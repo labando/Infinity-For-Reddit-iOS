@@ -61,6 +61,7 @@ struct TabVideoView: View {
             urlString: urlString,
             post: nil,
             videoType: .direct,
+            playbackTime: 0,
             videoFullScreenViewModel: videoFullScreenViewModel,
             hasDescription: hasDescription,
             canPlay: isSelected,
