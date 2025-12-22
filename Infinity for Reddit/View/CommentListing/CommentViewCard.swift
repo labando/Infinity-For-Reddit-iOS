@@ -387,14 +387,14 @@ struct CommentViewCard: View {
                     CustomDivider()
                 }
             }
-            .applyIf(isInPostDetails) {
-                $0.onTapGesture {
-                    isToolbarHidden.toggle()
-                }
-            }
         }
         .contentShape(Rectangle())
         .background(backgroundColor)
+        .applyIf(isInPostDetails) {
+            $0.onTapGesture {
+                isToolbarHidden.toggle()
+            }
+        }
     }
     
     private var backgroundColor: Color {

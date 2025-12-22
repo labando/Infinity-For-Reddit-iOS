@@ -212,12 +212,16 @@ struct PostListingView: View {
                                 .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                             }
                         }
+                        
                         if postListingViewModel.hasMorePages {
-                            ProgressIndicator()
-                                .task {
-                                    await postListingViewModel.loadPosts()
-                                }
-                                .listPlainItem()
+                            HStack {
+                                ProgressIndicator()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .listPlainItemNoInsets()
+                            .task {
+                                await postListingViewModel.loadPosts()
+                            } 
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)

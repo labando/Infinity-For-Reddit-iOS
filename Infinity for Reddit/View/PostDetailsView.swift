@@ -169,7 +169,8 @@ struct PostDetailsView: View {
                                         }
                                     } else {
                                         ForEach(postDetailsViewModel.visibleComments, id: \.id) { commentItem in
-                                            if case let .comment(comment) = commentItem {
+                                            switch commentItem {
+                                            case .comment(let comment):
                                                 CommentViewCard(
                                                     comment: comment,
                                                     isInPostDetails: true,
@@ -274,10 +275,10 @@ struct PostDetailsView: View {
                                                     }
                                                     .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                                                 }
-                                            } else if case let .more(commentMore) = commentItem {
+                                            case .more(let commentMore):
                                                 CommentMoreViewCard(commentMore: commentMore)
                                                     .listPlainItemNoInsets()
-                                                    .id(commentMore.id)
+                                                    .id(ObjectIdentifier(commentMore))
                                                     .onTapGesture {
                                                         if commentMore.children.count > 0 {
                                                             Task {
@@ -298,13 +299,16 @@ struct PostDetailsView: View {
                                                     }
                                             }
                                         }
+                                        
                                         if postDetailsViewModel.hasMoreComments {
-                                            Text("Loading more comments")
-                                                .primaryText()
-                                                .task {
-                                                    await postDetailsViewModel.fetchCommentsPagination()
-                                                }
-                                                .listPlainItem()
+                                            HStack {
+                                                ProgressIndicator()
+                                            }
+                                            .frame(maxWidth: .infinity)
+                                            .listPlainItemNoInsets()
+                                            .task {
+                                                await postDetailsViewModel.fetchCommentsPagination()
+                                            }
                                         }
                                     }
                                     
@@ -312,6 +316,7 @@ struct PostDetailsView: View {
                                         .frame(height: 150)
                                         .listPlainItemNoInsets()
                                 }
+                                .transaction { $0.animation = nil }
                                 .themedList()
                                 .scrollIndicators(.hidden)
                                 .scrollBounceBehavior(.basedOnSize)
