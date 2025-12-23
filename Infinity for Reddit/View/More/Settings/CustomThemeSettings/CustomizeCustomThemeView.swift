@@ -96,7 +96,6 @@ struct CustomizeCustomThemeView: View {
                 if customizeCustomThemeViewModel.backingCustomTheme != nil {
                     Button(action: {
                         customizeCustomThemeViewModel.saveCustomTheme()
-                        dismiss()
                     }) {
                         SwiftUI.Image(systemName: "tray.and.arrow.down")
                             .navigationBarImage()
@@ -106,6 +105,11 @@ struct CustomizeCustomThemeView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Customize")
+        .onChange(of: customizeCustomThemeViewModel.savingSuccess) { _, newValue in
+            if newValue {
+                dismiss()
+            }
+        }
         .showErrorUsingSnackbar(customizeCustomThemeViewModel.$error)
         .task {
             await customizeCustomThemeViewModel.getAndSetCustomTheme()
