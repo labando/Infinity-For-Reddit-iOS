@@ -28,17 +28,20 @@ struct MoreView: View {
                         navigationManager.append(MoreViewNavigation.popular)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     SimpleTouchItemRow(text: "All", icon: "globe") {
                         navigationManager.append(MoreViewNavigation.all)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     if !accountViewModel.account.isAnonymous() {
                         SimpleTouchItemRow(text: "Search", icon: "magnifyingglass") {
                             navigationManager.append(AppNavigation.search)
                         }
                         .listPlainItemNoInsets()
+                        .limitedWidthListItem()
                     }
                     
                     SimpleTouchItemRow(text: "Handle Link", icon: "link") {
@@ -48,6 +51,7 @@ struct MoreView: View {
                         }                        
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     SimpleTouchItemRow(text: "Go to Subreddit", icon: "bubble.left.and.text.bubble.right") {
                         withAnimation(.linear(duration: 0.2)) {
@@ -56,6 +60,7 @@ struct MoreView: View {
                         }
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     SimpleTouchItemRow(text: "Go to User", icon: "person.crop.circle") {
                         withAnimation(.linear(duration: 0.2)) {
@@ -64,6 +69,7 @@ struct MoreView: View {
                         }
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                 }
                 
                 CustomListSection("Account") {
@@ -72,32 +78,38 @@ struct MoreView: View {
                             navigationManager.append(AppNavigation.userDetails(username: accountViewModel.account.username))
                         }
                         .listPlainItemNoInsets()
+                        .limitedWidthListItem()
                     }
                     
                     SimpleTouchItemRow(text: "Upvoted", icon:"arrowshape.up") {
                         navigationManager.append(MoreViewNavigation.upvoted)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     SimpleTouchItemRow(text: "Downvoted", icon: "arrowshape.down") {
                         navigationManager.append(MoreViewNavigation.downvoted)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     SimpleTouchItemRow(text: "Hidden", icon: "eye.slash") {
                         navigationManager.append(MoreViewNavigation.hidden)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     SimpleTouchItemRow(text: "Saved", icon: "bookmark.fill") {
                         navigationManager.append(MoreViewNavigation.saved)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     SimpleTouchItemRow(text: "History", icon: "clock") {
                         navigationManager.append(MoreViewNavigation.history)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                 }
                 
                 CustomListSection("Preferences") {
@@ -105,11 +117,13 @@ struct MoreView: View {
                         navigationManager.append(MoreViewNavigation.settings)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                     
                     SimpleTouchItemRow(text: "Test", icon: "testtube.2") {
                         navigationManager.append(MoreViewNavigation.test)
                     }
                     .listPlainItemNoInsets()
+                    .limitedWidthListItem()
                 }
             }
             .themedList()
