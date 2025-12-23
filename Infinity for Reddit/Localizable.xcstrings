@@ -1764,7 +1764,6 @@
       }
     },
     "theme_item_tab_bar_background_color" : {
-      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
