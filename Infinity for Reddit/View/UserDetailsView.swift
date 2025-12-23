@@ -43,7 +43,7 @@ struct UserDetailsView: View {
                         VStack(spacing: 0) {
                             CustomWebImage(
                                 userDetailsViewModel.userData?.banner,
-                                width: UIScreen.main.bounds.width,
+                                width: proxy.size.width,
                                 height: 150,
                                 handleImageTapGesture: false,
                                 centerCrop: true,
