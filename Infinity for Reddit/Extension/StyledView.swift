@@ -223,6 +223,10 @@ extension View {
         self.modifier(CrosspostTagViewModifier())
     }
     
+    func stickiedTag() -> some View {
+        self.modifier(StickiedTagViewModifier())
+    }
+    
     func filledCardBackground() -> some View {
         self.modifier(FilledCardBackgroundViewModifier())
     }

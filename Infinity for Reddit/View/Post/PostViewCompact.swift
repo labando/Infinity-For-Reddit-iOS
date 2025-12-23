@@ -118,7 +118,8 @@ struct PostViewCompact: View {
                     if hidePostType && !postViewModel.post.spoiler
                         && !postViewModel.post.over18 && hidePostFlair
                         && !postViewModel.post.archived && !postViewModel.post.locked
-                        && postViewModel.post.crosspostParent == nil && postViewModel.post.postType != .link {
+                        && postViewModel.post.crosspostParent == nil && !postViewModel.post.stickied
+                        && postViewModel.post.postType != .link {
                         // Not showing post metadata
                         EmptyView()
                     } else {
@@ -156,6 +157,10 @@ struct PostViewCompact: View {
                             
                             if postViewModel.post.crosspostParent != nil {
                                 CrosspostTag()
+                            }
+                            
+                            if postViewModel.post.stickied {
+                                StickiedTag()
                             }
                             
                             switch postViewModel.post.postType {
