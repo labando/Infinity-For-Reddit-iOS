@@ -172,6 +172,7 @@ struct UserDetailsView: View {
                         .toolbar(.hidden, for: .tabBar)
                     }
                 }
+                .edgesIgnoringSafeArea(.top)
                 .overlay(alignment: .top) {
                     Rectangle()
                         .fill(
@@ -189,7 +190,6 @@ struct UserDetailsView: View {
                         .frame(height: proxy.safeAreaInsets.top)
                         .ignoresSafeArea()
                 }
-                .edgesIgnoringSafeArea(.top)
             }
         }
         .task {
@@ -197,7 +197,7 @@ struct UserDetailsView: View {
                 await userDetailsViewModel.fetchUserDetails()
             }
         }
-        .themedNavigationBar()
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack(spacing: 4) {
