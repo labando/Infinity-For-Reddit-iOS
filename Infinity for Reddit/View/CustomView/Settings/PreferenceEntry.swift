@@ -40,5 +40,6 @@ struct PreferenceEntry: View {
             }
             .padding(.horizontal, 16)
         }
+        .limitedWidthListItem()
     }
 }

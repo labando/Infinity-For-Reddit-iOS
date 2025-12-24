@@ -10,7 +10,7 @@ import Foundation
 enum FullScreenMediaType {
     case image(urlString: String, aspectRatio: CGSize? = nil, post: Post? = nil, fileName: String, matchedGeometryEffectId: String? = nil)
     case gif(urlString: String, post: Post? = nil, fileName: String)
-    case video(urlString: String, post: Post? = nil, videoType: VideoType = .reddit, canDownload: Bool = true)
+    case video(urlString: String, post: Post? = nil, videoType: VideoType = .reddit, canDownload: Bool = true, playbackTime: Double = 0)
     case gallery(currentUrlString: String, post: Post? = nil, items: [GalleryItem], galleryScrollState: GalleryScrollState)
     case imgurGallery(imgurId: String, post: Post? = nil)
     case imgurAlbum(imgurId: String, post: Post? = nil)
@@ -126,42 +126,12 @@ class GalleryScrollState: ObservableObject {
 
 class FullScreenMediaViewModel: ObservableObject {
     @Published var media: FullScreenMediaType?
-    @Published var matchedGeometryEffectId: String?
-    @Published var isTransitioning: Bool = false
     
     func show(_ media: FullScreenMediaType) {
-        isTransitioning = true
         self.media = media
-        switch media {
-        case .image(_, _, _, _, let matchedGeometryEffectId):
-            self.matchedGeometryEffectId = matchedGeometryEffectId
-        case .gif:
-            break
-        case .video:
-            break
-        case .gallery:
-            break
-        case .imgurGallery:
-            break
-        case .imgurAlbum:
-            break
-        case .imgurImage:
-            break
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            self.isTransitioning = false
-        }
     }
     
     func dismiss() {
-        isTransitioning = true
-        
         self.media = nil
-        self.matchedGeometryEffectId = nil
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            self.isTransitioning = false
-        }
     }
 }

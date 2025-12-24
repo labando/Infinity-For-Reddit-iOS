@@ -153,7 +153,7 @@ extension View {
         self.modifier(MarkdownViewModifier(fontSize: fontSize))
     }
     
-    func themedPostCommentMarkdown(_ fontSize: AppFontSize = .f15) -> some View {
+    func themedPostContentMarkdown(_ fontSize: AppFontSize = .f15) -> some View {
         self.modifier(PostContentMarkdownViewModifier(fontSize: fontSize))
     }
     
@@ -223,6 +223,10 @@ extension View {
         self.modifier(CrosspostTagViewModifier())
     }
     
+    func stickiedTag() -> some View {
+        self.modifier(StickiedTagViewModifier())
+    }
+    
     func filledCardBackground() -> some View {
         self.modifier(FilledCardBackgroundViewModifier())
     }
@@ -280,8 +284,9 @@ extension View {
     func mediaGesture(
         minZoomScale: CGFloat = 1,
         doubleTapZoomScale: CGFloat = 2,
-        outOfBoundsColor: Color? = nil,
+        outOfBoundsColor: Color = .black,
         onDragEnded: @escaping (CGAffineTransform) -> Bool,
+        onStartDismiss: @escaping () -> Void,
         onDismiss: @escaping () -> Void
     ) -> some View {
         self.modifier(MediaGestureViewModifier(
@@ -289,6 +294,25 @@ extension View {
             doubleTapZoomScale: doubleTapZoomScale,
             outOfBoundsColor: outOfBoundsColor,
             onDragEnded: onDragEnded,
+            onStartDismiss: onStartDismiss,
+            onDismiss: onDismiss
+        ))
+    }
+    
+    func tabItemMediaGesture(
+        minZoomScale: CGFloat = 1,
+        doubleTapZoomScale: CGFloat = 2,
+        outOfBoundsColor: Color = .black,
+        onDragEnded: @escaping (CGAffineTransform) -> Bool,
+        onStartDismiss: @escaping () -> Void,
+        onDismiss: @escaping () -> Void
+    ) -> some View {
+        self.modifier(TabItemMediaGestureViewModifier(
+            minZoomScale: minZoomScale,
+            doubleTapZoomScale: doubleTapZoomScale,
+            outOfBoundsColor: outOfBoundsColor,
+            onDragEnded: onDragEnded,
+            onStartDismiss: onStartDismiss,
             onDismiss: onDismiss
         ))
     }
@@ -335,5 +359,9 @@ extension View {
         showTaskCancelledError: Bool = false
     ) -> some View where P.Output == Error?, P.Failure == Never {
         self.modifier(SnackbarErrorViewModifier(errorPublisher: errorPublisher, showTaskCancelledError: showTaskCancelledError))
+    }
+    
+    func limitedWidthListItem() -> some View {
+        self.modifier(LimitedWidthListItemViewModifier())
     }
 }

@@ -12,6 +12,7 @@ import GRDB
 class CustomizeCustomThemeViewModel: ObservableObject {
     @Published var backingCustomTheme: CustomTheme?
     @Published var loadState: LoadState = .idle
+    @Published var savingSuccess: Bool = false
     @Published var error: Error?
     
     var customTheme: CustomTheme {
@@ -31,6 +32,20 @@ class CustomizeCustomThemeViewModel: ObservableObject {
     private let predefindCustomThemeName: String?
     private let customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol
     private let customThemeDao: CustomThemeDao
+    
+    enum CustomizeCustomThemeViewModelError: LocalizedError {
+        case failedToLoadCustomTheme(Error)
+        case failedToSaveCustomTheme(Error)
+        
+        var errorDescription: String? {
+            switch self {
+            case .failedToLoadCustomTheme(let error):
+                return "Failed to load custom theme: \(error.localizedDescription)"
+            case .failedToSaveCustomTheme(let error):
+                return "Failed to save custom theme: \(error.localizedDescription)"
+            }
+        }
+    }
     
     init(customThemeId: Int?, predefindCustomThemeName: String?, customizeCustomThemeRepository: CustomizeCustomThemeRepositoryProtocol) {
         guard let resolvedDatabasePool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
@@ -58,14 +73,18 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             loadState = .loaded
         } catch {
             print(error)
-            loadState = .failed(error)
+            loadState = .failed(CustomizeCustomThemeViewModelError.failedToLoadCustomTheme(error))
         }
     }
     
     func saveCustomTheme() {
         guard let customTheme = backingCustomTheme else {
+            savingSuccess = true
             return
         }
+        
+        savingSuccess = false
+        error = nil
         
         Task {
             do {
@@ -78,9 +97,11 @@ class CustomizeCustomThemeViewModel: ObservableObject {
                 }
                 
                 try await customThemeDao.insert(customTheme: customTheme)
+                self.savingSuccess = true
             } catch {
                 print(error.localizedDescription)
-                self.error = error
+                self.error = CustomizeCustomThemeViewModelError.failedToSaveCustomTheme(error)
+                self.savingSuccess = false
             }
         }
     }
@@ -181,6 +202,11 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_sent_message_text_color_detail", comment: "")
         )
         
+        customThemeSettingsItems["switchColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_switch_color", comment: ""),
+            description: NSLocalizedString("theme_item_switch_color_detail", comment: "")
+        )
+        
         customThemeSettingsItems["backgroundColor"] = CustomThemeSettingsItem(
             title: NSLocalizedString("theme_item_background_color", comment: ""),
             description: NSLocalizedString("theme_item_background_color_detail", comment: "")
@@ -226,9 +252,22 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_sent_message_background_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["bottomAppBarBackgroundColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_bottom_app_bar_background_color", comment: ""),
-            description: NSLocalizedString("theme_item_bottom_app_bar_background_color_detail", comment: "")
+        customThemeSettingsItems["tabBarBackgroundColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_tab_bar_background_color", comment: ""),
+            description: NSLocalizedString("theme_item_tab_bar_background_color_detail", comment: "")
+        )
+        
+        customThemeSettingsItems["snackbarTextColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_snackbar_text_color", comment: ""),
+            description: NSLocalizedString("theme_item_snackbar_text_color_detail", comment: "")
+        )
+        customThemeSettingsItems["snackbarActionTextColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_snackbar_action_text_color", comment: ""),
+            description: NSLocalizedString("theme_item_snackbar_action_text_color_detail", comment: "")
+        )
+        customThemeSettingsItems["snackbarBackgroundColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_snackbar_background_color", comment: ""),
+            description: NSLocalizedString("theme_item_snackbar_background_color_detail", comment: "")
         )
         
         customThemeSettingsItems["primaryIconColor"] = CustomThemeSettingsItem(
@@ -236,9 +275,9 @@ class CustomizeCustomThemeViewModel: ObservableObject {
             description: NSLocalizedString("theme_item_primary_icon_color_detail", comment: "")
         )
         
-        customThemeSettingsItems["bottomAppBarIconColor"] = CustomThemeSettingsItem(
-            title: NSLocalizedString("theme_item_bottom_app_bar_icon_color", comment: ""),
-            description: NSLocalizedString("theme_item_bottom_app_bar_icon_color_detail", comment: "")
+        customThemeSettingsItems["tabBarTextAndIconColor"] = CustomThemeSettingsItem(
+            title: NSLocalizedString("theme_item_tab_bar_text_and_icon_color", comment: ""),
+            description: NSLocalizedString("theme_item_tab_bar_text_and_icon_color_detail", comment: "")
         )
         
         customThemeSettingsItems["postIconAndInfoColor"] = CustomThemeSettingsItem(

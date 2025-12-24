@@ -9,12 +9,11 @@ import SwiftUI
 
 struct GalleryCarousel: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject private var namespaceManager: NamespaceManager
     @EnvironmentObject private var networkManager: NetworkManager
 
     @StateObject private var galleryScrollState = GalleryScrollState(scrollId: 0)
     
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = true
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(DataSavingModeUserDefaultsUtils.dataSavingModeKey, store: .dataSavingMode) private var dataSavingMode: Int = 0
     @AppStorage(DataSavingModeUserDefaultsUtils.disableImagePreviewKey, store: .dataSavingMode) private var disableImagePreview: Bool = false

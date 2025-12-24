@@ -67,6 +67,7 @@ struct CommentFilterUsageSheet: View {
                         CustomTextField(selectedType.textFieldPlaceholder,
                                         text: $nameOfUsage,
                                         singleLine: true,
+                                        autocapitalization: .never,
                                         fieldType: .nameOfUsage,
                                         focusedField: $focusedField)
                         .submitLabel(.done)

@@ -25,6 +25,11 @@ public class AccountViewModel: ObservableObject {
     @Published var account: Account
     @Published var error: Error?
     
+    @Published var inboxNavigationTarget: InboxNavigationTarget?
+    @Published var pendingInboxTabAfterNotificationClicked: Bool = false
+    @Published var pendingContextAfterNotificationClicked: String?
+    @Published var pendingInboxFullname: String?
+    
     private let accountDao: AccountDao
     private var cancellables: Set<AnyCancellable> = []
     
@@ -147,10 +152,20 @@ public class AccountViewModel: ObservableObject {
     }
     
     @MainActor
-    func switchToAccountIfNeeded(_ username: String) async {
-        guard account.username.caseInsensitiveCompare(username) != .orderedSame else { return }
+    func switchToAccountIfNeeded(_ username: String) async -> Bool {
+        guard account.username.caseInsensitiveCompare(username) != .orderedSame else {
+            return false
+        }
+        
         if let account = try? accountDao.getAccount(username: username) {
             self.switchAccount(newAccount: account)
+            return true
         }
+        
+        return false
     }
+}
+
+struct InboxNavigationTarget: Equatable {
+    let viewMessage: Bool
 }

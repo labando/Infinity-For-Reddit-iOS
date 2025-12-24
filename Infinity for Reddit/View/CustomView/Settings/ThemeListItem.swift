@@ -25,5 +25,6 @@ struct ThemeListItem: View {
             .padding(16)
             .contentShape(Rectangle())
         }
+        .limitedWidthListItem()
     }
 }

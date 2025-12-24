@@ -26,6 +26,7 @@ struct Infinity: App {
     
     @AppStorage(SecurityUserDefaultsUtils.appLockKey, store: .security) private var appLock: Bool = false
     @AppStorage(SecurityUserDefaultsUtils.appLockTimeoutKey, store: .security) private var appLockTimeout: Int = 600000
+    @AppStorage(CustomThemeUserDefaultsUtils.themeKey, store: .theme) private var theme: Int = CustomThemeUserDefaultsUtils.themeDeviceDefault
     
     let container: Container = {
         let container = Container()
@@ -139,6 +140,7 @@ struct Infinity: App {
                 }
             }
             .environmentObject(customThemeViewModel)
+            .preferredColorScheme(themeType)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .background  {
@@ -164,6 +166,17 @@ struct Infinity: App {
                         }
                     }
                 }
+            }
+        }
+        
+        var themeType: ColorScheme? {
+            switch theme {
+            case CustomThemeUserDefaultsUtils.themeLight:
+                return .light
+            case CustomThemeUserDefaultsUtils.themeDark:
+                return .dark
+            default:
+                return nil
             }
         }
     }

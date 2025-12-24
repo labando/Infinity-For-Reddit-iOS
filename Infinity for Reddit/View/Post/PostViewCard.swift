@@ -13,7 +13,14 @@ struct PostViewCard: View {
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var themeViewModel: CustomThemeViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
-
+    
+    @StateObject private var videoPlayerViewModel: VideoPlayerViewModel
+    
+    @ObservedObject var postViewModel: PostViewModel
+    
+    @State private var voteTask: Task<Void, Never>?
+    @State private var saveTask: Task<Void, Never>?
+    
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostTypeKey, store: .interfacePost) private var hidePostType: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hidePostFlairKey, store: .interfacePost) private var hidePostFlair: Bool = false
     @AppStorage(InterfacePostUserDefaultsUtils.hideSubredditAndUserPrefixKey, store: .interfacePost) private var hideSubredditAndUserPrefix: Bool = false
@@ -23,12 +30,8 @@ struct PostViewCard: View {
     @AppStorage(InterfacePostUserDefaultsUtils.limitMediaHeightKey, store: .interfacePost) private var limitMediaHeight: Bool = false
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
 
-    @ObservedObject var postViewModel: PostViewModel
-    @State private var voteTask: Task<Void, Never>?
-    @State private var saveTask: Task<Void, Never>?
-
     let isSubredditPostListing: Bool
-    let onPostTap: () -> Void
+    let onPostTap: (Double) -> Void
     let onIconTap: () -> Void
     let onSubredditTap: () -> Void
     let onUserTap: () -> Void
@@ -48,7 +51,7 @@ struct PostViewCard: View {
     init(
         postViewModel: PostViewModel,
         isSubredditPostListing: Bool,
-        onPostTap: @escaping () -> Void,
+        onPostTap: @escaping (Double) -> Void,
         onIconTap: @escaping () -> Void,
         onSubredditTap: @escaping () -> Void,
         onUserTap: @escaping () -> Void,
@@ -79,6 +82,7 @@ struct PostViewCard: View {
         self.onShare = onShare
         self.onReadPost = onReadPost
         self.onLongPressPost = onLongPressPost
+        self._videoPlayerViewModel = StateObject(wrappedValue: VideoPlayerViewModel())
     }
 
     var body: some View {
@@ -141,7 +145,8 @@ struct PostViewCard: View {
             if hidePostType && !postViewModel.post.spoiler
                 && !postViewModel.post.over18 && hidePostFlair
                 && !postViewModel.post.archived && !postViewModel.post.locked
-                && postViewModel.post.crosspostParent == nil && postViewModel.post.postType != .link {
+                && postViewModel.post.crosspostParent == nil && !postViewModel.post.stickied
+                && postViewModel.post.postType != .link {
                 // Not showing post metadata
                 EmptyView()
             } else {
@@ -179,6 +184,10 @@ struct PostViewCard: View {
                     
                     if postViewModel.post.crosspostParent != nil {
                         CrosspostTag()
+                    }
+                    
+                    if postViewModel.post.stickied {
+                        StickiedTag()
                     }
                     
                     switch postViewModel.post.postType {
@@ -265,7 +274,7 @@ struct PostViewCard: View {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true) {
+                PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, videoPlayerViewModel: videoPlayerViewModel) {
                     Task {
                         await onReadPost()
                     }
@@ -274,7 +283,7 @@ struct PostViewCard: View {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true) {
+                PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString, inPostListing: true, videoPlayerViewModel: videoPlayerViewModel) {
                     Task {
                         await onReadPost()
                     }
@@ -410,7 +419,8 @@ struct PostViewCard: View {
         }
         .padding(.vertical, 8)
         .onTapGesture {
-            onPostTap()
+            // Don't care if it's a video post or not
+            onPostTap(videoPlayerViewModel.currentTime)
         }
     }
 }

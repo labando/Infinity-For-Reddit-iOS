@@ -11,8 +11,6 @@ import GRDB
 
 struct SettingsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
-    @Environment(\.dependencyManager) private var dependencyManager: Container
-    @State private var selectedItem: Int? = nil
     
     var body: some View {
         RootView {

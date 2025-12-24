@@ -23,7 +23,6 @@ struct CommentListingView: View {
     @State private var showSortTypeTimeSheet: Bool = false
     @State private var showCommentModerationSheet: Bool = false
     @State private var showCopyContentOptionsSheet: Bool = false
-    @State private var showCopyContentSheet: Bool = false
     @State private var markdownToBeCopied: String = ""
     @State private var plainTextToBeCopied: String = ""
     @State private var textToBeSelectedAndCopiedItem: TextToBeSelectedAndCopiedItem?
@@ -71,11 +70,7 @@ struct CommentListingView: View {
             } else {
                 List {
                     ForEach(commentListingViewModel.comments, id: \.id) { comment in
-                        TouchRipple(action: {
-                            navigationManager.append(
-                                AppNavigation.postDetailsWithId(postId: String(comment.linkId.dropFirst(3)), commentId: comment.id)
-                            )
-                        }) {
+                        TouchRipple {
                             CommentViewCard(
                                 comment: comment,
                                 isInPostDetails: false,
@@ -109,6 +104,11 @@ struct CommentListingView: View {
                                     showCopyContentOptionsSheet = true
                                 }
                             )
+                            .onTapGesture {
+                                navigationManager.append(
+                                    AppNavigation.postDetailsWithId(postId: String(comment.linkId.dropFirst(3)), commentId: comment.id)
+                                )
+                            }
                         }
                         .listPlainItemNoInsets()
                         .id(ObjectIdentifier(comment))
@@ -232,11 +232,9 @@ struct CommentListingView: View {
                 },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
-                    showCopyContentSheet = true
                 },
                 onCopyPlainText: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: plainTextToBeCopied)
-                    showCopyContentSheet = true
                 }
             )
         }

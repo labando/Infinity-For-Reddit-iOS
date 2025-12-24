@@ -55,6 +55,7 @@ struct CustomizeCommentFilterView: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 16)
                         .padding(.bottom, 8)
+                        .limitedWidthListItem()
                         
                         FilledCardView {
                             VStack(spacing: 16) {
@@ -77,6 +78,7 @@ struct CustomizeCommentFilterView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
+                        .limitedWidthListItem()
                         
                         FilledCardView {
                             VStack(spacing: 16) {
@@ -96,6 +98,7 @@ struct CustomizeCommentFilterView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
+                        .limitedWidthListItem()
                         
                         FilledCardView {
                             VStack(spacing: 16) {
@@ -128,6 +131,7 @@ struct CustomizeCommentFilterView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
+                        .limitedWidthListItem()
                         
                         FilledCardView {
                             VStack(spacing: 16) {
@@ -199,6 +203,7 @@ struct CustomizeCommentFilterView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
+                        .limitedWidthListItem()
                     }
                     .themedList()
                     .onChange(of: focusedField) { oldField, newField in

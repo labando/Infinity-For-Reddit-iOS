@@ -10,8 +10,12 @@ import SwiftUI
 struct PostVideoView: View {
     @EnvironmentObject private var networkManager: NetworkManager
     @EnvironmentObject private var fullScreenMediaViewModel: FullScreenMediaViewModel
+    
+    @ObservedObject private var videoPlayerViewModel: VideoPlayerViewModel
+    
+    @State private var canPlay: Bool = false
 
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = true
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(VideoUserDefaultsUtils.videoAutoplayKey, store: .video) private var videoAutoplay: Int = 0
     @AppStorage(VideoUserDefaultsUtils.autoplaySensitiveVideoKey, store: .video) private var autoplaySensitiveVideo: Bool = true
@@ -20,13 +24,28 @@ struct PostVideoView: View {
     @AppStorage(DataSavingModeUserDefaultsUtils.dataSavingModeKey, store: .dataSavingMode) private var dataSavingMode: Int = 0
     @AppStorage(DataSavingModeUserDefaultsUtils.disableImagePreviewKey, store: .dataSavingMode) private var disableImagePreview: Bool = false
     @AppStorage(DataSavingModeUserDefaultsUtils.onlyDisablePreviewInVideoAndGIFKey, store: .dataSavingMode) private var onlyDisablePreviewInVideoAndGIF: Bool = false
-
-    @State private var canPlay: Bool = false
     
     let post: Post
     let videoUrlString: String
-    var inPostListing: Bool = false
-    var onReadPost: (() -> Void)? = nil
+    let inPostListing: Bool
+    let playbackTimeToSeekToInitially: Double
+    let onReadPost: (() -> Void)?
+    
+    init(
+        post: Post,
+        videoUrlString: String,
+        inPostListing: Bool = false,
+        playbackTimeToSeekToInitially: Double = 0,
+        videoPlayerViewModel: VideoPlayerViewModel,
+        onReadPost: (() -> Void)? = nil
+    ) {
+        self.post = post
+        self.videoUrlString = videoUrlString
+        self.inPostListing = inPostListing
+        self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        self.onReadPost = onReadPost
+        self.videoPlayerViewModel = videoPlayerViewModel
+    }
     
     private var isDataSavingModeActive: Bool {
         return DataSavingModeUserDefaultsUtils.isDataSavingModeActive(dataSavingMode: dataSavingMode, isWifiConnected: networkManager.isWifiConnected)
@@ -45,7 +64,9 @@ struct PostVideoView: View {
                         aspectRatio: preview.images[0].source.aspectRatio,
                         muteVideo: muteAutoplayingVideo,
                         canPlay: canPlay,
-                        isSensitive: post.over18
+                        isSensitive: post.over18,
+                        playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+                        videoPlayerViewModel: videoPlayerViewModel
                     ) {
                         showFullScreenVideo()
                         if inPostListing {
@@ -58,7 +79,9 @@ struct PostVideoView: View {
                         aspectRatio: nil,
                         muteVideo: muteAutoplayingVideo,
                         canPlay: canPlay,
-                        isSensitive: post.over18
+                        isSensitive: post.over18,
+                        playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+                        videoPlayerViewModel: videoPlayerViewModel
                     ) {
                         showFullScreenVideo()
                         if inPostListing {
@@ -125,21 +148,57 @@ struct PostVideoView: View {
     private func showFullScreenVideo() {
         switch post.postType {
         case .redditVideo(let videoUrlString, _):
-            fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post))
+            fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post, playbackTime: videoPlayerViewModel.currentTime))
         case .video(let videoUrlString, _):
-            fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post))
+            fullScreenMediaViewModel.show(.video(urlString: videoUrlString, post: post, playbackTime: videoPlayerViewModel.currentTime))
         case .gallery:
             if let items = post.galleryData?.items, let firstGalleryItem = items.first {
                 fullScreenMediaViewModel.show(.gallery(currentUrlString: firstGalleryItem.urlString, post: post, items: items, galleryScrollState: GalleryScrollState(scrollId: 0)))
             }
         case .imgurVideo(let urlString):
-            fullScreenMediaViewModel.show(.video(urlString: urlString, videoType: .direct))
+            fullScreenMediaViewModel.show(.video(urlString: urlString, videoType: .direct, playbackTime: videoPlayerViewModel.currentTime))
         case .redgifs(let redgifsId):
-            fullScreenMediaViewModel.show(.video(urlString: post.url, videoType: .redgifs(id: redgifsId)))
+            fullScreenMediaViewModel.show(.video(urlString: post.url, videoType: .redgifs(id: redgifsId), playbackTime: videoPlayerViewModel.currentTime))
         case .streamable(let shortCode):
-            fullScreenMediaViewModel.show(.video(urlString: post.url, videoType: .streamable(shortCode: shortCode)))
+            fullScreenMediaViewModel.show(.video(urlString: post.url, videoType: .streamable(shortCode: shortCode), playbackTime: videoPlayerViewModel.currentTime))
         default:
             break
         }
+    }
+}
+
+struct PostVideoViewSelfContainedViewModel: View {
+    @StateObject private var videoPlayerViewModel: VideoPlayerViewModel
+    
+    let post: Post
+    let videoUrlString: String
+    let inPostListing: Bool
+    let playbackTimeToSeekToInitially: Double
+    let onReadPost: (() -> Void)?
+    
+    init(
+        post: Post,
+        videoUrlString: String,
+        inPostListing: Bool = false,
+        playbackTimeToSeekToInitially: Double = 0,
+        onReadPost: (() -> Void)? = nil
+    ) {
+        self.post = post
+        self.videoUrlString = videoUrlString
+        self.inPostListing = inPostListing
+        self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        self.onReadPost = onReadPost
+        self._videoPlayerViewModel = StateObject(wrappedValue: VideoPlayerViewModel())
+    }
+    
+    var body: some View {
+        PostVideoView(
+            post: post,
+            videoUrlString: videoUrlString,
+            inPostListing: inPostListing,
+            playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
+            videoPlayerViewModel: videoPlayerViewModel,
+            onReadPost: onReadPost
+        )
     }
 }

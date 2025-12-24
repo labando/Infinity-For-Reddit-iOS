@@ -50,6 +50,7 @@ struct GenericPickerPreference: View {
                     .primaryIcon()
             }
             .padding(16)
+            .limitedWidthListItem()
         }
     }
 }

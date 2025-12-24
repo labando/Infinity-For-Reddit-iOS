@@ -196,6 +196,16 @@ struct CrosspostTagViewModifier: ViewModifier {
     }
 }
 
+struct StickiedTagViewModifier: ViewModifier {
+    @EnvironmentObject var themeViewModel: CustomThemeViewModel
+    
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.stickiedPostIconTint))
+            .colorMultiply(Color(hex: themeViewModel.currentCustomTheme.stickiedPostIconTint))
+    }
+}
+
 struct FilledCardBackgroundViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
@@ -307,5 +317,13 @@ struct SnackbarErrorViewModifier<P: Publisher>: ViewModifier where P.Output == E
                     snackbarManager.dismiss()
                 }
             }
+    }
+}
+
+struct LimitedWidthListItemViewModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: 500)
+            .frame(maxWidth: .infinity, alignment: .center)
     }
 }

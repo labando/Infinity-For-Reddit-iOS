@@ -56,5 +56,6 @@ struct TogglePreference: View {
             .contentShape(Rectangle())
             .padding(.horizontal, 16)
         }
+        .limitedWidthListItem()
     }
 }

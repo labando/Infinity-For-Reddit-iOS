@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ImgurFullScreenView: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject private var namespaceManager: NamespaceManager
     
     @StateObject private var imgurFullScreenViewModel: ImgurFullScreenViewModel
     @StateObject private var tabViewDismissalViewModel: TabViewDismissalViewModel
@@ -79,6 +78,8 @@ struct ImgurFullScreenView: View {
                             }
                         }
                     }
+                    .edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea()
                     .tabViewStyle(.page(indexDisplayMode: .never))
                 }
             } else {
@@ -155,6 +156,7 @@ struct ImgurImageView: View {
     @State private var hasStartedDragging: Bool = false
     @State private var isAnimatingBack: Bool = false
     @State private var isToolbarVisible: Bool = true
+    @State private var dismissStarted: Bool = false
     
     let imgurMediaItem: ImgurMediaItem
     let imgurMedia: ImgurMedia
@@ -164,63 +166,37 @@ struct ImgurImageView: View {
     
     var body: some View {
         ZStack {
-            ZoomableScrollView(
-                content: {
-                    CustomWebImage(
-                        imgurMediaItem.link,
-                        handleImageTapGesture: false
-                    )
-                    .offset(y: currentDragOffset)
+            CustomWebImage(
+                imgurMediaItem.link,
+                handleImageTapGesture: false
+            )
+            .tabItemMediaGesture(
+                onDragEnded: { transform in
+                    if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
+                        return true
+                    }
+                    return false
                 },
-                onSingleTap: {
+                onStartDismiss: {
+                    dismissStarted = true
+                    withAnimation {
+                        isToolbarVisible = false
+                    }
+                },
+                onDismiss: onDismiss
+            )
+            .onTapGesture {
+                if !dismissStarted {
                     withAnimation {
                         isToolbarVisible.toggle()
                     }
-                },
-                currentZoomScale: $currentImageZoom
-            )
-            .simultaneousGesture(
-                DragGesture()
-                    .updating($dragOffset) { value, state, _ in
-                        // Only allow vertical drag to trigger dismiss
-                        if !hasStartedDragging && abs(value.translation.width) < 4 && currentImageZoom == 1.0 {
-                            hasStartedDragging = true
-                        }
-                        if hasStartedDragging {
-                            state = value.translation
-                        }
-                    }
-                    .onChanged { value in
-                        // Adjust the scale based on the drag distance
-                        if hasStartedDragging {
-                            currentDragOffset = value.translation.height
-                        }
-                    }
-                    .onEnded { value in
-                        if hasStartedDragging && abs(value.translation.height) > 100 {
-                            withAnimation(.linear(duration: 0.25)) {
-                                if value.translation.height < 0 {
-                                    // Dragged up
-                                    currentDragOffset = -UIScreen.main.bounds.height
-                                } else {
-                                    // Dragged down
-                                    currentDragOffset = UIScreen.main.bounds.height
-                                }
-                            } completion: {
-                                onDismiss()
-                            }
-                        } else {
-                            withAnimation {
-                                currentDragOffset = 0.0
-                            }
-                        }
-                        hasStartedDragging = false
-                    }
-            )
+                }
+            }
             
             ImgurImageToolbar(
                 downloadMediaType: imgurMediaItem.toDownloadMediaType(post: post),
                 isVisible: $isToolbarVisible,
+                imgurMediaItem: imgurMediaItem,
                 imgurMedia: imgurMedia,
                 post: post,
                 hasDescription: !imgurMediaItem.title.isEmpty || !imgurMediaItem.description.isEmpty,
@@ -236,6 +212,7 @@ struct ImgurImageToolbar: View {
     
     @Binding var isVisible: Bool
     
+    let imgurMediaItem: ImgurMediaItem
     let imgurMedia: ImgurMedia
     let post: Post?
     let hasDescription: Bool
@@ -246,6 +223,7 @@ struct ImgurImageToolbar: View {
     
     init(downloadMediaType: DownloadMediaType,
          isVisible: Binding<Bool>,
+         imgurMediaItem: ImgurMediaItem,
          imgurMedia: ImgurMedia,
          post: Post?,
          hasDescription: Bool,
@@ -256,6 +234,7 @@ struct ImgurImageToolbar: View {
             wrappedValue: FullScreenMediaToolbarViewModel(downloadMediaType: downloadMediaType)
         )
         self._isVisible = isVisible
+        self.imgurMediaItem = imgurMediaItem
         self.imgurMedia = imgurMedia
         self.post = post
         self.hasDescription = hasDescription
@@ -289,7 +268,7 @@ struct ImgurImageToolbar: View {
             Spacer()
             
             if isVisible {
-                VStack {
+                VStack(spacing: 16) {
                     HStack {
                         Button {
                             fullScreenMediaToolbarViewModel.downloadMedia()
@@ -306,19 +285,21 @@ struct ImgurImageToolbar: View {
                                 )
                         }
                         
-                        Button {
-                            fullScreenMediaToolbarViewModel.shareImage()
-                        } label: {
-                            SwiftUI.Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: buttonSize))
-                                .padding(.horizontal, 10)
-                                .padding(.top, 12)
-                                .padding(.bottom, 14)
-                                .foregroundColor(Color.white)
-                                .background(
-                                    Circle()
-                                        .fill(Color(hex: "#2E2E2E"))
-                                )
+                        if imgurMediaItem.mediaType == .image {
+                            Button {
+                                fullScreenMediaToolbarViewModel.shareImage()
+                            } label: {
+                                SwiftUI.Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: buttonSize))
+                                    .padding(.horizontal, 10)
+                                    .padding(.top, 12)
+                                    .padding(.bottom, 14)
+                                    .foregroundColor(Color.white)
+                                    .background(
+                                        Circle()
+                                            .fill(Color(hex: "#2E2E2E"))
+                                    )
+                            }
                         }
                         
                         if hasDescription {
@@ -363,6 +344,7 @@ struct ImgurImageToolbar: View {
                         VStack {
                             Text("Downloading...")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
                                 .tint(.white)
@@ -378,9 +360,11 @@ struct ImgurImageToolbar: View {
                         HStack {
                             SwiftUI.Image(systemName: "checkmark.seal")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
                             
                             Text("Image downloaded")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -389,12 +373,30 @@ struct ImgurImageToolbar: View {
                                 .fill(Color(hex: "#6B6B6B", opacity: 0.5))
                         )
                         .opacity(fullScreenMediaToolbarViewModel.showFinishedDownloadMessage ? 1 : 0)
+                        
+                        HStack {
+                            SwiftUI.Image(systemName: "xmark.seal")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
+                            
+                            Text("Download failed: \(fullScreenMediaToolbarViewModel.error?.localizedDescription ?? "Unknown error")")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.error != nil ? 1 : 0)
                     }
 
                     ZStack {
                         VStack {
                             Text("Downloading all media...")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
                             
                             ProgressView(value: fullScreenMediaToolbarViewModel.downloadImgurAllMediaProgress)
                                 .tint(.white)
@@ -410,9 +412,11 @@ struct ImgurImageToolbar: View {
                         HStack {
                             SwiftUI.Image(systemName: "checkmark.seal")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
                             
                             Text("All media downloaded")
                                 .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -421,6 +425,23 @@ struct ImgurImageToolbar: View {
                                 .fill(Color(hex: "#6B6B6B", opacity: 0.5))
                         )
                         .opacity(fullScreenMediaToolbarViewModel.showFinishedDownloadAllMediaMessage ? 1 : 0)
+                        
+                        HStack {
+                            SwiftUI.Image(systemName: "xmark.seal")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
+                            
+                            Text("Some media couldn’t be downloaded.")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.hasErrorWhenDownloadAllMedia ? 1 : 0)
                     }
                 }
                 .padding(.horizontal, 32)

@@ -73,5 +73,6 @@ struct PreferenceEntryWithBackground: View {
         }
         .padding(.top, top ? 16 : 2)
         .padding(.horizontal, 16)
+        .limitedWidthListItem()
     }
 }

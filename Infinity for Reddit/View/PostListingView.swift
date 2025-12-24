@@ -30,7 +30,6 @@ struct PostListingView: View {
     @State private var showPostModerationSheet: Bool = false
     @State private var postForPostOptionsSheet: Post?
     @State private var showCopyContentOptionsSheet: Bool = false
-    @State private var showCopyContentSheet: Bool = false
     @State private var titleToBeCopied: String?
     @State private var markdownToBeCopied: String = ""
     @State private var plainTextToBeCopied: String = ""
@@ -168,6 +167,7 @@ struct PostListingView: View {
                                     await postListingViewModel.readPost(post: post, markPostsAsRead: markPostsAsRead, limitReadPosts: limitReadPosts, readPostsLimit: readPostsLimit)
                                 }
                             )
+                            .frame(maxWidth: .infinity, alignment: .center)
                             .id(ObjectIdentifier(post))
                             .listPlainItemNoInsets()
                             .onAppear {
@@ -211,12 +211,16 @@ struct PostListingView: View {
                                 .tint(Color(hex: customThemeViewModel.currentCustomTheme.downvoted))
                             }
                         }
+                        
                         if postListingViewModel.hasMorePages {
-                            ProgressIndicator()
-                                .task {
-                                    await postListingViewModel.loadPosts()
-                                }
-                                .listPlainItem()
+                            HStack {
+                                ProgressIndicator()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .listPlainItemNoInsets()
+                            .task {
+                                await postListingViewModel.loadPosts()
+                            } 
                         }
                     }
                     .scrollBounceBehavior(.basedOnSize)
@@ -438,18 +442,15 @@ struct PostListingView: View {
                 },
                 onCopyTitle: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(title: titleToBeCopied)
-                    showCopyContentSheet = true
                 },
                 onCopyEntireMarkdown: {
                     snackbarManager.showSnackbar(.info("Copied"))
                 },
                 onCopyMarkdown: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: markdownToBeCopied)
-                    showCopyContentSheet = true
                 },
                 onCopyPlainText: {
                     textToBeSelectedAndCopiedItem = TextToBeSelectedAndCopiedItem(content: plainTextToBeCopied)
-                    showCopyContentSheet = true
                 }
             )
         }

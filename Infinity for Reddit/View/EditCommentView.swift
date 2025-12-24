@@ -60,7 +60,7 @@ struct EditCommentView: View {
                                             )
                                         )
                                         .padding(16)
-                                        .themedPostCommentMarkdown()
+                                        .themedPostContentMarkdown()
                                         .markdownLinkHandler { url in
                                             navigationManager.openLink(url)
                                         }
@@ -74,7 +74,7 @@ struct EditCommentView: View {
                                             )
                                         )
                                         .padding(16)
-                                        .themedPostCommentMarkdown()
+                                        .themedPostContentMarkdown()
                                         .markdownLinkHandler { url in
                                             navigationManager.openLink(url)
                                         }

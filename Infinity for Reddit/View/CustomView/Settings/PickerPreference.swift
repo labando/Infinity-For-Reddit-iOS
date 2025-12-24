@@ -56,6 +56,7 @@ struct PickerPreference: View {
                     .primaryIcon()
             }
             .padding(16)
+            .limitedWidthListItem()
         }
     }
 }

@@ -34,10 +34,7 @@ class UploadedImage: ObservableObject {
         uploadTask = Task {
             self.isUploading = true
             do {
-                //let imageId = try await uploadImage()
-                try await Task.sleep(for: .seconds(3))
-                let imageId = Utils.randomString()
-                self.imageId = imageId
+                self.imageId = try await uploadImage()
                 self.isUploaded = true
                 self.isUploading = false
                 self.uploadError = nil

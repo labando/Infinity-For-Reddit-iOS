@@ -238,20 +238,22 @@ public class HistoryPostListingViewModel: ObservableObject {
         
         return posts.filter { post in
             return PostFilter.isPostAllowed(post: post, postFilter: postFilter)
+            && !(AccountViewModel.shared.account.isAnonymous() && hiddenPostIdsAnonymous.contains(post.id) && historyPostListingMetadata.historyPostListingType != .hidden)
         }.map {
             if !$0.selftext.isEmpty {
                 modifyPostBody($0)
                 $0.selftextProcessedMarkdown = MarkdownContent($0.selftext)
             }
             
-            if upvotedPostIdsAnonymous.contains($0.id) {
-                $0.likes = 1
+            if AccountViewModel.shared.account.isAnonymous() {
+                if upvotedPostIdsAnonymous.contains($0.id) {
+                    $0.likes = 1
+                } else if downvotedPostIdsAnonymous.contains($0.id) {
+                    $0.likes = -1
+                }
+                $0.hidden = hiddenPostIdsAnonymous.contains($0.id)
+                $0.saved = savedPostIdsAnonymous.contains($0.id)
             }
-            if downvotedPostIdsAnonymous.contains($0.id) {
-                $0.likes = -1
-            }
-            $0.hidden = hiddenPostIdsAnonymous.contains($0.id)
-            $0.saved = savedPostIdsAnonymous.contains($0.id)
             
             return $0
         }

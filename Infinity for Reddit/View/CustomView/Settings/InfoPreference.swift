@@ -33,5 +33,6 @@ struct InfoPreference: View {
             
             CustomDivider()
         }
+        .limitedWidthListItem()
     }
 }

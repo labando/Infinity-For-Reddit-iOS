@@ -11,17 +11,12 @@ import Combine
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var hasNewMessages: Bool = false
-    @Published var inboxNavigationTarget: InboxNavigationTarget?
     @Published var inboxCount: Int = 0
     
     private let homeRepository: HomeRepositoryProtocol
     @Published private var inboxCountPollingTask: Task<Void, Never>?
     private var hasFetchedInboxCount: Bool = false
     @Published private var lastInboxCountPollingTime: Int = 0
-    
-    struct InboxNavigationTarget: Equatable {
-        let viewMessage: Bool
-    }
     
     init(homeRepository: HomeRepositoryProtocol) {
         self.homeRepository = homeRepository
@@ -70,5 +65,16 @@ class HomeViewModel: ObservableObject {
     func stopInboxCountPolling() {
         inboxCountPollingTask?.cancel()
         inboxCountPollingTask = nil
+    }
+    
+    func readInbox(inboxFullname: String) {
+        Task {
+            do {
+                try await homeRepository.readInbox(inboxFullname: inboxFullname)
+            } catch {
+                // We don't care about the error
+                print("Error reading inbox: \(error)")
+            }
+        }
     }
 }

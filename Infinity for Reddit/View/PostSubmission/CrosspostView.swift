@@ -80,9 +80,9 @@ struct CrosspostView: View {
                                     $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
                                 }
                         } else if case .redditVideo(let videoUrlString, _) = crosspostViewModel.postToBeCrossposted.postType {
-                            PostVideoView(post: crosspostViewModel.postToBeCrossposted, videoUrlString: videoUrlString)
+                            PostVideoViewSelfContainedViewModel(post: crosspostViewModel.postToBeCrossposted, videoUrlString: videoUrlString)
                         } else if case .video(let videoUrlString, _) = crosspostViewModel.postToBeCrossposted.postType {
-                            PostVideoView(post: crosspostViewModel.postToBeCrossposted, videoUrlString: videoUrlString)
+                            PostVideoViewSelfContainedViewModel(post: crosspostViewModel.postToBeCrossposted, videoUrlString: videoUrlString)
                         } else if crosspostViewModel.postToBeCrossposted.postType.isMedia {
                             PostPreviewView(post: crosspostViewModel.postToBeCrossposted)
                         }
@@ -104,7 +104,7 @@ struct CrosspostView: View {
                                 .font(.system(size: 24))
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 16)
-                                .themedPostCommentMarkdown()
+                                .themedPostContentMarkdown()
                                 .markdownLinkHandler { url in
                                     navigationManager.openLink(url)
                                 }

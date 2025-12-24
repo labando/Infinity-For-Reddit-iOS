@@ -56,6 +56,7 @@ struct CustomTextField<FieldType: Hashable>: View {
         .foregroundStyle(customTextFieldScheme.getTextColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
         .keyboardType(keyboardType)
         .textInputAutocapitalization(autocapitalization)
+        .autocorrectionDisabled(true)
         .tint(customTextFieldScheme.getTintColor(currentCustomTheme: customThemeViewModel.currentCustomTheme))
         .applyIf(showBorder) {
             // TODO different border color for different focus state

@@ -60,51 +60,58 @@ struct PostView: View {
     }
 
     var body: some View {
-        switch postLayout {
-        case .card:
-            PostViewCard(
-                postViewModel: postViewModel,
-                isSubredditPostListing: isSubredditPostListing,
-                onPostTap: onPostTap,
-                onIconTap: onIconTap,
-                onSubredditTap: onSubredditTap,
-                onUserTap: onUserTap,
-                onUpvote: onUpvote,
-                onDownvote: onDownvote,
-                onCommentsTap: onCommentsTap,
-                onToggleSave: onToggleSave,
-                onPostTypeClicked: onPostTypeTap,
-                onSensitiveClicked: onSensitiveTap,
-                onOpenLink: openLink,
-                onShare: onShare,
-                onReadPost: onReadPost,
-                onLongPressPost: onLongPressPost
-            )
-        case .compact:
-            PostViewCompact(
-                postViewModel: postViewModel,
-                isSubredditPostListing: isSubredditPostListing,
-                onPostTap: onPostTap,
-                onIconTap: onIconTap,
-                onSubredditTap: onSubredditTap,
-                onUserTap: onUserTap,
-                onUpvote: onUpvote,
-                onDownvote: onDownvote,
-                onCommentsTap: onCommentsTap,
-                onToggleSave: onToggleSave,
-                onPostTypeClicked: onPostTypeTap,
-                onSensitiveClicked: onSensitiveTap,
-                onOpenLink: openLink,
-                onShare: onShare,
-                onReadPost: onReadPost
-            )
-            .onLongPressGesture {
-                onLongPressPost()
+        Group {
+            switch postLayout {
+            case .card:
+                PostViewCard(
+                    postViewModel: postViewModel,
+                    isSubredditPostListing: isSubredditPostListing,
+                    onPostTap: { videoPlaybackTime in
+                        onPostTap(videoPlaybackTime)
+                    },
+                    onIconTap: onIconTap,
+                    onSubredditTap: onSubredditTap,
+                    onUserTap: onUserTap,
+                    onUpvote: onUpvote,
+                    onDownvote: onDownvote,
+                    onCommentsTap: onCommentsTap,
+                    onToggleSave: onToggleSave,
+                    onPostTypeClicked: onPostTypeTap,
+                    onSensitiveClicked: onSensitiveTap,
+                    onOpenLink: openLink,
+                    onShare: onShare,
+                    onReadPost: onReadPost,
+                    onLongPressPost: onLongPressPost
+                )
+            case .compact:
+                PostViewCompact(
+                    postViewModel: postViewModel,
+                    isSubredditPostListing: isSubredditPostListing,
+                    onPostTap: {
+                        onPostTap(0)
+                    },
+                    onIconTap: onIconTap,
+                    onSubredditTap: onSubredditTap,
+                    onUserTap: onUserTap,
+                    onUpvote: onUpvote,
+                    onDownvote: onDownvote,
+                    onCommentsTap: onCommentsTap,
+                    onToggleSave: onToggleSave,
+                    onPostTypeClicked: onPostTypeTap,
+                    onSensitiveClicked: onSensitiveTap,
+                    onOpenLink: openLink,
+                    onShare: onShare,
+                    onReadPost: onReadPost
+                )
+                .onLongPressGesture {
+                    onLongPressPost()
+                }
             }
         }
+        .frame(maxWidth: 500)
     }
     
-    private func onPostTap() {
+    private func onPostTap(_ videoPlaybackTime: Double) {
         Task {
             await postViewModel.readPost(markPostsAsRead: markPostsAsRead, limitReadPosts: limitReadPosts, readPostsLimit: readPostsLimit)
         }
@@ -112,7 +119,8 @@ struct PostView: View {
         navigationManager.append(
             AppNavigation.postDetails(
                 postDetailsInput: .post(post),
-                isFromSubredditPostListing: isSubredditPostListing
+                isFromSubredditPostListing: isSubredditPostListing,
+                videoPlaybackTime: videoPlaybackTime
             )
         )
     }

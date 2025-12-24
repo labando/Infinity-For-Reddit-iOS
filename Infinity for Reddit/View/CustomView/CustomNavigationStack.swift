@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CustomNavigationStack<Content: View>: View {
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
     @EnvironmentObject var accountViewModel: AccountViewModel
     
     @ObservedObject private var navigationManager: NavigationManager
@@ -32,8 +34,8 @@ struct CustomNavigationStack<Content: View>: View {
                     case .login:
                         LoginView()
                             .environmentObject(navigationManager)
-                    case .postDetails(let postDetailsInput, let isFromSubredditPostListing):
-                        PostDetailsView(postDetailsInput: postDetailsInput, isFromSubredditPostListing: isFromSubredditPostListing)
+                    case .postDetails(let postDetailsInput, let isFromSubredditPostListing, let videoPlaybackTime):
+                        PostDetailsView(postDetailsInput: postDetailsInput, isFromSubredditPostListing: isFromSubredditPostListing, videoPlaybackTime: videoPlaybackTime)
                             .environmentObject(navigationManager)
                             .environmentObject(commentSubmissionShareableViewModel)
                             .environmentObject(postEditingShareableViewModel)
@@ -274,7 +276,6 @@ struct CustomNavigationStack<Content: View>: View {
                         InterfaceCommentSettingsView()
                     }
                 }
-                .environmentObject(navigationManager)
                 .navigationDestination(for: AboutSettingsViewNavigation.self) { destination in
                     switch destination {
                     case .acknowledgement:
@@ -288,19 +289,15 @@ struct CustomNavigationStack<Content: View>: View {
                         InterfaceFontFontPreviewSettingsView()
                     }
                 }
+                .environmentObject(navigationManager)
         }
         .themedNavigationBarBackButton()
         .onChange(of: navigationManager.path) { _, newValue in
             let newCount = newValue.count
-            if navigationManager.viewShouldHideRootTabLabels.count > newCount {
-                navigationManager.viewShouldHideRootTabLabels = Array(navigationManager.viewShouldHideRootTabLabels.prefix(newCount))
-            }
             if navigationManager.viewShouldHideNavigationBarOnScroll.count > newCount {
                 navigationManager.viewShouldHideNavigationBarOnScroll = Array(navigationManager.viewShouldHideNavigationBarOnScroll.prefix(newCount))
             }
         }
-        .toolbar(navigationManager.rootTabLabelVisibility, for: .tabBar)
-        .animation(.easeInOut(duration: 0.2), value: navigationManager.rootTabLabelVisibility)
         .introspect(.navigationStack, on: .iOS(.v16, .v17, .v18, .v26)) {
             // UINavigationController
             $0.hidesBarsOnSwipe = hideNavigationBarOnScrollDown && navigationManager.hideNavigationBarOnScrollDown

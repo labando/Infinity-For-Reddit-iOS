@@ -22,7 +22,7 @@ struct MarkdownViewModifier: ViewModifier {
                 FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
-                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.linkColor))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.primaryTextColor))
             }.code {
@@ -38,6 +38,26 @@ struct MarkdownViewModifier: ViewModifier {
                             Color(hex: themeViewModel.currentCustomTheme.primaryTextColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8)
                         )
                     )
+            }.table { configuration in
+                configuration.label
+                  .fixedSize(horizontal: false, vertical: true)
+                  .markdownTableBorderStyle(.init(color: Color(hex: themeViewModel.currentCustomTheme.dividerColor)))
+                  .markdownTableBackgroundStyle(
+                    .alternatingRows(.clear, Color(hex: themeViewModel.currentCustomTheme.primaryTextColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8))
+                  )
+                  .markdownMargin(top: 0, bottom: 16)
+            }.tableCell { configuration in
+                configuration.label
+                    .markdownTextStyle {
+                        if configuration.row == 0 {
+                            FontWeight(.semibold)
+                        }
+                        BackgroundColor(nil)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 13)
+                    .relativeLineSpacing(.em(0.25))
             })
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -57,7 +77,7 @@ struct PostContentMarkdownViewModifier: ViewModifier {
                 FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
-                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.linkColor))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.postContentColor))
             }.code {
@@ -73,6 +93,26 @@ struct PostContentMarkdownViewModifier: ViewModifier {
                             Color(hex: themeViewModel.currentCustomTheme.postContentColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8)
                         )
                     )
+            }.table { configuration in
+                configuration.label
+                  .fixedSize(horizontal: false, vertical: true)
+                  .markdownTableBorderStyle(.init(color: Color(hex: themeViewModel.currentCustomTheme.dividerColor)))
+                  .markdownTableBackgroundStyle(
+                    .alternatingRows(.clear, Color(hex: themeViewModel.currentCustomTheme.postContentColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8))
+                  )
+                  .markdownMargin(top: 0, bottom: 16)
+            }.tableCell { configuration in
+                configuration.label
+                    .markdownTextStyle {
+                        if configuration.row == 0 {
+                            FontWeight(.semibold)
+                        }
+                        BackgroundColor(nil)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 13)
+                    .relativeLineSpacing(.em(0.25))
             })
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -92,7 +132,7 @@ struct CommentMarkdownViewModifier: ViewModifier {
                 FontSize(fontSize.scaledContentFontSize(ContentFontScale(rawValue: contentFontScale)))
             }
             .markdownTheme(.gitHub.link {
-                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.colorAccent))
+                ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.linkColor))
             }.text {
                 ForegroundColor(Color(hex: themeViewModel.currentCustomTheme.commentColor))
             }.code {
@@ -108,6 +148,26 @@ struct CommentMarkdownViewModifier: ViewModifier {
                             Color(hex: themeViewModel.currentCustomTheme.commentColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.8)
                         )
                     )
+            }.table { configuration in
+                configuration.label
+                  .fixedSize(horizontal: false, vertical: true)
+                  .markdownTableBorderStyle(.init(color: Color(hex: themeViewModel.currentCustomTheme.dividerColor)))
+                  .markdownTableBackgroundStyle(
+                    .alternatingRows(.clear, Color(hex: themeViewModel.currentCustomTheme.commentColor).mix(with: Color(hex: themeViewModel.currentCustomTheme.backgroundColor), by: 0.9))
+                  )
+                  .markdownMargin(top: 0, bottom: 16)
+            }.tableCell { configuration in
+                configuration.label
+                    .markdownTextStyle {
+                        if configuration.row == 0 {
+                            FontWeight(.semibold)
+                        }
+                        BackgroundColor(nil)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 13)
+                    .relativeLineSpacing(.em(0.25))
             })
             .frame(maxWidth: .infinity, alignment: .leading)
     }
