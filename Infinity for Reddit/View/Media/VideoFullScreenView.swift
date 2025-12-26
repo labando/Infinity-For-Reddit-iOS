@@ -472,11 +472,13 @@ struct VideoController<Content: View>: View {
                     HStack(spacing: 0) {
                         Text(formatTime(currentTime))
                             .foregroundStyle(.white)
+                            .customFont()
                         
                         Spacer()
                         
                         Text(formatTime(duration))
                             .foregroundStyle(.white)
+                            .customFont()
                     }
                     .padding(.bottom, 32)
                     
