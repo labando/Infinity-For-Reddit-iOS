@@ -62,12 +62,4 @@ class Utils {
             forPasteboardType: UTType.plainText.identifier
         )
     }
-    
-    static func isIOS26() -> Bool {
-        if #available(iOS 26, *) {
-            return true
-        } else {
-            return false
-        }
-    }
 }

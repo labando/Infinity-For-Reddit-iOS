@@ -50,7 +50,7 @@ struct NavigationBarPrimaryTextViewModifier: ViewModifier {
     @EnvironmentObject var themeViewModel: CustomThemeViewModel
     
     func body(content: Content) -> some View {
-        if Utils.isIOS26() {
+        if #available(iOS 26, *) {
             content
                 .customFont()
                 .foregroundColor(

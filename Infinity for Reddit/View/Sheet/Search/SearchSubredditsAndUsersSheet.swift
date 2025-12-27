@@ -23,9 +23,14 @@ struct SearchSubredditsAndUsersSheet: View {
             }
         }
         .id(accountViewModel.account.username)
-        .applyIf(!Utils.isIOS26()) {
-            $0.addTitleToInlineNavigationBar(navigationBarTitle)
+        .applyIf(true) {
+            if #available(iOS 26, *) {
+                $0
+            } else {
+                $0.addTitleToInlineNavigationBar(navigationBarTitle)
+            }
         }
+
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
