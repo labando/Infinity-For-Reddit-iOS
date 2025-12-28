@@ -16,7 +16,9 @@ struct InboxListingView: View {
     
     @Binding private var hasReadAllMessages: Bool
     
-    init(messageWhere: MessageWhere, hasReadAllMessages: Binding<Bool>) {
+    let isPresented: Bool
+    
+    init(messageWhere: MessageWhere, hasReadAllMessages: Binding<Bool>, isPresented: Bool) {
         self._hasReadAllMessages = hasReadAllMessages
         _inboxListingViewModel = StateObject(
             wrappedValue: InboxListingViewModel(
@@ -24,6 +26,7 @@ struct InboxListingView: View {
                 inboxListingRepository: InboxListingRepository()
             )
         )
+        self.isPresented = isPresented
     }
     
     var body: some View {
@@ -77,22 +80,24 @@ struct InboxListingView: View {
         .task(id: inboxListingViewModel.loadInboxFlag) {
             await inboxListingViewModel.initialLoadInboxes()
         }
-        .onAppear {
-            if let key = navigationBarMenuKey {
-                navigationBarMenuManager.pop(key: key)
-            }
-            navigationBarMenuKey = navigationBarMenuManager.push([
-                NavigationBarMenuItem(title: "Refresh") {
-                    hasReadAllMessages = false
-                    inboxListingViewModel.refreshInboxes()
+        .onChange(of: isPresented, initial: true) { _, presented in
+            if presented {
+                if let key = navigationBarMenuKey {
+                    navigationBarMenuManager.pop(key: key)
                 }
-            ])
-        }
-        .onDisappear {
-            guard let navigationBarMenuKey else {
-                return
+
+                navigationBarMenuKey = navigationBarMenuManager.push([
+                    NavigationBarMenuItem(title: "Refresh") {
+                        hasReadAllMessages = false
+                        inboxListingViewModel.refreshInboxes()
+                    }
+                ])
+            } else {
+                if let key = navigationBarMenuKey {
+                    navigationBarMenuManager.pop(key: key)
+                    navigationBarMenuKey = nil
+                }
             }
-            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
     }
 }
