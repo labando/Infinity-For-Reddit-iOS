@@ -1,5 +1,5 @@
 {
-  "originHash" : "0a91b79e985a1db8fafeffaa0e84547cf242abf0ff7e2b34d3dd49b2090e66a2",
+  "originHash" : "18d78c566ba18f1f364c64fac656d44e7ae343afb1be4eadd7b0c073bcac21a1",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -92,12 +92,21 @@
       }
     },
     {
+      "identity" : "seekbar",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kim-minseong/SeekBar",
+      "state" : {
+        "branch" : "main",
+        "revision" : "aad83f51a597c4ca1fb8512f284cd8de016073fb"
+      }
+    },
+    {
       "identity" : "swift-cmark-reddit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Docile-Alligator/swift-cmark-reddit",
       "state" : {
         "branch" : "gfm",
-        "revision" : "d81feecc0fc21811b9bfce5da221871c6cd771bd"
+        "revision" : "4a16666f51ba20b5b5b96fb0afeb2207541ec082"
       }
     },
     {
@@ -124,7 +133,7 @@
       "location" : "https://github.com/Docile-Alligator/swift-markdown-ui.git",
       "state" : {
         "branch" : "main",
-        "revision" : "bcae4b3a8c9ba9b30d0801599add611c2b984c8a"
+        "revision" : "af0d7f31191cbd4450338364bc8b6f5b723b41b2"
       }
     },
     {

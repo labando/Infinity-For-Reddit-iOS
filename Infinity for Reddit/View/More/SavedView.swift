@@ -17,8 +17,10 @@ struct SavedView: View {
     var body: some View {
         RootView {
             VStack(spacing: 0) {
-                SegmentedPicker(selectedValue: $selectedOption, values: accountViewModel.account.isAnonymous() ? ["Posts"] : ["Posts", "Comments"])
-                    .padding(4)
+                if !accountViewModel.account.isAnonymous() {
+                    SegmentedPicker(selectedValue: $selectedOption, values: ["Posts", "Comments"])
+                        .padding(4)
+                }
                 
                 TabView(selection: $selectedOption) {
                     Group {
@@ -29,6 +31,7 @@ struct SavedView: View {
                                 ),
                                 handleToolbarMenu: false
                             )
+                            .tag(0)
                         } else {
                             PostListingView(
                                 postListingMetadata: PostListingMetadata(
@@ -40,22 +43,22 @@ struct SavedView: View {
                                 ),
                                 handleToolbarMenu: false
                             )
+                            .tag(0)
+                        }
+                        
+                        if !accountViewModel.account.isAnonymous() {
+                            CommentListingView(
+                                commentListingMetadata: CommentListingMetadata(
+                                    commentListingType:.userSaved,
+                                    pathComponents: ["username": "\(accountViewModel.account.username)"],
+                                    queries: nil
+                                )
+                            )
+                            .tag(1)
                         }
                     }
-                    .tag(0)
-                    
-                    if accountViewModel.account.isAnonymous() {
-                        CommentListingView(
-                            commentListingMetadata: CommentListingMetadata(
-                                commentListingType:.userSaved,
-                                pathComponents: ["username": "\(accountViewModel.account.username)"],
-                                queries: nil
-                            )
-                        )
-                        .tag(1)
-                    }
+                    .toolbar(.hidden, for: .tabBar)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
         .themedNavigationBar()

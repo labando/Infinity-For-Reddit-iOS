@@ -14,6 +14,9 @@
         }
       }
     },
+    "%lld" : {
+
+    },
     "%lld days" : {
 
     },
@@ -69,6 +72,12 @@
     "Clear All" : {
 
     },
+    "Click here to apply your comment filter somewhere. Leave it empty to apply everywhere." : {
+
+    },
+    "Click here to apply your post filter somewhere." : {
+
+    },
     "Click here to browse all comments" : {
 
     },
@@ -120,13 +129,13 @@
     "Delete" : {
 
     },
-    "Do you dare interact?" : {
-
-    },
     "Done" : {
 
     },
     "Download all media" : {
+
+    },
+    "Download failed: %@" : {
 
     },
     "Downloading all media..." : {
@@ -186,9 +195,6 @@
     "Large" : {
 
     },
-    "Lazy Mode Interval" : {
-
-    },
     "Link posts that do not have the following urls will be filtered out." : {
 
     },
@@ -196,9 +202,6 @@
 
     },
     "Load more comments" : {
-
-    },
-    "Loading more comments" : {
 
     },
     "Manage Subscription" : {
@@ -318,9 +321,6 @@
     "Restart the app to see the changes" : {
 
     },
-    "Ripple Demo" : {
-
-    },
     "Rules" : {
 
     },
@@ -366,13 +366,10 @@
     "Small" : {
 
     },
+    "Some media couldn’t be downloaded." : {
+
+    },
     "Spoiler" : {
-
-    },
-    "Start by applying your comment filter somewhere" : {
-
-    },
-    "Start by applying your post filter somewhere" : {
 
     },
     "Start by creating a comment filter" : {
@@ -405,7 +402,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Archived icon"
+            "value" : "Used for posts that are archived."
           }
         }
       }
@@ -415,7 +412,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Author Flair Color"
+            "value" : "Author Flair Text Color"
           }
         }
       }
@@ -425,7 +422,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Author flair in comments"
+            "value" : "Used for author flair in comments."
           }
         }
       }
@@ -445,47 +442,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of every page and navigation drawer"
-          }
-        }
-      }
-    },
-    "theme_item_bottom_app_bar_background_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bottom Navigation Bar Color"
-          }
-        }
-      }
-    },
-    "theme_item_bottom_app_bar_background_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Bottom navigation bar"
-          }
-        }
-      }
-    },
-    "theme_item_bottom_app_bar_icon_color" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bottom Navigation Bar Icon Color"
-          }
-        }
-      }
-    },
-    "theme_item_bottom_app_bar_icon_color_detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applied to: Icons in the bottom navigation bar"
+            "value" : "Used for all screens and sheets."
           }
         }
       }
@@ -505,7 +462,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Text on button"
+            "value" : "Used for text on buttons."
           }
         }
       }
@@ -525,7 +482,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Post background and message background"
+            "value" : "Used for cards."
           }
         }
       }
@@ -535,7 +492,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color Accent"
+            "value" : "Accent Color"
           }
         }
       }
@@ -545,7 +502,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Progress Bar and background of Floating Action Button, etc"
+            "value" : "Used for progress indicator, background of floating action buttons, list sections, sliders, etc."
           }
         }
       }
@@ -555,7 +512,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color Primary"
+            "value" : "Primary Color"
           }
         }
       }
@@ -565,7 +522,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Toolbar"
+            "value" : "Used for: navigation bar and filled buttons."
           }
         }
       }
@@ -575,7 +532,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Color Primary Light Theme"
+            "value" : "Primary Color in Light Theme"
           }
         }
       }
@@ -585,7 +542,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Button"
+            "value" : "Used for background of buttons."
           }
         }
       }
@@ -605,7 +562,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment background"
+            "value" : "Used for background of comments."
           }
         }
       }
@@ -615,7 +572,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Color"
+            "value" : "Comment Text Color"
           }
         }
       }
@@ -625,7 +582,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment"
+            "value" : "Used for comments."
           }
         }
       }
@@ -635,7 +592,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Icon and Info Color"
+            "value" : "Comment Icon and Info Text Color"
           }
         }
       }
@@ -645,7 +602,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Icons and score in comments"
+            "value" : "Used for icon and info text of comments."
           }
         }
       }
@@ -655,7 +612,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Vertical Bar Color 1"
+            "value" : "First-Level Comment Bar"
           }
         }
       }
@@ -665,7 +622,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment Vertical Bar (Level 1)"
+            "value" : "Used for the vertical bar of first-level child comments. Colors cycle for deeper replies."
           }
         }
       }
@@ -675,7 +632,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Vertical Bar Color 2"
+            "value" : "Second-Level Comment Bar"
           }
         }
       }
@@ -685,7 +642,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment Vertical Bar (Level 2)"
+            "value" : "Used for the vertical bar of second-level child comments. Colors cycle for deeper replies."
           }
         }
       }
@@ -695,7 +652,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Vertical Bar Color 3"
+            "value" : "Third-Level Comment Bar"
           }
         }
       }
@@ -705,7 +662,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment Vertical Bar (Level 3)"
+            "value" : "Used for the vertical bar of third-level child comments. Colors cycle for deeper replies."
           }
         }
       }
@@ -715,7 +672,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Vertical Bar Color 4"
+            "value" : "Fourth-Level Comment Bar"
           }
         }
       }
@@ -725,7 +682,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment Vertical Bar (Level 4)"
+            "value" : "Used for the vertical bar of fourth-level child comments. Colors cycle for deeper replies."
           }
         }
       }
@@ -735,7 +692,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Vertical Bar Color 5"
+            "value" : "Fifth-Level Comment Bar"
           }
         }
       }
@@ -745,7 +702,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment Vertical Bar (Level 5)"
+            "value" : "Used for the vertical bar of fifth-level child comments. Colors cycle for deeper replies."
           }
         }
       }
@@ -755,7 +712,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Vertical Bar Color 6"
+            "value" : "Sixth-Level Comment Bar"
           }
         }
       }
@@ -765,7 +722,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment Vertical Bar (Level 6)"
+            "value" : "Used for the vertical bar of sixth-level child comments. Colors cycle for deeper replies."
           }
         }
       }
@@ -775,7 +732,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comment Vertical Bar Color 7"
+            "value" : "Seventh-Level Comment Bar"
           }
         }
       }
@@ -785,7 +742,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment Vertical Bar (Level 7)"
+            "value" : "Used for the vertical bar of seventh-level child comments. Colors cycle for deeper replies."
           }
         }
       }
@@ -805,7 +762,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Crosspost icon"
+            "value" : "Used for posts that are crossposted."
           }
         }
       }
@@ -815,7 +772,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Current User"
+            "value" : "Current User Username"
           }
         }
       }
@@ -825,7 +782,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Current user in comments"
+            "value" : "Used for username of the current user in comments."
           }
         }
       }
@@ -845,7 +802,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Comment divider, dividers in pages for submitting posts, etc."
+            "value" : "Used for dividers."
           }
         }
       }
@@ -855,7 +812,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Downvoted Color"
+            "value" : "Downvoted Button & Score"
           }
         }
       }
@@ -865,7 +822,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Vote buttons and scores (downvoted)"
+            "value" : "Used for downvote button when a post or comment has been downvoted."
           }
         }
       }
@@ -885,7 +842,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Floating action button icon"
+            "value" : "Used for icon on floating action buttons."
           }
         }
       }
@@ -905,7 +862,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of a post in a filled card view, some edit text fields"
+            "value" : "Used for background of filled card views and some text fields."
           }
         }
       }
@@ -925,7 +882,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of the flair tag"
+            "value" : "Used for background in flairs displayed on posts."
           }
         }
       }
@@ -945,7 +902,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Text color of the flair tag"
+            "value" : "Used for text in flairs displayed on posts."
           }
         }
       }
@@ -965,7 +922,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of fully-collapsed comments"
+            "value" : "Used for background of fully-collapsed comments."
           }
         }
       }
@@ -1015,7 +972,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: URL"
+            "value" : "Used for URL."
           }
         }
       }
@@ -1035,7 +992,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Locked icon"
+            "value" : "Used for posts that are locked."
           }
         }
       }
@@ -1055,7 +1012,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of video or gallery icon on post preview"
+            "value" : "Used for background of media indicator on post preview."
           }
         }
       }
@@ -1075,7 +1032,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Video or gallery icon on post preview"
+            "value" : "Used for media indicator on post preview"
           }
         }
       }
@@ -1095,7 +1052,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Moderator in comments"
+            "value" : "Used for username of the moderator in comments."
           }
         }
       }
@@ -1115,7 +1072,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Placeholder indicating the type of post when there is no preview available"
+            "value" : "Used for placeholders showing the post type when no preview is available."
           }
         }
       }
@@ -1135,7 +1092,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Icon indicating the type of post when there is no preview available"
+            "value" : "Used for placeholders showing the post type when no preview is available."
           }
         }
       }
@@ -1155,7 +1112,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of the sensitive tag"
+            "value" : "Used for background of the sensitive tag on posts."
           }
         }
       }
@@ -1175,7 +1132,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Text color of the sensitive tag"
+            "value" : "Used for the sensitive tag on posts."
           }
         }
       }
@@ -1185,7 +1142,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Text Color of Picker Item"
+            "value" : "Picker Item Text Color"
           }
         }
       }
@@ -1195,7 +1152,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Picker Item"
+            "value" : "Used for unselected picker items."
           }
         }
       }
@@ -1205,7 +1162,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Background Color of Selected Picker Item"
+            "value" : "Selected Picker Item Background Color"
           }
         }
       }
@@ -1215,7 +1172,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Selected Picker Item"
+            "value" : "Used for background of the selected picker item"
           }
         }
       }
@@ -1225,7 +1182,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Text Color of Selected Picker Item"
+            "value" : "Selected Picker Item Text Color"
           }
         }
       }
@@ -1235,7 +1192,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Selected Picker Item"
+            "value" : "Used for the selected picker item."
           }
         }
       }
@@ -1255,7 +1212,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Post content"
+            "value" : "Used for the main text of posts."
           }
         }
       }
@@ -1275,7 +1232,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Icons, score and the number of comments in posts"
+            "value" : "Used for icons, score and info in posts."
           }
         }
       }
@@ -1295,7 +1252,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Post title"
+            "value" : "Used for post titles."
           }
         }
       }
@@ -1315,7 +1272,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of the post type (IMAGE, TEXT, VIDEO, GIF, LINK)"
+            "value" : "Used for background of post types."
           }
         }
       }
@@ -1335,7 +1292,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Text color of the post type (IMAGE, TEXT, VIDEO, GIF LINK)"
+            "value" : "Used for post types."
           }
         }
       }
@@ -1355,7 +1312,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Icons in the navigation drawer."
+            "value" : "Used for primary icons."
           }
         }
       }
@@ -1375,7 +1332,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Primary text"
+            "value" : "Used for primary text."
           }
         }
       }
@@ -1385,7 +1342,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Read Post Card View Background Color"
+            "value" : "Read Post Background Color"
           }
         }
       }
@@ -1395,7 +1352,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Read Post background"
+            "value" : "Used for background of read posts."
           }
         }
       }
@@ -1415,7 +1372,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Read Post Content"
+            "value" : "Used for the main text of read posts."
           }
         }
       }
@@ -1435,7 +1392,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of a read post in a filled card view"
+            "value" : "Used for background of read posts in the filled card view."
           }
         }
       }
@@ -1455,7 +1412,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Read Post Title"
+            "value" : "Used for title of read posts."
           }
         }
       }
@@ -1475,7 +1432,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of received private messages"
+            "value" : "Used for background of received private messages."
           }
         }
       }
@@ -1495,7 +1452,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Received Private Messages"
+            "value" : "Used for received private messages."
           }
         }
       }
@@ -1515,7 +1472,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Secondary text"
+            "value" : "Used for secondary text."
           }
         }
       }
@@ -1535,7 +1492,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: send private message icon"
+            "value" : "Used for the send private message icon."
           }
         }
       }
@@ -1555,7 +1512,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of sent private messages"
+            "value" : "Used for background of sent private messages."
           }
         }
       }
@@ -1575,7 +1532,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Sent Private Messages"
+            "value" : "Used for sent private messages."
           }
         }
       }
@@ -1585,7 +1542,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Single Comment Thread Background Color"
+            "value" : "Focused Comment Background"
           }
         }
       }
@@ -1595,7 +1552,67 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Single Comment"
+            "value" : "Used for background of focused comments."
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_action_text_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snackbar Action Text Color"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_action_text_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used for snackbar action color."
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_background_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snackbar Background Color"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_background_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used for background of snackbar."
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_text_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snackbar Text Color"
+          }
+        }
+      }
+    },
+    "theme_item_snackbar_text_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used for snackbar."
           }
         }
       }
@@ -1615,7 +1632,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Background of the spoiler tag"
+            "value" : "Used for background of the spoiler tag on posts."
           }
         }
       }
@@ -1635,7 +1652,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Text color in the spoiler tag"
+            "value" : "Used for the spoiler tag on posts."
           }
         }
       }
@@ -1655,7 +1672,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Stickied post icon"
+            "value" : "Used for the stickied post icon on posts."
           }
         }
       }
@@ -1675,7 +1692,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Submitter in comments"
+            "value" : "Used for username of the post submitter in comments."
           }
         }
       }
@@ -1695,7 +1712,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Subreddit name"
+            "value" : "Used for subreddit names."
           }
         }
       }
@@ -1705,7 +1722,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Subscribed"
+            "value" : "Subscribed Button"
           }
         }
       }
@@ -1715,7 +1732,67 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Unsubscribe button"
+            "value" : "Used for the subscribe button when a subreddit or user is already subscribed."
+          }
+        }
+      }
+    },
+    "theme_item_switch_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch Color"
+          }
+        }
+      }
+    },
+    "theme_item_switch_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used for switches."
+          }
+        }
+      }
+    },
+    "theme_item_tab_bar_background_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab Bar Background Color"
+          }
+        }
+      }
+    },
+    "theme_item_tab_bar_background_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used for tab bar."
+          }
+        }
+      }
+    },
+    "theme_item_tab_bar_text_and_icon_color" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unselected Tab Bar Item Color"
+          }
+        }
+      }
+    },
+    "theme_item_tab_bar_text_and_icon_color_detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used for text and icons of unselected tabs in the tab bar."
           }
         }
       }
@@ -1725,7 +1802,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toolbar Primary Text and Icon Color"
+            "value" : "Navigation Bar Text and Icon Color"
           }
         }
       }
@@ -1735,7 +1812,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Primary texts and icons in toolbars"
+            "value" : "Used for text and icons on navigation bars."
           }
         }
       }
@@ -1755,7 +1832,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Unread Message Background Color"
+            "value" : "Used for background of unread messages."
           }
         }
       }
@@ -1765,7 +1842,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unsubscribed"
+            "value" : "Unsubscribed Button"
           }
         }
       }
@@ -1775,7 +1852,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Subscribe button"
+            "value" : "Used for the subscribe button when a subreddit or user is not subscribed."
           }
         }
       }
@@ -1795,7 +1872,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Upvote ratio icon"
+            "value" : "Used for the upvote ratio icon on posts."
           }
         }
       }
@@ -1805,7 +1882,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Upvoted Color"
+            "value" : "Upvoted Button & Score"
           }
         }
       }
@@ -1815,7 +1892,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Vote buttons and scores (upvoted)"
+            "value" : "Used for upvote button when a post or comment has been upvoted."
           }
         }
       }
@@ -1835,7 +1912,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Username"
+            "value" : "Used for usernames."
           }
         }
       }
@@ -1845,7 +1922,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vote and Reply Unavailable Button Color"
+            "value" : "Disabled Vote & Reply Button Color"
           }
         }
       }
@@ -1855,7 +1932,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Applied to: Vote and reply buttons (Unavailable)"
+            "value" : "Used for vote and reply buttons when they are unavailable."
           }
         }
       }

@@ -105,7 +105,7 @@ struct PostViewCompact: View {
                     .onTapGesture {
                         onIconTap()
                     }
-                    
+
                     Text(hideSubredditAndUserPrefix ? postViewModel.post.subreddit : postViewModel.post.subredditNamePrefixed)
                         .subreddit()
                         .onTapGesture {

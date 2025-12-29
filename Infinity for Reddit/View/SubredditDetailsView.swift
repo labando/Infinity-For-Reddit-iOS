@@ -41,7 +41,7 @@ struct SubredditDetailsView: View {
                         VStack(spacing: 0) {
                             CustomWebImage(
                                 subredditDetailsViewModel.subredditData?.bannerUrl,
-                                width: UIScreen.main.bounds.width,
+                                width: proxy.size.width,
                                 height: 150,
                                 handleImageTapGesture: false,
                                 centerCrop: true,

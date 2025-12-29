@@ -10,6 +10,8 @@ import SwiftUI
 struct CustomListSection<Content: View>: View {
     @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
+    @State private var currentWidth: CGFloat = 0
+    
     let title: String
     let padding: CGFloat
     var content: Content
@@ -30,8 +32,18 @@ struct CustomListSection<Content: View>: View {
         } header: {
             Text(title)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                .padding(.horizontal, padding)
-                .background(Color(hex: customThemeViewModel.currentCustomTheme.backgroundColor))
+                .padding(.horizontal, max(0, (currentWidth - 500) / 2) + 16)
+                .background(
+                    GeometryReader { proxy in
+                        Color(hex: customThemeViewModel.currentCustomTheme.backgroundColor)
+                            .onAppear {
+                                currentWidth = proxy.size.width
+                            }
+                            .onChange(of: proxy.size) { _, newValue in
+                                currentWidth = newValue.width
+                            }
+                    }
+                )
                 .listSectionHeader()
         }
         .listPlainItemNoInsets()

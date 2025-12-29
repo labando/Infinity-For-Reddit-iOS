@@ -232,7 +232,12 @@ public class PostListingViewModel: ObservableObject {
             let postListing: PostListing
             switch postListingMetadata.postListingType.sortEmbeddingStyle {
             case .inPath:
-                var queries = ["t": sortType.time?.rawValue ?? "", "limit": "100", "after": self.after ?? ""]
+                var queries: [String: String]
+                if let time = sortType.time?.rawValue {
+                    queries = ["t": time, "limit": "100", "after": self.after ?? ""]
+                } else {
+                    queries = ["limit": "100", "after": self.after ?? ""]
+                }
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = sensitiveContent ? "1" : "0"
                 }
@@ -243,7 +248,12 @@ public class PostListingViewModel: ObservableObject {
                     params: postListingMetadata.params
                 )
             case .inQuery(let key):
-                var queries = [key: sortType.type.rawValue, "t": sortType.time?.rawValue ?? "", "limit": "100", "after": self.after ?? ""]
+                var queries: [String: String]
+                if let time = sortType.time?.rawValue {
+                    queries = [key: sortType.type.rawValue, "t": time, "limit": "100", "after": self.after ?? ""]
+                } else {
+                    queries = [key: sortType.type.rawValue, "limit": "100", "after": self.after ?? ""]
+                }
                 if postListingMetadata.postListingType.canQuerySensitiveInAPICall {
                     queries["include_over_18"] = sensitiveContent ? "1" : "0"
                 }
@@ -371,9 +381,26 @@ public class PostListingViewModel: ObservableObject {
             account: AccountViewModel.shared.account,
             postIds: posts.map { $0.id }
         )
+        let upvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? await historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+            postIds: posts.map { $0.id },
+            postHistoryType: .upvoted
+        ) : Set<String>()
+        let downvotedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? await historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+            postIds: posts.map { $0.id },
+            postHistoryType: .downvoted
+        ) : Set<String>()
+        let hiddenPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? await historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+            postIds: posts.map { $0.id },
+            postHistoryType: .hidden
+        ) : Set<String>()
+        let savedPostIdsAnonymous = AccountViewModel.shared.account.isAnonymous() ? await historyPostsRepository.getHistoryPostsIdsByIdsAnonymous(
+            postIds: posts.map { $0.id },
+            postHistoryType: .saved
+        ) : Set<String>()
         
         return posts.filter { post in
             return PostFilter.isPostAllowed(post: post, postFilter: postFilter)
+            && !(AccountViewModel.shared.account.isAnonymous() && hiddenPostIdsAnonymous.contains(post.id))
         }.map {
             if !$0.selftext.isEmpty {
                 modifyPostBody($0)
@@ -382,6 +409,14 @@ public class PostListingViewModel: ObservableObject {
             
             if readPostIds.contains($0.id) {
                 $0.isRead = true
+            }
+            if AccountViewModel.shared.account.isAnonymous() {
+                if upvotedPostIdsAnonymous.contains($0.id) {
+                    $0.likes = 1
+                } else if downvotedPostIdsAnonymous.contains($0.id) {
+                    $0.likes = -1
+                }
+                $0.saved = savedPostIdsAnonymous.contains($0.id)
             }
             
             return $0
@@ -427,10 +462,10 @@ public class PostListingViewModel: ObservableObject {
     
     func changeSortTypeKind(_ sortTypeKind: SortType.Kind) {
         if sortTypeKind != self.sortType.type {
-            self.sortType = self.sortType.with(type: sortTypeKind)
+            self.sortType = SortType(type: sortTypeKind)
             loadPostsTaskId = UUID()
             if SortTypeSettingsUserDefaultsUtils.saveSortType {
-                postListingMetadata.postListingType.saveSortType(sortType: SortType(type: sortTypeKind))
+                postListingMetadata.postListingType.saveSortType(sortType: self.sortType)
             }
         }
     }

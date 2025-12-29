@@ -12,7 +12,6 @@ import GRDB
 struct CommentFilterSettingsView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     
     @StateObject var commentFilterViewModel: CommentFilterViewModel
     @State private var selectedCommentFilter: CommentFilter?
@@ -77,6 +76,7 @@ struct CommentFilterSettingsView: View {
                             .tint(.red)
                         }
                         .listPlainItemNoInsets()
+                        .limitedWidthListItem()
                     }
                 }
                 .themedList()

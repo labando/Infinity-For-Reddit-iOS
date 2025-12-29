@@ -14,7 +14,6 @@ import Alamofire
 
 struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.dependencyManager) private var dependencyManager: Container
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var accountViewModel: AccountViewModel
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
@@ -45,8 +44,6 @@ struct HomeView: View {
     
     @State private var selectedTab: Tab = .home
     @State private var showProfile: Bool = false
-    
-    @Namespace private var animation
     
     init(fullScreenMediaViewModel: FullScreenMediaViewModel) {
         self.fullScreenMediaViewModel = fullScreenMediaViewModel
@@ -215,14 +212,6 @@ struct HomeView: View {
                 }
             }
             .themedTabView()
-            .onAppear {
-                let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-                let docsDir = dirPaths[0]
-                
-                print(docsDir)
-                
-                customThemeViewModel.setAppColorScheme(colorScheme)
-            }
             .id(accountViewModel.account.username)
             
             if let media = fullScreenMediaViewModel.media {
@@ -237,11 +226,13 @@ struct HomeView: View {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(currentUrlString)
-                } else if case let .video(urlString, post, videoType, canDownload) = media {
+                    .zIndex(1)
+                } else if case let .video(urlString, post, videoType, canDownload, playbackTime) = media {
                     VideoFullScreenView(
                         urlString: urlString,
                         post: post,
                         videoType: videoType,
+                        playbackTime: playbackTime,
                         videoFullScreenViewModel: videoFullScreenViewModel,
                         muteVideo: VideoUserDefaultsUtils.muteVideo || ((post?.over18 ?? false) && VideoUserDefaultsUtils.muteSensitiveVideo),
                         canDownload: canDownload
@@ -262,7 +253,6 @@ struct HomeView: View {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(imgurId)
-                    .zIndex(1)
                 } else if case let .imgurGallery(imgurId, post) = media {
                     ImgurFullScreenView(imgurMediaType: .imgurGallery(imgurId: imgurId), post: post) {
                         fullScreenMediaViewModel.dismiss()
@@ -276,6 +266,27 @@ struct HomeView: View {
                     .id(imgurId)
                     .zIndex(1)
                 }
+            }
+        }
+        .onAppear {
+            let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+            let docsDir = dirPaths[0]
+            
+            print(docsDir)
+            
+            customThemeViewModel.setAppColorScheme(colorScheme)
+            
+            if accountViewModel.pendingInboxTabAfterNotificationClicked {
+                selectedTab = .inbox
+                accountViewModel.pendingInboxTabAfterNotificationClicked = false
+            } else if let context = accountViewModel.pendingContextAfterNotificationClicked {
+                currentNavigationManager.openLink(context)
+                accountViewModel.pendingContextAfterNotificationClicked = nil
+            }
+            
+            if let inboxFullname = accountViewModel.pendingInboxFullname, !inboxFullname.isEmpty {
+                homeViewModel.readInbox(inboxFullname: inboxFullname)
+                accountViewModel.pendingInboxFullname = nil
             }
         }
         .task {
@@ -293,7 +304,6 @@ struct HomeView: View {
             
             homeViewModel.startInboxCountPolling(resetPollingTime: true)
         }
-        .environmentObject(NamespaceManager(animation))
         .appForegroundBackgroundListener(onAppEntersForeground: {
             if NotificationUserDefaultsUtils.enableNotification {
                 homeViewModel.startInboxCountPolling()
@@ -304,29 +314,52 @@ struct HomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: .inboxDeepLink)) { note in
             let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
             let viewMessage = (note.userInfo?[AppDeepLink.viewMessageKey] as? Bool) ?? false
+            let inboxFullname = note.userInfo?[AppDeepLink.fullnameKey] as? String
             
             Task {
                 if !accountName.isEmpty {
-                    await accountViewModel.switchToAccountIfNeeded(accountName)
-                }
-                
-                await MainActor.run {
-                    homeViewModel.inboxNavigationTarget = .init(viewMessage: viewMessage)
-                    selectedTab = .inbox
+                    await MainActor.run {
+                        accountViewModel.inboxNavigationTarget = .init(viewMessage: viewMessage)
+                    }
+                    
+                    if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
+                        await MainActor.run {
+                            selectedTab = .inbox
+                        }
+                        if let inboxFullname {
+                            homeViewModel.readInbox(inboxFullname: inboxFullname)
+                        }
+                    } else {
+                        await MainActor.run {
+                            accountViewModel.pendingInboxTabAfterNotificationClicked = true
+                            accountViewModel.pendingInboxFullname = inboxFullname
+                        }
+                    }
                 }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .contextDeepLink)) { note in
             let accountName = (note.userInfo?[AppDeepLink.accountNameKey] as? String) ?? ""
+            let inboxFullname = note.userInfo?[AppDeepLink.fullnameKey] as? String
             
             Task {
                 if !accountName.isEmpty {
-                    await accountViewModel.switchToAccountIfNeeded(accountName)
-                }
-                
-                if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
-                    await MainActor.run {
-                        currentNavigationManager.openLink(context)
+                    if !(await accountViewModel.switchToAccountIfNeeded(accountName)) {
+                        if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                            await MainActor.run {
+                                currentNavigationManager.openLink(context)
+                            }
+                            if let inboxFullname {
+                                homeViewModel.readInbox(inboxFullname: inboxFullname)
+                            }
+                        }
+                    } else {
+                        if let context = (note.userInfo?[AppDeepLink.contextKey] as? String) {
+                            await MainActor.run {
+                                accountViewModel.pendingContextAfterNotificationClicked = context
+                                accountViewModel.pendingInboxFullname = inboxFullname
+                            }
+                        }
                     }
                 }
             }

@@ -74,15 +74,15 @@ struct InboxView: View {
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        .onChange(of: homeViewModel.inboxNavigationTarget, initial: true) { _, _  in
+        .onChange(of: accountViewModel.inboxNavigationTarget, initial: true) { _, _  in
             applyPendingRouteIfAny()
         }
     }
     
     private func applyPendingRouteIfAny() {
-        if let route = homeViewModel.inboxNavigationTarget {
+        if let route = accountViewModel.inboxNavigationTarget {
             selectedOption = route.viewMessage ? 1 : 0
-            homeViewModel.inboxNavigationTarget = nil 
+            accountViewModel.inboxNavigationTarget = nil
         }
     }
 }

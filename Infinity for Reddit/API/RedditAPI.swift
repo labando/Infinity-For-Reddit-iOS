@@ -149,6 +149,7 @@ enum RedditAPI: URLRequestConvertible {
         var request = URLRequest(url: url)
         request.method = method
         request.headers = headers ?? HTTPHeaders()
+        request.headers["User-Agent"] = APIUtils.USER_AGENT
         
         //Setup URL encoded form data
         let formEncodedData = parameters?.map { key, value in

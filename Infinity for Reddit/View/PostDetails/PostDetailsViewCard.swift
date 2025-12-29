@@ -17,10 +17,10 @@ struct PostDetailsViewCard: View {
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     
     @StateObject var postViewModel: PostViewModel
-    @State var voteTask: Task<Void, Never>?
+    //@State var voteTask: Task<Void, Never>?
     @State var saveTask: Task<Void, Never>?
     
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = true
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.showPostAndCommentsInTwoColumnsInLandscapeKey, store: .interfacePostDetails) private var showPostAndCommentsInTwoColumnsInLandscape: Bool = true
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.hidePostTypeKey, store: .interfacePostDetails) private var hidePostType: Bool = false
@@ -33,8 +33,9 @@ struct PostDetailsViewCard: View {
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
 
     let isFromSubredditPostListing: Bool
-    let onUpvote: () async -> Void
-    let onDownvote: () async -> Void
+    let playbackTimeToSeekToInitially: Double
+    let onUpvote: () -> Void
+    let onDownvote: () -> Void
     let onToggleSave: () async -> Void
     let onSendComment: () -> Void
     let onLongPress: () -> Void
@@ -45,14 +46,16 @@ struct PostDetailsViewCard: View {
     init(
         post: Post,
         isFromSubredditPostListing: Bool,
-        onUpvote: @escaping () async -> Void,
-        onDownvote: @escaping () async -> Void,
+        playbackTimeToSeekToInitially: Double,
+        onUpvote: @escaping () -> Void,
+        onDownvote: @escaping () -> Void,
         onToggleSave: @escaping () async -> Void,
         onSendComment: @escaping () -> Void,
         onLongPress: @escaping () -> Void,
         onLongPressOnContent: @escaping () -> Void
     ) {
         self.isFromSubredditPostListing = isFromSubredditPostListing
+        self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         self.onUpvote = onUpvote
         self.onDownvote = onDownvote
         self.onToggleSave = onToggleSave
@@ -249,12 +252,12 @@ struct PostDetailsViewCard: View {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString)
+                PostVideoViewSelfContainedViewModel(post: postViewModel.post, videoUrlString: videoUrlString, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
             } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoView(post: postViewModel.post, videoUrlString: videoUrlString)
+                PostVideoViewSelfContainedViewModel(post: postViewModel.post, videoUrlString: videoUrlString, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
             } else if postViewModel.post.postType.isMedia {
                 Spacer()
                     .frame(height: 10)
@@ -285,7 +288,7 @@ struct PostDetailsViewCard: View {
                     )
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
-                    .themedPostCommentMarkdown()
+                    .themedPostContentMarkdown()
                     .markdownLinkHandler { url in
                         navigationManager.openLink(url)
                     }
@@ -300,10 +303,7 @@ struct PostDetailsViewCard: View {
             HStack(spacing: 0) {
                 HStack(spacing: 0) {
                     Button(action: {
-                        voteTask?.cancel()
-                        voteTask = Task {
-                            await onUpvote()
-                        }
+                        onUpvote()
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                             .postIconTemplateRendering()
@@ -318,10 +318,7 @@ struct PostDetailsViewCard: View {
                         .postInfo()
                     
                     Button(action: {
-                        voteTask?.cancel()
-                        voteTask = Task {
-                            await onDownvote()
-                        }
+                        onDownvote()
                     }) {
                         SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                             .postIconTemplateRendering()

@@ -9,7 +9,9 @@ import Foundation
 import AVFoundation
 
 class VideoPlayerViewModel: NSObject, ObservableObject {
-    let player: AVPlayer = .init()
+    lazy var player: AVPlayer = {
+        return AVPlayer()
+    }()
     @Published private var isLoading: Bool = false
     @Published private var isLoaded: Bool = false
     private var timer: Timer?
@@ -34,7 +36,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         self.canPlay = canPlay
     }
     
-    func loadAndPlay(url: URL, muteVideo: Bool) async {
+    func loadAndPlay(url: URL, muteVideo: Bool, playbackTimeToSeekToInitially: Double) async {
         guard !isLoaded, !isLoading else {
             return
         }
@@ -56,6 +58,9 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 self.isMuted = muteVideo
                 self.playbackSpeed = VideoUserDefaultsUtils.defaultPlaybackSpeed
                 self.play()
+                self.player.seek(
+                    to: CMTime(seconds: playbackTimeToSeekToInitially, preferredTimescale: 600)
+                )
                 
                 observeCurrentItem()
                 observeTime()
@@ -142,8 +147,16 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     func togglePlayPause() {
         if player.timeControlStatus == .playing {
             player.pause()
+            
+            Task {
+                await ScreenWakeManager.shared.videoDidPause(player)
+            }
         } else {
             player.play()
+            
+            Task {
+                await ScreenWakeManager.shared.videoDidPlay(player)
+            }
         }
     }
     
@@ -151,19 +164,35 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         if canPlay {
             player.play()
             player.rate = Float(playbackSpeed)
+            
+            Task {
+                await ScreenWakeManager.shared.videoDidPlay(player)
+            }
         }
     }
     
     func pause() {
         player.pause()
+        
+        Task {
+            await ScreenWakeManager.shared.videoDidPause(player)
+        }
     }
     
     func setCanPlay(_ value: Bool) {
         self.canPlay = value
         if value {
             player.play()
+            
+            Task {
+                await ScreenWakeManager.shared.videoDidPlay(player)
+            }
         } else {
             player.pause()
+            
+            Task {
+                await ScreenWakeManager.shared.videoDidPause(player)
+            }
         }
     }
     

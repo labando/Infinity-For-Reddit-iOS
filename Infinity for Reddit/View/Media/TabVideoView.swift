@@ -61,6 +61,7 @@ struct TabVideoView: View {
             urlString: urlString,
             post: nil,
             videoType: .direct,
+            playbackTime: 0,
             videoFullScreenViewModel: videoFullScreenViewModel,
             hasDescription: hasDescription,
             canPlay: isSelected,
@@ -109,6 +110,16 @@ struct TabVideoView: View {
         ) {
             onDismiss()
         }
+        .tabItemMediaGesture(
+            onDragEnded: { transform in
+                if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
+                    return true
+                }
+                return false
+            },
+            onStartDismiss: {},
+            onDismiss: onDismiss
+        )
         .onChange(of: isSelected) { _, newValue in
             videoFullScreenViewModel.setCanPlay(to: newValue)
             if newValue {

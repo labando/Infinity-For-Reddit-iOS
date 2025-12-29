@@ -32,12 +32,13 @@ struct CommentFilterUsageListingView: View {
                         SwiftUI.Image(systemName: "plus.circle")
                             .primaryIcon()
                         
-                        Text("Start by applying your comment filter somewhere")
-                            .primaryIcon()
+                        Text("Click here to apply your comment filter somewhere. Leave it empty to apply everywhere.")
+                            .primaryText()
                         
                         Spacer()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(32)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         showCommentFilterUsageSheet = true

@@ -7,22 +7,17 @@
 
 import SwiftUI
 import AVKit
+import SeekBar
 
 struct VideoFullScreenView<Content: View>: View {
-    @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
-    @EnvironmentObject var namespaceManager: NamespaceManager
-    
     @ObservedObject private var videoFullScreenViewModel: VideoFullScreenViewModel
-    
-    @State private var scale: CGFloat = 1.0
-    @GestureState private var dragOffset: CGSize = .zero
-    @State private var currentDragOffset = 0.0
-    @State private var hasStartedDragging: Bool = false
-    @State private var isAnimatingBack: Bool = false
+
+    @State private var dismissStarted: Bool = false
     
     let urlString: String
     let post: Post?
     let videoType: VideoType
+    let playbackTimeToSeekToInitially: Double
     let hasDescription: Bool
     // This is for wrapper view to control if the video can be played
     let canPlay: Bool
@@ -37,6 +32,7 @@ struct VideoFullScreenView<Content: View>: View {
         urlString: String,
         post: Post?,
         videoType: VideoType,
+        playbackTime: Double,
         videoFullScreenViewModel: VideoFullScreenViewModel,
         hasDescription: Bool = false,
         canPlay: Bool = true,
@@ -50,6 +46,7 @@ struct VideoFullScreenView<Content: View>: View {
         self.urlString = urlString
         self.post = post
         self.videoType = videoType
+        self.playbackTimeToSeekToInitially = playbackTime
         self.videoFullScreenViewModel = videoFullScreenViewModel
         self.hasDescription = hasDescription
         self.canPlay = canPlay
@@ -63,19 +60,28 @@ struct VideoFullScreenView<Content: View>: View {
     
     var body: some View {
         ZStack {
-            Color.black
-                .opacity(opacityForBackground())
-                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                .edgesIgnoringSafeArea(.all)
-                .ignoresSafeArea()
-            
             PlayerView(player: videoFullScreenViewModel.player)
-                .offset(y: currentDragOffset)
                 .onTapGesture {
-                    withAnimation {
-                        videoFullScreenViewModel.toggleController()
+                    if !dismissStarted {
+                        withAnimation {
+                            videoFullScreenViewModel.toggleController()
+                        }
                     }
                 }
+            
+            if let error = videoFullScreenViewModel.error {
+                HStack(spacing: 16) {
+                    SwiftUI.Image(systemName: "play.slash.fill")
+                        .foregroundColor(.white)
+                        .customFont(fontSize: .f24)
+                    
+                    Text(error.localizedDescription)
+                        .frame(alignment: .leading)
+                        .foregroundStyle(.white)
+                        .customFont(fontSize: .f17)
+                }
+                .padding(32)
+            }
             
             if videoFullScreenViewModel.isShowingController {
                 VideoController(
@@ -90,6 +96,7 @@ struct VideoFullScreenView<Content: View>: View {
                     downloadProgressTitle: videoFullScreenViewModel.downloadProgressTitle,
                     downloadProgress: videoFullScreenViewModel.downloadProgress,
                     showDownloadFinishedMessage: videoFullScreenViewModel.showDownloadFinishedMessage,
+                    downloadError: videoFullScreenViewModel.downloadError,
                     hasDescription: hasDescription,
                     canDownload: canDownload,
                     onTogglePlayPause: {
@@ -127,12 +134,39 @@ struct VideoFullScreenView<Content: View>: View {
                     }
                 )
                 .onTapGesture {
-                    withAnimation {
-                        videoFullScreenViewModel.toggleController()
+                    if !dismissStarted {
+                        withAnimation {
+                            videoFullScreenViewModel.toggleController()
+                        }
                     }
                 }
                 .zIndex(1)
             }
+        }
+        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
+        .applyIf(onDownloadAllMedia == nil) {
+            // Not in TabVideoView
+            $0.mediaGesture(
+                onDragEnded: { transform in
+                    if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
+                        return true
+                    }
+                    return false
+                },
+                onStartDismiss: {
+                    dismissStarted = true
+                    
+                    withAnimation {
+                        videoFullScreenViewModel.isShowingController = false
+                    }
+                },
+                onDismiss: {
+                    videoFullScreenViewModel.resetState()
+                    videoFullScreenViewModel.removeControllerTimer()
+                    onDismiss()
+                }
+            )
         }
         .appForegroundBackgroundListener(onAppEntersForeground: {
             videoFullScreenViewModel.play(respectUserPaused: true)
@@ -169,53 +203,8 @@ struct VideoFullScreenView<Content: View>: View {
             videoFullScreenViewModel.player.rate = Float(newValue)
         }
         .task {
-            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo)
+            await videoFullScreenViewModel.loadAndPlay(urlString: urlString, videoType: videoType, muteVideo: muteVideo, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
         }
-        .simultaneousGesture(
-            DragGesture()
-                .updating($dragOffset) { value, state, _ in
-                    // Only allow vertical drag to trigger dismiss
-                    if !hasStartedDragging && abs(value.translation.height) > abs(value.translation.width) {
-                        hasStartedDragging = true
-                    }
-                    if hasStartedDragging {
-                        state = value.translation
-                    }
-                }
-                .onChanged { value in
-                    // Adjust the scale based on the drag distance
-                    currentDragOffset = value.translation.height
-                }
-                .onEnded { value in
-                    if hasStartedDragging && abs(value.translation.height) > 100 {
-                        videoFullScreenViewModel.resetState()
-                        withAnimation(.linear(duration: 0.25)) {
-                            videoFullScreenViewModel.removeControllerTimer()
-                            videoFullScreenViewModel.isShowingController = false
-                            if value.translation.height < 0 {
-                                // Dragged up
-                                currentDragOffset = -UIScreen.main.bounds.height
-                            } else {
-                                // Dragged down
-                                currentDragOffset = UIScreen.main.bounds.height
-                            }
-                        } completion: {
-                            onDismiss()
-                        }
-                    } else {
-                        withAnimation {
-                            currentDragOffset = 0.0
-                        }
-                    }
-                    hasStartedDragging = false
-                }
-        )
-    }
-    
-    private func opacityForBackground() -> Double {
-        let maxOffset: CGFloat = 300
-        let offset = min(abs(currentDragOffset), maxOffset)
-        return Double(1 - (offset / maxOffset))
     }
 }
 
@@ -234,6 +223,7 @@ struct VideoController<Content: View>: View {
     let downloadProgressTitle: String
     let downloadProgress: Double
     let showDownloadFinishedMessage: Bool
+    let downloadError: Error?
     let hasDescription: Bool
     let canDownload: Bool
     let onTogglePlayPause: () -> Void
@@ -260,6 +250,7 @@ struct VideoController<Content: View>: View {
         downloadProgressTitle: String,
         downloadProgress: Double,
         showDownloadFinishedMessage: Bool,
+        downloadError: Error?,
         hasDescription: Bool,
         canDownload: Bool,
         onTogglePlayPause: @escaping () -> Void,
@@ -285,6 +276,7 @@ struct VideoController<Content: View>: View {
         self.downloadProgressTitle = downloadProgressTitle
         self.downloadProgress = downloadProgress
         self.showDownloadFinishedMessage = showDownloadFinishedMessage
+        self.downloadError = downloadError
         self.hasDescription = hasDescription
         self.canDownload = canDownload
         self.onTogglePlayPause = onTogglePlayPause
@@ -423,6 +415,7 @@ struct VideoController<Content: View>: View {
                     VStack {
                         Text(downloadProgressTitle)
                             .foregroundStyle(.white)
+                            .customFont(fontSize: .f17)
                         
                         ProgressView(value: downloadProgress)
                             .tint(.white)
@@ -438,9 +431,11 @@ struct VideoController<Content: View>: View {
                     HStack {
                         SwiftUI.Image(systemName: "checkmark.seal")
                             .foregroundStyle(.white)
+                            .customFont(fontSize: .f24)
                         
                         Text("Video downloaded")
                             .foregroundStyle(.white)
+                            .customFont(fontSize: .f17)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -449,6 +444,23 @@ struct VideoController<Content: View>: View {
                             .fill(Color(hex: "#6B6B6B", opacity: 0.5))
                     )
                     .opacity(showDownloadFinishedMessage ? 1 : 0)
+                    
+                    HStack {
+                        SwiftUI.Image(systemName: "xmark.seal")
+                            .foregroundStyle(.white)
+                            .customFont(fontSize: .f24)
+                        
+                        Text("Download failed: \(downloadError?.localizedDescription ?? "Unknown error")")
+                            .foregroundStyle(.white)
+                            .customFont(fontSize: .f17)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                    )
+                    .opacity(downloadError != nil ? 1 : 0)
                 }
                 
                 if let title {
@@ -456,18 +468,32 @@ struct VideoController<Content: View>: View {
                         .foregroundStyle(.white)
                 }
                 
-                HStack {
-                    Text(formatTime(currentTime))
-                        .foregroundStyle(.white)
+                ZStack(alignment: .bottom) {
+                    HStack(spacing: 0) {
+                        Text(formatTime(currentTime))
+                            .foregroundStyle(.white)
+                            .customFont()
+                        
+                        Spacer()
+                        
+                        Text(formatTime(duration))
+                            .foregroundStyle(.white)
+                            .customFont()
+                    }
+                    .padding(.bottom, 32)
                     
-                    Slider(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
-                        isSeekingProgress = isEditing
+                    SeekBar(value: $currentTime, in: 0...duration, onEditingChanged: { isEditing in
+                        withAnimation {
+                            isSeekingProgress = isEditing
+                        }
                         onResetControllerTimer()
                     })
-                    .padding(.horizontal, 16)
-                    
-                    Text(formatTime(duration))
-                        .foregroundStyle(.white)
+                    .seekBarDisplay(with: .trackOnly)
+                    .trackDimensions(
+                        trackHeight: isSeekingProgress ? 24 : 16,
+                        inactiveTrackCornerRadius: 24
+                    )
+                    .trackColors(activeTrackColor: .white, inactiveTrackColor: .gray)
                 }
             }
             .padding(.horizontal, 16)

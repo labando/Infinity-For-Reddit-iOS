@@ -7,4 +7,5 @@
 
 protocol HomeRepositoryProtocol {
     func fetchInboxCount() async throws -> Int
+    func readInbox(inboxFullname: String) async throws
 }

@@ -56,6 +56,7 @@ struct CustomizeCustomThemeView: View {
                             CustomDivider()
                         }
                         .listPlainItemNoInsets()
+                        .limitedWidthListItem()
                         
                         ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
                             if customizeCustomThemeViewModel.customThemeFieldsBoolType.contains(fieldName) {
@@ -63,11 +64,10 @@ struct CustomizeCustomThemeView: View {
                                     BooleanEntry(
                                         fieldName: fieldName,
                                         title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
-                                        // Notice we use the same string as the title
-                                        description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
                                         isEnabled: binding
                                     )
                                     .listPlainItemNoInsets()
+                                    .limitedWidthListItem()
                                 }
                             } else {
                                 if let colorBinding = getIntBinding(for: fieldName) {
@@ -78,6 +78,7 @@ struct CustomizeCustomThemeView: View {
                                         color: getWrappedBinding(for: colorBinding)
                                     )
                                     .listPlainItemNoInsets()
+                                    .limitedWidthListItem()
                                 }
                             }
                         }
@@ -95,7 +96,6 @@ struct CustomizeCustomThemeView: View {
                 if customizeCustomThemeViewModel.backingCustomTheme != nil {
                     Button(action: {
                         customizeCustomThemeViewModel.saveCustomTheme()
-                        dismiss()
                     }) {
                         SwiftUI.Image(systemName: "tray.and.arrow.down")
                             .navigationBarImage()
@@ -105,6 +105,11 @@ struct CustomizeCustomThemeView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Customize")
+        .onChange(of: customizeCustomThemeViewModel.savingSuccess) { _, newValue in
+            if newValue {
+                dismiss()
+            }
+        }
         .showErrorUsingSnackbar(customizeCustomThemeViewModel.$error)
         .task {
             await customizeCustomThemeViewModel.getAndSetCustomTheme()
@@ -156,24 +161,14 @@ struct CustomizeCustomThemeView: View {
     private struct BooleanEntry: View {
         let fieldName: String
         let title: String
-        let description: String
         let isEnabled: Binding<Bool>
         
         var body: some View {
             VStack(spacing: 0) {
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(title)
-                            .primaryText()
-                        
-                        Spacer()
-                            .frame(height: 8)
-                        
-                        Text(description)
-                            .font(.system(size: 14))
-                            .secondaryText()
-                    }
-                    .padding(16)
+                HStack(alignment: .center, spacing: 0) {
+                    Text(title)
+                        .primaryText()
+                        .padding(16)
                     
                     Spacer()
                     
@@ -219,6 +214,8 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.colorPrimary
         case "colorAccent":
             return $customizeCustomThemeViewModel.customTheme.colorAccent
+        case "colorPrimaryLightTheme":
+            return $customizeCustomThemeViewModel.customTheme.colorPrimaryLightTheme
         case "primaryTextColor":
             return $customizeCustomThemeViewModel.customTheme.primaryTextColor
         case "secondaryTextColor":
@@ -241,6 +238,8 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.receivedMessageTextColor
         case "sentMessageTextColor":
             return $customizeCustomThemeViewModel.customTheme.sentMessageTextColor
+        case "switchColor":
+            return $customizeCustomThemeViewModel.customTheme.switchColor
         case "backgroundColor":
             return $customizeCustomThemeViewModel.customTheme.backgroundColor
         case "cardViewBackgroundColor":
@@ -259,12 +258,18 @@ struct CustomizeCustomThemeView: View {
             return $customizeCustomThemeViewModel.customTheme.receivedMessageBackgroundColor
         case "sentMessageBackgroundColor":
             return $customizeCustomThemeViewModel.customTheme.sentMessageBackgroundColor
-        case "bottomAppBarBackgroundColor":
-            return $customizeCustomThemeViewModel.customTheme.bottomAppBarBackgroundColor
+        case "tabBarBackgroundColor":
+            return $customizeCustomThemeViewModel.customTheme.tabBarBackgroundColor
+        case "snackbarTextColor":
+            return $customizeCustomThemeViewModel.customTheme.snackbarTextColor
+        case "snackbarActionTextColor":
+            return $customizeCustomThemeViewModel.customTheme.snackbarActionTextColor
+        case "snackbarBackgroundColor":
+            return $customizeCustomThemeViewModel.customTheme.snackbarBackgroundColor
         case "primaryIconColor":
             return $customizeCustomThemeViewModel.customTheme.primaryIconColor
-        case "bottomAppBarIconColor":
-            return $customizeCustomThemeViewModel.customTheme.bottomAppBarIconColor
+        case "tabBarTextAndIconColor":
+            return $customizeCustomThemeViewModel.customTheme.tabBarTextAndIconColor
         case "postIconAndInfoColor":
             return $customizeCustomThemeViewModel.customTheme.postIconAndInfoColor
         case "commentIconAndInfoColor":

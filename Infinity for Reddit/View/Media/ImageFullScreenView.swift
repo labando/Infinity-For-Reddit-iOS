@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 
 struct ImageFullScreenView: View {
     @State private var isToolbarVisible: Bool = true
+    @State private var dismissStarted: Bool = false
     
     let urlString: String
     let fileName: String
@@ -33,18 +34,25 @@ struct ImageFullScreenView: View {
                 matchedGeometryEffectId: matchedGeometryEffectId
             )
             .mediaGesture(
-                outOfBoundsColor: .black,
                 onDragEnded: { transform in
                     if transform.scaleX == 1 && transform.scaleY == 1 && abs(transform.ty) > 100 {
                         return true
                     }
                     return false
                 },
+                onStartDismiss: {
+                    dismissStarted = true
+                    withAnimation {
+                        isToolbarVisible = false
+                    }
+                },
                 onDismiss: onDismiss
             )
             .onTapGesture {
-                withAnimation {
-                    isToolbarVisible.toggle()
+                if !dismissStarted {
+                    withAnimation {
+                        isToolbarVisible.toggle()
+                    }
                 }
             }
             
@@ -113,7 +121,7 @@ struct ImageFullScreenToolbar: View {
             Spacer()
             
             if isVisible {
-                VStack(spacing: 0) {
+                VStack(spacing: 16) {
                     HStack(spacing: 8) {
                         Button {
                             fullScreenMediaToolbarViewModel.downloadMedia()
@@ -155,20 +163,57 @@ struct ImageFullScreenToolbar: View {
                     )
                     .contentShape(Capsule())
                     
-                    VStack {
-                        Text("Downloading...")
-                            .foregroundStyle(.white)
+                    ZStack {
+                        VStack {
+                            Text("Downloading...")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                            
+                            ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
+                                .tint(.white)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.downloadProgress == 0 ? 0 : 1)
                         
-                        ProgressView(value: fullScreenMediaToolbarViewModel.downloadProgress)
-                            .tint(.white)
+                        HStack {
+                            SwiftUI.Image(systemName: "checkmark.seal")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
+                            
+                            Text("Image downloaded")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.showFinishedDownloadMessage ? 1 : 0)
+                        
+                        HStack {
+                            SwiftUI.Image(systemName: "xmark.seal")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f24)
+                            
+                            Text("Download failed: \(fullScreenMediaToolbarViewModel.error?.localizedDescription ?? "Unknown error")")
+                                .foregroundStyle(.white)
+                                .customFont(fontSize: .f17)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
+                        .opacity(fullScreenMediaToolbarViewModel.error != nil ? 1 : 0)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: "#6B6B6B", opacity: 0.5))
-                    )
-                    .opacity(fullScreenMediaToolbarViewModel.downloadProgress == 0 ? 0 : 1)
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 32)

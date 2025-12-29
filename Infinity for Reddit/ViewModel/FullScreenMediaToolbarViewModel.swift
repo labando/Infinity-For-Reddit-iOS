@@ -16,6 +16,7 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
     @Published var showFinishedDownloadAllMediaMessage: Bool = false
     @Published var showFinishedDownloadMessage: Bool = false
     @Published var error: Error?
+    @Published var hasErrorWhenDownloadAllMedia: Bool = false
     
     private let downloadMediaType: DownloadMediaType
     private var downloadTask: Task<Void, Never>?
@@ -24,12 +25,12 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
     private var shareTask: Task<Void, Never>?
     
     enum FullScreenMediaToolbarError: LocalizedError {
-        case invalidURL
+        case invalidCacheURL
         
         var errorDescription: String? {
             switch self {
-            case .invalidURL:
-                return "Invalid URL."
+            case .invalidCacheURL:
+                return "Invalid cache URL."
             }
         }
     }
@@ -63,17 +64,14 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
         
         await MainActor.run {
             self.downloadProgress = 0
-            self.showFinishedDownloadMessage = true
+            self.showFinishedDownloadMessage = error == nil
         }
         
-        do {
-            try await Task.sleep(for: .seconds(1))
-        } catch {
-            // Ignore
-        }
+        try? await Task.sleep(for: .seconds(1))
         
         await MainActor.run {
             self.showFinishedDownloadMessage = false
+            self.error = nil
             self.downloadTask = nil
         }
     }
@@ -99,17 +97,14 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
                 
                 await MainActor.run {
                     self.downloadGalleryAllMediaProgress = 0
-                    self.showFinishedDownloadAllMediaMessage = true
+                    self.showFinishedDownloadAllMediaMessage = !hasErrorWhenDownloadAllMedia
                 }
                 
-                do {
-                    try await Task.sleep(for: .seconds(1))
-                } catch {
-                    // Ignore
-                }
+                try? await Task.sleep(for: .seconds(1))
                 
                 await MainActor.run {
                     self.showFinishedDownloadAllMediaMessage = false
+                    self.hasErrorWhenDownloadAllMedia = false
                     self.downloadGalleryAllMediaTask = nil
                 }
             }
@@ -137,17 +132,14 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
                 
                 await MainActor.run {
                     self.downloadImgurAllMediaProgress = 0
-                    self.showFinishedDownloadAllMediaMessage = true
+                    self.showFinishedDownloadAllMediaMessage = !hasErrorWhenDownloadAllMedia
                 }
                 
-                do {
-                    try await Task.sleep(for: .seconds(1))
-                } catch {
-                    // Ignore
-                }
+                try? await Task.sleep(for: .seconds(1))
                 
                 await MainActor.run {
                     self.showFinishedDownloadAllMediaMessage = false
+                    self.hasErrorWhenDownloadAllMedia = false
                     self.downloadImgurAllMediaTask = nil
                 }
             }
@@ -158,8 +150,9 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
         do {
             try await MediaDownloader.shared.download(downloadMediaType: downloadMediaType, onProgressWithTitle: { _, _ in })
         } catch {
+            print(error)
             await MainActor.run {
-                self.error = error
+                self.hasErrorWhenDownloadAllMedia = true
             }
         }
     }
@@ -179,11 +172,14 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
                 }
             } catch {
                 print(error.localizedDescription)
-                self.error = error
+                await MainActor.run {
+                    self.error = error
+                }
+                try? await Task.sleep(for: .seconds(1))
             }
             
             await MainActor.run {
-                self.downloadProgress = 0
+                self.error = nil
                 self.shareTask = nil
             }
         }
@@ -193,7 +189,7 @@ class FullScreenMediaToolbarViewModel: ObservableObject {
         let url = await downloadMediaType.getDownloadUrl()
         
         guard let url else {
-            throw FullScreenMediaToolbarError.invalidURL
+            throw FullScreenMediaToolbarError.invalidCacheURL
         }
         
         let urlString = url.absoluteString

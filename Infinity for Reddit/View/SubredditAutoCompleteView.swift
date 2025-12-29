@@ -97,6 +97,7 @@ struct SubredditAutoCompleteView: View {
                 .themedList()
             }
         }
+        .limitedWidthListItem()
         .onChange(of: query) { _, newValue in
             guard !AccountViewModel.shared.account.isAnonymous() else {
                 return

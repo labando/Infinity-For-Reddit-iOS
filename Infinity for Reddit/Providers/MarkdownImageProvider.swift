@@ -9,8 +9,6 @@ import MarkdownUI
 import SDWebImageSwiftUI
 import SwiftUI
 
-// MARK: - WebImageProvider
-
 struct MarkdownImageProvider: ImageProvider {
     let mediaMetadata: [String: MediaMetadata]?
     let markdownEmbeddedMediaType: MarkdownEmbeddedMediaType
@@ -112,7 +110,7 @@ struct MarkdownImageProvider: ImageProvider {
                     if markdownEmbeddedMediaType.allowVideo {
                         VStack {
                             if let url = URL(string: media.hlsUrl) {
-                                InlineVideoPlayer(
+                                InlineVideoPlayerWithSelfContainedViewModel(
                                     videoURL: url,
                                     aspectRatio: CGSize(width: media.x, height: media.y),
                                     muteVideo: VideoUserDefaultsUtils.muteAutoplayingVideo,

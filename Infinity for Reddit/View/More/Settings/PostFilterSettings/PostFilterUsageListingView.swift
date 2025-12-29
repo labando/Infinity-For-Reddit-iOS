@@ -34,12 +34,13 @@ struct PostFilterUsageListingView: View {
                         SwiftUI.Image(systemName: "plus.circle")
                             .primaryIcon()
                         
-                        Text("Start by applying your post filter somewhere")
-                            .primaryIcon()
+                        Text("Click here to apply your post filter somewhere.")
+                            .primaryText()
                         
                         Spacer()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(32)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         showPostFilterUsageSheet = true

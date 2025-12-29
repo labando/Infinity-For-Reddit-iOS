@@ -10,6 +10,8 @@ extension ImgurMediaItem {
         switch mediaType {
         case .image:
             return .image(downloadUrlString: link, fileName: "\(post == nil ? "Imgur-" : post!.fileNameWithoutExtension + "-")\(id ?? Utils.randomString()).\(Utils.getFileExtension(from: link) ?? "jpg")")
+        case .gif:
+            return .image(downloadUrlString: link, fileName: "\(post == nil ? "Imgur-" : post!.fileNameWithoutExtension + "-")\(id ?? Utils.randomString()).\(Utils.getFileExtension(from: link) ?? "gif")")
         case .video:
             return .video(downloadUrlString: link, fileName: "\(post == nil ? "Imgur-" : post!.fileNameWithoutExtension + "-")\(id ?? Utils.randomString()).\(Utils.getFileExtension(from: link) ?? "mp4")")
         }

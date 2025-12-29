@@ -49,6 +49,7 @@ struct BarebonePickerPreference<T: Hashable>: View {
                     .primaryIcon()
             }
             .padding(16)
+            .limitedWidthListItem()
         }
     }
 }

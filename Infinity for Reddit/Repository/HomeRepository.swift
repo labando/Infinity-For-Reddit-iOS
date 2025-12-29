@@ -59,4 +59,11 @@ class HomeRepository: HomeRepositoryProtocol {
         
         return json["data"]["inbox_count"].intValue
     }
+    
+    func readInbox(inboxFullname: String) async throws {
+        await self.session.request(RedditOAuthAPI.readMessage(params: ["id": inboxFullname]))
+            .validate()
+            .serializingData(automaticallyCancelling: true)
+            .response
+    }
 }
