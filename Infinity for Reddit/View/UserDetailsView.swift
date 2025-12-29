@@ -48,8 +48,13 @@ struct UserDetailsView: View {
                                 handleImageTapGesture: false,
                                 centerCrop: true,
                                 fallbackView: {
-                                    Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                        .frame(height: proxy.safeAreaInsets.top)
+                                    if #available(iOS 26, *) {
+                                        Color.clear
+                                            .frame(height: proxy.safeAreaInsets.top)
+                                    } else {
+                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                            .frame(height: proxy.safeAreaInsets.top)
+                                    }
                                 }
                             )
                             
@@ -178,22 +183,28 @@ struct UserDetailsView: View {
                     .animation(.easeInOut(duration: 0.2), value: tabBarVisibility)
                     .animation(.bouncy, value: navigationManager.rootTabLabelVisibility)
                 }
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(
-                                    colors: [
-                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary),
-                                        isUserInfoVisible ? .clear : Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                    ]
-                                ),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .frame(height: proxy.safeAreaInsets.top)
-                        .ignoresSafeArea()
+                .applyIf(true) {
+                    if #available(iOS 26, *) {
+                        $0
+                    } else {
+                        $0.overlay(alignment: .top) {
+                            Rectangle()
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(
+                                            colors: [
+                                                Color(hex: themeViewModel.currentCustomTheme.colorPrimary),
+                                                isUserInfoVisible ? .clear : Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                            ]
+                                        ),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .frame(height: proxy.safeAreaInsets.top)
+                                .ignoresSafeArea()
+                        }
+                    }
                 }
                 .edgesIgnoringSafeArea(.top)
             }
