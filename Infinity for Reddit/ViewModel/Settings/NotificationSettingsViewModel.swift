@@ -12,20 +12,20 @@ class NotificationSettingsViewModel {
     func enableNotification(enable: Bool) {
         if enable {
             print("Notifications enabled — scheduling background refresh.")
-            PullNotificationBackgroundTaskManager.shared.scheduleBackgroundTask()
+            PullNotificationBackgroundTaskManager.shared.registerAndScheduleBackgroundTaskIfNecessary()
         } else {
             print("Notifications disabled — cancelling background refresh.")
-            BGTaskScheduler.shared.cancelAllTaskRequests()
+            PullNotificationBackgroundTaskManager.shared.cancelBackgroundTask()
         }
         
         NotificationCenter.default.post(
             name: .notificationToggleChanged,
-            object: nil,
-            userInfo: ["enabled": enable]
+            object: nil
         )
     }
     
     func updateNotificationInterval() {
+        PullNotificationBackgroundTaskManager.shared.scheduleBackgroundTask()
         NotificationCenter.default.post(name: .notificationIntervalChanged, object: nil)
     }
 }

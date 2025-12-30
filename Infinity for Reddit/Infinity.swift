@@ -52,7 +52,7 @@ struct Infinity: App {
         }
         
         NotificationDelegate.shared.configure()
-        PullNotificationBackgroundTaskManager.shared.registerAndScheduleBackgroundTask()
+        PullNotificationBackgroundTaskManager.shared.registerAndScheduleBackgroundTaskIfNecessary()
 
         FontUtils.registerCustomFonts()
 

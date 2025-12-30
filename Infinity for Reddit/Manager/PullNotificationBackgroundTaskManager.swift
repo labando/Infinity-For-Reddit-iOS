@@ -24,33 +24,36 @@ class PullNotificationBackgroundTaskManager {
         }
         self.accountDao = AccountDao(dbPool: resolvedDatabasePool)
         self.inboxListingRepository = InboxListingRepository(sessionName: "plain")
-        
-        NotificationCenter.default.addObserver(
-            forName: .notificationIntervalChanged,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.scheduleBackgroundTask()
-        }
     }
     
-    func registerAndScheduleBackgroundTask() {
+    func registerAndScheduleBackgroundTaskIfNecessary() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: taskIdentifier, using: nil) { task in
+            self.scheduleBackgroundTask()
+            
             let pullNotificationTask = Task {
                 let success = await self.pullNotificationsForAllAccounts()
                 task.setTaskCompleted(success: success)
-                self.scheduleBackgroundTask()
             }
+            
             task.expirationHandler = {
                 print("Background Task: Task is expiring, attempting to cancel.")
                 pullNotificationTask.cancel()
+                task.setTaskCompleted(success: false)
             }
+        }
+        
+        guard NotificationUserDefaultsUtils.enableNotification else {
+            return
         }
         
         scheduleBackgroundTask()
     }
     
     func scheduleBackgroundTask() {
+        guard NotificationUserDefaultsUtils.enableNotification else {
+            return
+        }
+        
         let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
         let refreshInterval = NotificationUserDefaultsUtils.notificationInterval
         request.earliestBeginDate = Date(timeIntervalSinceNow: TimeInterval(refreshInterval * 60))
@@ -66,6 +69,10 @@ class PullNotificationBackgroundTaskManager {
                 print("Background Task Manager: Could not schedule app refresh task: \(error)")
             }
         }
+    }
+    
+    func cancelBackgroundTask() {
+        BGTaskScheduler.shared.cancelAllTaskRequests()
     }
     
     private func getAllAccounts() async -> [Account]? {
