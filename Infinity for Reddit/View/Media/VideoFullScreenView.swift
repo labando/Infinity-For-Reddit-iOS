@@ -486,7 +486,6 @@ struct VideoController<Content: View>: View {
                         withAnimation {
                             isSeekingProgress = isEditing
                         }
-                        onResetControllerTimer()
                     })
                     .seekBarDisplay(with: .trackOnly)
                     .trackDimensions(

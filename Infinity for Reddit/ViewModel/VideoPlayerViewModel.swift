@@ -26,7 +26,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     @Published var isPlaying = false
     @Published var currentTime: Double = 0
     @Published var duration: Double = 1
-    @Published var isDragging = false
+    @Published var isSeekingProgress = false
     @Published var hasAudio: Bool = false
     @Published var isMuted: Bool = false
     @Published var playbackSpeed: Double = 1
@@ -129,8 +129,10 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     
     private func observeTime() {
         timeObserverToken = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.5, preferredTimescale: 600), queue: .main) { [weak self] time in
-            guard let self = self else { return }
-            if !self.isDragging {
+            guard let self = self else {
+                return
+            }
+            if !self.isSeekingProgress {
                 self.currentTime = time.seconds
             }
         }
@@ -214,11 +216,11 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     func toggleControls() {
         showControls.toggle()
         if showControls {
-            resetControlsTimer()
+            resetControllerTimer()
         }
     }
     
-    func resetControlsTimer() {
+    func resetControllerTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
             DispatchQueue.main.async {

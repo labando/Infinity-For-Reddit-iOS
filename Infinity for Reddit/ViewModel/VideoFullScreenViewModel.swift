@@ -195,7 +195,9 @@ class VideoFullScreenViewModel: ObservableObject {
     
     private func observeTime() {
         timeObserverToken = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.5, preferredTimescale: 600), queue: .main) { [weak self] time in
-            guard let self = self else { return }
+            guard let self = self else {
+                return
+            }
             self.currentTime = time.seconds
         }
     }

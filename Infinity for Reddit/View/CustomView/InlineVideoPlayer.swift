@@ -188,23 +188,15 @@ private struct InlineVideoPlayerWithControls: View {
                         
                         SeekBar(value: $videoPlayerViewModel.currentTime, in: 0...videoPlayerViewModel.duration, onEditingChanged: { editing in
                             withAnimation {
-                                videoPlayerViewModel.isDragging = editing
-                            }
-                            if !editing {
-                                videoPlayerViewModel.seek(to: videoPlayerViewModel.currentTime)
+                                videoPlayerViewModel.isSeekingProgress = editing
                             }
                         })
                         .seekBarDisplay(with: .trackOnly)
                         .trackDimensions(
-                            trackHeight: videoPlayerViewModel.isDragging ? 24 : 16,
+                            trackHeight: videoPlayerViewModel.isSeekingProgress ? 24 : 16,
                             inactiveTrackCornerRadius: 24
                         )
                         .trackColors(activeTrackColor: .white, inactiveTrackColor: .gray)
-                        .onChange(of: videoPlayerViewModel.currentTime, initial: false) { _, _  in
-                            if videoPlayerViewModel.isDragging {
-                                videoPlayerViewModel.resetControlsTimer()
-                            }
-                        }
                     }
                     .padding(.bottom, 16)
                     .padding(.horizontal, 16)
@@ -214,7 +206,7 @@ private struct InlineVideoPlayerWithControls: View {
                     if videoPlayerViewModel.hasAudio {
                         Button(action: {
                             let isMuted = videoPlayerViewModel.toggleMute()
-                            videoPlayerViewModel.resetControlsTimer()
+                            videoPlayerViewModel.resetControllerTimer()
                             postListingVideoManager?.isMuted = isMuted
                         }) {
                             SwiftUI.Image(systemName: videoPlayerViewModel.isMuted ? "speaker.slash" : "speaker.wave.2")
@@ -230,7 +222,7 @@ private struct InlineVideoPlayerWithControls: View {
                     
                     Button(action: {
                         videoPlayerViewModel.togglePlayPause()
-                        videoPlayerViewModel.resetControlsTimer()
+                        videoPlayerViewModel.resetControllerTimer()
                     }) {
                         SwiftUI.Image(systemName: videoPlayerViewModel.isPlaying ? "pause.fill" : "play.fill")
                             .resizable()
@@ -286,6 +278,17 @@ private struct InlineVideoPlayerWithControls: View {
         })
         .onChange(of: canPlay) { _, newValue in
             videoPlayerViewModel.setCanPlay(newValue)
+        }
+        .onReceive(videoPlayerViewModel.$currentTime
+            .removeDuplicates()
+            .throttle(for: .milliseconds(500), scheduler: RunLoop.main, latest: true)
+        ) { newValue in
+            if videoPlayerViewModel.isSeekingProgress {
+                videoPlayerViewModel.resetControllerTimer()
+                videoPlayerViewModel.player.seek(
+                    to: CMTime(seconds: newValue, preferredTimescale: 600)
+                )
+            }
         }
     }
 
