@@ -24,7 +24,9 @@ struct SearchSubredditsAndUsersSheet: View {
         }
         .id(accountViewModel.account.username)
         .modify {
-            if #unavailable(iOS 26) {
+            if #available(iOS 26, *) {
+                $0
+            } else {
                 $0.addTitleToInlineNavigationBar(navigationBarTitle)
             }
         }

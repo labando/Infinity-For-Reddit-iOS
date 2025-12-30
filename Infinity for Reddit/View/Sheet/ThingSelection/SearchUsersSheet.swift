@@ -25,7 +25,9 @@ struct SearchUsersSheet: View {
         }
         .themedNavigationBar()
         .modify {
-            if #unavailable(iOS 26) {
+            if #available(iOS 26, *) {
+                $0
+            } else {
                 $0.addTitleToInlineNavigationBar("Search Users")
             }
         }
