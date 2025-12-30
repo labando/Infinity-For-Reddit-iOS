@@ -48,7 +48,7 @@ struct CommentAuthorView: View {
                     .foregroundColor(Color(hex: customThemeViewModel.currentCustomTheme.currentUser))
             }
             
-            Text("u/\(comment.author)")
+            Text("u/\(comment.author ?? "")")
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(textColor)
         }
