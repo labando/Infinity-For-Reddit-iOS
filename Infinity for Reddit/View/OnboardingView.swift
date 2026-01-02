@@ -23,37 +23,39 @@ struct OnboardingView: View {
             image: "sparkles"
         ),
         OnboardingPage(
-            title: "Anonymous ≠ Limited",
-            subtitle: "Save, vote, and revisit, even when logged out.",
+            title: "Browse without limits",
+            subtitle: "Subscribe, save, vote, and revisit, even when logged out.",
             image: "eye.slash.fill"
         )
     ]
     
     var body: some View {
-        GeometryReader { proxy in
-            VStack {
-                TabView(selection: $currentIndex) {
-                    ForEach(pages.indices, id: \.self) { index in
-                        OnboardingPageView(page: pages[index])
-                            .padding(16)
-                            .tag(index)
+        RootView {
+            GeometryReader { proxy in
+                VStack {
+                    TabView(selection: $currentIndex) {
+                        ForEach(pages.indices, id: \.self) { index in
+                            OnboardingPageView(page: pages[index])
+                                .padding(16)
+                                .tag(index)
+                        }
                     }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    
+                    PageIndicator(
+                        count: pages.count,
+                        currentIndex: currentIndex
+                    )
+                    
+                    Button(action: advance) {
+                        Text(currentIndex == pages.count - 1 ? "Get Started" : "Next")
+                            .frame(maxWidth: 500)
+                    }
+                    .filledButton()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, proxy.size.height > 1000 ? 120 : 16)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                
-                PageIndicator(
-                    count: pages.count,
-                    currentIndex: currentIndex
-                )
-                
-                Button(action: advance) {
-                    Text(currentIndex == pages.count - 1 ? "Get Started" : "Next")
-                        .frame(maxWidth: 500)
-                }
-                .filledButton()
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, proxy.size.height > 1000 ? 120 : 16)
             }
         }
         .animation(.default, value: currentIndex)
@@ -75,19 +77,23 @@ struct OnboardingView: View {
     }
     
     struct OnboardingPageView: View {
+        @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
+        
         let page: OnboardingPage
 
         var body: some View {
             VStack(spacing: 24) {
                 SwiftUI.Image(systemName: page.image)
-                    .font(.system(size: 56))
+                    .font(.system(size: 64))
 
                 Text(page.title)
-                    .font(.largeTitle.bold())
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundStyle(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor))
+                    .multilineTextAlignment(.center)
 
                 Text(page.subtitle)
                     .font(.body)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(hex: customThemeViewModel.currentCustomTheme.secondaryTextColor))
                     .multilineTextAlignment(.center)
             }
             .padding()
