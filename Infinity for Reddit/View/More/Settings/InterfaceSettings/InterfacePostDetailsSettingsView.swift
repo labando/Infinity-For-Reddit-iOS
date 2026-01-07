@@ -10,7 +10,7 @@ import GRDB
 import SwiftUI
 
 struct InterfacePostDetailsSettingsView: View {
-    @AppStorage(InterfacePostDetailsUserDefaultsUtils.showPostAndCommentsInTwoColumnsInLandscapeKey, store: .interfacePostDetails) private var showPostAndCommentsInTwoColumnsInLandscape: Bool = true
+    @AppStorage(InterfacePostDetailsUserDefaultsUtils.separatePostAndCommentsKey, store: .interfacePostDetails) private var separatePostAndComments: Bool = true
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.hidePostTypeKey, store: .interfacePostDetails) private var hidePostType: Bool = false
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.hidePostFlairKey, store: .interfacePostDetails) private var hidePostFlair: Bool = false
     @AppStorage(InterfacePostDetailsUserDefaultsUtils.hideUpvoteRatioKey, store: .interfacePostDetails) private var hideUpvoteRatio: Bool = false
@@ -22,8 +22,12 @@ struct InterfacePostDetailsSettingsView: View {
     var body: some View {
         RootView {
             List {
-                TogglePreference(isEnabled: $showPostAndCommentsInTwoColumnsInLandscape, title: "Show Post and Comments in Two Columns in Landscape Mode")
-                    .listPlainItemNoInsets()
+                TogglePreference(
+                    isEnabled: $separatePostAndComments,
+                    title: "Separate Post and Comments",
+                    subtitle: "When enabled, post and comments appear in separate columns if there’s enough space."
+                )
+                .listPlainItemNoInsets()
                 
                 TogglePreference(isEnabled: $hidePostType, title: "Hide Post Type")
                     .listPlainItemNoInsets()

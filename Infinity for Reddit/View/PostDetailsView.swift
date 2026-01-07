@@ -46,6 +46,8 @@ struct PostDetailsView: View {
     @State private var commentToBeModerated: Comment?
     @State private var voteTask: Task<Void, Never>?
     
+    @AppStorage(InterfacePostDetailsUserDefaultsUtils.separatePostAndCommentsKey, store: .interfacePostDetails)
+    private var separatePostAndComments: Bool = true
     @AppStorage(InterfaceCommentUserDefaultsUtils.fullyCollapseCommentKey, store: .interfaceComment)
     private var fullyCollapseComment: Bool = false
     @AppStorage(InterfaceCommentUserDefaultsUtils.showAuthorAvatarKey, store: .interfaceComment)
@@ -81,7 +83,7 @@ struct PostDetailsView: View {
                 GeometryReader { geometryProxy in
                     ZStack(alignment: .bottom) {
                         HStack(spacing: 0) {
-                            if geometryProxy.size.width > 500 {
+                            if geometryProxy.size.width > 500 && separatePostAndComments {
                                 List {
                                     PostDetailsItemView(
                                         postDetailsViewModel: postDetailsViewModel,
@@ -111,7 +113,7 @@ struct PostDetailsView: View {
                             
                             ScrollViewReader { proxy in
                                 List {
-                                    if geometryProxy.size.width <= 500 {
+                                    if geometryProxy.size.width <= 500 || !separatePostAndComments {
                                         PostDetailsItemView(
                                             postDetailsViewModel: postDetailsViewModel,
                                             post: post,

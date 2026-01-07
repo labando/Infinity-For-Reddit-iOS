@@ -8,9 +8,9 @@
 import Foundation
 
 class InterfacePostDetailsUserDefaultsUtils {
-    static let showPostAndCommentsInTwoColumnsInLandscapeKey = "show_post_and_comments_in_two_columns_in_landscape"
-    static var showPostAndCommentsInTwoColumnsInLandscape: Bool {
-        return UserDefaults.interfacePostDetails.bool(forKey: showPostAndCommentsInTwoColumnsInLandscapeKey, true)
+    static let separatePostAndCommentsKey = "separate_post_and_comments"
+    static var separatePostAndComments: Bool {
+        return UserDefaults.interfacePostDetails.bool(forKey: separatePostAndCommentsKey, true)
     }
     
     static let hidePostTypeKey = "hide_post_type"
