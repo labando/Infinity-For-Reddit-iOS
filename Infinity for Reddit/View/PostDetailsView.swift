@@ -436,7 +436,7 @@ struct PostDetailsView: View {
                             )
                             .padding(16)
                             .contentShape(RoundedRectangle(cornerRadius: 12))
-                            .transition(.move(edge: .bottom))
+                            .transition(.opacity)
                             .zIndex(2)
                         } else if showActionBar {
                             HStack(spacing: 0) {
@@ -490,7 +490,7 @@ struct PostDetailsView: View {
                             )
                             .padding(.bottom, 32)
                             .contentShape(Capsule())
-                            .transition(.move(edge: .bottom))
+                            .transition(.opacity)
                             .zIndex(1)
                         }
                     }
