@@ -239,6 +239,39 @@ struct CustomizePostFilterView: View {
                                     .padding(.leading, 16)
                                 }
                                 
+                                Text("Posts will be filtered out if they are not from the following subreddits")
+                                    .primaryText()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                HStack(spacing: 0) {
+                                    CustomTextField("E.g. funny,AskReddit",
+                                                    text: $customizePostFilterViewModel.containSubreddits,
+                                                    showBackground: false,
+                                                    fieldType: .containSubreddits,
+                                                    focusedField: $focusedField)
+                                        .lineLimit(1...5)
+                                        .id(FieldType.containSubreddits)
+                                    
+                                    Button(action: {
+                                        subredditSelectionPurpose = .containSubreddits
+                                    }) {
+                                        SwiftUI.Image(systemName: "plus.bubble")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .primaryIcon()
+                                            .frame(width: 28)
+                                    }
+                                    .padding(.leading, 16)
+                                }
+                            }
+                            .padding(16)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .limitedWidthListItem()
+                        
+                        FilledCardView {
+                            VStack(spacing: 16) {
                                 Text("Posts submitted by the following users will be filtered out.")
                                     .primaryText()
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -254,6 +287,31 @@ struct CustomizePostFilterView: View {
                                     
                                     Button(action: {
                                         userSelectionPurpose = .excludeUsers
+                                    }) {
+                                        SwiftUI.Image(systemName: "person.crop.circle.badge.plus")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .primaryIcon()
+                                            .frame(width: 28)
+                                    }
+                                    .padding(.leading, 16)
+                                }
+                                
+                                Text("Posts will be filtered out if they are not from the following users.")
+                                    .primaryText()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                HStack {
+                                    CustomTextField("E.g. Hostilenemy,random",
+                                                    text: $customizePostFilterViewModel.containUsers,
+                                                    showBackground: false,
+                                                    fieldType: .containUsers,
+                                                    focusedField: $focusedField)
+                                        .lineLimit(1...5)
+                                        .id(FieldType.containUsers)
+                                    
+                                    Button(action: {
+                                        userSelectionPurpose = .containUsers
                                     }) {
                                         SwiftUI.Image(systemName: "person.crop.circle.badge.plus")
                                             .resizable()
@@ -525,6 +583,8 @@ struct CustomizePostFilterView: View {
                 SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditMultiSelection(selectedSubreddits: nil, onConfirmSelection: { things in
                     if item == .excludeSubreddits {
                         addSubredditsToExcludeSubreddits(things)
+                    } else if item == .containSubreddits {
+                        addSubredditsToContainSubreddits(things)
                     }
                 }))
             }
@@ -534,6 +594,8 @@ struct CustomizePostFilterView: View {
                 SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .userMultiSelection(selectedUsers: nil, onConfirmSelection: { things in
                     if item == .excludeUsers {
                         addUsersToExcludeUsers(things)
+                    } else if item == .containUsers {
+                        addUsersToContainUsers(things)
                     }
                 }))
             }
@@ -563,6 +625,29 @@ struct CustomizePostFilterView: View {
         }
     }
     
+    private func addSubredditsToContainSubreddits(_ things: [Thing]) {
+        for thing in things {
+            switch thing {
+            case .subscribedSubreddit(let subscribedSubredditData):
+                addSubredditsToContainSubreddit(subscribedSubredditData.name)
+            case .subreddit(let subredditData):
+                addSubredditsToContainSubreddit(subredditData.name)
+            default:
+                break
+            }
+        }
+    }
+    
+    private func addSubredditsToContainSubreddit(_ subreddit: String) {
+        if customizePostFilterViewModel.containSubreddits.isEmpty {
+            customizePostFilterViewModel.containSubreddits = subreddit
+        } else if customizePostFilterViewModel.containSubreddits.last != "," {
+            customizePostFilterViewModel.containSubreddits += ",\(subreddit)"
+        } else {
+            customizePostFilterViewModel.containSubreddits += subreddit
+        }
+    }
+    
     private func addUsersToExcludeUsers(_ things: [Thing]) {
         for thing in things {
             switch thing {
@@ -586,8 +671,31 @@ struct CustomizePostFilterView: View {
         }
     }
     
+    private func addUsersToContainUsers(_ things: [Thing]) {
+        for thing in things {
+            switch thing {
+            case .subscribedUser(let subscribedUserData):
+                addUsersToContainUser(subscribedUserData.name)
+            case .user(let userData):
+                addUsersToContainUser(userData.name)
+            default:
+                break
+            }
+        }
+    }
+    
+    private func addUsersToContainUser(_ username: String) {
+        if customizePostFilterViewModel.containUsers.isEmpty {
+            customizePostFilterViewModel.containUsers = username
+        } else if customizePostFilterViewModel.containUsers.last != "," {
+            customizePostFilterViewModel.containUsers += ",\(username)"
+        } else {
+            customizePostFilterViewModel.containUsers += username
+        }
+    }
+    
     private enum FieldType: Hashable {
-        case postFilterName, excludeKeywords, containKeywords, titleExcludeRegex, titleContainRegex, excludeSubreddits, excludeUsers,
+        case postFilterName, excludeKeywords, containKeywords, titleExcludeRegex, titleContainRegex, excludeSubreddits, containSubreddits, excludeUsers, containUsers,
              excludeFlairs, containFlairs, excludeDomains, containDomains, minVotes, maxVotes, minComments, maxComments
     }
     

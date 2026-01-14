@@ -303,6 +303,12 @@
     "Posts will be filtered out if their title matches the following regular expression." : {
 
     },
+    "Posts will be filtered out if they are not from the following subreddits" : {
+
+    },
+    "Posts will be filtered out if they are not from the following users." : {
+
+    },
     "Posts will be filtered out if they contain the following keywords in their title" : {
 
     },
