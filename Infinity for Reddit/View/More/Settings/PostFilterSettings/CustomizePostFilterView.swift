@@ -578,6 +578,7 @@ struct CustomizePostFilterView: View {
             onApplyPostFilter?(customizePostFilterViewModel.getPostFilter())
             dismiss()
         }
+        .showErrorUsingSnackbar(customizePostFilterViewModel.$error)
         .sheet(item: $subredditSelectionPurpose) { item in
             NavigationStack {
                 SubredditAndUserMultiSelectionSheet(subscriptionSelectionMode: .subredditMultiSelection(selectedSubreddits: nil, onConfirmSelection: { things in

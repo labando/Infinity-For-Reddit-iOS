@@ -40,7 +40,9 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
     
     // Subreddit, User, Flair filters
     var excludeSubreddits: String?
+    var containSubreddits: String?
     var excludeUsers: String?
+    var containUsers: String?
     var containFlairs: String?
     var excludeFlairs: String?
     
@@ -80,7 +82,9 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
         postTitleExcludesStrings: String? = nil,
         postTitleContainsStrings: String? = nil,
         excludeSubreddits: String? = nil,
+        containSubreddits: String? = nil,
         excludeUsers: String? = nil,
+        containUsers: String? = nil,
         containFlairs: String? = nil,
         excludeFlairs: String? = nil,
         excludeDomains: String? = nil,
@@ -107,7 +111,9 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
         self.postTitleExcludesStrings = postTitleExcludesStrings
         self.postTitleContainsStrings = postTitleContainsStrings
         self.excludeSubreddits = excludeSubreddits
+        self.containSubreddits = containSubreddits
         self.excludeUsers = excludeUsers
+        self.containUsers = containUsers
         self.containFlairs = containFlairs
         self.excludeFlairs = excludeFlairs
         self.excludeDomains = excludeDomains
@@ -136,7 +142,9 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
         case postTitleExcludesStrings = "post_title_excludes_strings"
         case postTitleContainsStrings = "post_title_contains_strings"
         case excludeSubreddits = "exclude_subreddits"
+        case containSubreddits = "contain_subreddits"
         case excludeUsers = "exclude_users"
+        case containUsers = "contain_users"
         case containFlairs = "contain_flairs"
         case excludeFlairs = "exclude_flairs"
         case excludeDomains = "exclude_domains"
@@ -264,9 +272,21 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
                 return false
             }
         }
+        if let containSubreddits = postFilter.containSubreddits, !containSubreddits.isEmpty {
+            let subreddits = containSubreddits.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            if !subreddits.contains(where: { $0.localizedCaseInsensitiveCompare(post.subreddit) == .orderedSame }) {
+                return false
+            }
+        }
         if let excludeUsers = postFilter.excludeUsers, !excludeUsers.isEmpty {
             let users = excludeUsers.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             if users.contains(where: { $0.localizedCaseInsensitiveCompare(post.author) == .orderedSame }) {
+                return false
+            }
+        }
+        if let containUsers = postFilter.containUsers, !containUsers.isEmpty {
+            let users = containUsers.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            if !users.contains(where: { $0.localizedCaseInsensitiveCompare(post.author) == .orderedSame }) {
                 return false
             }
         }
@@ -308,6 +328,18 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
 
         var merged = PostFilter()
         merged.name = "Merged"
+        
+        func append(_ current: String?, _ addition: String?) -> String? {
+            guard let addition, !addition.isEmpty else {
+                return current
+            }
+            
+            if let current, !current.isEmpty {
+                return current + "," + addition
+            } else {
+                return addition
+            }
+        }
 
         for p in postFilters {
             merged.maxVote = min(p.maxVote, merged.maxVote)
@@ -328,22 +360,12 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
                 merged.postTitleContainsRegex = regex
             }
 
-            func append(_ current: String?, _ addition: String?) -> String? {
-                guard let addition, !addition.isEmpty else {
-                    return current
-                }
-                
-                if let current, !current.isEmpty {
-                    return current + "," + addition
-                } else {
-                    return addition
-                }
-            }
-
             merged.postTitleExcludesStrings = append(merged.postTitleExcludesStrings, p.postTitleExcludesStrings)
             merged.postTitleContainsStrings = append(merged.postTitleContainsStrings, p.postTitleContainsStrings)
             merged.excludeSubreddits = append(merged.excludeSubreddits, p.excludeSubreddits)
+            merged.containSubreddits = append(merged.containSubreddits, p.containSubreddits)
             merged.excludeUsers = append(merged.excludeUsers, p.excludeUsers)
+            merged.containUsers = append(merged.containUsers, p.containUsers)
             merged.containFlairs = append(merged.containFlairs, p.containFlairs)
             merged.excludeFlairs = append(merged.excludeFlairs, p.excludeFlairs)
             merged.excludeDomains = append(merged.excludeDomains, p.excludeDomains)

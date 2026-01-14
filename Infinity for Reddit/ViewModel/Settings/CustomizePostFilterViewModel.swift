@@ -53,7 +53,9 @@ public class CustomizePostFilterViewModel: ObservableObject {
          customizePostFilterRepository: CustomizePostFilterRepositoryProtocol
     ) {
         var excludeSubreddits = ""
+        var containSubreddits = ""
         var excludeUsers = ""
+        var containUsers = ""
         var excludeFlairs = ""
         var containFlairs = ""
         var excludeDomains = ""
@@ -75,7 +77,9 @@ public class CustomizePostFilterViewModel: ObservableObject {
             excludesRegex = postFilter.postTitleExcludesRegex ?? ""
             containsRegex = postFilter.postTitleContainsRegex ?? ""
             excludeSubreddits = postFilter.excludeSubreddits ?? ""
+            containSubreddits = postFilter.containSubreddits ?? ""
             excludeUsers = postFilter.excludeUsers ?? ""
+            containUsers = postFilter.containUsers ?? ""
             excludeFlairs = postFilter.excludeFlairs ?? ""
             containFlairs = postFilter.containFlairs ?? ""
             excludeDomains = postFilter.excludeDomains ?? ""
@@ -100,14 +104,20 @@ public class CustomizePostFilterViewModel: ObservableObject {
                         }
                         excludeSubreddits += postToBeAdded.subreddit
                     case .containSubreddit:
-                        break
+                        if !containSubreddits.isEmpty {
+                            containSubreddits += ","
+                        }
+                        containSubreddits += postToBeAdded.subreddit
                     case .excludeUser:
                         if !excludeUsers.isEmpty {
                             excludeUsers += ","
                         }
                         excludeUsers += postToBeAdded.author
                     case .containUser:
-                        break
+                        if !containUsers.isEmpty {
+                            containUsers += ","
+                        }
+                        containUsers += postToBeAdded.author
                     case .excludeFlair:
                         if !excludeFlairs.isEmpty {
                             excludeFlairs += ","
@@ -143,7 +153,10 @@ public class CustomizePostFilterViewModel: ObservableObject {
                         }
                         excludeSubreddits += subredditToBeAdded
                     case .containSubreddit:
-                        break
+                        if !containSubreddits.isEmpty {
+                            containSubreddits += ","
+                        }
+                        containSubreddits += subredditToBeAdded
                     default:
                         break
                     }
@@ -157,7 +170,10 @@ public class CustomizePostFilterViewModel: ObservableObject {
                         }
                         excludeUsers += userToBeAdded
                     case .containUser:
-                        break
+                        if !containUsers.isEmpty {
+                            containUsers += ","
+                        }
+                        containUsers += userToBeAdded
                     default:
                         break
                     }
@@ -166,7 +182,9 @@ public class CustomizePostFilterViewModel: ObservableObject {
         }
         
         self.excludeSubreddits = excludeSubreddits
+        self.containSubreddits = containSubreddits
         self.excludeUsers = excludeUsers
+        self.containUsers = containUsers
         self.excludeFlairs = excludeFlairs
         self.containFlairs = containFlairs
         self.excludeDomains = excludeDomains
@@ -190,7 +208,9 @@ public class CustomizePostFilterViewModel: ObservableObject {
                 postTitleExcludesStrings: excludesKeywords,
                 postTitleContainsStrings: containsKeywords,
                 excludeSubreddits: excludeSubreddits,
+                containSubreddits: containSubreddits,
                 excludeUsers: excludeUsers,
+                containUsers: containUsers,
                 containFlairs: containFlairs,
                 excludeFlairs: excludeFlairs,
                 excludeDomains: excludeDomains,
@@ -228,7 +248,9 @@ public class CustomizePostFilterViewModel: ObservableObject {
             postTitleExcludesStrings: excludesKeywords,
             postTitleContainsStrings: containsKeywords,
             excludeSubreddits: excludeSubreddits,
+            containSubreddits: containSubreddits,
             excludeUsers: excludeUsers,
+            containUsers: containUsers,
             containFlairs: containFlairs,
             excludeFlairs: excludeFlairs,
             excludeDomains: excludeDomains,
