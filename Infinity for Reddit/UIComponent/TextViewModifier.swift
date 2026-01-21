@@ -53,9 +53,6 @@ struct NavigationBarPrimaryTextViewModifier: ViewModifier {
         if #available(iOS 26, *) {
             content
                 .customFont()
-                .foregroundColor(
-                    Color(hex: themeViewModel.currentCustomTheme.primaryTextColor)
-                )
                 .navigationBarTitleDisplayMode(.inline)
         } else {
             content

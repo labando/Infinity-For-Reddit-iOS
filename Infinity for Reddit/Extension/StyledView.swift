@@ -36,6 +36,10 @@ extension View {
     func navigationBarPrimaryText() -> some View {
         self.modifier(NavigationBarPrimaryTextViewModifier())
     }
+
+    func navigationBarTitleGlassEffect() -> some View {
+        self.modifier(NavigationBarTitleGlassEffectViewModifier())
+    }
     
     func linkText(_ fontSize: AppFontSize = .f17) -> some View {
         self.modifier(LinkTextViewModifier(fontSize: fontSize))

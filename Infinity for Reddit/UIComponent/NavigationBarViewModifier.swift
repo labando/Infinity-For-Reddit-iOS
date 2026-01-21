@@ -38,6 +38,7 @@ struct InlineNavigationBarWithTitle: ViewModifier {
                     ToolbarItem(placement: .principal) {
                         Text(title)
                             .navigationBarPrimaryText()
+                            .navigationBarTitleGlassEffect()
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
@@ -51,6 +52,19 @@ struct InlineNavigationBarWithTitle: ViewModifier {
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+struct NavigationBarTitleGlassEffectViewModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .glassEffect(.regular, in: Capsule())
+        } else {
+            content
         }
     }
 }

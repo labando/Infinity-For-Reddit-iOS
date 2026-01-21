@@ -171,6 +171,13 @@ struct SubredditDetailsView: View {
                         .navigationBarPrimaryText()
                         .rotationEffect(.degrees(isSubredditInfoVisible ? 180 : 0))
                 }
+                .modify {
+                    if #available(iOS 26, *) {
+                        $0.navigationBarTitleGlassEffect()
+                    } else {
+                        $0
+                    }
+                }
                 .contentShape(Rectangle())
                 .onTapGesture {
                     withAnimation {
