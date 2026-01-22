@@ -2,20 +2,7 @@
   "fill-specializations" : [
     {
       "value" : {
-        "linear-gradient" : [
-          "display-p3:0.08836,0.16956,0.31105,1.00000",
-          "display-p3:0.11186,0.19712,0.35776,1.00000"
-        ],
-        "orientation" : {
-          "start" : {
-            "x" : 0.5,
-            "y" : 0
-          },
-          "stop" : {
-            "x" : 0.5,
-            "y" : 0.7
-          }
-        }
+        "solid" : "display-p3:0.04706,0.14118,0.27451,1.00000"
       }
     },
     {
@@ -34,12 +21,12 @@
             "scale" : 4,
             "translation-in-points" : [
               0,
-              34.078125
+              40
             ]
           }
         }
       ],
-      "name" : "Foreground Group",
+      "name" : "FGroup",
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5

@@ -12,7 +12,6 @@
 		5509013D2EB42E2400707F87 /* GiphyUISDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5509013C2EB42E2400707F87 /* GiphyUISDK */; };
 		55155AE12CFD5BCF003D5F14 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 55155AE02CFD5BCF003D5F14 /* GRDB */; };
 		554918CB2E26D8ED00355B48 /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 554918CA2E26D8ED00355B48 /* Flow */; };
-		555866B42F09F73F00A609C5 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 555866B32F09F73F00A609C5 /* AppIcon.icon */; };
 		555866B72F0ABFA800A609C5 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 555866B62F0ABFA800A609C5 /* Lottie */; };
 		555F0B842D07AD53003A1CA7 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 555F0B832D07AD53003A1CA7 /* SDWebImageSwiftUI */; };
 		5582E51B2EFF32550031EDE7 /* SeekBar in Frameworks */ = {isa = PBXBuildFile; productRef = 5582E51A2EFF32550031EDE7 /* SeekBar */; };
@@ -22,6 +21,7 @@
 		55949B882CFA7EAD002D1C46 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 55949B872CFA7EAD002D1C46 /* Swinject */; };
 		5597B1E12EE3417000D79683 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 5597B1E02EE3417000D79683 /* SwiftUIIntrospect */; };
 		55AAB5322D3A9E3E006816B2 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 55AAB5312D3A9E3E006816B2 /* MarkdownUI */; };
+		55BA78B52F21D4270087037D /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 55BA78B42F21D4270087037D /* AppIcon.icon */; };
 		55C7421F2CFD1E4300853D4E /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 55C7421E2CFD1E4300853D4E /* SwiftyJSON */; };
 		824357B22CFCFF1A0091EFF1 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 824357B12CFCFF1A0091EFF1 /* Alamofire */; };
 /* End PBXBuildFile section */
@@ -58,10 +58,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		555866B32F09F73F00A609C5 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppIcon.icon; sourceTree = "<group>"; };
 		559BD2332CF7D58500621685 /* Infinity for Reddit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Infinity for Reddit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		559BD2452CF7D58600621685 /* Infinity for RedditTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Infinity for RedditTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		559BD24F2CF7D58600621685 /* Infinity for RedditUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Infinity for RedditUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		55BA78B42F21D4270087037D /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -129,7 +129,7 @@
 				559BD2482CF7D58600621685 /* Infinity for RedditTests */,
 				559BD2522CF7D58600621685 /* Infinity for RedditUITests */,
 				559BD2342CF7D58500621685 /* Products */,
-				555866B32F09F73F00A609C5 /* AppIcon.icon */,
+				55BA78B42F21D4270087037D /* AppIcon.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -296,7 +296,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				555866B42F09F73F00A609C5 /* AppIcon.icon in Resources */,
+				55BA78B52F21D4270087037D /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
