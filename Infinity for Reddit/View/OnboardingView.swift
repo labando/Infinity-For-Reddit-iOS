@@ -12,6 +12,7 @@ struct OnboardingView: View {
     @Environment(\.colorScheme) var colorScheme
     
     @State private var currentIndex = 0
+    @State private var animate = false
     
     let onFinish: () -> Void
     
@@ -35,8 +36,20 @@ struct OnboardingView: View {
     
     var body: some View {
         GeometryReader { proxy in
-            VStack {
+            VStack(spacing: 0) {
                 TabView(selection: $currentIndex) {
+                    WelcomePageView(
+                        horizontalLayout: proxy.size.width > proxy.size.height || proxy.size.width > 1400,
+                        geoWidth: proxy.size.width,
+                        geoHeight: proxy.size.height,
+                        primaryTextColor: primaryTextColor,
+                        secondaryTextColor: secondaryTextColor
+                    )
+                    .padding(.top, 32)
+                    .padding(.bottom, 16)
+                    .padding(.horizontal, 32)
+                    .tag(0)
+                    
                     ForEach(pages.indices, id: \.self) { index in
                         OnboardingPageView(
                             page: pages[index],
@@ -44,41 +57,137 @@ struct OnboardingView: View {
                             primaryTextColor: primaryTextColor,
                             secondaryTextColor: secondaryTextColor
                         )
-                        .padding(16)
-                        .tag(index)
+                        .padding(.top, 32)
+                        .padding(.bottom, 16)
+                        .padding(.horizontal, 32)
+                        .tag(index + 1)
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 
                 PageIndicator(
-                    count: pages.count,
+                    count: pages.count + 1,
                     currentIndex: currentIndex,
                     primaryIndicatorColor: primaryTextColor,
                     secondaryIndicatorColor: secondaryTextColor
                 )
                 
                 Button(action: advance) {
-                    Text(currentIndex == pages.count - 1 ? "Get Started" : "Next")
+                    Text(currentIndex == 0 ? "Take a Quick Tour" : currentIndex == pages.count ? "Get Started" : "Next")
                         .frame(maxWidth: 500)
                 }
                 .foregroundColor(.white)
                 .tint(Color(hex: "#0336FF"))
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.capsule)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 32)
                 .padding(.top, 16)
                 .padding(.bottom, proxy.size.height > 1000 ? 120 : 16)
+                .opacity(animate ? 1 : 0)
+                .offset(y: animate ? 0 : 20)
+                .animation(.easeOut(duration: 0.4).delay(0.25), value: animate)
             }
+            .background(.ultraThinMaterial)
         }
         .animation(.default, value: currentIndex)
-        .background(colorScheme == .light ? .white : .black)
+        //.background(colorScheme == .light ? .white : .black)
+        //.background(Color(hex: "#faf3dd"))
+        .background {
+            SwiftUI.Image("onboarding_background")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                //.opacity(animate ? 0.5 : 0.1)
+        }
+        .onAppear {
+            animate = true
+        }
     }
     
     private func advance() {
-        if currentIndex < pages.count - 1 {
+        if currentIndex < pages.count {
             currentIndex += 1
         } else {
             onFinish()
+        }
+    }
+    
+    struct WelcomePageView: View {
+        @State private var animate = false
+        
+        let horizontalLayout: Bool
+        let geoWidth: CGFloat
+        let geoHeight: CGFloat
+        let primaryTextColor: Color
+        let secondaryTextColor: Color
+        
+        var body: some View {
+            if horizontalLayout && geoHeight < 500 {
+                HStack(spacing: 24) {
+                    SwiftUI.Image("onboarding_app_icon")
+                        .resizable()
+                        .frame(width: 150, height: 150)
+                        .clipShape(RoundedRectangle(cornerRadius: 28))
+                        .scaleEffect(animate ? 1 : 0.9)
+                        .opacity(animate ? 1 : 0)
+                        .animation(.easeOut(duration: 0.4), value: animate)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        RowText("Welcome to Infinity for Reddit!")
+                            .font(.system(size: 24))
+                            .foregroundStyle(secondaryTextColor)
+                            .opacity(animate ? 1 : 0)
+                            .offset(y: animate ? 0 : 10)
+                            .animation(.easeOut(duration: 0.4).delay(0.15), value: animate)
+                        
+                        RowText("The infinitely better Reddit experience.")
+                            .font(.system(size: 48, weight: .bold))
+                            .foregroundStyle(primaryTextColor)
+                            .opacity(animate ? 1 : 0)
+                            .offset(y: animate ? 0 : 10)
+                            .animation(.easeOut(duration: 0.4).delay(0.15), value: animate)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .onAppear {
+                    animate = true
+                }
+            } else {
+                ZStack {
+                    VStack(alignment: .leading, spacing: 24) {
+                        SwiftUI.Image("onboarding_app_icon")
+                            .resizable()
+                            .frame(width: min(geoWidth / 3, 200), height: min(geoWidth / 3, 200))
+                            .clipShape(RoundedRectangle(cornerRadius: 28))
+                            .scaleEffect(animate ? 1 : 0.9)
+                            .opacity(animate ? 1 : 0)
+                            .animation(.easeOut(duration: 0.4), value: animate)
+                        
+                        Spacer()
+                        
+                        Text("Welcome to Infinity for Reddit!")
+                            .font(.system(size: 32))
+                            .foregroundStyle(secondaryTextColor)
+                            .opacity(animate ? 1 : 0)
+                            .offset(y: animate ? 0 : 10)
+                            .animation(.easeOut(duration: 0.4).delay(0.15), value: animate)
+                        
+                        RowText("The infinitely better Reddit experience.")
+                            .font(.system(size: geoWidth > 500 ? 72 : 48, weight: .bold))
+                            .foregroundStyle(primaryTextColor)
+                            .opacity(animate ? 1 : 0)
+                            .offset(y: animate ? 0 : 10)
+                            .animation(.easeOut(duration: 0.4).delay(0.15), value: animate)
+                        
+                        if horizontalLayout {
+                            Spacer()
+                        }
+                    }
+                }
+                .onAppear {
+                    animate = true
+                }
+            }
         }
     }
     
