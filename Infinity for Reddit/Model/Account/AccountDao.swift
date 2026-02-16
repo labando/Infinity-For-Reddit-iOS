@@ -120,24 +120,6 @@ struct AccountDao {
             )
         }
     }
-
-    func updateAccessToken(username: String, accessToken: String) throws {
-        try dbPool.write { db in
-            try db.execute(
-                sql: "UPDATE accounts SET access_token = ? WHERE username = ?",
-                arguments: [accessToken, username]
-            )
-        }
-    }
-
-    func updateAccessTokenAndRefreshToken(username: String, accessToken: String, refreshToken: String) throws {
-        try dbPool.write { db in
-            try db.execute(
-                sql: "UPDATE accounts SET access_token = ?, refresh_token = ? WHERE username = ?",
-                arguments: [accessToken, refreshToken, username]
-            )
-        }
-    }
     
     func updateSubscriptionSyncTime(username: String, subscriptionSyncTime: Int64) throws {
         try dbPool.write { db in

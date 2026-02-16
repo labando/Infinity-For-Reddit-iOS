@@ -55,7 +55,6 @@ struct SearchResultsView: View {
                                 searchInMultiReddit: searchResultsViewModel.searchInMultiReddit,
                                 searchInThingType: searchResultsViewModel.searchInThingType
                             ),
-                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                             queries: ["q": searchResultsViewModel.query, "type": "link"],
                             params: nil
                         ),

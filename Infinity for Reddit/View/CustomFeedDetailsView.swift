@@ -30,7 +30,6 @@ struct CustomFeedDetailsView: View {
             postListingMetadata: PostListingMetadata(
                 postListingType: postListingType,
                 pathComponents: pathComponents,
-                headers: nil,
                 queries: nil,
                 params: nil
             )

@@ -37,7 +37,6 @@ struct SavedView: View {
                                 postListingMetadata: PostListingMetadata(
                                     postListingType: .user(username: accountViewModel.account.username, userWhere: .saved),
                                     pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.saved.rawValue],
-                                    headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                     queries: nil,
                                     params: nil
                                 ),

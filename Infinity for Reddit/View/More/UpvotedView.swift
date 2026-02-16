@@ -23,7 +23,6 @@ struct UpvotedView: View {
                     postListingMetadata: PostListingMetadata(
                         postListingType: .user(username: accountViewModel.account.username, userWhere: .upvoted),
                         pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.upvoted.rawValue],
-                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                         queries: nil,
                         params: nil
                     )

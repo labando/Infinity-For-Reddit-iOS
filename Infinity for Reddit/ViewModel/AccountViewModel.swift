@@ -92,16 +92,16 @@ public class AccountViewModel: ObservableObject {
         try accountDao.deleteCurrentAccount()
     }
     
-    public func updateTokens(accessToken: String, refreshToken: String?) throws {
-        account.accessToken = accessToken
-        print("Access Token: \(accessToken)")
-        if let validRefreshToken = refreshToken, !validRefreshToken.isEmpty {
-            account.refreshToken = validRefreshToken
-            try accountDao.updateAccessTokenAndRefreshToken(username: account.username, accessToken: accessToken, refreshToken: validRefreshToken)
-        } else {
-            try accountDao.updateAccessToken(username: account.username, accessToken: accessToken)
-        }
-    }
+//    public func updateTokens(accessToken: String, refreshToken: String?) throws {
+//        account.accessToken = accessToken
+//        print("Access Token: \(accessToken)")
+//        if let validRefreshToken = refreshToken, !validRefreshToken.isEmpty {
+//            account.refreshToken = validRefreshToken
+//            try accountDao.updateAccessTokenAndRefreshToken(username: account.username, accessToken: accessToken, refreshToken: validRefreshToken)
+//        } else {
+//            try accountDao.updateAccessToken(username: account.username, accessToken: accessToken)
+//        }
+//    }
     
     public func updateSubscriptionSyncTime() async throws {
         await MainActor.run {
@@ -148,7 +148,6 @@ public class AccountViewModel: ObservableObject {
         }
         
         _shared = AccountViewModel(dbPool: resolvedDBPool)
-        print("Access Token: \(_shared?.account.accessToken ?? "")")
     }
     
     @MainActor

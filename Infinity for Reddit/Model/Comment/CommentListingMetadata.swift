@@ -10,17 +10,15 @@ import Alamofire
 public struct CommentListingMetadata {
     var commentListingType: CommentListingType
     var pathComponents: [String: String]
-    var headers: HTTPHeaders?
     var queries: [String: String]?
     
-    init(commentListingType: CommentListingType,
-         pathComponents: [String: String] = [:],
-         headers: HTTPHeaders? = nil,
-         queries: [String: String]? = nil
+    init(
+        commentListingType: CommentListingType,
+        pathComponents: [String: String] = [:],
+        queries: [String: String]? = nil
     ) {
         self.commentListingType = commentListingType
         self.pathComponents = pathComponents
-        self.headers = headers
         self.queries = queries
     }
 }

@@ -23,7 +23,6 @@ struct DownvotedView: View {
                     postListingMetadata: PostListingMetadata(
                         postListingType: .user(username: accountViewModel.account.username, userWhere: .downvoted),
                         pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.downvoted.rawValue],
-                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                         queries: nil,
                         params: nil
                     )

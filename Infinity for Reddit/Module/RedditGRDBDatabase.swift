@@ -39,8 +39,6 @@ struct RedditGRDBDatabase {
                 t.column("banner_image_url", .text)
                 t.column("karma", .integer)
                 t.column("is_mod", .boolean)
-                t.column("access_token", .text)
-                t.column("refresh_token", .text)
                 t.column("is_current_user", .boolean)
                 t.column("code", .text)
                 t.column("subscription_sync_time", .integer)

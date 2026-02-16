@@ -17,7 +17,6 @@ struct PopularOrAllView: View {
             postListingMetadata:PostListingMetadata(
                 postListingType:.subreddit(subredditName: subredditName),
                 pathComponents: ["subreddit": subredditName],
-                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                 queries: nil,
                 params: nil
             )

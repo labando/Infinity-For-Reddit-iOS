@@ -7,6 +7,6 @@
 import Foundation
 
 public protocol RedditAccessTokenProviderProtocol: Sendable {
-    func currentAccessToken(for username: String) async -> String?
-    func forceRefresh(for username: String) async throws -> String
+    func getAccessToken(accountName: String) async -> String?
+    func refreshAccessToken(accountName: String) async throws -> String
 }

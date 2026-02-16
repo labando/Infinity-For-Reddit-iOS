@@ -28,7 +28,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
                     urlRequest.url = newURL
                 }
             } else if urlRequest.headers["Authorization"] == nil {
-                urlRequest.setValue("bearer \(AccountViewModel.shared.account.accessToken ?? "")", forHTTPHeaderField: "Authorization")
+                urlRequest.setValue("bearer \((try? RedditAccessTokenKeychainManager.shared.getAccessToken(accountName: AccountViewModel.shared.account.username)) ?? "")", forHTTPHeaderField: "Authorization")
                 urlRequest.setValue(APIUtils.USER_AGENT, forHTTPHeaderField: APIUtils.USER_AGENT_KEY)
             }
         }
@@ -56,7 +56,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
         
         lock.lock()
         
-        if request.request?.value(forHTTPHeaderField: "Authorization")?.contains(AccountViewModel.shared.account.accessToken ?? "") != true {
+        if request.request?.value(forHTTPHeaderField: "Authorization")?.contains((try? RedditAccessTokenKeychainManager.shared.getAccessToken(accountName: AccountViewModel.shared.account.username)) ?? "") != true {
             lock.unlock()
             return completion(.retry)
         }
@@ -67,7 +67,10 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
             switch result {
             case .success(let token):
                 do {
-                    try AccountViewModel.shared.updateTokens(accessToken: token.0, refreshToken: token.1)
+                    try RedditAccessTokenKeychainManager.shared.saveAccessToken(accountName: AccountViewModel.shared.account.username, accessToken: token.0)
+                    if let refreshToken = token.1, !refreshToken.isEmpty {
+                        try RedditAccessTokenKeychainManager.shared.saveRefreshToken(accountName: AccountViewModel.shared.account.username, refreshToken: refreshToken)
+                    }
                     /// After updating the token we can safely retry the original request.
                     completion(.retry)
                     self.lock.unlock()
@@ -85,7 +88,7 @@ final class RedditAccessTokenInterceptor: RequestInterceptor {
     
     // MARK: - Refresh the access token
     private func refreshAccessToken(completion: @escaping (Result<(String, String?), Error>) -> Void) {
-        guard let refreshToken = AccountViewModel.shared.account.refreshToken else {
+        guard let refreshToken = try? RedditAccessTokenKeychainManager.shared.getRefreshToken(accountName: AccountViewModel.shared.account.username) else {
             completion(.failure(NSError(domain: "TokenManager", code: 1001, userInfo: [NSLocalizedDescriptionKey: "No refresh token found"])))
             return
         }

@@ -8,12 +8,12 @@ import Alamofire
 import Foundation
 
 final class RedditPerAccountAccessTokenInterceptor: RequestInterceptor {
-    private let getToken: @Sendable() async -> String?
-    private let refreshToken: @Sendable() async throws -> String
+    private let getAccessToken: @Sendable() async -> String?
+    private let refreshAccessToken: @Sendable() async throws -> String
     
-    init(getToken: @escaping @Sendable() async -> String?, refreshToken: @escaping @Sendable () async throws -> String) {
-        self.getToken = getToken
-        self.refreshToken = refreshToken
+    init(getAccessToken: @escaping @Sendable() async -> String?, refreshAccessToken: @escaping @Sendable () async throws -> String) {
+        self.getAccessToken = getAccessToken
+        self.refreshAccessToken = refreshAccessToken
     }
     
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
@@ -28,7 +28,7 @@ final class RedditPerAccountAccessTokenInterceptor: RequestInterceptor {
                 return
             }
             
-            if let accessToken = await getToken(), !accessToken.isEmpty {
+            if let accessToken = await getAccessToken(), !accessToken.isEmpty {
                 req.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             } else {
                 req.headers.remove(name: "Authorization")
@@ -47,14 +47,14 @@ final class RedditPerAccountAccessTokenInterceptor: RequestInterceptor {
         }
         
         Task {
-            let headerToken = request.request?.value(forHTTPHeaderField: "Authorization") ?? ""
-            let current = await getToken() ?? ""
-            if !current.isEmpty, headerToken.contains(current) == false {
-                return completion(.retry) 
+            let headerAccessToken = request.request?.value(forHTTPHeaderField: "Authorization") ?? ""
+            let existingAccessToken = await getAccessToken() ?? ""
+            if !existingAccessToken.isEmpty, headerAccessToken.contains(existingAccessToken) == false {
+                return completion(.retry)
             }
             
             do {
-                _ = try await refreshToken()
+                _ = try await refreshAccessToken()
                 completion(.retry)
             } catch {
                 completion(.doNotRetryWithError(error))

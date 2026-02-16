@@ -6,49 +6,47 @@
         
 import Foundation
 import Alamofire
-import GRDB
 
 public actor RedditAccessTokenProvider: RedditAccessTokenProviderProtocol {
     public static let shared = RedditAccessTokenProvider()
     
-    private let dbPool: DatabasePool
     private var inFlight: [String: Task<String, Error>] = [:]
     
-    private init() {
-        guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
-            fatalError( "Failed to resolve DatabasePool")
+    enum RedditAccessTokenProviderError: LocalizedError {
+        case missingRefreshToken(accountName: String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .missingRefreshToken(let accountName):
+                return "Missing refresh token for \(accountName)"
+            }
         }
-        self.dbPool = resolvedDBPool
     }
     
-    public func currentAccessToken(for username: String) async -> String? {
-        let accountDao = AccountDao(dbPool: dbPool)
-        return try? accountDao.getAccount(username: username)?.accessToken
+    private init() {}
+    
+    public func getAccessToken(accountName: String) -> String? {
+        return try? RedditAccessTokenKeychainManager.shared.getAccessToken(accountName: accountName)
     }
     
     @discardableResult
-    public func forceRefresh(for username: String) async throws -> String {
-        if let existing = inFlight[username] {
+    public func refreshAccessToken(accountName: String) async throws -> String {
+        if let existing = inFlight[accountName] {
             return try await existing.value
         }
         let task = Task {
-            try await self.refreshToken(for: username)
+            try await self.refreshAccessTokenTask(for: accountName)
         }
-        inFlight[username] = task
+        inFlight[accountName] = task
         defer {
-            inFlight[username] = nil
+            inFlight[accountName] = nil
         }
         return try await task.value
     }
     
-    private func refreshToken(for username: String) async throws -> String {
-        let accountDao = AccountDao(dbPool: dbPool)
-        guard let account = try? await accountDao.getAccount(username: username),
-              let refreshToken = account.refreshToken, !refreshToken.isEmpty else {
-            throw NSError(domain: "TokenCenter",
-                          code: 1001,
-                          userInfo: [NSLocalizedDescriptionKey:
-                                        "Missing refresh token for \(username)"])
+    private func refreshAccessTokenTask(for username: String) async throws -> String {
+        guard let refreshToken = try? RedditAccessTokenKeychainManager.shared.getRefreshToken(accountName: username), !refreshToken.isEmpty else {
+            throw RedditAccessTokenProviderError.missingRefreshToken(accountName: username)
         }
         
         struct AccessTokenResponse: Decodable {
@@ -75,21 +73,9 @@ public actor RedditAccessTokenProvider: RedditAccessTokenProviderProtocol {
         
         switch result {
         case .success(let response):
-            if let newRefreshToken = response.refreshToken {
-                try? await accountDao.updateAccessTokenAndRefreshToken(username: username,
-                                                                 accessToken: response.accessToken,
-                                                                 refreshToken: newRefreshToken)
-            } else {
-                try? await accountDao.updateAccessToken(username: username,
-                                                  accessToken: response.accessToken)
-            }
-            
-            if AccountViewModel.shared.account.username
-                .caseInsensitiveCompare(username) == .orderedSame {
-                await MainActor.run {
-                    try? AccountViewModel.shared.updateTokens(accessToken: response.accessToken,
-                                                              refreshToken: response.refreshToken)
-                }
+            try? RedditAccessTokenKeychainManager.shared.saveAccessToken(accountName: username, accessToken: response.accessToken)
+            if let refreshToken = response.refreshToken, !refreshToken.isEmpty {
+                try? RedditAccessTokenKeychainManager.shared.saveRefreshToken(accountName: username, refreshToken: refreshToken)
             }
             return response.accessToken
         case .failure(let error):

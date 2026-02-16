@@ -23,7 +23,6 @@ struct HiddenView: View {
                     postListingMetadata: PostListingMetadata(
                         postListingType: .user(username: accountViewModel.account.username, userWhere: .hidden),
                         pathComponents: ["username": accountViewModel.account.username, "where": UserWhere.hidden.rawValue],
-                        headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                         queries: nil,
                         params: nil
                     )

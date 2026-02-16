@@ -106,7 +106,6 @@ struct SubredditDetailsView: View {
                         postListingMetadata:PostListingMetadata(
                             postListingType:.subreddit(subredditName: subredditDetailsViewModel.subredditName),
                             pathComponents: ["subreddit": "\(subredditDetailsViewModel.subredditName)"],
-                            headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                             queries: nil,
                             params: nil
                         ),

@@ -127,7 +127,6 @@ struct UserDetailsView: View {
                             postListingMetadata:PostListingMetadata(
                                 postListingType:.user(username: userDetailsViewModel.username, userWhere: .submitted),
                                 pathComponents: ["username": "\(userDetailsViewModel.username)"],
-                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                 queries: nil,
                                 params: nil
                             ),
@@ -156,7 +155,6 @@ struct UserDetailsView: View {
                             commentListingMetadata: CommentListingMetadata(
                                 commentListingType:.user(username: userDetailsViewModel.username),
                                 pathComponents: ["username": "\(userDetailsViewModel.username)"],
-                                headers: APIUtils.getOAuthHeader(accessToken: accountViewModel.account.accessToken ?? ""),
                                 queries: nil
                             ),
                             isPresented: selectedTab == 1,

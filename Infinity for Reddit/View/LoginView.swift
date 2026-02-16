@@ -164,8 +164,6 @@ struct LoginView: View {
                                                                                         bannerImageUrl: bannerImageUrl,
                                                                                         karma: karma,
                                                                                         isMod: isMod,
-                                                                                        accessToken: accessToken,
-                                                                                        refreshToken: refreshToken,
                                                                                         code: authCode,
                                                                                         createdUTC: createdUTC
                                                                                     )
@@ -174,6 +172,8 @@ struct LoginView: View {
                                                                                     do {
                                                                                         try accountDao.markAllAccountsNonCurrent()
                                                                                         try accountDao.insert(account)
+                                                                                        try RedditAccessTokenKeychainManager.shared.saveAccessToken(accountName: name, accessToken: accessToken)
+                                                                                        try RedditAccessTokenKeychainManager.shared.saveRefreshToken(accountName: name, refreshToken: refreshToken)
                                                                                         
                                                                                         OperationQueue.main.addOperation {
                                                                                             AccountViewModel.shared.switchAccount(newAccount: account)
