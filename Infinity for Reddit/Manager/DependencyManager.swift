@@ -53,11 +53,5 @@ struct DependencyManager {
                 fatalError("Failed to create DatabasePool: \(error)")
             }
         }.inObjectScope(.container) // Singleton
-        
-        c.register(OperationQueue.self) { _ in
-            let operationQueue = OperationQueue()
-            operationQueue.maxConcurrentOperationCount = 4
-            return operationQueue
-        }.inObjectScope(.container) // Singleton
     }
 }

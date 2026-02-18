@@ -19,8 +19,7 @@ struct LoginView: View {
     @StateObject private var loginViewModel: LoginViewModel
     
     private let session: Session
-    private let dbPool: DatabasePool
-    private let operationQueue: OperationQueue
+    private let accountDao: AccountDao
     
     enum LoginError: LocalizedError {
         case failedToGetAccessToken
@@ -59,12 +58,8 @@ struct LoginView: View {
         guard let resolvedDBPool = DependencyManager.shared.container.resolve(DatabasePool.self) else {
             fatalError("Failed to resolve DatabasePool")
         }
-        guard let resolvedOperationQueue = DependencyManager.shared.container.resolve(OperationQueue.self) else {
-            fatalError("Failed to resolve OperationQueue")
-        }
         self.session = ProxyUtils.makeSession()
-        self.dbPool = resolvedDBPool
-        self.operationQueue = resolvedOperationQueue
+        self.accountDao = AccountDao(dbPool: resolvedDBPool)
         
         self._loginViewModel = StateObject(wrappedValue: LoginViewModel())
     }
@@ -140,11 +135,10 @@ struct LoginView: View {
                                                                             return
                                                                         }
                                                                         if let myInfo = myInfoResponse.data(using: .utf8) {
-                                                                            operationQueue.addOperation {
+                                                                            Task {
                                                                                 do {
                                                                                     let jsonResponse = try JSON(data: myInfo)
                                                                                     
-                                                                                    // Parse the response
                                                                                     let name = jsonResponse[JSONUtils.NAME_KEY].stringValue
                                                                                     let profileImageUrl = jsonResponse[JSONUtils.ICON_IMG_KEY].stringValue
                                                                                     
@@ -168,24 +162,26 @@ struct LoginView: View {
                                                                                         createdUTC: createdUTC
                                                                                     )
                                                                                     
-                                                                                    let accountDao = AccountDao(dbPool: dbPool)
                                                                                     do {
                                                                                         try accountDao.markAllAccountsNonCurrent()
                                                                                         try accountDao.insert(account)
                                                                                         try RedditAccessTokenKeychainManager.shared.saveAccessToken(accountName: name, accessToken: accessToken)
                                                                                         try RedditAccessTokenKeychainManager.shared.saveRefreshToken(accountName: name, refreshToken: refreshToken)
                                                                                         
-                                                                                        OperationQueue.main.addOperation {
-                                                                                            AccountViewModel.shared.switchAccount(newAccount: account)
+                                                                                        await MainActor.run {
                                                                                             dismiss()
                                                                                         }
                                                                                     } catch {
                                                                                         print("Error: Failed to insert account - \(error.localizedDescription)")
-                                                                                        loginViewModel.error = LoginError.failedToSaveAccountInfo
+                                                                                        await MainActor.run {
+                                                                                            loginViewModel.error = LoginError.failedToSaveAccountInfo
+                                                                                        }
                                                                                     }
                                                                                 } catch {
                                                                                     print("Error: Failed to parse account JSON - \(error.localizedDescription)")
-                                                                                    loginViewModel.error = LoginError.failedToParseAccountInfo
+                                                                                    await MainActor.run {
+                                                                                        loginViewModel.error = LoginError.failedToParseAccountInfo
+                                                                                    }
                                                                                 }
                                                                             }
                                                                         }
