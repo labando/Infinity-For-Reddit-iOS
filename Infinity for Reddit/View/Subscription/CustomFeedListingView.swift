@@ -19,7 +19,7 @@ struct CustomFeedListingView: View {
                 ZStack {
                     if subscriptionListingViewModel.isLoadingMyCustomFeeds {
                         ProgressIndicator()
-                    } else if let error = subscriptionListingViewModel.error {
+                    } else if let error = subscriptionListingViewModel.myCustomFeedListingError {
                         Text("Unable to load custom feeds. Tap to retry. Error: \(error.localizedDescription)")
                             .primaryText()
                             .padding(16)

@@ -75,7 +75,7 @@ class Subreddit: NSObject, Identifiable {
     var canAssignLinkFlair : Bool!
     var canAssignUserFlair : Bool!
     var collapseDeletedComments : Bool!
-    var commentContributionSettings : CommentContributionSetting!
+    var commentContributionSettings : CommentContributionSetting?
     var commentScoreHideMins : Int!
     var communityIcon : String!
     var communityReviewed : Bool!
@@ -187,8 +187,8 @@ class Subreddit: NSObject, Identifiable {
         canAssignUserFlair = json["can_assign_user_flair"].boolValue
         collapseDeletedComments = json["collapse_deleted_comments"].boolValue
         let commentContributionSettingsJson = json["comment_contribution_settings"]
-        if !commentContributionSettingsJson.isEmpty{
-            commentContributionSettings = CommentContributionSetting(fromJson: commentContributionSettingsJson)
+        if !commentContributionSettingsJson.isEmpty {
+            commentContributionSettings = try? CommentContributionSetting(fromJson: commentContributionSettingsJson)
         }
         commentScoreHideMins = json["comment_score_hide_mins"].intValue
         communityIcon = json["community_icon"].stringValue

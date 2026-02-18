@@ -20,7 +20,7 @@ struct SubscribedUserListingView: View {
                 ZStack {
                     if subscriptionListingViewModel.isLoadingSubscriptions {
                         ProgressIndicator()
-                    } else if let error = subscriptionListingViewModel.error {
+                    } else if let error = subscriptionListingViewModel.subscribedThingListingError {
                         Text("Unable to load subscribed users. Tap to retry. Error: \(error.localizedDescription)")
                             .primaryText()
                             .padding(16)

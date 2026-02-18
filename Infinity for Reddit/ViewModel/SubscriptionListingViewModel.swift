@@ -31,6 +31,8 @@ public class SubscriptionListingViewModel: ObservableObject {
     @Published var isLoadingMyCustomFeeds: Bool = false
     
     @Published var error: Error?
+    @Published var subscribedThingListingError: Error?
+    @Published var myCustomFeedListingError: Error?
     
     private var after: String? = nil
     
@@ -282,47 +284,46 @@ public class SubscriptionListingViewModel: ObservableObject {
         do {
             try Task.checkCancellation()
             
-            let subscriptionListing = try await subscriptionListingRepository.fetchSubscriptions(
+            if let subscriptionListing = try await subscriptionListingRepository.fetchSubscriptions(
                 queries: ["limit": "100", "after": after ?? ""]
-            )
-            
-            if (subscriptionListing.subscriptions.isEmpty) {
+            ) {
+                if subscriptionListing.subscriptions.isEmpty {
+                    // No more subscriptions
+                    try Task.checkCancellation()
+                    
+                    await transformSubsriptions()
+                    
+                    try? await AccountViewModel.shared.updateSubscriptionSyncTime()
+                } else {
+                    try Task.checkCancellation()
+                    
+                    await MainActor.run {
+                        self.after = subscriptionListing.after
+                    }
+                    
+                    subscriptionsPrivate.append(contentsOf: subscriptionListing.subscriptions)
+                    
+                    if self.after == nil || self.after?.isEmpty == true {
+                        try Task.checkCancellation()
+                        
+                        await transformSubsriptions()
+                        
+                        try? await AccountViewModel.shared.updateSubscriptionSyncTime()
+                    } else {
+                        await loadSubscriptionsOnline(isPagination: true)
+                    }
+                }
+            } else {
                 // No more subscriptions
                 try Task.checkCancellation()
                 
                 await transformSubsriptions()
                 
-                do {
-                    try await AccountViewModel.shared.updateSubscriptionSyncTime()
-                } catch {
-                    print("Unable to update subscription sync time: \(error)")
-                }
-            } else {
-                try Task.checkCancellation()
-                
-                await MainActor.run {
-                    self.after = subscriptionListing.after
-                }
-                
-                subscriptionsPrivate.append(contentsOf: subscriptionListing.subscriptions)
-                
-                if self.after == nil || self.after?.isEmpty == true {
-                    try Task.checkCancellation()
-                    
-                    await transformSubsriptions()
-                    
-                    do {
-                        try await AccountViewModel.shared.updateSubscriptionSyncTime()
-                    } catch {
-                        print("Unable to update subscription sync time: \(error)")
-                    }
-                } else {
-                    await loadSubscriptionsOnline(isPagination: true)
-                }
+                try? await AccountViewModel.shared.updateSubscriptionSyncTime()
             }
         } catch {
             await MainActor.run {
-                self.error = error
+                self.subscribedThingListingError = error
                 self.after = nil
                 self.isLoadingSubscriptions = false
                 
@@ -402,7 +403,13 @@ public class SubscriptionListingViewModel: ObservableObject {
             
             let myCustomFeedListing = try await subscriptionListingRepository.fetchMyCustomFeeds()
             
-            try Task.checkCancellation()
+            guard let myCustomFeedListing else {
+                try? await AccountViewModel.shared.updateCustomFeedSyncTime()
+                await MainActor.run {
+                    self.isLoadingMyCustomFeeds = false
+                }
+                return
+            }
             
             myCustomFeedListing.customFeeds.sort { $0.displayName < $1.displayName }
             
@@ -410,22 +417,16 @@ public class SubscriptionListingViewModel: ObservableObject {
                 $0.toMyCustomFeed()
             }
             
-            try Task.checkCancellation()
-            
             await insertMyCustomFeeds(myCustomFeeds: myCustomFeedsTemp)
             
-            do {
-                try await AccountViewModel.shared.updateCustomFeedSyncTime()
-            } catch {
-                print("Unable to update custom feed sync time: \(error)")
-            }
+            try? await AccountViewModel.shared.updateCustomFeedSyncTime()
             
             await MainActor.run {
                 self.isLoadingMyCustomFeeds = false
             }
         } catch {
             await MainActor.run {
-                self.error = error
+                self.myCustomFeedListingError = error
                 self.isLoadingMyCustomFeeds = false
             }
             

@@ -31,7 +31,7 @@ class SubscriptionListingRepository: SubscriptionListingRepositoryProtocol {
     
     public func fetchSubscriptions(
         queries: [String: String] = [:]
-    ) async throws -> SubscriptionListing {
+    ) async throws -> SubscriptionListing? {
         let data = try await self.session.request(
             RedditOAuthAPI.getSubscribedThings(queries: queries)
         )
@@ -43,12 +43,11 @@ class SubscriptionListingRepository: SubscriptionListingRepositoryProtocol {
         if let error = json.error {
             throw APIError.jsonDecodingError(error.localizedDescription)
         }
-        
-        // TODO need to handle JSON error
-        return SubscriptionListingRootClass(fromJson: json).subscriptionListing
+
+        return try? SubscriptionListingRootClass(fromJson: json).subscriptionListing
     }
     
-    public func fetchMyCustomFeeds() async throws -> MyCustomFeedListing {
+    public func fetchMyCustomFeeds() async throws -> MyCustomFeedListing? {
         let data = try await self.session.request(
             RedditOAuthAPI.getMyCustomFeeds
         )
@@ -61,7 +60,7 @@ class SubscriptionListingRepository: SubscriptionListingRepositoryProtocol {
             throw APIError.jsonDecodingError(error.localizedDescription)
         }
         
-        return try MyCustomFeedListing(fromJson: json)
+        return try? MyCustomFeedListing(fromJson: json)
     }
     
     func toggleFavoriteSubreddit(_ subscribedSubreddit: SubscribedSubredditData) async throws {
