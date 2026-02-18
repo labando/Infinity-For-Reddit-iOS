@@ -36,9 +36,9 @@ struct AboutSettingsView: View {
                     
                     PreferenceEntry(
                         title: "Email",
-                        subtitle: "docilealligator.app@gmail.com"
+                        subtitle: "support@foxanastudio.com"
                     ) {
-                        if let url = URL(string: "mailto:docilealligator.app@gmail.com") {
+                        if let url = URL(string: "mailto:support@foxanastudio.com") {
                             UIApplication.shared.open(url)
                         }
                     }

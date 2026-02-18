@@ -101,7 +101,7 @@ struct SettingsView: View {
                 .listPlainItemNoInsets()
                 
                 PreferenceEntryWithBackground(title: "Privacy Policy", icon: "hand.raised.circle") {
-                    navigationManager.openLink("https://docile-alligator.github.io/")
+                    navigationManager.openLink("https://foxanastudio.com/infinity-privacy")
                 }
                 .listPlainItemNoInsets()
                 
