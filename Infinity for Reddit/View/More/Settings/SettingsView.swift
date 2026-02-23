@@ -105,6 +105,11 @@ struct SettingsView: View {
                 }
                 .listPlainItemNoInsets()
                 
+                PreferenceEntryWithBackground(title: "Terms of Use", icon: "doc.text") {
+                    navigationManager.openLink("https://foxanastudio.com/terms")
+                }
+                .listPlainItemNoInsets()
+                
                 PreferenceEntryWithBackground(title: "Reddit User Agreement", icon: "text.document", bottom: true) {
                     navigationManager.openLink("https://www.redditinc.com/policies/user-agreement")
                 }
