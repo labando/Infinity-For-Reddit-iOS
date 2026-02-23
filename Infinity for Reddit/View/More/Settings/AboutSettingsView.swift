@@ -24,7 +24,7 @@ struct AboutSettingsView: View {
                         title: "Open Source",
                         subtitle: "Star it on Github if you like this app"
                     ) {
-                        navigationManager.openLink("https://github.com/Docile-Alligator/Infinity-For-Reddit-iOS")
+                        
                     }
                     
                     PreferenceEntry(
