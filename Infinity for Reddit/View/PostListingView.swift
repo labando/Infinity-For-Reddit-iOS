@@ -356,9 +356,9 @@ struct PostListingView: View {
             snackbarManager.showSnackbar(.info("Gallery download complete."))
         }
         .onChange(of: isPresented) { _, newValue in
+            setUpMenu()
+            
             if newValue {
-                setUpMenu()
-                
                 if lazyModeState == .paused {
                     resumeLazyMode()
                 }
@@ -366,11 +366,6 @@ struct PostListingView: View {
                 if lazyModeState == .started {
                     pauseLazyMode(resetScrolledPost: false)
                 }
-                
-                guard let navigationBarMenuKey else {
-                    return
-                }
-                navigationBarMenuManager.pop(key: navigationBarMenuKey)
             }
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
@@ -549,47 +544,54 @@ struct PostListingView: View {
     }
     
     private func setUpMenu() {
-        if let key = navigationBarMenuKey {
-            navigationBarMenuManager.pop(key: key)
-        }
-        var options = [
-            NavigationBarMenuItem(title: "Refresh") {
-                postListingViewModel.refreshPosts()
-            },
-            
-            NavigationBarMenuItem(title: "Sort") {
-                showSortTypeKindSheet = true
-            },
-            
-            NavigationBarMenuItem(title: "Change Post Layout") {
-                showLayoutTypeSheet = true
-            },
-            
-            NavigationBarMenuItem(title: lazyModeState == .stopped ? "Start Lazy Mode" : "Stop Lazy Mode") {
-                if lazyModeState == .stopped {
-                    snackbarManager.showSnackbar(.info("Content will auto-scroll in \(lazyModeInterval) \(lazyModeInterval == 1 ? "second" : "seconds")."))
-                    startLazyMode()
-                } else {
-                    stopLazyMode()
-                }
-            },
-            
-            NavigationBarMenuItem(title: "Hide Read Posts") {
-                postListingViewModel.hideReadPosts()
+        if isPresented {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
             }
-        ]
-        
-        if showFilterPostsOption {
-            options.append(NavigationBarMenuItem(title: "Filter Posts") {
-                navigationManager.append(
-                    AppNavigation.filterPosts(
-                        postListingMetadata: postListingMetadata
+            var options = [
+                NavigationBarMenuItem(title: "Refresh") {
+                    postListingViewModel.refreshPosts()
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    showSortTypeKindSheet = true
+                },
+                
+                NavigationBarMenuItem(title: "Change Post Layout") {
+                    showLayoutTypeSheet = true
+                },
+                
+                NavigationBarMenuItem(title: lazyModeState == .stopped ? "Start Lazy Mode" : "Stop Lazy Mode") {
+                    if lazyModeState == .stopped {
+                        snackbarManager.showSnackbar(.info("Content will auto-scroll in \(lazyModeInterval) \(lazyModeInterval == 1 ? "second" : "seconds")."))
+                        startLazyMode()
+                    } else {
+                        stopLazyMode()
+                    }
+                },
+                
+                NavigationBarMenuItem(title: "Hide Read Posts") {
+                    postListingViewModel.hideReadPosts()
+                }
+            ]
+            
+            if showFilterPostsOption {
+                options.append(NavigationBarMenuItem(title: "Filter Posts") {
+                    navigationManager.append(
+                        AppNavigation.filterPosts(
+                            postListingMetadata: postListingMetadata
+                        )
                     )
-                )
-            })
+                })
+            }
+            
+            navigationBarMenuKey = navigationBarMenuManager.push(options)
+        } else {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        
-        navigationBarMenuKey = navigationBarMenuManager.push(options)
     }
     
     private func onPostTypeClicked(post: Post) {

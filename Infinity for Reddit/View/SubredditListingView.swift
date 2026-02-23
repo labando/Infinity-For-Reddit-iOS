@@ -137,14 +137,7 @@ struct SubredditListingView: View {
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
         .onChange(of: isPresented) { _, newValue in
-            if isPresented {
-                setUpMenu()
-            } else {
-                guard let navigationBarMenuKey else {
-                    return
-                }
-                navigationBarMenuManager.pop(key: navigationBarMenuKey)
-            }
+            setUpMenu()
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
@@ -164,18 +157,25 @@ struct SubredditListingView: View {
     }
     
     private func setUpMenu() {
-        if let key = navigationBarMenuKey {
-            navigationBarMenuManager.pop(key: key)
-        }
-        navigationBarMenuKey = navigationBarMenuManager.push([
-            NavigationBarMenuItem(title: "Refresh") {
-                subredditListingViewModel.refreshSubreddits()
-            },
-            
-            NavigationBarMenuItem(title: "Sort") {
-                showSortTypeKindSheet = true
+        if isPresented {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
             }
-        ])
+            navigationBarMenuKey = navigationBarMenuManager.push([
+                NavigationBarMenuItem(title: "Refresh") {
+                    subredditListingViewModel.refreshSubreddits()
+                },
+                
+                NavigationBarMenuItem(title: "Sort") {
+                    showSortTypeKindSheet = true
+                }
+            ])
+        } else {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
+        }
     }
     
     private func isSelected(_ subreddit: Subreddit) -> Bool {

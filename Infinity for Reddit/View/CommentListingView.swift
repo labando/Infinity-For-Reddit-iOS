@@ -186,14 +186,7 @@ struct CommentListingView: View {
             }
         }
         .onChange(of: isPresented) { _, newValue in
-            if newValue {
-                setUpMenu()
-            } else {
-                guard let navigationBarMenuKey else {
-                    return
-                }
-                navigationBarMenuManager.pop(key: navigationBarMenuKey)
-            }
+            setUpMenu()
         }
         .wrapContentSheet(isPresented: $showSortTypeKindSheet) {
             SortTypeKindSheet(
@@ -267,29 +260,36 @@ struct CommentListingView: View {
     }
     
     private func setUpMenu() {
-        if let key = navigationBarMenuKey {
-            navigationBarMenuManager.pop(key: key)
+        if isPresented {
+            if let key = navigationBarMenuKey {
+                navigationBarMenuManager.pop(key: key)
+            }
+            let menu: [NavigationBarMenuItem]
+            switch commentListingMetadata.commentListingType {
+            case .user:
+                menu = [
+                    NavigationBarMenuItem(title: "Refresh") {
+                        commentListingViewModel.refreshComments()
+                    },
+                    
+                    NavigationBarMenuItem(title: "Sort") {
+                        showSortTypeKindSheet = true
+                    }
+                ]
+            case .userSaved:
+                menu = [
+                    NavigationBarMenuItem(title: "Refresh") {
+                        commentListingViewModel.refreshComments()
+                    }
+                ]
+            }
+            navigationBarMenuKey = navigationBarMenuManager.push(menu)
+        } else {
+            guard let navigationBarMenuKey else {
+                return
+            }
+            navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        let menu: [NavigationBarMenuItem]
-        switch commentListingMetadata.commentListingType {
-        case .user:
-            menu = [
-                NavigationBarMenuItem(title: "Refresh") {
-                    commentListingViewModel.refreshComments()
-                },
-                
-                NavigationBarMenuItem(title: "Sort") {
-                    showSortTypeKindSheet = true
-                }
-            ]
-        case .userSaved:
-            menu = [
-                NavigationBarMenuItem(title: "Refresh") {
-                    commentListingViewModel.refreshComments()
-                }
-            ]
-        }
-        navigationBarMenuKey = navigationBarMenuManager.push(menu)
     }
     
     struct LoadCommentsTaskKey: Hashable {
