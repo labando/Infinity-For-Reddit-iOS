@@ -12,7 +12,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.docilealligator.infinity</string>
+			<string>com.foxanastudio.infinity</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>infinity</string>
