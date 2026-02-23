@@ -33,7 +33,7 @@ struct InboxListingView: View {
         RootView {
             if inboxListingViewModel.inboxes.isEmpty {
                 ZStack {
-                    if inboxListingViewModel.isInitialLoading || inboxListingViewModel.isInitialLoad {
+                    if inboxListingViewModel.isInitialLoading {
                         ProgressIndicator()
                     } else if inboxListingViewModel.isInitialLoad, let error = inboxListingViewModel.error {
                         Text("Unable to load inbox. Tap to retry. Error: \(error.localizedDescription)")
