@@ -10,10 +10,12 @@ import SDWebImageSwiftUI
 import MarkdownUI
 
 struct UserDetailsView: View {
-    @EnvironmentObject var accountViewModel: AccountViewModel
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var navigationManager: NavigationManager
-    @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var themeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
+    @EnvironmentObject private var snackbarManager: SnackbarManager
     
     @StateObject var userDetailsViewModel : UserDetailsViewModel
     
@@ -22,6 +24,7 @@ struct UserDetailsView: View {
     @State private var isCurrentUserProfile: Bool = true
     @State private var isUserInfoVisible: Bool = true
     @State private var pauseLazyModeFlag: Bool = false
+    @State private var blockUserAlertIsPresented: Bool = false
     
     private let userIconSize: CGFloat = 80
     
@@ -251,6 +254,20 @@ struct UserDetailsView: View {
                     navigationManager.append(AppNavigation.sendChatMessage(recipient: userDetailsViewModel.userData?.name ?? userDetailsViewModel.username))
                 },
                 
+                NavigationBarMenuItem(title: "Block User") {
+                    guard !AccountViewModel.shared.account.isAnonymous() else {
+                        snackbarManager.showSnackbar(.info("You must be logged in to perform that action."))
+                        return
+                    }
+                    
+                    guard (userDetailsViewModel.userData?.name ?? userDetailsViewModel.username).lowercased() != accountViewModel.account.username.lowercased() else {
+                        snackbarManager.showSnackbar(.info("You can't block yourself."))
+                        return
+                    }
+                    
+                    blockUserAlertIsPresented = true
+                },
+                
                 NavigationBarMenuItem(title: "Report") {
                     navigationManager.openLink("https://www.reddit.com/report")
                 }
@@ -262,5 +279,22 @@ struct UserDetailsView: View {
             }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
+        .showErrorUsingSnackbar(userDetailsViewModel.$error)
+        .onChange(of: userDetailsViewModel.userBlockedFlag) { _, userBlockedFlag in
+            // We don't care about the Bool value
+            snackbarManager.showSnackbar(.info("User blocked. Refresh to remove their content across the app."))
+            dismiss()
+        }
+        .overlay(
+            CustomAlert(
+                title: "Block \(userDetailsViewModel.username)?",
+                buttonStyle: .warning,
+                isPresented: $blockUserAlertIsPresented
+            ) {
+                EmptyView()
+            } onConfirm: {
+                userDetailsViewModel.blockUser()
+            }
+        )
     }
 }

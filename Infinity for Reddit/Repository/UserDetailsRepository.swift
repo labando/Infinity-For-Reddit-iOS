@@ -106,4 +106,17 @@ public class UserDetailsRepository: UserDetailsRepositoryProtocol {
             try await subscribedUserDao.insert(subscribedUserData: userData.toSubscribedUserData())
         }
     }
+    
+    public func blockUser(username: String) async throws {
+        guard !AccountViewModel.shared.account.isAnonymous() else {
+            return
+        }
+        
+        let params = ["name": username]
+        
+        _ = try await self.session.request(RedditOAuthAPI.blockUser(params: params))
+            .validate()
+            .serializingDecodable(Empty.self)
+            .value
+    }
 }
