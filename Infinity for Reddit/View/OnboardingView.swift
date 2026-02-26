@@ -18,7 +18,7 @@ struct OnboardingView: View {
     
     private let pages: [OnboardingPage] = [
         OnboardingPage(
-            title: "Reddit, your way",
+            title: "Your communities, your way",
             subtitle: "Filters, themes, and browsing all in your hands.",
             animation: "RedditYourWay"
         ),
@@ -99,6 +99,15 @@ struct OnboardingView: View {
                         .opacity(animate ? 1 : 0)
                         .offset(y: animate ? 0 : 20)
                         .animation(.easeOut(duration: 0.4).delay(0.25), value: animate)
+                    
+                    Text("Infinity is an independent client for Reddit. Not affiliated or endorsed by Reddit.")
+                        .foregroundStyle(secondaryTextColor)
+                        .font(.system(size: 13))
+                        .padding(.horizontal, 32)
+                        .padding(.top, 4)
+                        .opacity(animate ? 1 : 0)
+                        .offset(y: animate ? 0 : 20)
+                        .animation(.easeOut(duration: 0.4).delay(0.25), value: animate)
                 }
                 .padding(.bottom, proxy.size.height > 1000 ? 120 : 16)
             }
@@ -117,7 +126,7 @@ struct OnboardingView: View {
     }
     
     private func makeAttributedString() -> AttributedString {
-        var text = AttributedString("By continuing, you agree to the Terms of Use and Privacy Policy.")
+        var text = AttributedString("By continuing, you agree to the Terms of Use, Privacy Policy and Reddit User Agreement.")
         
         if let termsRange = text.range(of: "Terms of Use") {
             text[termsRange].link = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula")
@@ -126,6 +135,11 @@ struct OnboardingView: View {
         
         if let privacyRange = text.range(of: "Privacy Policy") {
             text[privacyRange].link = URL(string: "https://foxanastudio.com/infinity-privacy")
+            text[privacyRange].foregroundColor = Color(hex: "#0336FF")
+        }
+        
+        if let privacyRange = text.range(of: "Reddit User Agreement") {
+            text[privacyRange].link = URL(string: "https://redditinc.com/policies/user-agreement")
             text[privacyRange].foregroundColor = Color(hex: "#0336FF")
         }
         
@@ -169,7 +183,7 @@ struct OnboardingView: View {
                             .offset(y: animate ? 0 : 10)
                             .animation(.easeOut(duration: 0.4).delay(0.15), value: animate)
                         
-                        RowText("The infinitely better Reddit experience.")
+                        RowText("The infinitely better browsing experience.")
                             .font(.system(size: 48, weight: .bold))
                             .foregroundStyle(primaryTextColor)
                             .opacity(animate ? 1 : 0)
@@ -194,14 +208,14 @@ struct OnboardingView: View {
                         
                         Spacer()
                         
-                        Text("Welcome to Infinity for Reddit!")
+                        Text("Welcome to Infinity!")
                             .font(.system(size: 32))
                             .foregroundStyle(secondaryTextColor)
                             .opacity(animate ? 1 : 0)
                             .offset(y: animate ? 0 : 10)
                             .animation(.easeOut(duration: 0.4).delay(0.15), value: animate)
                         
-                        RowText("The infinitely better Reddit experience.")
+                        RowText("The infinitely better browsing experience.")
                             .font(.system(size: largeFontSize ? 72 : 48, weight: .bold))
                             .foregroundStyle(primaryTextColor)
                             .opacity(animate ? 1 : 0)
