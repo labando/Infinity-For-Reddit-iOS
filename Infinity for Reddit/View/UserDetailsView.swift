@@ -256,7 +256,8 @@ struct UserDetailsView: View {
                 
                 NavigationBarMenuItem(title: "Block User") {
                     guard !AccountViewModel.shared.account.isAnonymous() else {
-                        snackbarManager.showSnackbar(.info("You must be logged in to perform that action."))
+                        snackbarManager.showSnackbar(.info("Blocking users requires login. Filter this user’s content locally instead."))
+                        navigationManager.append(SettingsViewNavigation.postFilter(postToBeAdded: nil, subredditToBeAdded: nil, userToBeAdded: userDetailsViewModel.username))
                         return
                     }
                     
