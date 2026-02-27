@@ -99,15 +99,6 @@ struct OnboardingView: View {
                         .opacity(animate ? 1 : 0)
                         .offset(y: animate ? 0 : 20)
                         .animation(.easeOut(duration: 0.4).delay(0.25), value: animate)
-                    
-                    Text("Infinity is an independent client for Reddit. Not affiliated or endorsed by Reddit.")
-                        .foregroundStyle(secondaryTextColor)
-                        .font(.system(size: 13))
-                        .padding(.horizontal, 32)
-                        .padding(.top, 4)
-                        .opacity(animate ? 1 : 0)
-                        .offset(y: animate ? 0 : 20)
-                        .animation(.easeOut(duration: 0.4).delay(0.25), value: animate)
                 }
                 .padding(.bottom, proxy.size.height > 1000 ? 120 : 16)
             }
@@ -126,7 +117,7 @@ struct OnboardingView: View {
     }
     
     private func makeAttributedString() -> AttributedString {
-        var text = AttributedString("By continuing, you agree to the Terms of Use, Privacy Policy and Reddit User Agreement.")
+        var text = AttributedString("By continuing, you agree to the Terms of Use, Privacy Policy and Reddit User Agreement.\nInfinity is an independent client for Reddit. Not affiliated or endorsed by Reddit.")
         
         if let termsRange = text.range(of: "Terms of Use") {
             text[termsRange].link = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula")
