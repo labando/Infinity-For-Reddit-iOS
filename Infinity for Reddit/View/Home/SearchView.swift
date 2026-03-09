@@ -73,7 +73,7 @@ struct SearchView: View {
                         .padding(16)
                         .contentShape(Rectangle())
                     }
-                    .limitedWidthListItem()
+                    .limitedWidth()
                 }
                 
                 if searchViewModel.query.isEmpty || onSearchCustomAction != nil {
@@ -93,7 +93,7 @@ struct SearchView: View {
                             .foregroundColor(.blue)
                         }
                         .padding(.horizontal, 16)
-                        .limitedWidthListItem()
+                        .limitedWidth()
                     }
                     
                     // Recent search items
@@ -146,7 +146,7 @@ struct SearchView: View {
                                 }
                             }
                             .listPlainItemNoInsets()
-                            .limitedWidthListItem()
+                            .limitedWidth()
                         }
                     }
                     .themedList()

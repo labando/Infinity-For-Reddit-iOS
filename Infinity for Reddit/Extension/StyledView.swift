@@ -367,7 +367,7 @@ extension View {
         self.modifier(SnackbarErrorViewModifier(errorPublisher: errorPublisher, showTaskCancelledError: showTaskCancelledError))
     }
     
-    func limitedWidthListItem() -> some View {
-        self.modifier(LimitedWidthListItemViewModifier())
+    func limitedWidth() -> some View {
+        self.modifier(LimitedWidthViewModifier())
     }
 }

@@ -78,7 +78,7 @@ struct PostFilterSettingsView: View {
                             .tint(.red)
                         }
                         .listPlainItemNoInsets()
-                        .limitedWidthListItem()
+                        .limitedWidth()
                     }
                 }
                 .themedList()

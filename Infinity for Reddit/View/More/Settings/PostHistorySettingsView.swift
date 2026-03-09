@@ -57,7 +57,7 @@ struct PostHistorySettingsView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 8)
                                 .listPlainItemNoInsets()
-                                .limitedWidthListItem()
+                                .limitedWidth()
                                 .transition(.move(edge: .trailing).combined(with: .opacity))
                                 .id(FieldType.readPostsLimit)
                             }

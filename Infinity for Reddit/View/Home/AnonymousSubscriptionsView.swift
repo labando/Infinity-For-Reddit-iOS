@@ -170,8 +170,7 @@ struct AnonymousSubscriptionsView: View {
                 }
             }
         }
-        .frame(maxWidth: 500)
-        .frame(maxWidth: .infinity, alignment: .center)
+        .limitedWidth()
         .onAppear {
             if let key = navigationBarMenuKey {
                 navigationBarMenuManager.pop(key: key)

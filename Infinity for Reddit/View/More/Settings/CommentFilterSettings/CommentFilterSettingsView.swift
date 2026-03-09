@@ -76,7 +76,7 @@ struct CommentFilterSettingsView: View {
                             .tint(.red)
                         }
                         .listPlainItemNoInsets()
-                        .limitedWidthListItem()
+                        .limitedWidth()
                     }
                 }
                 .themedList()

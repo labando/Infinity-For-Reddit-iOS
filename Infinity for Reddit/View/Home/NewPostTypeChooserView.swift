@@ -40,7 +40,6 @@ struct NewPostTypeChooserView: View {
                 }
             }
         }
-        .frame(maxWidth: 500)
-        .frame(maxWidth: .infinity, alignment: .center)
+        .limitedWidth()
     }
 }

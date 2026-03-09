@@ -107,7 +107,6 @@ struct PostView: View {
                 )
             }
         }
-        .frame(maxWidth: 500)
     }
     
     private func onPostTap(_ videoPlaybackTime: Double) {

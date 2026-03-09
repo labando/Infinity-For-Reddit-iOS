@@ -56,7 +56,7 @@ struct CustomizeCustomThemeView: View {
                                 
                                 CustomDivider()
                             }
-                            .limitedWidthListItem()
+                            .limitedWidth()
                             
                             ForEach(customizeCustomThemeViewModel.customThemeFields, id: \.self) { fieldName in
                                 if customizeCustomThemeViewModel.customThemeFieldsBoolType.contains(fieldName) {
@@ -66,7 +66,7 @@ struct CustomizeCustomThemeView: View {
                                             title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
                                             isEnabled: binding
                                         )
-                                        .limitedWidthListItem()
+                                        .limitedWidth()
                                     }
                                 } else {
                                     if let colorIntBinding = getColorIntBinding(for: fieldName), let colorBinding = getColorBinding(for: fieldName) {
@@ -77,7 +77,7 @@ struct CustomizeCustomThemeView: View {
                                             title: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.title ?? "",
                                             description: customizeCustomThemeViewModel.customThemeSettingsItems[fieldName]?.description ?? ""
                                         )
-                                        .limitedWidthListItem()
+                                        .limitedWidth()
                                     }
                                 }
                             }
