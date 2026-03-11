@@ -36,6 +36,8 @@ class MarkdownUtils {
 
         var startIndex = 0
         
+        processProcessingImgText(markdownString: &markdownString, mediaMetadataMap: mediaMetadataMap)
+        
         while true {
             // Apply regex starting from the current index
             let rangeToSearch = NSRange(location: startIndex, length: markdownString.count - startIndex)
@@ -72,6 +74,8 @@ class MarkdownUtils {
         let redditVideoLength = "https://reddit.com/link/".count
 
         var startIndex = 0
+        
+        processProcessingImgText(markdownString: &markdownString, mediaMetadataMap: mediaMetadataMap)
         
         while true {
             // Apply regex starting from the current index
@@ -120,6 +124,37 @@ class MarkdownUtils {
             }
             
             post.selftext = markdownString
+        }
+    }
+    
+    private static func processProcessingImgText(markdownString: inout String, mediaMetadataMap: [String: MediaMetadata]) {
+        if let processingImgPattern = try? NSRegularExpression(pattern: "\\*?Processing img (\\w+)\\.{3}\\*?", options: []) {
+            let matches = processingImgPattern.matches(in: markdownString, range: NSRange(location: 0, length: markdownString.count))
+            for match in matches.reversed() {
+                guard let range = Range(match.range, in: markdownString) else {
+                    continue
+                }
+                
+                if let group1Range = Range(match.range(at: 1), in: markdownString) {
+                    print("processing id: \(markdownString[group1Range.lowerBound..<group1Range.upperBound])")
+                    let id = String(markdownString[group1Range.lowerBound..<group1Range.upperBound])
+                    if let media = mediaMetadataMap[id] {
+                        if media.e == MediaMetadata.gifType {
+                            if let replacingText = media.s?.gif {
+                                markdownString.replaceSubrange(range, with: replacingText)
+                            }
+                        } else if media.e == MediaMetadata.imageType {
+                            if let replacingText = media.s?.u {
+                                markdownString.replaceSubrange(range, with: replacingText)
+                            }
+                        } else if media.e == MediaMetadata.redditVideoType {
+                            if let replacingText = media.hlsUrl {
+                                markdownString.replaceSubrange(range, with: replacingText)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
