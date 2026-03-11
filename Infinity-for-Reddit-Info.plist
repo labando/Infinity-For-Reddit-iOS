@@ -4,7 +4,7 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.docilealligator.infinityforreddit.bg.refresh.inbox</string>
+		<string>com.foxanastudio.infinity.bg.refresh.inbox</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
