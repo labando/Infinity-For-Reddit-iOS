@@ -13,10 +13,10 @@
     {
       "identity" : "camera",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Mijick/Camera.git",
+      "location" : "git@github.com:Wonky-Wombat/Camera.git",
       "state" : {
-        "revision" : "0f02348fcc8fbbc9224c7fbf444f182dc25d0b40",
-        "version" : "3.0.3"
+        "branch" : "main",
+        "revision" : "987c01dee746b7460bcd7ae1b0a8fefb3c2862f8"
       }
     },
     {
