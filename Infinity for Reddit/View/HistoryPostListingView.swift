@@ -174,25 +174,18 @@ struct HistoryPostListingView: View {
                     .onAppear {
                         scrollProxy = proxy
                     }
-                    .simultaneousGesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                if lazyModeState == .started {
-                                    pauseLazyMode(resetScrolledPost: true)
-                                }
-                            }
-                            .onEnded { value in
-                                if lazyModeState == .paused {
-                                    resumeLazyMode()
-                                }
-                            }
-                    )
                     .onScrollPhaseChange { _, phase in
                         switch phase {
                         case .idle:
+                            if lazyModeState == .paused {
+                                resumeLazyMode()
+                            }
                             historyPostListingViewModel.isScrollIdle = true
                             historyPostListingViewModel.applyPendingResolvedIconUrlString()
                         case .interacting:
+                            if lazyModeState == .started {
+                                pauseLazyMode(resetScrolledPost: true)
+                            }
                             historyPostListingViewModel.isScrollIdle = false
                         default:
                             break

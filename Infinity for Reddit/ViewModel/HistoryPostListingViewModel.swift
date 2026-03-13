@@ -22,13 +22,11 @@ public class HistoryPostListingViewModel: ObservableObject {
     @Published var error: Error?
     @Published var loadPostsTaskId = UUID()
     @Published var postLayout: PostLayout
-    
-    @Published var appearedPosts: IdentifiedArrayOf<Post> = []
-    @Published var lazyModeScrolledPost: Post?
-    
     @Published var showMediaDownloadFinishedMessageTrigger: Bool = false
     @Published var showAllGalleryMediaDownloadFinishedMessageTrigger: Bool = false
     
+    var appearedPosts: IdentifiedArrayOf<Post> = []
+    var lazyModeScrolledPost: Post?
     var isScrollIdle: Bool = true
     
     private var historyPostListingMetadata: HistoryPostListingMetadata
