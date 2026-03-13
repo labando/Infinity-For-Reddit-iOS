@@ -10,7 +10,7 @@ import SwiftUI
 struct PostView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     
-    @StateObject private var postViewModel: PostViewModel
+    //@StateObject private var postViewModel: PostViewModel
     
     let post: Post
     let postLayout: PostLayout
@@ -48,12 +48,12 @@ struct PostView: View {
         self.onLongPressPost = onLongPressPost
         self.onShare = onShare
         self.onReadPost = onReadPost
-        _postViewModel = StateObject(
-            wrappedValue: PostViewModel(
-                post: post,
-                postRepository: PostRepository()
-            )
-        )
+//        _postViewModel = StateObject(
+//            wrappedValue: PostViewModel(
+//                post: post,
+//                postRepository: PostRepository()
+//            )
+//        )
     }
 
     var body: some View {
@@ -61,7 +61,8 @@ struct PostView: View {
             switch postLayout {
             case .card:
                 PostViewCard(
-                    postViewModel: postViewModel,
+                    //postViewModel: postViewModel,
+                    post: post,
                     iconType: iconType,
                     onPostTap: { videoPlaybackTime in
                         onPostTap(videoPlaybackTime)
@@ -82,7 +83,8 @@ struct PostView: View {
                 )
             case .compact:
                 PostViewCompact(
-                    postViewModel: postViewModel,
+                    //postViewModel: postViewModel,
+                    post: post,
                     iconType: iconType,
                     onPostTap: {
                         onPostTap(0)

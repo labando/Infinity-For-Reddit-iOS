@@ -19,7 +19,9 @@ struct PostViewCompact: View {
     @AppStorage(InterfacePostUserDefaultsUtils.hideNCommentsKey, store: .interfacePost) private var hideNComments: Bool = false
     @AppStorage(InterfaceUserDefaultsUtils.voteButtonsOnTheRightKey, store: .interface) private var voteButtonsOnTheRight: Bool = false
     
-    @ObservedObject var postViewModel: PostViewModel
+    //@ObservedObject var postViewModel: PostViewModel
+    @ObservedObject var post: Post
+    
     @State private var voteTask: Task<Void, Never>?
     @State private var saveTask: Task<Void, Never>?
 
@@ -42,7 +44,8 @@ struct PostViewCompact: View {
     private let iconSize: CGFloat = 24
 
     init(
-        postViewModel: PostViewModel,
+        //postViewModel: PostViewModel,
+        post: Post,
         iconType: IconType,
         onPostTap: @escaping () -> Void,
         onIconTap: @escaping () -> Void,
@@ -59,7 +62,8 @@ struct PostViewCompact: View {
         onReadPost: @escaping () async -> Void,
         onLongPressPost: @escaping () -> Void
     ) {
-        self.postViewModel = postViewModel
+        //self.postViewModel = postViewModel
+        self.post = post
         self.iconType = iconType
         self.onPostTap = onPostTap
         self.onIconTap = onIconTap
@@ -106,7 +110,7 @@ struct PostViewCompact: View {
                         onIconTap()
                     }
 
-                    Text(hideSubredditAndUserPrefix ? postViewModel.post.subreddit : postViewModel.post.subredditNamePrefixed)
+                    Text(hideSubredditAndUserPrefix ? post.subreddit : post.subredditNamePrefixed)
                         .subreddit()
                         .onTapGesture {
                             onSubredditTap()
@@ -115,7 +119,7 @@ struct PostViewCompact: View {
                     
                     Spacer()
                     
-                    TimeText(timeUTCInSeconds: postViewModel.post.createdUtc)
+                    TimeText(timeUTCInSeconds: post.createdUtc)
                         .secondaryText()
                 }
                 .padding(.horizontal, 16)
@@ -123,30 +127,30 @@ struct PostViewCompact: View {
                 
                 HStack (alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(postViewModel.post.title)
+                        Text(post.title)
                             .padding(.bottom, 8)
                             .postTitle()
                         
-                        if hidePostType && !postViewModel.post.spoiler
-                            && !postViewModel.post.over18 && hidePostFlair
-                            && !postViewModel.post.archived && !postViewModel.post.locked
-                            && postViewModel.post.crosspostParent == nil && postViewModel.post.postType != .link {
+                        if hidePostType && !post.spoiler
+                            && !post.over18 && hidePostFlair
+                            && !post.archived && !post.locked
+                            && post.crosspostParent == nil && post.postType != .link {
                             // Not showing post metadata
                             EmptyView()
                         } else {
                             HFlow(alignment: .center) {
                                 if !hidePostType {
-                                    PostTypeTag(post: postViewModel.post)
+                                    PostTypeTag(post: post)
                                         .onTapGesture {
                                             onPostTypeClicked()
                                         }
                                 }
                                 
-                                if postViewModel.post.spoiler {
+                                if post.spoiler {
                                     SpoilerTag()
                                 }
                                 
-                                if postViewModel.post.over18 {
+                                if post.over18 {
                                     SensitiveTag()
                                         .onTapGesture {
                                             onSensitiveClicked()
@@ -154,25 +158,25 @@ struct PostViewCompact: View {
                                 }
                                 
                                 if !hidePostFlair {
-                                    FlairView(flairRichtext: postViewModel.post.linkFlairRichtext,
-                                              flairText: postViewModel.post.linkFlairText)
+                                    FlairView(flairRichtext: post.linkFlairRichtext,
+                                              flairText: post.linkFlairText)
                                 }
                                 
-                                if postViewModel.post.archived {
+                                if post.archived {
                                     ArchivedTag()
                                 }
                                 
-                                if postViewModel.post.locked {
+                                if post.locked {
                                     LockedTag()
                                 }
                                 
-                                if postViewModel.post.crosspostParent != nil {
+                                if post.crosspostParent != nil {
                                     CrosspostTag()
                                 }
                                 
-                                switch postViewModel.post.postType {
+                                switch post.postType {
                                 case .link:
-                                    if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                                    if let url = URL(string: post.url), let domain = url.host {
                                         Text(domain)
                                             .secondaryText()
                                     }
@@ -184,16 +188,16 @@ struct PostViewCompact: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    switch postViewModel.post.postType {
+                    switch post.postType {
                     case .noPreviewLink:
-                        if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                        if let url = URL(string: post.url), let domain = url.host {
                             NoPreviewLinkView {
                                 onOpenLink(url)
                                 Task {
                                     await onReadPost()
                                 }
                             }
-                        } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
+                        } else if let crosspost = post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
                             NoPreviewLinkView {
                                 onOpenLink(url)
                                 Task {
@@ -202,8 +206,8 @@ struct PostViewCompact: View {
                             }
                         }
                     default:
-                        if postViewModel.post.postType.isMedia {
-                            PostPreviewView(post: postViewModel.post, inPostListing: true, isInCompactLayout: true) {
+                        if post.postType.isMedia {
+                            PostPreviewView(post: post, inPostListing: true, isInCompactLayout: true) {
                                 Task {
                                     await onReadPost()
                                 }
@@ -225,15 +229,15 @@ struct PostViewCompact: View {
                                 await onUpvote()
                             }
                         }) {
-                            SwiftUI.Image(systemName: postViewModel.post.likes == 1 && !accountViewModel.account.isAnonymous() ? "arrowshape.up.fill" : "arrowshape.up")
+                            SwiftUI.Image(systemName: post.likes == 1 && !accountViewModel.account.isAnonymous() ? "arrowshape.up.fill" : "arrowshape.up")
                                 .postIconTemplateRendering()
-                                .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1 && !accountViewModel.account.isAnonymous())
+                                .postUpvoteIcon(isUpvoted: post.likes == 1 && !accountViewModel.account.isAnonymous())
                         }
                         .buttonStyle(.borderless)
                         .padding(8)
                         .contentShape(Rectangle())
                         
-                        VotesText(votes: postViewModel.post.score + postViewModel.post.likes, hideNVotes: hideNVotes)
+                        VotesText(votes: post.score + post.likes, hideNVotes: hideNVotes)
                             .frame(width: 72, alignment: .center)
                             .postInfo()
                             .contentShape(Rectangle())
@@ -245,9 +249,9 @@ struct PostViewCompact: View {
                                 await onDownvote()
                             }
                         }) {
-                            SwiftUI.Image(systemName: postViewModel.post.likes == -1 && !accountViewModel.account.isAnonymous() ? "arrowshape.down.fill" : "arrowshape.down")
+                            SwiftUI.Image(systemName: post.likes == -1 && !accountViewModel.account.isAnonymous() ? "arrowshape.down.fill" : "arrowshape.down")
                                 .postIconTemplateRendering()
-                                .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1 && !accountViewModel.account.isAnonymous())
+                                .postDownvoteIcon(isDownvoted: post.likes == -1 && !accountViewModel.account.isAnonymous())
                         }
                         .buttonStyle(.borderless)
                         .padding(8)
@@ -265,7 +269,7 @@ struct PostViewCompact: View {
                                     .postIconTemplateRendering()
                                     .postIcon()
                                 
-                                Text(String(postViewModel.post.numComments))
+                                Text(String(post.numComments))
                                     .postInfo()
                             }
                         }
@@ -281,7 +285,7 @@ struct PostViewCompact: View {
                             await onToggleSave()
                         }
                     }) {
-                        SwiftUI.Image(systemName: postViewModel.post.saved ? "bookmark.fill" : "bookmark")
+                        SwiftUI.Image(systemName: post.saved ? "bookmark.fill" : "bookmark")
                             .postIconTemplateRendering()
                             .postIcon()
                     }
@@ -306,27 +310,27 @@ struct PostViewCompact: View {
         }
         .background {
             Rectangle()
-                .fill(Color(hex: postViewModel.post.isRead ? themeViewModel.currentCustomTheme.readPostCardViewBackgroundColor : themeViewModel.currentCustomTheme.cardViewBackgroundColor))
+                .fill(Color(hex: post.isRead ? themeViewModel.currentCustomTheme.readPostCardViewBackgroundColor : themeViewModel.currentCustomTheme.cardViewBackgroundColor))
         }
     }
     
     var iconUrl: String? {
         switch iconType {
         case .subreddit:
-            return postViewModel.post.subredditIconUrlString
+            return post.subredditIconUrlString
         case .user:
-            return postViewModel.post.userIconUrlString
+            return post.userIconUrlString
         case .fromAPI:
-            return postViewModel.post.resolvedSubredditIconUrlString
+            return post.resolvedSubredditIconUrlString
         }
     }
     
     var iconFallbackText: String {
         if iconType == .user {
-            return postViewModel.post.author
+            return post.author
         }
         
-        return postViewModel.post.subreddit
+        return post.subreddit
     }
 }
 

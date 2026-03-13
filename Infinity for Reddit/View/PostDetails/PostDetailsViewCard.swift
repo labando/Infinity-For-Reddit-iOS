@@ -16,7 +16,8 @@ struct PostDetailsViewCard: View {
     @EnvironmentObject var fullScreenMediaViewModel: FullScreenMediaViewModel
     @EnvironmentObject var customThemeViewModel: CustomThemeViewModel
     
-    @StateObject var postViewModel: PostViewModel
+    //@StateObject var postViewModel: PostViewModel
+    @ObservedObject var post: Post
     //@State var voteTask: Task<Void, Never>?
     @State var saveTask: Task<Void, Never>?
     
@@ -51,6 +52,7 @@ struct PostDetailsViewCard: View {
         onLongPress: @escaping () -> Void,
         onLongPressOnContent: @escaping () -> Void
     ) {
+        self.post = post
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         self.onUpvote = onUpvote
         self.onDownvote = onDownvote
@@ -58,7 +60,7 @@ struct PostDetailsViewCard: View {
         self.onSendComment = onSendComment
         self.onLongPress = onLongPress
         self.onLongPressOnContent = onLongPressOnContent
-        _postViewModel = StateObject(wrappedValue: PostViewModel(post: post, postRepository: PostRepository()))
+        //_postViewModel = StateObject(wrappedValue: PostViewModel(post: post, postRepository: PostRepository()))
     }
     
     var body: some View {
@@ -68,13 +70,13 @@ struct PostDetailsViewCard: View {
             
             HStack {
                 CustomWebImage(
-                    postViewModel.post.subredditIconUrlString,
+                    post.subredditIconUrlString,
                     width: iconSize,
                     height: iconSize,
                     circleClipped: true,
                     handleImageTapGesture: false,
                     fallbackView: {
-                        InitialLetterAvatarImageFallbackView(name: postViewModel.post.subreddit, size: iconSize)
+                        InitialLetterAvatarImageFallbackView(name: post.subreddit, size: iconSize)
                     }
                 )
                 .frame(width: iconSize, height: iconSize)
@@ -83,19 +85,19 @@ struct PostDetailsViewCard: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(hideSubredditAndUserPrefix ? postViewModel.post.subreddit : postViewModel.post.subredditNamePrefixed)
+                    Text(hideSubredditAndUserPrefix ? post.subreddit : post.subredditNamePrefixed)
                         .subreddit()
                         .onTapGesture {
                             goToSubredditDetails()
                         }
                     
-                    Text(hideSubredditAndUserPrefix ? postViewModel.post.author : "u/\(postViewModel.post.author ?? "")")
-                        .usernameOnPost(post: postViewModel.post)
+                    Text(hideSubredditAndUserPrefix ? post.author : "u/\(post.author ?? "")")
+                        .usernameOnPost(post: post)
                         .onTapGesture {
                             goToUserDetails()
                         }
                     
-                    AuthorFlairView(flairRichtext: postViewModel.post.authorFlairRichtext, flairText: postViewModel.post.authorFlairText)
+                    AuthorFlairView(flairRichtext: post.authorFlairRichtext, flairText: post.authorFlairText)
                         .padding(.top, 4)
                         .onTapGesture {
                             goToUserDetails()
@@ -105,7 +107,7 @@ struct PostDetailsViewCard: View {
                 
                 Spacer()
                 
-                TimeText(timeUTCInSeconds: postViewModel.post.createdUtc)
+                TimeText(timeUTCInSeconds: post.createdUtc)
                     .secondaryText()
             }
             .padding(.horizontal, 16)
@@ -115,7 +117,7 @@ struct PostDetailsViewCard: View {
                 onLongPress()
             }
             
-            Text(postViewModel.post.title)
+            Text(post.title)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
                 .postTitle()
@@ -124,34 +126,34 @@ struct PostDetailsViewCard: View {
                     onLongPress()
                 }
             
-            if hidePostType && !postViewModel.post.spoiler
-                && !postViewModel.post.over18 && hidePostFlair
-                && hideUpvoteRatio && !postViewModel.post.archived
-                && !postViewModel.post.locked && postViewModel.post.crosspostParent == nil
-                && postViewModel.post.postType != .link {
+            if hidePostType && !post.spoiler
+                && !post.over18 && hidePostFlair
+                && hideUpvoteRatio && !post.archived
+                && !post.locked && post.crosspostParent == nil
+                && post.postType != .link {
                 // Not showing post metadata
                 EmptyView()
             } else {
                 HFlow(alignment: .center) {
                     if !hidePostType {
-                        PostTypeTag(post: postViewModel.post)
+                        PostTypeTag(post: post)
                             .onTapGesture {
                                 navigationManager.append(
                                     AppNavigation.filteredPosts(
                                         postListingMetadata: PostListingMetadata.getSubredditMetadadata(
-                                            subredditName: postViewModel.post.subreddit, accountViewModel: accountViewModel
+                                            subredditName: post.subreddit, accountViewModel: accountViewModel
                                         ),
-                                        postFilter: PostFilter.constructPostFilter(postType: postViewModel.post.postType)
+                                        postFilter: PostFilter.constructPostFilter(postType: post.postType)
                                     )
                                 )
                             }
                     }
                     
-                    if postViewModel.post.spoiler {
+                    if post.spoiler {
                         SpoilerTag()
                     }
                     
-                    if postViewModel.post.over18 {
+                    if post.over18 {
                         SensitiveTag()
                             .onTapGesture {
                                 var postFilter = PostFilter()
@@ -159,7 +161,7 @@ struct PostDetailsViewCard: View {
                                 navigationManager.append(
                                     AppNavigation.filteredPosts(
                                         postListingMetadata: PostListingMetadata.getSubredditMetadadata(
-                                            subredditName: postViewModel.post.subreddit, accountViewModel: accountViewModel
+                                            subredditName: post.subreddit, accountViewModel: accountViewModel
                                         ),
                                         postFilter: postFilter
                                     )
@@ -168,29 +170,29 @@ struct PostDetailsViewCard: View {
                     }
                     
                     if !hidePostFlair {
-                        FlairView(flairRichtext: postViewModel.post.linkFlairRichtext,
-                                  flairText: postViewModel.post.linkFlairText)
+                        FlairView(flairRichtext: post.linkFlairRichtext,
+                                  flairText: post.linkFlairText)
                     }
                     
                     if !hideUpvoteRatio {
-                        UpvoteRatioTag(post: postViewModel.post)
+                        UpvoteRatioTag(post: post)
                     }
                     
-                    if postViewModel.post.archived {
+                    if post.archived {
                         ArchivedTag()
                     }
                     
-                    if postViewModel.post.locked {
+                    if post.locked {
                         LockedTag()
                     }
                     
-                    if postViewModel.post.crosspostParent != nil {
+                    if post.crosspostParent != nil {
                         CrosspostTag()
                     }
                     
-                    switch postViewModel.post.postType {
+                    switch post.postType {
                     case .link:
-                        if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                        if let url = URL(string: post.url), let domain = url.host {
                             Text(domain)
                                 .secondaryText()
                         }
@@ -208,13 +210,13 @@ struct PostDetailsViewCard: View {
             }
             
             Group {
-                switch postViewModel.post.postType {
+                switch post.postType {
                 case .noPreviewLink:
-                    if let url = URL(string: postViewModel.post.url), let domain = url.host {
+                    if let url = URL(string: post.url), let domain = url.host {
                         NoPreviewLinkView(domain: domain) {
                             navigationManager.openLink(url)
                         }
-                    } else if let crosspost = postViewModel.post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
+                    } else if let crosspost = post.crosspostParent, let url = URL(string: crosspost.url), let domain = url.host {
                         NoPreviewLinkView(domain: domain) {
                             navigationManager.openLink(url)
                         }
@@ -228,15 +230,15 @@ struct PostDetailsViewCard: View {
                 onLongPress()
             }
             
-            if let galleryData = postViewModel.post.galleryData,
+            if let galleryData = post.galleryData,
                       !galleryData.items.isEmpty,
-                      let mediaMetadata = postViewModel.post.mediaMetadata,
+                      let mediaMetadata = post.mediaMetadata,
                       let preview = mediaMetadata[galleryData.items[0].mediaId] {
                 Spacer()
                     .frame(height: 10)
                 
                 // May not have a preview!!!!!!
-                GalleryCarousel(post: postViewModel.post)
+                GalleryCarousel(post: post)
                     .applyIf(preview.s?.aspectRatio != nil) {
                         $0.aspectRatio(preview.s!.aspectRatio, contentMode: .fit)
                     }
@@ -244,34 +246,34 @@ struct PostDetailsViewCard: View {
                     .onLongPressGesture {
                         onLongPress()
                     }
-            } else if case .redditVideo(let videoUrlString, _) = postViewModel.post.postType {
+            } else if case .redditVideo(let videoUrlString, _) = post.postType {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoViewSelfContainedViewModel(post: postViewModel.post, videoUrlString: videoUrlString, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
-            } else if case .video(let videoUrlString, _) = postViewModel.post.postType {
+                PostVideoViewSelfContainedViewModel(post: post, videoUrlString: videoUrlString, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
+            } else if case .video(let videoUrlString, _) = post.postType {
                 Spacer()
                     .frame(height: 10)
                 
-                PostVideoViewSelfContainedViewModel(post: postViewModel.post, videoUrlString: videoUrlString, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
-            } else if postViewModel.post.postType.isMedia {
+                PostVideoViewSelfContainedViewModel(post: post, videoUrlString: videoUrlString, playbackTimeToSeekToInitially: playbackTimeToSeekToInitially)
+            } else if post.postType.isMedia {
                 Spacer()
                     .frame(height: 10)
                 
-                PostPreviewView(post: postViewModel.post)
+                PostPreviewView(post: post)
                     .contentShape(Rectangle())
                     .onLongPressGesture {
                         onLongPress()
                     }
             }
             
-            if let selftext = postViewModel.post.selftextProcessedMarkdown {
+            if let selftext = post.selftextProcessedMarkdown {
                 Markdown(selftext)
                     .markdownImageProvider(
                         MarkdownImageProvider(
-                            mediaMetadata: postViewModel.post.mediaMetadata,
+                            mediaMetadata: post.mediaMetadata,
                             markdownEmbeddedMediaType: markdownEmbeddedMediaType,
-                            isSensitive: postViewModel.post.over18,
+                            isSensitive: post.over18,
                             linkColor: Color(hex: customThemeViewModel.currentCustomTheme.linkColor),
                             fullScreenMediaViewModel: fullScreenMediaViewModel
                         ) { url in
@@ -301,24 +303,24 @@ struct PostDetailsViewCard: View {
                     Button(action: {
                         onUpvote()
                     }) {
-                        SwiftUI.Image(systemName: postViewModel.post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
+                        SwiftUI.Image(systemName: post.likes == 1 ? "arrowshape.up.fill" : "arrowshape.up")
                             .postIconTemplateRendering()
-                            .postUpvoteIcon(isUpvoted: postViewModel.post.likes == 1)
+                            .postUpvoteIcon(isUpvoted: post.likes == 1)
                     }
                     .buttonStyle(.borderless)
                     .padding(8)
                     .contentShape(Rectangle())
                     
-                    VotesText(votes: accountViewModel.account.isAnonymous() ? postViewModel.post.score : postViewModel.post.score + postViewModel.post.likes, hideNVotes: hideNVotes)
+                    VotesText(votes: accountViewModel.account.isAnonymous() ? post.score : post.score + post.likes, hideNVotes: hideNVotes)
                         .frame(width: 72, alignment: .center)
                         .postInfo()
                     
                     Button(action: {
                         onDownvote()
                     }) {
-                        SwiftUI.Image(systemName: postViewModel.post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
+                        SwiftUI.Image(systemName: post.likes == -1 ? "arrowshape.down.fill" : "arrowshape.down")
                             .postIconTemplateRendering()
-                            .postDownvoteIcon(isDownvoted: postViewModel.post.likes == -1)
+                            .postDownvoteIcon(isDownvoted: post.likes == -1)
                     }
                     .buttonStyle(.borderless)
                     .padding(8)
@@ -333,13 +335,13 @@ struct PostDetailsViewCard: View {
                             .postIcon()
                         
                         if !hideNComments {
-                            Text(String(postViewModel.post.numComments))
+                            Text(String(post.numComments))
                                 .postInfo()
                         }
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        if !accountViewModel.account.isAnonymous() && postViewModel.post.canReply {
+                        if !accountViewModel.account.isAnonymous() && post.canReply {
                             onSendComment()
                         }
                     }
@@ -355,7 +357,7 @@ struct PostDetailsViewCard: View {
                         await onToggleSave()
                     }
                 }) {
-                    SwiftUI.Image(systemName: postViewModel.post.saved ? "bookmark.fill" : "bookmark")
+                    SwiftUI.Image(systemName: post.saved ? "bookmark.fill" : "bookmark")
                         .postIconTemplateRendering()
                         .postIcon()
                 }
@@ -363,7 +365,7 @@ struct PostDetailsViewCard: View {
                 .padding(8)
                 .contentShape(Rectangle())
                 
-                ShareLink(item: postViewModel.post.url) {
+                ShareLink(item: post.url) {
                     SwiftUI.Image(systemName: "square.and.arrow.up")
                         .postIconTemplateRendering()
                         .postIcon()
@@ -387,11 +389,11 @@ struct PostDetailsViewCard: View {
     }
     
     private func goToSubredditDetails() {
-        navigationManager.append(AppNavigation.subredditDetails(subredditName: postViewModel.post.subreddit))
+        navigationManager.append(AppNavigation.subredditDetails(subredditName: post.subreddit))
     }
     
     private func goToUserDetails() {
-        navigationManager.append(AppNavigation.userDetails(username: postViewModel.post.author))
+        navigationManager.append(AppNavigation.userDetails(username: post.author))
     }
 }
 
