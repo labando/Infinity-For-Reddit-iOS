@@ -17,7 +17,7 @@ struct PostViewCard: View {
     @StateObject private var videoPlayerViewModel: VideoPlayerViewModel
     
     //@ObservedObject var postViewModel: PostViewModel
-    @ObservedObject var post: Post
+    @ObservedObject private var post: Post
     
     @State private var voteTask: Task<Void, Never>?
     @State private var saveTask: Task<Void, Never>?
