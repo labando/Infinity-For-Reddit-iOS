@@ -13,7 +13,7 @@ struct ContentSensitivityFilterSettingsView: View {
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.sensitiveContentKey, store: .contentSensitivityFilter) private var sensitiveContent: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSensitiveImagesKey, store: .contentSensitivityFilter) private var blurSensitiveImages: Bool = true
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.doNotBlurSensitiveImagesInSensitiveSubredditsKey, store: .contentSensitivityFilter) private var doNotBlurSensitiveImagesInSensitiveSubreddits: Bool = false
-    @AppStorage(ContentSensitivityFilterUserDetailsUtils.spoilerContentKey, store: .contentSensitivityFilter) private var spoilerContent: Bool = false
+    @AppStorage(ContentSensitivityFilterUserDetailsUtils.spoilerContentKey, store: .contentSensitivityFilter) private var spoilerContent: Bool = true
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.blurSpoilerImagesKey, store: .contentSensitivityFilter) private var blurSpoilerImages: Bool = false
     @AppStorage(ContentSensitivityFilterUserDetailsUtils.disableSensitiveContentForeverKey, store: .contentSensitivityFilter) private var disableSensitiveContentForever: Bool = false
     
