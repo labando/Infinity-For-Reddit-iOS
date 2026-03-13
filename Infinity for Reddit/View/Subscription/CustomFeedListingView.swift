@@ -49,6 +49,7 @@ struct CustomFeedListingView: View {
                                         await subscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
                                     }
                                 }
+                                .limitedWidth()
                                 .id(ObjectIdentifier(customFeed))
                                 .listPlainItemNoInsets()
                                 .applyIf(onSelectCustomAction == nil) {
@@ -82,6 +83,7 @@ struct CustomFeedListingView: View {
                                     await subscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
                                 }
                             }
+                            .limitedWidth()
                             .id(ObjectIdentifier(customFeed))
                             .listPlainItemNoInsets()
                             .applyIf(onSelectCustomAction == nil) {

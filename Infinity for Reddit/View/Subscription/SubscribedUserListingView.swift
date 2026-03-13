@@ -50,6 +50,7 @@ struct SubscribedUserListingView: View {
                                         await subscriptionListingViewModel.toggleFavoriteUser(subscription)
                                     }
                                 }
+                                .limitedWidth()
                                 .id(ObjectIdentifier(subscription))
                                 .listPlainItemNoInsets()
                                 .applyIf(onSelectCustomAction == nil) {
@@ -83,6 +84,7 @@ struct SubscribedUserListingView: View {
                                     await subscriptionListingViewModel.toggleFavoriteUser(subscription)
                                 }
                             }
+                            .limitedWidth()
                             .id(ObjectIdentifier(subscription))
                             .listPlainItemNoInsets()
                             .applyIf(onSelectCustomAction == nil) {

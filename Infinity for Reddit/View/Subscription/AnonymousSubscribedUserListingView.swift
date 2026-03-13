@@ -44,6 +44,7 @@ struct AnonymousSubscribedUserListingView: View {
                                     subscription.isFavorite.toggle()
                                     anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
                                 }
+                                .limitedWidth()
                                 .id(ObjectIdentifier(subscription))
                                 .listPlainItemNoInsets()
                                 .applyIf(onSelectCustomAction == nil) {
@@ -75,6 +76,7 @@ struct AnonymousSubscribedUserListingView: View {
                                 subscription.isFavorite.toggle()
                                 anonymousSubscriptionListingViewModel.toggleFavoriteUser(subscription)
                             }
+                            .limitedWidth()
                             .id(ObjectIdentifier(subscription))
                             .listPlainItemNoInsets()
                             .applyIf(onSelectCustomAction == nil) {

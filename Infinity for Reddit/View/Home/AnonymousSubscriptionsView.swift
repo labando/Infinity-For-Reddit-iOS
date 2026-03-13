@@ -170,7 +170,6 @@ struct AnonymousSubscriptionsView: View {
                 }
             }
         }
-        .limitedWidth()
         .onAppear {
             if let key = navigationBarMenuKey {
                 navigationBarMenuManager.pop(key: key)
@@ -215,6 +214,7 @@ struct AnonymousSubscriptionsView: View {
                                         customFeed.isFavorite.toggle()
                                         anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
                                     }
+                                    .limitedWidth()
                                     .id(ObjectIdentifier(customFeed))
                                     .listPlainItemNoInsets()
                                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -240,6 +240,7 @@ struct AnonymousSubscriptionsView: View {
                                     customFeed.isFavorite.toggle()
                                     anonymousSubscriptionListingViewModel.toggleFavoriteCustomFeed(customFeed)
                                 }
+                                .limitedWidth()
                                 .id(ObjectIdentifier(customFeed))
                                 .listPlainItemNoInsets()
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
