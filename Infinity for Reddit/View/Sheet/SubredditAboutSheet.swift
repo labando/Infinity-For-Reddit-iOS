@@ -19,8 +19,8 @@ struct SubredditAboutSheet: View {
                     RowText("Cakeday: \(Utils.getFormattedCakeDay(subredditData?.createdUTC))")
                         .primaryText()
                     
-                    if let description = subredditData?.description, !description.isEmpty {
-                        Markdown(description)
+                    if let sidebarDescription = subredditData?.sidebarDescription, !sidebarDescription.isEmpty {
+                        Markdown(sidebarDescription)
                             .themedMarkdown()
                             .markdownLinkHandler { url in
                                 navigationManager.openLink(url)

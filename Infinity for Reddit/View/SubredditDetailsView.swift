@@ -87,7 +87,7 @@ struct SubredditDetailsView: View {
                             }
                             .padding(16)
                             
-                            if let description = subredditDetailsViewModel.subredditData?.sidebarDescription, !description.isEmpty {
+                            if let description = subredditDetailsViewModel.subredditData?.description, !description.isEmpty {
                                 Markdown(description)
                                     .themedMarkdown()
                                     .padding(.horizontal, 16)
