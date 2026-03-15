@@ -240,16 +240,37 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
             break
         }
         
+        let titleRange = NSRange(location: 0, length: post.title.utf16.count)
         if let excludesRegex = postFilter.postTitleExcludesRegex, !excludesRegex.isEmpty {
-            if let regex = try? NSRegularExpression(pattern: excludesRegex) {
-                if regex.firstMatch(in: post.title, options: [], range: NSRange(location: 0, length: post.title.utf16.count)) != nil {
+            let patterns = excludesRegex
+                .split(whereSeparator: \.isNewline)
+                .map {
+                    $0.trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                .filter {
+                    !$0.isEmpty
+                }
+            print("[PostFilter] excludesRegex patterns: \(patterns)")
+            for pattern in patterns {
+                if let regex = try? NSRegularExpression(pattern: pattern),
+                   regex.firstMatch(in: post.title, options: [], range: titleRange) != nil {
                     return false
                 }
             }
         }
         if let containsRegex = postFilter.postTitleContainsRegex, !containsRegex.isEmpty {
-            if let regex = try? NSRegularExpression(pattern: containsRegex) {
-                if regex.firstMatch(in: post.title, options: [], range: NSRange(location: 0, length: post.title.utf16.count)) == nil {
+            let patterns = containsRegex
+                .split(whereSeparator: \.isNewline)
+                .map {
+                    $0.trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                .filter {
+                    !$0.isEmpty
+                }
+            print("[PostFilter] containsRegex patterns: \(patterns)")
+            for pattern in patterns {
+                if let regex = try? NSRegularExpression(pattern: pattern),
+                   regex.firstMatch(in: post.title, options: [], range: titleRange) == nil {
                     return false
                 }
             }
@@ -329,13 +350,13 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
         var merged = PostFilter()
         merged.name = "Merged"
         
-        func append(_ current: String?, _ addition: String?) -> String? {
+        func append(_ current: String?, _ addition: String?, separator: String = ",") -> String? {
             guard let addition, !addition.isEmpty else {
                 return current
             }
             
             if let current, !current.isEmpty {
-                return current + "," + addition
+                return current + separator + addition
             } else {
                 return addition
             }
@@ -366,13 +387,8 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
             merged.onlySensitive = p.onlySensitive || merged.onlySensitive
             merged.onlySpoiler = p.onlySpoiler || merged.onlySpoiler
 
-            if let regex = p.postTitleExcludesRegex, !regex.isEmpty {
-                merged.postTitleExcludesRegex = regex
-            }
-
-            if let regex = p.postTitleContainsRegex, !regex.isEmpty {
-                merged.postTitleContainsRegex = regex
-            }
+            merged.postTitleExcludesRegex = append(merged.postTitleExcludesRegex, p.postTitleExcludesRegex, separator: "\n")
+            merged.postTitleContainsRegex = append(merged.postTitleContainsRegex, p.postTitleContainsRegex, separator: "\n")
 
             merged.postTitleExcludesStrings = append(merged.postTitleExcludesStrings, p.postTitleExcludesStrings)
             merged.postTitleContainsStrings = append(merged.postTitleContainsStrings, p.postTitleContainsStrings)
