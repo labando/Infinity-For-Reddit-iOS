@@ -55,8 +55,6 @@ struct RedditGRDBDatabase {
                 t.column("min_vote", .integer)
                 t.column("max_comments", .integer)
                 t.column("min_comments", .integer)
-                t.column("max_awards", .integer)
-                t.column("min_awards", .integer)
                 t.column("only_sensitive", .boolean)
                 t.column("only_spoiler", .boolean)
                 t.column("post_title_excludes_regex", .text)

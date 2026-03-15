@@ -24,10 +24,6 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
     var maxComments: Int = -1
     var minComments: Int = -1
     
-    // Award filters
-    var maxAwards: Int = -1
-    var minAwards: Int = -1
-    
     // Sensitive and spoiler filters
     var onlySensitive: Bool = false
     var onlySpoiler: Bool = false
@@ -73,8 +69,6 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
         minVote: Int = -1,
         maxComments: Int = -1,
         minComments: Int = -1,
-        maxAwards: Int = -1,
-        minAwards: Int = -1,
         onlySensitive: Bool = false,
         onlySpoiler: Bool = false,
         postTitleExcludesRegex: String? = nil,
@@ -102,8 +96,6 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
         self.minVote = minVote
         self.maxComments = maxComments
         self.minComments = minComments
-        self.maxAwards = maxAwards
-        self.minAwards = minAwards
         self.onlySensitive = onlySensitive
         self.onlySpoiler = onlySpoiler
         self.postTitleExcludesRegex = postTitleExcludesRegex
@@ -133,8 +125,6 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
         case minVote = "min_vote"
         case maxComments = "max_comments"
         case minComments = "min_comments"
-        case maxAwards = "max_awards"
-        case minAwards = "min_awards"
         case onlySensitive = "only_sensitive"
         case onlySpoiler = "only_spoiler"
         case postTitleExcludesRegex = "post_title_excludes_regex"
@@ -376,13 +366,6 @@ public struct PostFilter: Codable, FetchableRecord, PersistableRecord, Equatable
                 merged.maxComments = min(merged.maxComments, p.maxComments)
             }
             merged.minComments = max(p.minComments, merged.minComments)
-            
-            if merged.maxAwards == -1 {
-                merged.maxAwards = p.maxAwards
-            } else if p.maxAwards != -1 {
-                merged.maxAwards = min(merged.maxAwards, p.maxAwards)
-            }
-            merged.minAwards = max(p.minAwards, merged.minAwards)
 
             merged.onlySensitive = p.onlySensitive || merged.onlySensitive
             merged.onlySpoiler = p.onlySpoiler || merged.onlySpoiler
