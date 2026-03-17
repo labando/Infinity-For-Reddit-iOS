@@ -235,7 +235,7 @@ struct SubredditDetailsView: View {
             }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
         }
-        .wrapContentSheet(isPresented: $showSubredditAboutSheet) {
+        .sheet(isPresented: $showSubredditAboutSheet) {
             SubredditAboutSheet(subredditData: subredditDetailsViewModel.subredditData)
         }
         .wrapContentSheet(isPresented: $showUserFlairSheet) {
