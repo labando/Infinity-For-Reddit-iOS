@@ -46,76 +46,80 @@ struct UserDetailsView: View {
             GeometryReader { proxy in
                 VStack(spacing: 0) {
                     if isUserInfoVisible {
-                        VStack(spacing: 0) {
-                            CustomWebImage(
-                                userDetailsViewModel.userData?.banner,
-                                width: proxy.size.width,
-                                height: 150,
-                                handleImageTapGesture: false,
-                                centerCrop: true,
-                                fallbackView: {
-                                    if #available(iOS 26, *) {
-                                        Color.clear
-                                            .frame(height: proxy.safeAreaInsets.top)
-                                    } else {
-                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                            .frame(height: proxy.safeAreaInsets.top)
-                                    }
-                                }
-                            )
-                            
-                            HStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
                                 CustomWebImage(
-                                    userDetailsViewModel.userData?.iconUrl,
-                                    width: userIconSize,
-                                    height: userIconSize,
-                                    circleClipped: true,
+                                    proxy.size.height < 500 ? nil : userDetailsViewModel.userData?.banner,
+                                    width: proxy.size.width,
+                                    height: 150,
                                     handleImageTapGesture: false,
+                                    centerCrop: true,
                                     fallbackView: {
-                                        InitialLetterAvatarImageFallbackView(name: userDetailsViewModel.userData?.name ?? "", size: userIconSize)
+                                        if #available(iOS 26, *) {
+                                            Color.clear
+                                                .frame(height: proxy.safeAreaInsets.top)
+                                        } else {
+                                            Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                                .frame(height: proxy.safeAreaInsets.top)
+                                        }
                                     }
                                 )
                                 
-                                VStack(alignment: .leading, spacing: 5) {
-                                    Text("u/\(userDetailsViewModel.userData?.name ?? userDetailsViewModel.username)")
-                                        .username()
+                                HStack(spacing: 0) {
+                                    CustomWebImage(
+                                        userDetailsViewModel.userData?.iconUrl,
+                                        width: userIconSize,
+                                        height: userIconSize,
+                                        circleClipped: true,
+                                        handleImageTapGesture: false,
+                                        fallbackView: {
+                                            InitialLetterAvatarImageFallbackView(name: userDetailsViewModel.userData?.name ?? "", size: userIconSize)
+                                        }
+                                    )
                                     
-                                    Button(userDetailsViewModel.userData?.isSubscribed ?? false ? "Followed" : "Follow") {
-                                        userDetailsViewModel.toggleFollowUser()
+                                    VStack(alignment: .leading, spacing: 5) {
+                                        Text("u/\(userDetailsViewModel.userData?.name ?? userDetailsViewModel.username)")
+                                            .username()
+                                        
+                                        Button(userDetailsViewModel.userData?.isSubscribed ?? false ? "Followed" : "Follow") {
+                                            userDetailsViewModel.toggleFollowUser()
+                                        }
+                                        .subscribeButton(isSubscribed: userDetailsViewModel.userData?.isSubscribed ?? false)
                                     }
-                                    .subscribeButton(isSubscribed: userDetailsViewModel.userData?.isSubscribed ?? false)
+                                    .padding(.horizontal, 16)
+                                    
+                                    Spacer()
                                 }
+                                .padding(16)
+                                
+                                HStack {
+                                    Text("Karma: \(userDetailsViewModel.userData?.totalKarma ?? 0)")
+                                        .primaryText()
+                                    
+                                    Spacer()
+                                    
+                                    Text("Cake day: \(Utils.getFormattedCakeDay(userDetailsViewModel.userData?.cakeday ?? 0))")
+                                        .primaryText()
+                                        .padding(.leading, 20)
+                                }
+                                .padding(.bottom, 16)
                                 .padding(.horizontal, 16)
                                 
-                                Spacer()
+                                if let description = userDetailsViewModel.userData?.description, !description.isEmpty {
+                                    Markdown(description)
+                                        .themedMarkdown()
+                                        .padding(.horizontal, 16)
+                                        .padding(.bottom, 16)
+                                        .markdownLinkHandler { url in
+                                            navigationManager.openLink(url)
+                                        }
+                                }
                             }
-                            .padding(16)
-                            
-                            HStack {
-                                Text("Karma: \(userDetailsViewModel.userData?.totalKarma ?? 0)")
-                                    .primaryText()
-                                
-                                Spacer()
-                                
-                                Text("Cake day: \(Utils.getFormattedCakeDay(userDetailsViewModel.userData?.cakeday ?? 0))")
-                                    .primaryText()
-                                    .padding(.leading, 20)
-                            }
-                            .padding(.bottom, 16)
-                            .padding(.horizontal, 16)
-                            
-                            if let description = userDetailsViewModel.userData?.description, !description.isEmpty {
-                                Markdown(description)
-                                    .themedMarkdown()
-                                    .padding(.horizontal, 16)
-                                    .padding(.bottom, 16)
-                                    .markdownLinkHandler { url in
-                                        navigationManager.openLink(url)
-                                    }
-                            }
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .animation(.easeInOut, value: isUserInfoVisible)
                         }
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                        .animation(.easeInOut, value: isUserInfoVisible)
+                        .frame(maxHeight: proxy.size.height * 3 / 5)
+                        .fixedSize(horizontal: false, vertical: true)
                     } else {
                         Spacer()
                             .frame(height: proxy.safeAreaInsets.top)

@@ -42,63 +42,68 @@ struct SubredditDetailsView: View {
             GeometryReader { proxy in
                 VStack(spacing: 0) {
                     if isSubredditInfoVisible {
-                        VStack(spacing: 0) {
-                            CustomWebImage(
-                                subredditDetailsViewModel.subredditData?.bannerUrl,
-                                width: proxy.size.width,
-                                height: 150,
-                                handleImageTapGesture: false,
-                                centerCrop: true,
-                                fallbackView: {
-                                    if #available(iOS 26, *) {
-                                        Color.clear
-                                            .frame(height: proxy.safeAreaInsets.top)
-                                    } else {
-                                        Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
-                                            .frame(height: proxy.safeAreaInsets.top)
-                                    }
-                                }
-                            )
-                            
-                            HStack(spacing: 0) {
+                        ScrollView {
+                            VStack(spacing: 0) {
                                 CustomWebImage(
-                                    subredditDetailsViewModel.subredditData?.iconUrl,
-                                    width: subredditIconSize,
-                                    height: subredditIconSize,
-                                    circleClipped: true,
+                                    proxy.size.height < 500 ? nil : subredditDetailsViewModel.subredditData?.bannerUrl,
+                                    width: proxy.size.width,
+                                    height: 150,
                                     handleImageTapGesture: false,
+                                    centerCrop: true,
                                     fallbackView: {
-                                        InitialLetterAvatarImageFallbackView(name: subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName, size: subredditIconSize)
+                                        if #available(iOS 26, *) {
+                                            Color.clear
+                                                .frame(height: proxy.safeAreaInsets.top)
+                                        } else {
+                                            Color(hex: themeViewModel.currentCustomTheme.colorPrimary)
+                                                .frame(height: proxy.safeAreaInsets.top)
+                                        }
                                     }
                                 )
                                 
-                                VStack(alignment: .leading) {
-                                    Text("r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)")
-                                        .subreddit()
+                                HStack(spacing: 0) {
+                                    CustomWebImage(
+                                        subredditDetailsViewModel.subredditData?.iconUrl,
+                                        width: subredditIconSize,
+                                        height: subredditIconSize,
+                                        circleClipped: true,
+                                        handleImageTapGesture: false,
+                                        fallbackView: {
+                                            InitialLetterAvatarImageFallbackView(name: subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName, size: subredditIconSize)
+                                        }
+                                    )
                                     
-                                    Button("\(subredditDetailsViewModel.subredditData?.isSubscribed ?? false ? "Subscribed" : "Subscribe") \(subredditDetailsViewModel.subredditData?.nSubscribers ?? 0)") {
-                                        subredditDetailsViewModel.toggleSubscribeSubreddit()
+                                    VStack(alignment: .leading) {
+                                        Text("r/\(subredditDetailsViewModel.subredditData?.name ?? subredditDetailsViewModel.subredditName)")
+                                            .subreddit()
+                                        
+                                        Button("\(subredditDetailsViewModel.subredditData?.isSubscribed ?? false ? "Subscribed" : "Subscribe") \(subredditDetailsViewModel.subredditData?.nSubscribers ?? 0)") {
+                                            subredditDetailsViewModel.toggleSubscribeSubreddit()
+                                        }
+                                        .subscribeButton(isSubscribed: subredditDetailsViewModel.subredditData?.isSubscribed ?? false)
                                     }
-                                    .subscribeButton(isSubscribed: subredditDetailsViewModel.subredditData?.isSubscribed ?? false)
-                                }
-                                .padding(.horizontal, 16)
-                                
-                                Spacer()
-                            }
-                            .padding(16)
-                            
-                            if let description = subredditDetailsViewModel.subredditData?.description, !description.isEmpty {
-                                Markdown(description)
-                                    .themedMarkdown()
                                     .padding(.horizontal, 16)
-                                    .padding(.bottom, 16)
-                                    .markdownLinkHandler { url in
-                                        navigationManager.openLink(url)
-                                    }
+                                    
+                                    Spacer()
+                                }
+                                .padding(16)
+                                
+                                if let description = subredditDetailsViewModel.subredditData?.description, !description.isEmpty {
+                                    Markdown(description)
+                                        .themedMarkdown()
+                                        .frame(maxHeight: .infinity)
+                                        .padding(.horizontal, 16)
+                                        .padding(.bottom, 16)
+                                        .markdownLinkHandler { url in
+                                            navigationManager.openLink(url)
+                                        }
+                                }
                             }
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .animation(.easeInOut, value: isSubredditInfoVisible)
                         }
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                        .animation(.easeInOut, value: isSubredditInfoVisible)
+                        .frame(maxHeight: proxy.size.height / 2)
+                        .fixedSize(horizontal: false, vertical: true)
                     } else {
                         Spacer()
                             .frame(height: proxy.safeAreaInsets.top)
