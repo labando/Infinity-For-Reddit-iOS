@@ -35,6 +35,7 @@ struct GalleryFullScreenView: View {
                 if item.mediaType != .video {
                     GalleryImageView(
                         childViewHasZoomed: $childViewHasZoomed,
+                        index: index,
                         item: item,
                         items: items,
                         post: post,
@@ -90,6 +91,7 @@ struct GalleryImageView: View {
     
     @Binding var childViewHasZoomed: Bool
     
+    let index: Int
     let item: GalleryItem
     let items: [GalleryItem]
     let post: Post?
@@ -117,6 +119,7 @@ struct GalleryImageView: View {
             GalleryImageToolbar(
                 downloadMediaType: item.toDownloadMediaType(post: post),
                 isVisible: $isToolbarVisible,
+                index: index,
                 items: items,
                 post: post,
                 hasDescription: !item.caption.isEmpty || !item.captionUrl.isEmpty,
@@ -132,6 +135,7 @@ struct GalleryImageToolbar: View {
     
     @Binding var isVisible: Bool
     
+    let index: Int
     let items: [GalleryItem]
     let post: Post?
     let hasDescription: Bool
@@ -142,6 +146,7 @@ struct GalleryImageToolbar: View {
     
     init(downloadMediaType: DownloadMediaType,
          isVisible: Binding<Bool>,
+         index: Int,
          items: [GalleryItem],
          post: Post?,
          hasDescription: Bool,
@@ -152,6 +157,7 @@ struct GalleryImageToolbar: View {
             wrappedValue: FullScreenMediaToolbarViewModel(downloadMediaType: downloadMediaType)
         )
         self._isVisible = isVisible
+        self.index = index
         self.items = items
         self.post = post
         self.hasDescription = hasDescription
@@ -179,6 +185,14 @@ struct GalleryImageToolbar: View {
                     }
                     
                     Spacer()
+                    
+                    Text("\(index + 1)/\(items.count)")
+                        .padding(10)
+                        .foregroundColor(Color.white)
+                        .background(
+                            Capsule()
+                                .fill(Color(hex: "#6B6B6B", opacity: 0.5))
+                        )
                 }
                 .padding(16)
                 .transition(.move(edge: .top).combined(with: .opacity))
