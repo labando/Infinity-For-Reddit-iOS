@@ -89,6 +89,7 @@ struct PostFilterDao {
                     (SELECT post_filter_usage.post_filter_id FROM post_filter_usage 
                      WHERE (usage_type = ? AND name_of_usage = ? COLLATE NOCASE) 
                      OR (usage_type = ? AND name_of_usage = '--'))
+                OR NOT EXISTS (SELECT post_filter_usage.post_filter_id FROM post_filter_usage WHERE post_filter.id = post_filter_usage.post_filter_id)
             """
             return try PostFilter.fetchAll(db, sql: sql, arguments: [usage, nameOfUsage, usage])
         }

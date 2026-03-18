@@ -29,6 +29,11 @@ struct PostFilterItemView: View {
                     RowText(postFilterUsage.description)
                         .secondaryText()
                 }
+                
+                if postFilterItemViewModel.postFilterUsages.isEmpty {
+                    RowText("Applied Everywhere")
+                        .secondaryText()
+                }
             }
             .contentShape(Rectangle())
             .padding(16)
