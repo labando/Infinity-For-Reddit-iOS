@@ -17,6 +17,7 @@ class SubredditDetailsViewModel: ObservableObject {
     @Published var subredditName: String
     @Published var subredditData: SubredditData?
     @Published var userFlairs: [UserFlair]?
+    @Published var showSensitiveSubredditWarningTrigger: Bool = false
     @Published var error: Error?
     
     private let subredditDetailsRepository: SubredditDetailsRepositoryProtocol
@@ -36,6 +37,7 @@ class SubredditDetailsViewModel: ObservableObject {
             try Task.checkCancellation()
             
             self.subredditData = subredditData
+            self.showSensitiveSubredditWarningTrigger = subredditData.isSensitive && !AccountViewModel.shared.account.allowSensitive
         } catch {
             self.error = error
             

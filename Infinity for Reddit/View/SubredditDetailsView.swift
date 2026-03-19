@@ -9,9 +9,11 @@ import MarkdownUI
 import SDWebImageSwiftUI
 
 struct SubredditDetailsView: View {
-    @EnvironmentObject var accountViewModel: AccountViewModel
-    @EnvironmentObject var themeViewModel: CustomThemeViewModel
-    @EnvironmentObject var navigationBarMenuManager: NavigationBarMenuManager
+    @Environment(\.dismiss) private var dismiss
+    
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    @EnvironmentObject private var themeViewModel: CustomThemeViewModel
+    @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var navigationManager: NavigationManager
     
     @StateObject var subredditDetailsViewModel : SubredditDetailsViewModel
@@ -255,6 +257,19 @@ struct SubredditDetailsView: View {
                 subredditDetailsViewModel.cleaarUserFlair()
             })
         }
+        .overlay(
+            CustomAlert(
+                title: "NSFW Subreddit",
+                subtitle: "This subreddit is marked as NSFW. You can only go back.",
+                confirmButtonText: "Go Back",
+                buttonStyle: .info,
+                showDismissButton: false,
+                canDismissByTapOutside: false,
+                isPresented: $subredditDetailsViewModel.showSensitiveSubredditWarningTrigger
+            ) {} onConfirm: {
+                dismiss()
+            }
+        )
     }
     
     func getScreenHeight(_ proxy: GeometryProxy) -> CGFloat {

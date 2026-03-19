@@ -980,7 +980,7 @@ struct PostDetailsView: View {
             case .deletePost:
                 return nil
             case .sensitiveContentWarning:
-                return "This post may contain sensitive content. You have disabled sensitive content in your settings, so you can only go back."
+                return "This post may contain sensitive content. You can only go back."
             }
         }
         

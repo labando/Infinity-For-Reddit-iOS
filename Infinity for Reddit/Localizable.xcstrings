@@ -270,6 +270,9 @@
     "No wiki found" : {
 
     },
+    "NSFW" : {
+
+    },
     "Once enabled, sensitive content will always be hidden, regardless of the sensitive content setting. This option is irreversible; the only way to re-enable the sensitive content is to clear the app data.\n\nDo you still want to enable it?" : {
 
     },
