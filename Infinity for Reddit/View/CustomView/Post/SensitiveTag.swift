@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SensitiveTag: View {
     var body: some View {
-        Text("Sensitive")
+        Text("NSFW")
             .sensitiveTag()
     }
 }
