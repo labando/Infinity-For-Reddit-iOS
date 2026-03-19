@@ -297,7 +297,7 @@ struct CommentViewCard: View {
                                             onReply?()
                                         }
                                     }) {
-                                        SwiftUI.Image(systemName: "arrowshape.turn.up.left.fill")
+                                        SwiftUI.Image(systemName: "arrowshape.turn.up.left")
                                             .commentIconTemplateRendering()
                                             .applyIf(comment.locked) {
                                                 $0.voteAndReplyUnavailbleIcon()

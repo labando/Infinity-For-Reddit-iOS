@@ -37,6 +37,7 @@ struct PostDetailsViewCard: View {
     let onDownvote: () -> Void
     let onToggleSave: () async -> Void
     let onSendComment: () -> Void
+    let onShare: () -> Void
     let onLongPress: () -> Void
     let onLongPressOnContent: () -> Void
     
@@ -49,6 +50,7 @@ struct PostDetailsViewCard: View {
         onDownvote: @escaping () -> Void,
         onToggleSave: @escaping () async -> Void,
         onSendComment: @escaping () -> Void,
+        onShare: @escaping () -> Void,
         onLongPress: @escaping () -> Void,
         onLongPressOnContent: @escaping () -> Void
     ) {
@@ -58,6 +60,7 @@ struct PostDetailsViewCard: View {
         self.onDownvote = onDownvote
         self.onToggleSave = onToggleSave
         self.onSendComment = onSendComment
+        self.onShare = onShare
         self.onLongPress = onLongPress
         self.onLongPressOnContent = onLongPressOnContent
         //_postViewModel = StateObject(wrappedValue: PostViewModel(post: post, postRepository: PostRepository()))
@@ -365,7 +368,16 @@ struct PostDetailsViewCard: View {
                 .padding(8)
                 .contentShape(Rectangle())
                 
-                ShareLink(item: post.url) {
+//                ShareLink(item: post.url) {
+//                    SwiftUI.Image(systemName: "square.and.arrow.up")
+//                        .postIconTemplateRendering()
+//                        .postIcon()
+//                }
+//                .buttonStyle(.borderless)
+//                .padding(8)
+//                .contentShape(Rectangle())
+                
+                Button(action: onShare) {
                     SwiftUI.Image(systemName: "square.and.arrow.up")
                         .postIconTemplateRendering()
                         .postIcon()

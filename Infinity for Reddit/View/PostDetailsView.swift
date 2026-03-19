@@ -96,6 +96,9 @@ struct PostDetailsView: View {
                                         //isFromSubredditPostListing: isFromSubredditPostListing,
                                         playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                                         onSendComment: sendComment,
+                                        onShare: {
+                                            showPostShareSheet = true
+                                        },
                                         onLongPress: {
                                             showPostOptionsSheet = true
                                         },
@@ -125,6 +128,9 @@ struct PostDetailsView: View {
                                             //isFromSubredditPostListing: isFromSubredditPostListing,
                                             playbackTimeToSeekToInitially: playbackTimeToSeekToInitially,
                                             onSendComment: sendComment,
+                                            onShare: {
+                                                showPostShareSheet = true
+                                            },
                                             onLongPress: {
                                                 showPostOptionsSheet = true
                                             },
@@ -1040,6 +1046,7 @@ private struct PostDetailsItemView: View {
     //let isFromSubredditPostListing: Bool
     let playbackTimeToSeekToInitially: Double
     let onSendComment: () -> Void
+    let onShare: () -> Void
     let onLongPress: () -> Void
     let onLongPressOnContent: () -> Void
     
@@ -1064,6 +1071,7 @@ private struct PostDetailsItemView: View {
                 await postDetailsViewModel.toggleSavePost(save: !post.saved)
             },
             onSendComment: onSendComment,
+            onShare: onShare,
             onLongPress: {
                 onLongPress()
             },
