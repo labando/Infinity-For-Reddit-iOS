@@ -282,15 +282,20 @@ struct TabViewGestureViewModifier: ViewModifier {
                 x: endTranslation.width,
                 y: endTranslation.height
             )
-        }
-        
-        Task {
-            try? await Task.sleep(for: .seconds(0.3))
+        } completion: {
             onDismiss()
             dismissStarted = false
             transform = .identity
             lastTransform = .identity
         }
+        
+//        Task {
+//            try? await Task.sleep(for: .seconds(0.3))
+//            onDismiss()
+//            dismissStarted = false
+//            transform = .identity
+//            lastTransform = .identity
+//        }
     }
     
     private func onDragEnded(_ transform: CGAffineTransform) -> Bool {

@@ -228,19 +228,20 @@ struct HomeView: View {
             .id(accountViewModel.account.username)
             
             if let media = fullScreenMediaViewModel.media {
-                if case let .image(urlString, aspectRatio, post, fileName, matchedGeometryEffectId) = media {
+                switch media {
+                case .image(let urlString, let aspectRatio, let post, let fileName, let matchedGeometryEffectId):
                     ImageFullScreenView(urlString: urlString, fileName: fileName, matchedGeometryEffectId: matchedGeometryEffectId, isGif: false) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(urlString)
                     .zIndex(1)
-                } else if case let .gallery(currentUrlString, post, items, galleryScrollState) = media {
+                case .gallery(let currentUrlString, let post, let items, let galleryScrollState):
                     GalleryFullScreenView(post: post, items: items, galleryScrollState: galleryScrollState) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(currentUrlString)
                     .zIndex(1)
-                } else if case let .video(urlString, post, videoType, canDownload, playbackTime) = media {
+                case .video(let urlString, let post, let videoType, let canDownload, let playbackTime):
                     VideoFullScreenView(
                         urlString: urlString,
                         post: post,
@@ -255,24 +256,24 @@ struct HomeView: View {
                     }
                     .id(urlString)
                     .zIndex(1)
-                } else if case let .gif(urlString, post, fileName) = media {
+                case .gif(let urlString, let post, let fileName):
                     ImageFullScreenView(urlString: urlString, fileName: fileName, isGif: true) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(urlString)
                     .zIndex(1)
-                } else if case let .imgurAlbum(imgurId, post) = media {
-                    ImgurFullScreenView(imgurMediaType: .imgurAlbum(imgurId: imgurId), post: post) {
-                        fullScreenMediaViewModel.dismiss()
-                    }
-                    .id(imgurId)
-                } else if case let .imgurGallery(imgurId, post) = media {
+                case .imgurGallery(let imgurId, let post):
                     ImgurFullScreenView(imgurMediaType: .imgurGallery(imgurId: imgurId), post: post) {
                         fullScreenMediaViewModel.dismiss()
                     }
                     .id(imgurId)
                     .zIndex(1)
-                } else if case let .imgurImage(imgurId, post) = media {
+                case .imgurAlbum(let imgurId, let post):
+                    ImgurFullScreenView(imgurMediaType: .imgurAlbum(imgurId: imgurId), post: post) {
+                        fullScreenMediaViewModel.dismiss()
+                    }
+                    .id(imgurId)
+                case .imgurImage(let imgurId, let post):
                     ImgurFullScreenView(imgurMediaType: .imgurImage(imgurId: imgurId), post: post) {
                         fullScreenMediaViewModel.dismiss()
                     }
@@ -305,6 +306,62 @@ struct HomeView: View {
         .task {
             await homeViewModel.fetchInboxCount()
         }
+//        .fullScreenCover(item: $fullScreenMediaViewModel.media) { media in
+//            Group {
+//                if case let .image(urlString, aspectRatio, post, fileName, matchedGeometryEffectId) = media {
+//                    ImageFullScreenView(urlString: urlString, fileName: fileName, matchedGeometryEffectId: matchedGeometryEffectId, isGif: false) {
+//                        fullScreenMediaViewModel.dismiss()
+//                    }
+//                    .id(urlString)
+//                    .zIndex(1)
+//                } else if case let .gallery(currentUrlString, post, items, galleryScrollState) = media {
+//                    GalleryFullScreenView(post: post, items: items, galleryScrollState: galleryScrollState) {
+//                        fullScreenMediaViewModel.dismiss()
+//                    }
+//                    .id(currentUrlString)
+//                    .zIndex(1)
+//                } else if case let .video(urlString, post, videoType, canDownload, playbackTime) = media {
+//                    VideoFullScreenView(
+//                        urlString: urlString,
+//                        post: post,
+//                        videoType: videoType,
+//                        playbackTime: playbackTime,
+//                        videoFullScreenViewModel: videoFullScreenViewModel,
+//                        muteVideo: VideoUserDefaultsUtils.muteVideo || ((post?.over18 ?? false) && VideoUserDefaultsUtils.muteSensitiveVideo),
+//                        canDownload: canDownload
+//                    ) {
+//                        fullScreenMediaViewModel.dismiss()
+//                        videoFullScreenViewModel.resetState()
+//                    }
+//                    .id(urlString)
+//                    .zIndex(1)
+//                } else if case let .gif(urlString, post, fileName) = media {
+//                    ImageFullScreenView(urlString: urlString, fileName: fileName, isGif: true) {
+//                        fullScreenMediaViewModel.dismiss()
+//                    }
+//                    .id(urlString)
+//                    .zIndex(1)
+//                } else if case let .imgurAlbum(imgurId, post) = media {
+//                    ImgurFullScreenView(imgurMediaType: .imgurAlbum(imgurId: imgurId), post: post) {
+//                        fullScreenMediaViewModel.dismiss()
+//                    }
+//                    .id(imgurId)
+//                } else if case let .imgurGallery(imgurId, post) = media {
+//                    ImgurFullScreenView(imgurMediaType: .imgurGallery(imgurId: imgurId), post: post) {
+//                        fullScreenMediaViewModel.dismiss()
+//                    }
+//                    .id(imgurId)
+//                    .zIndex(1)
+//                } else if case let .imgurImage(imgurId, post) = media {
+//                    ImgurFullScreenView(imgurMediaType: .imgurImage(imgurId: imgurId), post: post) {
+//                        fullScreenMediaViewModel.dismiss()
+//                    }
+//                    .id(imgurId)
+//                    .zIndex(1)
+//                }
+//            }
+//            .presentationBackground(.clear)
+//        }
         .onChange(of: colorScheme) { _, newValue in
             if scenePhase != .background {
                 customThemeViewModel.setAppColorScheme(newValue)
@@ -401,6 +458,13 @@ struct HomeView: View {
                 currentSnackbarManager.dismiss()
             }
         }
+    }
+    
+    private var showFullScreenMedia: Binding<Bool> {
+        return Binding(
+            get: { fullScreenMediaViewModel.media != nil },
+            set: { _ in }
+        )
     }
     
     enum Tab {

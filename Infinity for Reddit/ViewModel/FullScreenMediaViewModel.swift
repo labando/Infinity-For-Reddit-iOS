@@ -16,6 +16,25 @@ enum FullScreenMediaType {
     case imgurAlbum(imgurId: String, post: Post? = nil)
     case imgurImage(imgurId: String, post: Post? = nil)
     
+//    var id: String {
+//        switch self {
+//        case .image(urlString: let urlString, aspectRatio: let aspectRatio, post: let post, fileName: let fileName, matchedGeometryEffectId: let matchedGeometryEffectId):
+//            return urlString
+//        case .gif(urlString: let urlString, post: let post, fileName: let fileName):
+//            return urlString
+//        case .video(urlString: let urlString, post: let post, videoType: let videoType, canDownload: let canDownload, playbackTime: let playbackTime):
+//            return urlString
+//        case .gallery(currentUrlString: let currentUrlString, post: let post, items: let items, galleryScrollState: let galleryScrollState):
+//            return currentUrlString
+//        case .imgurGallery(imgurId: let imgurId, post: let post):
+//            return imgurId
+//        case .imgurAlbum(imgurId: let imgurId, post: let post):
+//            return imgurId
+//        case .imgurImage(imgurId: let imgurId, post: let post):
+//            return imgurId
+//        }
+//    }
+    
 //    func getDownloadMediaType(fullScreenMediaType: FullScreenMediaType, loadedVideoURL: URL?) throws -> DownloadMediaType {
 //        switch self {
 //        case .image(let urlString, _, let post, _):
