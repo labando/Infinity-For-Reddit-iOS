@@ -154,7 +154,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 await ScreenWakeManager.shared.videoDidPause(player)
             }
         } else {
-            player.play()
+            usePlaybackCategoryAndPlay()
             
             Task {
                 await ScreenWakeManager.shared.videoDidPlay(player)
@@ -164,7 +164,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     
     func play() {
         if canPlay {
-            player.play()
+            usePlaybackCategoryAndPlay()
             player.rate = Float(playbackSpeed)
             
             Task {
@@ -184,7 +184,7 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
     func setCanPlay(_ value: Bool) {
         self.canPlay = value
         if value {
-            player.play()
+            usePlaybackCategoryAndPlay()
             
             Task {
                 await ScreenWakeManager.shared.videoDidPlay(player)
@@ -196,6 +196,11 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
                 await ScreenWakeManager.shared.videoDidPause(player)
             }
         }
+    }
+    
+    private func usePlaybackCategoryAndPlay() {
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+        player.play()
     }
     
     func toggleMute() -> Bool {

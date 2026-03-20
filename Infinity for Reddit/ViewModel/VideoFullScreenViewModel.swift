@@ -153,6 +153,7 @@ class VideoFullScreenViewModel: ObservableObject {
             return
         }
         
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
         player.play()
         player.rate = Float(playbackSpeed)
         isPlaying = true
