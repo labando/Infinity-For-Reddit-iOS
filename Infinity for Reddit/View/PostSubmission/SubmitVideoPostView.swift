@@ -29,6 +29,7 @@ struct SubmitVideoPostView: View {
     @State private var showCamera: Bool = false
     @State private var showVideoPicker: Bool = false
     @State private var selectedVideoItem: PhotosPickerItem? = nil
+    @State private var processingVideoTask: Task<Void, Never>? = nil
     @State private var showNoSubredditAlert: Bool = false
     
     init() {
@@ -99,7 +100,7 @@ struct SubmitVideoPostView: View {
                                     }
                                     .padding(.horizontal, 16)
                                 } else {
-                                    if submitVideoPostViewModel.processingVideoTask == nil {
+                                    if processingVideoTask == nil {
                                         SelectVideoToolbar(
                                             onCameraTap: { showCamera = true },
                                             onPhotoPickerTap: { showVideoPicker = true }
@@ -144,6 +145,11 @@ struct SubmitVideoPostView: View {
                 }
                 
                 Button {
+                    guard processingVideoTask == nil else {
+                        submitVideoPostViewModel.error = PostSubmissionError.videoStillBeingProcessedError
+                        return
+                    }
+                    
                     submitVideoPostViewModel.submitPost(
                         subreddit: postSubmissionContextViewModel.selectedSubreddit,
                         flair: postSubmissionContextViewModel.selectedFlair,
@@ -165,14 +171,28 @@ struct SubmitVideoPostView: View {
             matching: .videos,
             photoLibrary: .shared()
         )
-        .onChange(of: selectedVideoItem) { _, newItem in
-            submitVideoPostViewModel.processVideo(videoItem: newItem)
+        .onChange(of: selectedVideoItem) { _, newValue in
+            guard let newValue else {
+                return
+            }
+            
+            processingVideoTask?.cancel()
+            processingVideoTask = Task {
+                await submitVideoPostViewModel.processVideo(videoItem: newValue)
+                self.selectedVideoItem = nil
+                self.processingVideoTask = nil
+            }
         }
         .fullScreenCover(isPresented: $showCamera) {
             if Utils.checkCameraAvailability() {
                 MCamera()
                     .onVideoCaptured { videoURL, controller in
-                        submitVideoPostViewModel.setVideo(url: videoURL)
+                        processingVideoTask?.cancel()
+                        processingVideoTask = Task {
+                            await submitVideoPostViewModel.setCapturedVideo(url: videoURL)
+                            self.processingVideoTask = nil
+                        }
+                        
                         controller.closeMCamera()
                     }
                     .setCloseMCameraAction {

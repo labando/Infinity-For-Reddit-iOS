@@ -20,7 +20,6 @@ class SubmitVideoPostViewModel: ObservableObject {
     @Published var submitPostTask: Task<Void, Error>?
     @Published var postSubmittedFlag: Bool = false
     @Published var error: Error? = nil
-    @Published var processingVideoTask: Task<Void, Never>?
     
     private let submitPostRepository: SubmitPostRepositoryProtocol
     private let mediaUploadRepository: MediaUploadRepositoryProtocol
@@ -31,84 +30,43 @@ class SubmitVideoPostViewModel: ObservableObject {
         self.mediaUploadRepository = mediaUploadRepository
     }
     
-    func processVideo(videoItem: PhotosPickerItem?) {
-        processingVideoTask?.cancel()
-        
+    func processVideo(videoItem: PhotosPickerItem) async {
         videoURL = nil
         thumbnail = nil
         
-        guard let videoItem else {
-            self.error = PostSubmissionError.videoDataError
-            return
-        }
-        
-        self.processingVideoTask = Task {
-            do {
-                if let video = try await videoItem.loadTransferable(type: LocalVideo.self) {
-                    try await setVideo(url: video.url)
-                } else {
-                    throw PostSubmissionError.videoLoadingError
-                }
-            } catch is CancellationError {
-                // Ignore
-                self.videoURL = nil
-                self.thumbnail = nil
-            } catch {
-                self.error = error
-                self.videoURL = nil
-                self.thumbnail = nil
+        do {
+            if let video = try await videoItem.loadTransferable(type: LocalVideo.self) {
+                try await setVideo(url: video.url)
+            } else {
+                throw PostSubmissionError.videoLoadingError
             }
-            
-            processingVideoTask = nil
+        } catch {
+            self.error = error
         }
     }
     
     func setVideo(url: URL) async throws {
         printInDebugOnly(url)
-        self.videoURL = url
+        
         if let image = await generateThumbnail(for: url) {
-            try Task.checkCancellation()
-            
-            self.thumbnail = image
+            if !Task.isCancelled {
+                self.videoURL = url
+                self.thumbnail = image
+            }
         } else {
             throw PostSubmissionError.videoThumbnailError
         }
     }
     
-    func setVideo(url: URL) {
-        processingVideoTask?.cancel()
-        
-        videoURL = nil
-        thumbnail = nil
-        
-        printInDebugOnly(url)
-        self.videoURL = url
-        self.processingVideoTask = Task {
-            do {
-                if let image = await generateThumbnail(for: url) {
-                    try Task.checkCancellation()
-                    
-                    self.thumbnail = image
-                } else {
-                    throw PostSubmissionError.videoThumbnailError
-                }
-            } catch is CancellationError {
-                // Ignore
-                self.videoURL = nil
-                self.thumbnail = nil
-            } catch {
-                self.error = error
-                self.videoURL = nil
-                self.thumbnail = nil
-            }
-            
-            self.processingVideoTask = nil
+    func setCapturedVideo(url: URL) async {
+        do {
+            try await setVideo(url: url)
+        } catch {
+            self.error = error
         }
     }
     
     func clearVideo() {
-        processingVideoTask?.cancel()
-        processingVideoTask = nil
         videoURL = nil
         thumbnail = nil
     }
@@ -155,11 +113,6 @@ class SubmitVideoPostViewModel: ObservableObject {
         
         guard !title.isEmpty else {
             error = PostSubmissionError.noTitleError
-            return
-        }
-        
-        guard processingVideoTask == nil else {
-            error = PostSubmissionError.videoStillBeingProcessedError
             return
         }
         
