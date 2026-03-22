@@ -12,6 +12,7 @@ struct InboxConversationView: View {
     @EnvironmentObject private var navigationBarMenuManager: NavigationBarMenuManager
     @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var snackbarManager: SnackbarManager
+    @EnvironmentObject private var customThemeViewModel: CustomThemeViewModel
     
     @StateObject var inboxConversationViewModel: InboxConversationViewModel
     
@@ -19,7 +20,7 @@ struct InboxConversationView: View {
     @State private var messageText: String = ""
     @State private var sendMessageTask: Task<Void, Never>?
     @State private var navigationBarMenuKey: UUID?
-    @FocusState private var isInputActive: Bool
+    @FocusState private var focusedField: FieldType?
     
     init(inbox: Inbox) {
         _inboxConversationViewModel = StateObject(
@@ -53,7 +54,7 @@ struct InboxConversationView: View {
                     .themedList()
                     .scrollIndicators(.hidden)
                     .onTapGesture {
-                        isInputActive = false
+                        focusedField = nil
                     }
                     .onChange(of: inboxConversationViewModel.listScrollTarget) {
                         guard let target = inboxConversationViewModel.listScrollTarget else { return }
@@ -64,29 +65,33 @@ struct InboxConversationView: View {
                 
                 if inboxConversationViewModel.fullNameToReplyTo != nil {
                     // It shouldn't happen but still
-                    HStack(spacing: 8) {
-                        TextField("Type a message...", text: $messageText)
-                            .focused($isInputActive)
-                            .padding(12)
-                            .background(Color.gray.opacity(0.1))
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
-                            .submitLabel(.send)
-                            .onSubmit {
-                                sendMessage()
-                            }
+                    HStack(spacing: 12) {
+                        CustomTextField(
+                            "Type a message...",
+                            text: $messageText,
+                            showBackground: false,
+                            fieldType: .message,
+                            focusedField: $focusedField
+                        )
+                        .submitLabel(.send)
+                        .lineLimit(3)
+                        .onSubmit {
+                            sendMessage()
+                        }
 
                         Button(action: {
                             sendMessage()
                         }) {
                             SwiftUI.Image(systemName: "paperplane.fill")
-                                .foregroundColor(messageText.isEmpty ? .gray : .blue)
-                                .padding(10)
+                                .foregroundColor(Color(hex: messageText.isEmpty ? customThemeViewModel.currentCustomTheme.secondaryTextColor : customThemeViewModel.currentCustomTheme.colorPrimaryLightTheme))
                         }
                         .disabled(messageText.isEmpty || sendMessageTask != nil)
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color(UIColor.systemBackground))
+                    .padding(12)
+                    .background(Color(hex: customThemeViewModel.currentCustomTheme.filledCardViewBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .clipped()
+                    .padding(8)
                 }
             }
         }
@@ -129,16 +134,8 @@ struct InboxConversationView: View {
             self.sendMessageTask = nil
         }
     }
-}
-
-struct InboxConversationMe: View {
-    var body: some View {
-        EmptyView()
-    }
-}
-
-struct InboxConversationThem: View {
-    var body: some View {
-        EmptyView()
+    
+    private enum FieldType: Hashable {
+        case message
     }
 }
