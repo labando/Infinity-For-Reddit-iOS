@@ -39,14 +39,14 @@ struct CustomNavigationStack<Content: View>: View {
                             ),
                             handleToolbarMenu: false
                         )
-                        .environmentObject(navigationManager)
-                        .environmentObject(commentSubmissionShareableViewModel)
-                        .environmentObject(postEditingShareableViewModel)
-                        .navigationBarBackButtonHidden(true)
                         .setUpHomeTabViewChildNavigationBar(onLogin: {
                             accountViewModel.startLogin()
                         })
                         .addTitleToInlineNavigationBar("Home")
+                        .environmentObject(navigationManager)
+                        .environmentObject(commentSubmissionShareableViewModel)
+                        .environmentObject(postEditingShareableViewModel)
+                        .navigationBarBackButtonHidden(true)
                     case .postDetails(let postDetailsInput, let videoPlaybackTime):
                         PostDetailsView(postDetailsInput: postDetailsInput, videoPlaybackTime: videoPlaybackTime)
                             .environmentObject(navigationManager)
