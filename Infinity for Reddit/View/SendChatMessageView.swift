@@ -85,6 +85,7 @@ struct SendChatMessageView: View {
                     subjectCanFocus = false
                     messageCanFocus = false
                     focusedField = nil
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
             }
         }

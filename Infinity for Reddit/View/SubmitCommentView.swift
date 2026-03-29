@@ -104,9 +104,15 @@ struct SubmitCommentView: View {
                                     submitCommentViewModel.selectedAccount = $0
                                 }
                                 
-                                MarkdownTextField(hint: "Your interesting thoughts here", text: $submitCommentViewModel.text, selectedRange: $selectedRange, canFocus: $textViewCanFocus, minHeight: 300)
-                                    .contentShape(Rectangle())
-                                    .padding(16)
+                                MarkdownTextField(
+                                    hint: "Your interesting thoughts here",
+                                    text: $submitCommentViewModel.text,
+                                    selectedRange: $selectedRange,
+                                    canFocus: $textViewCanFocus,
+                                    minHeight: 300
+                                )
+                                .contentShape(Rectangle())
+                                .padding(16)
                             }
                         }
                         
@@ -133,6 +139,7 @@ struct SubmitCommentView: View {
                 KeyboardToolbar {
                     textViewCanFocus = false
                     markdownFocusedField = nil
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
             }
         }

@@ -99,11 +99,11 @@ private struct MarkdownUITextField: UIViewRepresentable {
         }
         uiView.textColor = UIColor(Color(hex: customThemeViewModel.currentCustomTheme.primaryTextColor))
         
-        DispatchQueue.main.async {
-            if uiView.isFirstResponder && !canFocus {
-                uiView.resignFirstResponder()
-                self.canFocus = true
-            }
-        }
+//        DispatchQueue.main.async {
+//            if uiView.isFirstResponder && !canFocus {
+//                uiView.resignFirstResponder()
+//                self.canFocus = true
+//            }
+//        }
     }
 }

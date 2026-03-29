@@ -118,6 +118,7 @@ struct SubmitLinkPostView: View {
                     contentTextViewCanFocus = false
                     markdownToolbarFocusedField = nil
                     focusedField = nil
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
             }
         }
