@@ -129,7 +129,40 @@ struct AccountSheet: View {
             }
         }
         .overlay {
-            if showLoginHelpMessage {
+            if let loginError = accountViewModel.error as? LoginError {
+                RootView {
+                    VStack(spacing: 16) {
+                        HStack(spacing: 0) {
+                            Text("Contact Us")
+                                .neutralTextButton()
+                                .onTapGesture {
+                                    if let url = URL(string: "mailto:support@foxanastudio.com") {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }
+                            
+                            Spacer()
+                            
+                            Text("Done")
+                                .positiveTextButton()
+                                .onTapGesture {
+                                    withAnimation {
+                                        accountViewModel.error = nil
+                                    }
+                                }
+                        }
+                        .padding(.top, 16)
+                        .padding(.horizontal, 16)
+                        
+                        ScrollView {
+                            RowText(loginError.localizedDescription)
+                                .fontWeight(.bold)
+                                .padding(.bottom, 16)
+                                .padding(.horizontal, 16)
+                        }
+                    }
+                }
+            } else if showLoginHelpMessage {
                 RootView {
                     VStack(spacing: 16) {
                         HStack(spacing: 0) {
