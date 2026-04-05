@@ -131,7 +131,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     public func getAnonymousCustomThemeSubredditsConcatenated(myCustomFeed: MyCustomFeed) async -> String {
         do {
             let subscribedSubreddits = try await anonymousCustomFeedSubredditDao.getAllAnonymousMultiRedditSubreddits(path: myCustomFeed.path)
-            return subscribedSubreddits.map {
+            return subscribedSubreddits.shuffled().prefix(20).map {
                 $0.subredditName
             }.joined(separator: "+")
         } catch {
