@@ -120,7 +120,7 @@ public class PostListingRepository: PostListingRepositoryProtocol {
     public func getAnonymousSubscriptionsConcatenated() async -> String {
         do {
             let subscribedSubreddits = try await subscribedSubredditDao.getAllSubscribedSubredditsList(accountName: Account.ANONYMOUS_ACCOUNT.username)
-            return subscribedSubreddits.map {
+            return subscribedSubreddits.shuffled().prefix(20).map {
                 $0.name
             }.joined(separator: "+")
         } catch {
