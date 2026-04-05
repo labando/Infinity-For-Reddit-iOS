@@ -325,8 +325,8 @@ extension View {
         self.modifier(AuthorFlairTextViewModifier())
     }
     
-    func filledButton() -> some View {
-        self.modifier(FilledButtonViewModifier())
+    func filledButton(elevate: Bool = true) -> some View {
+        self.modifier(FilledButtonViewModifier(elevate: elevate))
     }
     
     func subscribeButton(isSubscribed: Bool) -> some View {
