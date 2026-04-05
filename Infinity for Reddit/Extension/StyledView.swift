@@ -117,12 +117,12 @@ extension View {
         self.modifier(SubredditTextViewModifier())
     }
     
-    func postTitle() -> some View {
-        self.modifier(PostTitleTextViewModifier())
+    func postTitle(isRead: Bool) -> some View {
+        self.modifier(PostTitleTextViewModifier(isRead: isRead))
     }
     
-    func postContent() -> some View {
-        self.modifier(PostContentTextViewModifier())
+    func postContent(isRead: Bool) -> some View {
+        self.modifier(PostContentTextViewModifier(isRead: isRead))
     }
     
     func commentText() -> some View {
