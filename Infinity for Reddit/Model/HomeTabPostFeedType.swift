@@ -6,15 +6,15 @@
 //
 
 enum HomeTabPostFeedType: Int {
-    case home = 1
+    case frontPage = 1
     case subreddit = 2
     case user = 3
     case customFeed = 4
     
     var description: String {
         switch self {
-        case .home:
-            return "Home"
+        case .frontPage:
+            return "Front Page"
         case .subreddit:
             return "Subreddit"
         case .user:

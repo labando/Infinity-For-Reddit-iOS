@@ -58,8 +58,8 @@ struct HomeTabPostFeedSelectionSheet: View {
                 switch step {
                     case .selectHomeTabPostFeedType:
                     Group {
-                        IconTextButton(startIconUrl: "house", text: "Home") {
-                            onHomeTabPostFeedTypeSelected(.home, nil)
+                        IconTextButton(startIconUrl: "sparkles", text: "Front Page") {
+                            onHomeTabPostFeedTypeSelected(.frontPage, nil)
                             dismiss()
                         }
                         
