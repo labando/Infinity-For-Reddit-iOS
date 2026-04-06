@@ -17,6 +17,8 @@ struct InterfaceSettingsView: View {
     @AppStorage(InterfaceUserDefaultsUtils.lazyModeIntervalKey, store: .interface) private var lazyModeInterval: Double = 2.5
     @AppStorage(InterfaceUserDefaultsUtils.showAbsoluteNumberOfVotesKey, store: .interface) private var showAbsoluteNumberOfVotes: Bool = true
     
+    @State private var showHomeTabPostFeedSelectionSheet: Bool = false
+    
     var body: some View {
         RootView {
             List {
@@ -25,6 +27,13 @@ struct InterfaceSettingsView: View {
                     icon: "textformat.size"
                 ) {
                     navigationManager.append(InterfaceSettingsViewNavigation.font)
+                }
+                .listPlainItemNoInsets()
+                
+                PreferenceEntry(
+                    title: "Home Tab Post Feed"
+                ) {
+                    showHomeTabPostFeedSelectionSheet = true
                 }
                 .listPlainItemNoInsets()
                 
@@ -102,5 +111,10 @@ struct InterfaceSettingsView: View {
         }
         .themedNavigationBar()
         .addTitleToInlineNavigationBar("Interface")
+        .wrapContentSheet(isPresented: $showHomeTabPostFeedSelectionSheet) {
+            HomeTabPostFeedSelectionSheet { homeTabPostFeedType, nameOfHomeTabPostFeedType in
+                print("\(homeTabPostFeedType) - \(nameOfHomeTabPostFeedType)")
+            }
+        }
     }
 }
