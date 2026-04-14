@@ -1131,7 +1131,7 @@ public class PostDetailsViewModel: ObservableObject {
         })
     }
     
-    func getNextParentComment() -> CommentItem? {
+    func getNextParentComment(needToSeparatePostAndComments: Bool) -> CommentItem? {
         sortAppearedComments()
         
         for i in appearedComments.indices.reversed() {
@@ -1143,8 +1143,8 @@ public class PostDetailsViewModel: ObservableObject {
         if appearedComments.isEmpty {
             return visibleComments.first
         } else {
-            if let lastIndex = visibleComments.index(id: appearedComments[appearedComments.count - 1].id) {
-                for i in lastIndex..<visibleComments.count {
+            if let lastIndex = visibleComments.index(id: appearedComments.last?.id ?? "") {
+                for i in ((needToSeparatePostAndComments && lastIndex == 0) ? 1 : lastIndex)..<visibleComments.count {
                     if visibleComments[i].depth == 0 && visibleComments[i].isComment {
                         return visibleComments[i]
                     }
@@ -1489,8 +1489,8 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    private func getCurrentScrolledCommentItem() -> CommentItem? {
-        if appearedComments.isEmpty || isPostVisible {
+    private func getCurrentScrolledCommentItem(needToSeparatePostAndComments: Bool) -> CommentItem? {
+        if appearedComments.isEmpty || (isPostVisible && !needToSeparatePostAndComments) {
             return nil
         } else {
             sortAppearedComments()
@@ -1499,7 +1499,7 @@ public class PostDetailsViewModel: ObservableObject {
         }
     }
     
-    func saveCache() {
+    func saveCache(needToSeparatePostAndComments: Bool) {
         guard let post else {
             return
         }
@@ -1513,7 +1513,7 @@ public class PostDetailsViewModel: ObservableObject {
             visibleComments: visibleComments,
             allComments: allComments,
             commentFilter: commentFilter,
-            scrolledCommentItem: getCurrentScrolledCommentItem(),
+            scrolledCommentItem: getCurrentScrolledCommentItem(needToSeparatePostAndComments: needToSeparatePostAndComments),
             lastLoadedSortTypeKind: lastLoadedSortTypeKind,
             hasMoreComments: hasMoreComments
         )

@@ -42,6 +42,7 @@ struct PostDetailsView: View {
     @State private var activeAlert: ActiveAlert? = nil
     @State private var showActionBar: Bool = true
     @State private var showSearchBar: Bool = false
+    @State private var geometryProxy: GeometryProxy?
     @State private var listProxy: ScrollViewProxy?
     @State private var commentToBeModerated: Comment?
     @State private var commentsWithToolbarHidden: Set<String> = []
@@ -99,8 +100,8 @@ struct PostDetailsView: View {
                 GeometryReader { geometryProxy in
                     ZStack(alignment: .bottom) {
                         HStack(spacing: 0) {
-                            if geometryProxy.size.width > 500 && separatePostAndComments {
-                                List {
+                            if needToSeparatePostAndComments {
+                                ScrollView {
                                     PostDetailsItemView(
                                         postDetailsViewModel: postDetailsViewModel,
                                         post: post,
@@ -125,14 +126,13 @@ struct PostDetailsView: View {
                                         .frame(height: 150)
                                         .listPlainItemNoInsets()
                                 }
-                                .themedList()
                                 .scrollIndicators(.hidden)
                                 .scrollBounceBehavior(.basedOnSize)
                             }
                             
                             ScrollViewReader { proxy in
                                 List {
-                                    if geometryProxy.size.width <= 500 || !separatePostAndComments {
+                                    if !needToSeparatePostAndComments {
                                         PostDetailsItemView(
                                             postDetailsViewModel: postDetailsViewModel,
                                             post: post,
@@ -505,7 +505,7 @@ struct PostDetailsView: View {
                                             .glassEffectUnion(id: "actionBarOptions", namespace: glassActionBarNamespace)
                                             .onTapGesture {
                                                 if let listProxy {
-                                                    if let commentItem = postDetailsViewModel.getNextParentComment() {
+                                                    if let commentItem = postDetailsViewModel.getNextParentComment(needToSeparatePostAndComments: needToSeparatePostAndComments) {
                                                         scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                                     }
                                                 }
@@ -629,7 +629,7 @@ struct PostDetailsView: View {
                                         .contentShape(Rectangle())
                                         .onTapGesture {
                                             if let listProxy {
-                                                if let commentItem = postDetailsViewModel.getNextParentComment() {
+                                                if let commentItem = postDetailsViewModel.getNextParentComment(needToSeparatePostAndComments: needToSeparatePostAndComments) {
                                                     scrollToComment(listProxy: listProxy, commentItem: commentItem)
                                                 }
                                             }
@@ -646,6 +646,9 @@ struct PostDetailsView: View {
                                 .zIndex(1)
                             }
                         }
+                    }
+                    .onAppear {
+                        self.geometryProxy = geometryProxy
                     }
                     .showErrorUsingSnackbar(postDetailsViewModel.$error)
                 }
@@ -714,7 +717,7 @@ struct PostDetailsView: View {
             showActionBar = true
         }
         .onDisappear {
-            postDetailsViewModel.saveCache()
+            postDetailsViewModel.saveCache(needToSeparatePostAndComments: needToSeparatePostAndComments)
             
             guard let navigationBarMenuKey else { return }
             navigationBarMenuManager.pop(key: navigationBarMenuKey)
@@ -912,6 +915,13 @@ struct PostDetailsView: View {
                     }
                 }
         )
+    }
+    
+    private var needToSeparatePostAndComments: Bool {
+        guard let geometryProxy else {
+            return false
+        }
+        return geometryProxy.size.width > 500 && separatePostAndComments
     }
     
     private func setUpMenu() {
