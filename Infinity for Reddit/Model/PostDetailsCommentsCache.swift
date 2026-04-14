@@ -6,8 +6,9 @@
 //
 
 import IdentifiedCollections
+import Foundation
 
-class PostDetailsCommentsCache {
+class PostDetailsCommentsCache: NSObject, NSDiscardableContent {
     let post: Post
     let visibleComments: IdentifiedArrayOf<CommentItem>
     let allComments: IdentifiedArrayOf<CommentItem>
@@ -32,5 +33,21 @@ class PostDetailsCommentsCache {
         self.scrolledCommentItem = scrolledCommentItem
         self.lastLoadedSortTypeKind = lastLoadedSortTypeKind
         self.hasMoreComments = hasMoreComments
+    }
+    
+    func beginContentAccess() -> Bool {
+        return true
+    }
+    
+    func endContentAccess() {
+        
+    }
+    
+    func discardContentIfPossible() {
+        
+    }
+    
+    func isContentDiscarded() -> Bool {
+        return false
     }
 }
