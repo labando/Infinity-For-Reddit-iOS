@@ -108,6 +108,7 @@ struct UsernameTextViewModifier: ViewModifier {
             .fixedSize(horizontal: false, vertical: true)
             .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.username))
+            .lineLimit(1)
     }
 }
 
@@ -128,6 +129,7 @@ struct UsernameOnPostTextViewModifier: ViewModifier {
             .fixedSize(horizontal: false, vertical: true)
             .customFont()
             .foregroundColor(usernameColor)
+            .lineLimit(1)
     }
 }
 
@@ -139,6 +141,7 @@ struct SubredditTextViewModifier: ViewModifier {
             .fixedSize(horizontal: false, vertical: true)
             .customFont()
             .foregroundColor(Color(hex: themeViewModel.currentCustomTheme.subreddit))
+            .lineLimit(1)
     }
 }
 
