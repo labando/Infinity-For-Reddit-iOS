@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MarkdownUI
 
 struct InboxConversationView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
@@ -43,7 +44,20 @@ struct InboxConversationView: View {
                             let isLastFromSender = index == 0 || conversations[index - 1].author != inbox.author
                             
                             ChatBubble(isSentMessage: inbox.author == accountViewModel.account.username, shouldShowTail: isLastFromSender) {
-                                Text(inbox.body)
+                                //Text(inbox.body)
+                                
+                                Markdown(inbox.body)
+                                    .themedChatMessageMarkdown(isSentMessage: inbox.author == accountViewModel.account.username)
+                                    .markdownLinkHandler { url in
+                                        navigationManager.openLink(url)
+                                    }
+                                    .highPriorityGesture(
+                                        LongPressGesture()
+                                            .onEnded { _ in
+                                                //onLongPressOnContent()
+                                            }
+                                    )
+                                
                             }
                             .listPlainItemNoInsets()
                             .rotationEffect(.degrees(180))
