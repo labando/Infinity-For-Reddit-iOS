@@ -162,6 +162,9 @@ struct HistoryPostListingView: View {
                         if historyPostListingViewModel.hasMorePages {
                             ProgressIndicator()
                                 .task {
+                                    guard !historyPostListingViewModel.isPullToRefreshing else {
+                                        return
+                                    }
                                     await historyPostListingViewModel.loadPosts()
                                 }
                                 .listPlainItem()
