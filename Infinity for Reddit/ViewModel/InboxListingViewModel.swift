@@ -98,7 +98,6 @@ public class InboxListingViewModel: ObservableObject {
             
             if isRefreshWithContinuation {
                 finishPullToRefresh()
-                self.isInitialLoad = false
             } else {
                 self.isInitialLoad = isInitialLoadCopy
             }

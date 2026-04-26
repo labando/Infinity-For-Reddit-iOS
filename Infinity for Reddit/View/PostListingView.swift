@@ -263,6 +263,9 @@ struct PostListingView: View {
                                 .padding(16)
                                 .listPlainItemNoInsets()
                                 .task {
+                                    guard !postListingViewModel.isPullToRefreshing else {
+                                        return
+                                    }
                                     await postListingViewModel.loadPosts()
                                 }
                             }
