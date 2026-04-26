@@ -1343,6 +1343,9 @@ struct PaginationView: View {
             } else {
                 ProgressIndicator()
                     .task {
+                        guard !postDetailsViewModel.isPullToRefreshing else {
+                            return
+                        }
                         await postDetailsViewModel.fetchCommentsPagination()
                     }
             }
