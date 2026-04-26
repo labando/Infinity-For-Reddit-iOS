@@ -42,15 +42,15 @@ public class InboxListingViewModel: ObservableObject {
             return
         }
         
-        await loadInboxes()
+        await loadInboxes(isRefreshWithContinuation: refreshInboxesContinuation != nil)
     }
     
-    public func loadInboxes() async {
+    public func loadInboxes(isRefreshWithContinuation: Bool = false) async {
         guard !isInitialLoading, !isLoadingMore, hasMorePages else { return }
         
         let isInitialLoadCopy = isInitialLoad
         
-        if inboxes.isEmpty || isPullToRefreshing {
+        if inboxes.isEmpty || isRefreshWithContinuation {
             isInitialLoading = true
         } else {
             isLoadingMore = true
@@ -68,7 +68,7 @@ public class InboxListingViewModel: ObservableObject {
             let inboxListing = try await inboxListingRepository.fetchInboxListing(
                 messageWhere: messageWhere,
                 pathComponents: ["where": messageWhere.rawValue],
-                queries: ["after": isPullToRefreshing ? "" : (after ?? "")],
+                queries: ["after": isRefreshWithContinuation ? "" : (after ?? "")],
                 interceptor: nil
             )
             
@@ -77,14 +77,14 @@ public class InboxListingViewModel: ObservableObject {
             if (inboxListing.inboxes.isEmpty) {
                 self.after = nil
             } else {
-                if isPullToRefreshing {
+                if isRefreshWithContinuation {
                     self.inboxes.removeAll()
                 }
                 self.inboxes.append(contentsOf: inboxListing.inboxes)
                 self.after = inboxListing.after
             }
             
-            if isPullToRefreshing {
+            if isRefreshWithContinuation {
                 finishPullToRefresh()
             }
             
@@ -96,7 +96,7 @@ public class InboxListingViewModel: ObservableObject {
                 printInDebugOnly("Error fetching inboxes: \(error)")
             }
             
-            if isPullToRefreshing {
+            if isRefreshWithContinuation {
                 finishPullToRefresh()
                 self.isInitialLoad = false
             } else {
