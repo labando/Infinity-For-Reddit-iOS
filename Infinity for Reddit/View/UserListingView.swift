@@ -100,6 +100,9 @@ struct UserListingView: View {
                     if userListingViewModel.hasMorePages {
                         ProgressIndicator()
                             .task {
+                                guard !userListingViewModel.isPullToRefreshing else {
+                                    return
+                                }
                                 await userListingViewModel.loadUsers()
                             }
                             .listPlainItem()
