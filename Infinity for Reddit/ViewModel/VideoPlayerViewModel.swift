@@ -215,6 +215,10 @@ class VideoPlayerViewModel: NSObject, ObservableObject {
         }
     }
     
+    func initailizeCanPlay(_ value: Bool) {
+        self.canPlay = value
+    }
+    
     func setCanPlay(_ value: Bool) {
         self.canPlay = value
         if value {

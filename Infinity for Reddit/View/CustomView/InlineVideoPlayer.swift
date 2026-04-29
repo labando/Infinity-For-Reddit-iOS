@@ -156,6 +156,7 @@ private struct InlineVideoPlayerWithControls: View {
         self.muteVideo = muteVideo
         self.canPlay = canPlay
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
+        videoPlayerViewModel.initailizeCanPlay(canPlay)
         self.videoPlayerViewModel = videoPlayerViewModel
         self.onFullScreen = onFullScreen
     }
