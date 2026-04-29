@@ -48,7 +48,6 @@ struct InlineVideoPlayer: View {
         self.playbackTimeToSeekToInitially = playbackTimeToSeekToInitially
         self.videoPlayerViewModel = videoPlayerViewModel
         self.onFullScreen = onFullScreen
-        self.showPlayer = false
     }
 
     var body: some View {
